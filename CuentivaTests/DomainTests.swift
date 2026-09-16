@@ -177,6 +177,34 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         _ = try await progress.complete(book: script)
         #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).map(\.id) == ["script"])
     }
+    @Test func scriptCompletionWaitsForReaderAndPersistsAtomically() async throws {
+        let purchases = TestPurchases(), repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository); try await progress.load()
+        let learning = LearningManager(purchases: purchases, progress: progress)
+        var book = sample("script"); book.format = .movieScript
+        book.continuation = [Sentence(id: "extra", spanish: "Mañana.", english: "Tomorrow.", speaker: "Ana")]
+        await #expect(throws: AppFailure.self) { try await learning.finishScript(book) }
+        purchases.hasAccess = true
+        await #expect(throws: AppFailure.self) { try await learning.finishScript(book) }
+        let stage = try await learning.advance(book: book, from: 0)
+        if case .scriptReading = stage {} else { Issue.record("Expected the full reader") }
+        #expect(progress.snapshot.completed.isEmpty)
+        #expect(learning.position(book) == book.sentences.count)
+        await #expect(throws: AppFailure.self) { try await learning.finish(book) }
+        let restored = ProgressManager(repository: repository); try await restored.load()
+        #expect(restored.snapshot.positions[book.id] == 1)
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await learning.finishScript(book) }
+        #expect(progress.snapshot.completed.isEmpty)
+        #expect(progress.snapshot.attempts[book.id]?.contains("extra") == false)
+        await repository.setFailure(false)
+        let result = try await learning.finishScript(book)
+        #expect(result.isNew); #expect(result.total == 1)
+        #expect(progress.snapshot.attempts[book.id]?.contains("extra") == true)
+        #expect(progress.snapshot.vocabulary["mañana"] == .learning)
+        let repeated = try await learning.finishScript(book)
+        #expect(!repeated.isNew); #expect(repeated.total == 1)
+    }
     @Test func localSubmissionNeverClaimsPublication() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), repo = MemoryContributions()
         try await progress.load(); purchases.hasAccess = true
@@ -203,9 +231,10 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
             if book.kind == .movieScript {
                 #expect(book.scene?.isEmpty == false)
                 #expect(book.cast.count == 2)
+                #expect(book.continuation?.count == book.sentences.count)
                 #expect(book.sentences.allSatisfy { $0.speaker?.isEmpty == false })
             }
-            let words = book.sentences.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
+            let words = book.fullScript.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
             #expect(Set(words) == Set(book.vocabulary.map(\.word)))
             #expect(Set(book.vocabulary.map(\.word)).count == book.vocabulary.count)
             for entry in book.vocabulary {

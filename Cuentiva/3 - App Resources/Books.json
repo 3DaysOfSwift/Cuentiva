@@ -16054,6 +16054,16 @@
     ],
     "vocabulary": [
       {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "allí",
+        "lemma": "allí",
+        "occurrences": 1
+      },
+      {
         "word": "aquí",
         "lemma": "aquí",
         "occurrences": 2
@@ -16061,7 +16071,7 @@
       {
         "word": "azul",
         "lemma": "azul",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "blanca",
@@ -16074,8 +16084,33 @@
         "occurrences": 1
       },
       {
+        "word": "casa",
+        "lemma": "casa",
+        "occurrences": 1
+      },
+      {
+        "word": "cerca",
+        "lemma": "cerca",
+        "occurrences": 1
+      },
+      {
+        "word": "cocinero",
+        "lemma": "cocinero",
+        "occurrences": 1
+      },
+      {
         "word": "con",
         "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
+        "word": "del",
+        "lemma": "del",
         "occurrences": 1
       },
       {
@@ -16084,14 +16119,39 @@
         "occurrences": 1
       },
       {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "dónde",
+        "lemma": "dónde",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 4
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
         "word": "entonces",
         "lemma": "entonces",
+        "occurrences": 2
+      },
+      {
+        "word": "entrevista",
+        "lemma": "entrevista",
         "occurrences": 1
       },
       {
         "word": "es",
         "lemma": "ser",
-        "occurrences": 4
+        "occurrences": 5
       },
       {
         "word": "esta",
@@ -16101,12 +16161,17 @@
       {
         "word": "está",
         "lemma": "estar",
-        "occurrences": 2
+        "occurrences": 3
+      },
+      {
+        "word": "gracias",
+        "lemma": "gracias",
+        "occurrences": 1
       },
       {
         "word": "hambre",
         "lemma": "hambre",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "hay",
@@ -16116,10 +16181,20 @@
       {
         "word": "hermano",
         "lemma": "hermano",
-        "occurrences": 1
+        "occurrences": 3
+      },
+      {
+        "word": "hotel",
+        "lemma": "hotel",
+        "occurrences": 3
       },
       {
         "word": "la",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
         "lemma": "el",
         "occurrences": 1
       },
@@ -16129,9 +16204,19 @@
         "occurrences": 3
       },
       {
+        "word": "mar",
+        "lemma": "mar",
+        "occurrences": 2
+      },
+      {
+        "word": "mañana",
+        "lemma": "mañana",
+        "occurrences": 1
+      },
+      {
         "word": "mi",
         "lemma": "mi",
-        "occurrences": 3
+        "occurrences": 4
       },
       {
         "word": "momento",
@@ -16144,9 +16229,19 @@
         "occurrences": 1
       },
       {
+        "word": "mí",
+        "lemma": "mí",
+        "occurrences": 1
+      },
+      {
         "word": "mía",
         "lemma": "mía",
         "occurrences": 3
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 2
       },
       {
         "word": "nombre",
@@ -16156,6 +16251,16 @@
       {
         "word": "otra",
         "lemma": "otra",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 2
+      },
+      {
+        "word": "pequeña",
+        "lemma": "pequeño",
         "occurrences": 1
       },
       {
@@ -16171,7 +16276,7 @@
       {
         "word": "plátanos",
         "lemma": "plátano",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "quiere",
@@ -16189,19 +16294,29 @@
         "occurrences": 1
       },
       {
+        "word": "son",
+        "lemma": "son",
+        "occurrences": 2
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
         "word": "sí",
         "lemma": "sí",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "también",
         "lemma": "también",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "tengo",
         "lemma": "tener",
-        "occurrences": 2
+        "occurrences": 4
       },
       {
         "word": "tiene",
@@ -16209,13 +16324,33 @@
         "occurrences": 1
       },
       {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "trabaja",
+        "lemma": "trabajar",
+        "occurrences": 1
+      },
+      {
+        "word": "trabajo",
+        "lemma": "trabajo",
+        "occurrences": 1
+      },
+      {
         "word": "un",
         "lemma": "uno",
-        "occurrences": 3
+        "occurrences": 4
       },
       {
         "word": "una",
         "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "vacaciones",
+        "lemma": "vacación",
         "occurrences": 1
       },
       {
@@ -16234,12 +16369,84 @@
         "occurrences": 1
       },
       {
+        "word": "vive",
+        "lemma": "vivir",
+        "occurrences": 2
+      },
+      {
+        "word": "voy",
+        "lemma": "ir",
+        "occurrences": 1
+      },
+      {
         "word": "yo",
         "lemma": "yo",
-        "occurrences": 1
+        "occurrences": 2
       }
     ],
-    "license": "Original fictional learning script created for Cuentiva. Production licensing and native-speaker review pending."
+    "license": "Original fictional learning script created for Cuentiva. Production licensing and native-speaker review pending.",
+    "continuation": [
+      {
+        "id": "wrong-suitcase-extra-1",
+        "speaker": "Ana",
+        "spanish": "Gracias. ¿Dónde vive su hermano?",
+        "english": "Thank you. Where does your brother live?"
+      },
+      {
+        "id": "wrong-suitcase-extra-2",
+        "speaker": "Leo",
+        "spanish": "Vive cerca del mar, en una casa pequeña.",
+        "english": "He lives near the sea, in a small house."
+      },
+      {
+        "id": "wrong-suitcase-extra-3",
+        "speaker": "Ana",
+        "spanish": "Yo voy al mar también.",
+        "english": "I am going to the sea too."
+      },
+      {
+        "id": "wrong-suitcase-extra-4",
+        "speaker": "Leo",
+        "spanish": "¿Está de vacaciones?",
+        "english": "Are you on holiday?"
+      },
+      {
+        "id": "wrong-suitcase-extra-5",
+        "speaker": "Ana",
+        "spanish": "No. Tengo una entrevista de trabajo mañana.",
+        "english": "No. I have a job interview tomorrow."
+      },
+      {
+        "id": "wrong-suitcase-extra-6",
+        "speaker": "Leo",
+        "spanish": "¿En un hotel?",
+        "english": "In a hotel?"
+      },
+      {
+        "id": "wrong-suitcase-extra-7",
+        "speaker": "Ana",
+        "spanish": "Sí, en el Hotel Azul.",
+        "english": "Yes, at the Blue Hotel."
+      },
+      {
+        "id": "wrong-suitcase-extra-8",
+        "speaker": "Leo",
+        "spanish": "¡Mi hermano trabaja allí! Es el cocinero.",
+        "english": "My brother works there! He is the cook."
+      },
+      {
+        "id": "wrong-suitcase-extra-9",
+        "speaker": "Ana",
+        "spanish": "Entonces los plátanos son para el hotel.",
+        "english": "Then the bananas are for the hotel."
+      },
+      {
+        "id": "wrong-suitcase-extra-10",
+        "speaker": "Leo",
+        "spanish": "No, son para mí. ¡Tengo hambre todo el día!",
+        "english": "No, they are for me. I am hungry all day!"
+      }
+    ]
   },
   {
     "id": "table-for-three",
@@ -16318,7 +16525,12 @@
       {
         "word": "a",
         "lemma": "a",
-        "occurrences": 3
+        "occurrences": 6
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
       },
       {
         "word": "alguien",
@@ -16341,6 +16553,16 @@
         "occurrences": 1
       },
       {
+        "word": "año",
+        "lemma": "año",
+        "occurrences": 1
+      },
+      {
+        "word": "bastante",
+        "lemma": "bastante",
+        "occurrences": 1
+      },
+      {
         "word": "bien",
         "lemma": "bien",
         "occurrences": 1
@@ -16356,8 +16578,18 @@
         "occurrences": 1
       },
       {
+        "word": "cena",
+        "lemma": "cena",
+        "occurrences": 1
+      },
+      {
         "word": "cenar",
         "lemma": "cenar",
+        "occurrences": 1
+      },
+      {
+        "word": "chocolate",
+        "lemma": "chocolate",
         "occurrences": 1
       },
       {
@@ -16371,8 +16603,23 @@
         "occurrences": 1
       },
       {
+        "word": "cosas",
+        "lemma": "cosa",
+        "occurrences": 1
+      },
+      {
         "word": "cree",
         "lemma": "creer",
+        "occurrences": 1
+      },
+      {
+        "word": "creo",
+        "lemma": "creo",
+        "occurrences": 1
+      },
+      {
+        "word": "cuchara",
+        "lemma": "cuchara",
         "occurrences": 1
       },
       {
@@ -16386,8 +16633,23 @@
         "occurrences": 1
       },
       {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
         "word": "del",
         "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
         "occurrences": 1
       },
       {
@@ -16398,16 +16660,31 @@
       {
         "word": "dos",
         "lemma": "dos",
+        "occurrences": 2
+      },
+      {
+        "word": "dígale",
+        "lemma": "decir",
         "occurrences": 1
       },
       {
         "word": "entonces",
         "lemma": "entonces",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "es",
         "lemma": "ser",
+        "occurrences": 2
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 1
+      },
+      {
+        "word": "fuera",
+        "lemma": "fuera",
         "occurrences": 1
       },
       {
@@ -16416,19 +16693,49 @@
         "occurrences": 1
       },
       {
+        "word": "gracias",
+        "lemma": "gracias",
+        "occurrences": 1
+      },
+      {
+        "word": "gustan",
+        "lemma": "gustar",
+        "occurrences": 1
+      },
+      {
         "word": "ha",
         "lemma": "ha",
         "occurrences": 1
       },
       {
+        "word": "hay",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
         "word": "he",
         "lemma": "he",
+        "occurrences": 2
+      },
+      {
+        "word": "hecho",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "hermana",
+        "lemma": "hermana",
+        "occurrences": 1
+      },
+      {
+        "word": "herramientas",
+        "lemma": "herramienta",
         "occurrences": 1
       },
       {
         "word": "hoy",
         "lemma": "hoy",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "invitado",
@@ -16443,26 +16750,36 @@
       {
         "word": "la",
         "lemma": "el",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "las",
         "lemma": "el",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "le",
         "lemma": "le",
+        "occurrences": 2
+      },
+      {
+        "word": "llega",
+        "lemma": "llegar",
         "occurrences": 1
       },
       {
         "word": "lo",
         "lemma": "lo",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "martillo",
         "lemma": "martillo",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
         "occurrences": 1
       },
       {
@@ -16473,12 +16790,17 @@
       {
         "word": "mi",
         "lemma": "mi",
-        "occurrences": 1
+        "occurrences": 4
       },
       {
         "word": "más",
         "lemma": "más",
         "occurrences": 1
+      },
+      {
+        "word": "necesita",
+        "lemma": "necesitar",
+        "occurrences": 2
       },
       {
         "word": "necesito",
@@ -16491,6 +16813,16 @@
         "occurrences": 2
       },
       {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "ocupar",
+        "lemma": "ocupar",
+        "occurrences": 1
+      },
+      {
         "word": "otra",
         "lemma": "otra",
         "occurrences": 1
@@ -16498,7 +16830,7 @@
       {
         "word": "padre",
         "lemma": "padre",
-        "occurrences": 1
+        "occurrences": 4
       },
       {
         "word": "para",
@@ -16506,9 +16838,19 @@
         "occurrences": 1
       },
       {
+        "word": "pequeña",
+        "lemma": "pequeño",
+        "occurrences": 1
+      },
+      {
+        "word": "perfecto",
+        "lemma": "perfecto",
+        "occurrences": 1
+      },
+      {
         "word": "pero",
         "lemma": "pero",
-        "occurrences": 1
+        "occurrences": 3
       },
       {
         "word": "podemos",
@@ -16516,13 +16858,33 @@
         "occurrences": 1
       },
       {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
         "word": "que",
         "lemma": "que",
-        "occurrences": 3
+        "occurrences": 7
+      },
+      {
+        "word": "queda",
+        "lemma": "quedar",
+        "occurrences": 1
       },
       {
         "word": "quería",
         "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "quién",
+        "lemma": "quién",
+        "occurrences": 1
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
         "occurrences": 1
       },
       {
@@ -16538,16 +16900,31 @@
       {
         "word": "sabe",
         "lemma": "saber",
+        "occurrences": 2
+      },
+      {
+        "word": "segunda",
+        "lemma": "segunda",
+        "occurrences": 1
+      },
+      {
+        "word": "sencillas",
+        "lemma": "sencillo",
         "occurrences": 1
       },
       {
         "word": "silla",
         "lemma": "silla",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "sola",
         "lemma": "sola",
+        "occurrences": 1
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
         "occurrences": 1
       },
       {
@@ -16556,13 +16933,28 @@
         "occurrences": 1
       },
       {
+        "word": "sorpresas",
+        "lemma": "sorpresa",
+        "occurrences": 1
+      },
+      {
         "word": "su",
         "lemma": "su",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "sé",
         "lemma": "saber",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
         "occurrences": 1
       },
       {
@@ -16571,29 +16963,54 @@
         "occurrences": 1
       },
       {
+        "word": "tarta",
+        "lemma": "tarta",
+        "occurrences": 2
+      },
+      {
+        "word": "tenedor",
+        "lemma": "tenedor",
+        "occurrences": 1
+      },
+      {
         "word": "tenemos",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
         "lemma": "tener",
         "occurrences": 1
       },
       {
         "word": "tienen",
         "lemma": "tener",
+        "occurrences": 2
+      },
+      {
+        "word": "traer",
+        "lemma": "traer",
         "occurrences": 1
       },
       {
         "word": "un",
         "lemma": "uno",
-        "occurrences": 1
+        "occurrences": 3
       },
       {
         "word": "una",
         "lemma": "uno",
-        "occurrences": 4
+        "occurrences": 7
       },
       {
         "word": "usted",
         "lemma": "usted",
         "occurrences": 1
+      },
+      {
+        "word": "va",
+        "lemma": "va",
+        "occurrences": 2
       },
       {
         "word": "vela",
@@ -16623,10 +17040,77 @@
       {
         "word": "y",
         "lemma": "y",
+        "occurrences": 3
+      },
+      {
+        "word": "ya",
+        "lemma": "ya",
         "occurrences": 2
       }
     ],
-    "license": "Original fictional learning script created for Cuentiva. Production licensing and native-speaker review pending."
+    "license": "Original fictional learning script created for Cuentiva. Production licensing and native-speaker review pending.",
+    "continuation": [
+      {
+        "id": "table-for-three-extra-1",
+        "speaker": "Lucía",
+        "spanish": "Gracias. ¿Tienen una tarta de chocolate?",
+        "english": "Thank you. Do you have a chocolate cake?"
+      },
+      {
+        "id": "table-for-three-extra-2",
+        "speaker": "Diego",
+        "spanish": "Nos queda una, pero es bastante pequeña.",
+        "english": "We have one left, but it is quite small."
+      },
+      {
+        "id": "table-for-three-extra-3",
+        "speaker": "Lucía",
+        "spanish": "Perfecto. A mi padre le gustan las cosas sencillas.",
+        "english": "Perfect. My father likes simple things."
+      },
+      {
+        "id": "table-for-three-extra-4",
+        "speaker": "Diego",
+        "spanish": "¿Y quién va a ocupar la segunda silla?",
+        "english": "And who is going to sit in the second chair?"
+      },
+      {
+        "id": "table-for-three-extra-5",
+        "speaker": "Lucía",
+        "spanish": "Mi hermana. Llega hoy después de un año fuera.",
+        "english": "My sister. She is arriving today after a year away."
+      },
+      {
+        "id": "table-for-three-extra-6",
+        "speaker": "Diego",
+        "spanish": "Entonces esta cena tiene dos sorpresas.",
+        "english": "Then this dinner has two surprises."
+      },
+      {
+        "id": "table-for-three-extra-7",
+        "speaker": "Lucía",
+        "spanish": "Sí. Pero ahora mi padre me pregunta qué herramientas necesita.",
+        "english": "Yes. But now my father is asking me what tools he needs."
+      },
+      {
+        "id": "table-for-three-extra-8",
+        "speaker": "Diego",
+        "spanish": "Dígale que solo necesita un tenedor.",
+        "english": "Tell him he only needs a fork."
+      },
+      {
+        "id": "table-for-three-extra-9",
+        "speaker": "Lucía",
+        "spanish": "Ya lo he hecho. Dice que también va a traer una cuchara.",
+        "english": "I have already done that. He says he is going to bring a spoon too."
+      },
+      {
+        "id": "table-for-three-extra-10",
+        "speaker": "Diego",
+        "spanish": "Creo que su padre ya sabe que hay tarta.",
+        "english": "I think your father already knows there is cake."
+      }
+    ]
   },
   {
     "id": "last-train-scene",
@@ -16717,11 +17201,16 @@
       {
         "word": "a",
         "lemma": "a",
-        "occurrences": 3
+        "occurrences": 4
       },
       {
         "word": "ahora",
         "lemma": "ahora",
+        "occurrences": 2
+      },
+      {
+        "word": "al",
+        "lemma": "al",
         "occurrences": 1
       },
       {
@@ -16732,7 +17221,27 @@
       {
         "word": "antes",
         "lemma": "antes",
-        "occurrences": 3
+        "occurrences": 4
+      },
+      {
+        "word": "antiguas",
+        "lemma": "antiguas",
+        "occurrences": 1
+      },
+      {
+        "word": "aparecemos",
+        "lemma": "aparecer",
+        "occurrences": 1
+      },
+      {
+        "word": "así",
+        "lemma": "así",
+        "occurrences": 1
+      },
+      {
+        "word": "aunque",
+        "lemma": "aunque",
+        "occurrences": 2
       },
       {
         "word": "autobuses",
@@ -16740,13 +17249,28 @@
         "occurrences": 1
       },
       {
+        "word": "autobús",
+        "lemma": "autobús",
+        "occurrences": 1
+      },
+      {
         "word": "billetes",
         "lemma": "billete",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "buscaba",
         "lemma": "buscar",
+        "occurrences": 1
+      },
+      {
+        "word": "caja",
+        "lemma": "caja",
+        "occurrences": 1
+      },
+      {
+        "word": "casi",
+        "lemma": "casi",
         "occurrences": 1
       },
       {
@@ -16760,8 +17284,18 @@
         "occurrences": 1
       },
       {
+        "word": "comida",
+        "lemma": "comida",
+        "occurrences": 2
+      },
+      {
         "word": "comprar",
         "lemma": "comprar",
+        "occurrences": 1
+      },
+      {
+        "word": "cosas",
+        "lemma": "cosa",
         "occurrences": 1
       },
       {
@@ -16772,16 +17306,21 @@
       {
         "word": "cuando",
         "lemma": "cuando",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "de",
         "lemma": "de",
-        "occurrences": 5
+        "occurrences": 7
       },
       {
         "word": "decirle",
         "lemma": "decirle",
+        "occurrences": 1
+      },
+      {
+        "word": "demasiada",
+        "lemma": "demasiada",
         "occurrences": 1
       },
       {
@@ -16790,14 +17329,34 @@
         "occurrences": 1
       },
       {
+        "word": "despeinados",
+        "lemma": "despeinado",
+        "occurrences": 2
+      },
+      {
+        "word": "despierta",
+        "lemma": "despertar",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 1
+      },
+      {
         "word": "diez",
         "lemma": "diez",
         "occurrences": 1
       },
       {
+        "word": "dos",
+        "lemma": "dos",
+        "occurrences": 1
+      },
+      {
         "word": "el",
         "lemma": "el",
-        "occurrences": 3
+        "occurrences": 6
       },
       {
         "word": "ella",
@@ -16807,7 +17366,7 @@
       {
         "word": "en",
         "lemma": "en",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "encontraba",
@@ -16820,6 +17379,11 @@
         "occurrences": 1
       },
       {
+        "word": "encontré",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
         "word": "enfermo",
         "lemma": "enfermo",
         "occurrences": 1
@@ -16827,7 +17391,27 @@
       {
         "word": "entonces",
         "lemma": "entonces",
+        "occurrences": 2
+      },
+      {
+        "word": "espera",
+        "lemma": "esperar",
         "occurrences": 1
+      },
+      {
+        "word": "esperar",
+        "lemma": "esperar",
+        "occurrences": 1
+      },
+      {
+        "word": "espero",
+        "lemma": "espero",
+        "occurrences": 1
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 2
       },
       {
         "word": "estaba",
@@ -16840,8 +17424,53 @@
         "occurrences": 1
       },
       {
+        "word": "estas",
+        "lemma": "estas",
+        "occurrences": 1
+      },
+      {
+        "word": "foto",
+        "lemma": "foto",
+        "occurrences": 1
+      },
+      {
+        "word": "fotos",
+        "lemma": "foto",
+        "occurrences": 2
+      },
+      {
+        "word": "ha",
+        "lemma": "ha",
+        "occurrences": 1
+      },
+      {
         "word": "habríamos",
         "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "hacernos",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "haciendo",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "hasta",
+        "lemma": "hasta",
+        "occurrences": 1
+      },
+      {
+        "word": "haya",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "hermana",
+        "lemma": "hermana",
         "occurrences": 1
       },
       {
@@ -16855,9 +17484,19 @@
         "occurrences": 1
       },
       {
+        "word": "junto",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
         "word": "la",
         "lemma": "el",
         "occurrences": 3
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
       },
       {
         "word": "llamarla",
@@ -16870,7 +17509,17 @@
         "occurrences": 1
       },
       {
+        "word": "llegamos",
+        "lemma": "llegamos",
+        "occurrences": 1
+      },
+      {
         "word": "llegar",
+        "lemma": "llegar",
+        "occurrences": 1
+      },
+      {
+        "word": "lleguemos",
         "lemma": "llegar",
         "occurrences": 1
       },
@@ -16882,17 +17531,17 @@
       {
         "word": "lo",
         "lemma": "lo",
-        "occurrences": 3
+        "occurrences": 4
       },
       {
         "word": "los",
         "lemma": "el",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "mamá",
         "lemma": "mamá",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "mano",
@@ -16900,8 +17549,18 @@
         "occurrences": 1
       },
       {
+        "word": "mañana",
+        "lemma": "mañana",
+        "occurrences": 1
+      },
+      {
         "word": "medianoche",
         "lemma": "medianoche",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
         "occurrences": 1
       },
       {
@@ -16915,19 +17574,54 @@
         "occurrences": 1
       },
       {
+        "word": "mira",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
         "word": "mirar",
         "lemma": "mirar",
         "occurrences": 1
       },
       {
+        "word": "mucho",
+        "lemma": "mucho",
+        "occurrences": 1
+      },
+      {
         "word": "no",
         "lemma": "no",
-        "occurrences": 3
+        "occurrences": 5
+      },
+      {
+        "word": "noche",
+        "lemma": "noche",
+        "occurrences": 1
+      },
+      {
+        "word": "normales",
+        "lemma": "normales",
+        "occurrences": 1
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "nosotros",
+        "lemma": "nosotros",
+        "occurrences": 1
+      },
+      {
+        "word": "otra",
+        "lemma": "otra",
+        "occurrences": 1
       },
       {
         "word": "para",
         "lemma": "para",
-        "occurrences": 3
+        "occurrences": 5
       },
       {
         "word": "pena",
@@ -16935,17 +17629,37 @@
         "occurrences": 1
       },
       {
+        "word": "pensaba",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "perdemos",
+        "lemma": "perder",
+        "occurrences": 1
+      },
+      {
         "word": "pero",
         "lemma": "pero",
+        "occurrences": 2
+      },
+      {
+        "word": "personas",
+        "lemma": "persona",
         "occurrences": 1
       },
       {
         "word": "podemos",
         "lemma": "poder",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "podríamos",
+        "lemma": "poder",
+        "occurrences": 2
+      },
+      {
+        "word": "podían",
         "lemma": "poder",
         "occurrences": 1
       },
@@ -16960,6 +17674,11 @@
         "occurrences": 1
       },
       {
+        "word": "preparado",
+        "lemma": "preparar",
+        "occurrences": 2
+      },
+      {
         "word": "próximo",
         "lemma": "próximo",
         "occurrences": 1
@@ -16967,7 +17686,7 @@
       {
         "word": "que",
         "lemma": "que",
-        "occurrences": 3
+        "occurrences": 7
       },
       {
         "word": "rato",
@@ -16980,13 +17699,23 @@
         "occurrences": 1
       },
       {
+        "word": "recordaremos",
+        "lemma": "recordar",
+        "occurrences": 1
+      },
+      {
         "word": "regalo",
         "lemma": "regalo",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "rendirnos",
         "lemma": "rendirnos",
+        "occurrences": 1
+      },
+      {
+        "word": "río",
+        "lemma": "río",
         "occurrences": 1
       },
       {
@@ -17000,13 +17729,48 @@
         "occurrences": 1
       },
       {
+        "word": "salir",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
         "word": "se",
         "lemma": "se",
         "occurrences": 1
       },
       {
+        "word": "seis",
+        "lemma": "seis",
+        "occurrences": 1
+      },
+      {
         "word": "si",
         "lemma": "si",
+        "occurrences": 2
+      },
+      {
+        "word": "siempre",
+        "lemma": "siempre",
+        "occurrences": 1
+      },
+      {
+        "word": "significan",
+        "lemma": "significar",
+        "occurrences": 1
+      },
+      {
+        "word": "sobre",
+        "lemma": "sobre",
+        "occurrences": 1
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
+        "occurrences": 1
+      },
+      {
+        "word": "sopa",
+        "lemma": "sopa",
         "occurrences": 1
       },
       {
@@ -17017,7 +17781,12 @@
       {
         "word": "sí",
         "lemma": "sí",
-        "occurrences": 1
+        "occurrences": 2
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 2
       },
       {
         "word": "tanto",
@@ -17026,6 +17795,11 @@
       },
       {
         "word": "tendremos",
+        "lemma": "tener",
+        "occurrences": 2
+      },
+      {
+        "word": "tengo",
         "lemma": "tener",
         "occurrences": 1
       },
@@ -17040,8 +17814,18 @@
         "occurrences": 1
       },
       {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
         "word": "todavía",
         "lemma": "todavía",
+        "occurrences": 1
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
         "occurrences": 1
       },
       {
@@ -17052,7 +17836,7 @@
       {
         "word": "una",
         "lemma": "uno",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "vale",
@@ -17062,7 +17846,7 @@
       {
         "word": "vamos",
         "lemma": "vamos",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
         "word": "verdad",
@@ -17075,8 +17859,33 @@
         "occurrences": 1
       },
       {
+        "word": "vez",
+        "lemma": "vez",
+        "occurrences": 1
+      },
+      {
         "word": "viajar",
         "lemma": "viajar",
+        "occurrences": 1
+      },
+      {
+        "word": "viaje",
+        "lemma": "viaje",
+        "occurrences": 1
+      },
+      {
+        "word": "viene",
+        "lemma": "venir",
+        "occurrences": 1
+      },
+      {
+        "word": "visitas",
+        "lemma": "visitas",
+        "occurrences": 1
+      },
+      {
+        "word": "vivíamos",
+        "lemma": "vivir",
         "occurrences": 1
       },
       {
@@ -17087,14 +17896,93 @@
       {
         "word": "y",
         "lemma": "y",
-        "occurrences": 2
+        "occurrences": 3
+      },
+      {
+        "word": "ya",
+        "lemma": "ya",
+        "occurrences": 1
       },
       {
         "word": "yo",
         "lemma": "yo",
-        "occurrences": 2
+        "occurrences": 3
       }
     ],
-    "license": "Original fictional learning script created for Cuentiva. Production licensing and native-speaker review pending."
+    "license": "Original fictional learning script created for Cuentiva. Production licensing and native-speaker review pending.",
+    "continuation": [
+      {
+        "id": "last-train-scene-extra-1",
+        "speaker": "Clara",
+        "spanish": "Mamá dice que nos espera despierta.",
+        "english": "Mum says she will stay up and wait for us."
+      },
+      {
+        "id": "last-train-scene-extra-2",
+        "speaker": "Pablo",
+        "spanish": "Espero que no haya preparado demasiada comida.",
+        "english": "I hope she has not prepared too much food."
+      },
+      {
+        "id": "last-train-scene-extra-3",
+        "speaker": "Clara",
+        "spanish": "Ha preparado sopa para seis personas, aunque solo vamos nosotros dos.",
+        "english": "She has made soup for six people, although only the two of us are going."
+      },
+      {
+        "id": "last-train-scene-extra-4",
+        "speaker": "Pablo",
+        "spanish": "Entonces tendremos comida para mañana también.",
+        "english": "Then we will have food for tomorrow too."
+      },
+      {
+        "id": "last-train-scene-extra-5",
+        "speaker": "Clara",
+        "spanish": "Antes siempre pensaba que estas visitas podían esperar.",
+        "english": "I used to think these visits could always wait."
+      },
+      {
+        "id": "last-train-scene-extra-6",
+        "speaker": "Pablo",
+        "spanish": "Yo también, hasta que encontré una caja de fotos antiguas.",
+        "english": "So did I, until I found a box of old photographs."
+      },
+      {
+        "id": "last-train-scene-extra-7",
+        "speaker": "Clara",
+        "spanish": "¿Las fotos de cuando vivíamos junto al río?",
+        "english": "The photographs from when we lived by the river?"
+      },
+      {
+        "id": "last-train-scene-extra-8",
+        "speaker": "Pablo",
+        "spanish": "Sí. En casi todas aparecemos haciendo cosas normales, pero ahora significan mucho.",
+        "english": "Yes. In almost all of them we are doing ordinary things, but now they mean a lot."
+      },
+      {
+        "id": "last-train-scene-extra-9",
+        "speaker": "Clara",
+        "spanish": "Esta noche podríamos hacernos otra foto, aunque lleguemos despeinados.",
+        "english": "Tonight we could take another photograph together, even if we arrive with messy hair."
+      },
+      {
+        "id": "last-train-scene-extra-10",
+        "speaker": "Pablo",
+        "spanish": "Sobre todo si llegamos despeinados. Así recordaremos el viaje.",
+        "english": "Especially if we arrive with messy hair. That way we will remember the journey."
+      },
+      {
+        "id": "last-train-scene-extra-11",
+        "speaker": "Clara",
+        "spanish": "Mira, ya viene el autobús. Esta vez no lo perdemos.",
+        "english": "Look, the bus is coming. We are not missing it this time."
+      },
+      {
+        "id": "last-train-scene-extra-12",
+        "speaker": "Pablo",
+        "spanish": "Tengo los billetes, el regalo y a mi hermana. Podemos salir.",
+        "english": "I have the tickets, the present, and my sister. We can leave."
+      }
+    ]
   }
 ]

@@ -8,6 +8,7 @@ struct LessonView: View {
     var body: some View {
         Group {
             if let receipt = viewModel.receipt { CompletionView(receipt: receipt) }
+            else if viewModel.showingScript { ScriptReaderView(book: book) }
             else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 25) {

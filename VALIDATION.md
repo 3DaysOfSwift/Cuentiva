@@ -1,3 +1,9 @@
+## Full-script reader — 16 September 2026
+
+All 18 core tests and the Xcode simulator suite pass. Added coverage for delayed script completion, persisted reader-stage resumption, atomic save failure/retry, duplicate-safe totals, slow sequential playback, speaker-change pauses, stopping/restarting audio, and no automatic completion at audio end. Content checks cover original and continuation vocabulary; each continuation has exactly as many turns as its guided script.
+
+On iPhone Air, exercised all ten guided turns of The wrong suitcase, entered the full reader, observed automatic highlighting and scrolling through the continuation, toggled audio off/on, and used Mark as read. The celebration displayed 20 lines and Books Learned increased from 2 to 3 only after that action. Updated build installed. Physical-device audio quality and timing still need listening review; automated playback tests use a replaceable audio adapter.
+
 ## Movie Scripts and library controls — 16 September 2026
 
 Added three original scripts (46 books total), optional format/scene/speaker metadata, role selection, and shared type filtering and sorting for Discover and Completed. Existing JSON decodes as Stories. All 17 core tests and the Xcode simulator test suite pass, including combined access/filter/completion checks and role-selection/manual-completion behavior. Verified Movie Scripts filtering, title sorting, and role selection visually on iPhone Air. Installed the updated build there. Dialogue uses the existing single Spanish voice with manual playback.

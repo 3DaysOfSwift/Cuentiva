@@ -14,10 +14,12 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     let license: String
     var format: BookFormat? = nil
     var scene: String? = nil
+    var continuation: [Sentence]? = nil
+    var fullScript: [Sentence] { sentences + (continuation ?? []) }
     var kind: BookFormat { format ?? .story }
     var unitName: String { kind == .movieScript ? "lines" : "sentences" }
-    var cast: [String] { sentences.compactMap(\.speaker).reduce(into: []) { if !$0.contains($1) { $0.append($1) } } }
-    var wordCount: Int { sentences.reduce(0) { $0 + WordComparison.words($1.spanish).count } }
+    var cast: [String] { fullScript.compactMap(\.speaker).reduce(into: []) { if !$0.contains($1) { $0.append($1) } } }
+    var wordCount: Int { fullScript.reduce(0) { $0 + WordComparison.words($1.spanish).count } }
 }
 struct Sentence: Codable, Identifiable, Hashable, Sendable {
     let id: String

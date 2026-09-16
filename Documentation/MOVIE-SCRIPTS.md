@@ -1,6 +1,6 @@
 # Movie Scripts
 
-Three original fictional scenes, with provisional A1–B1 difficulty. Each step is one speaking turn. Choose a role or read all roles; Listen and Next remain manual. Speaker names are metadata, excluded from spoken text and vocabulary. Native-speaker review remains pending.
+Three original fictional scenes, with provisional A1–B1 difficulty. Each step is one speaking turn. Choose a role or read all roles in the guided lesson; Listen and Next remain manual there. The subsequent full reader autoplays slowly by default and can be silenced using its toolbar control. Speaker names are metadata, excluded from spoken text and vocabulary. Native-speaker review remains pending.
 
 ## The wrong suitcase — A1
 
@@ -141,4 +141,143 @@ By the way, did you find the present?
 **Pablo:** Sí. Lo llevaba en la mano mientras lo buscaba.
 
 Yes. I was holding it in my hand while I was looking for it.
+
+
+# Full-script continuations
+
+The guided lesson covers the original turns. The full reader repeats those turns and adds an equally long continuation. Completion happens only with Mark as read at the end of the reader.
+
+## The wrong suitcase — continuation
+
+**Ana:** Gracias. ¿Dónde vive su hermano?
+
+Thank you. Where does your brother live?
+
+**Leo:** Vive cerca del mar, en una casa pequeña.
+
+He lives near the sea, in a small house.
+
+**Ana:** Yo voy al mar también.
+
+I am going to the sea too.
+
+**Leo:** ¿Está de vacaciones?
+
+Are you on holiday?
+
+**Ana:** No. Tengo una entrevista de trabajo mañana.
+
+No. I have a job interview tomorrow.
+
+**Leo:** ¿En un hotel?
+
+In a hotel?
+
+**Ana:** Sí, en el Hotel Azul.
+
+Yes, at the Blue Hotel.
+
+**Leo:** ¡Mi hermano trabaja allí! Es el cocinero.
+
+My brother works there! He is the cook.
+
+**Ana:** Entonces los plátanos son para el hotel.
+
+Then the bananas are for the hotel.
+
+**Leo:** No, son para mí. ¡Tengo hambre todo el día!
+
+No, they are for me. I am hungry all day!
+
+## A table for three — continuation
+
+**Lucía:** Gracias. ¿Tienen una tarta de chocolate?
+
+Thank you. Do you have a chocolate cake?
+
+**Diego:** Nos queda una, pero es bastante pequeña.
+
+We have one left, but it is quite small.
+
+**Lucía:** Perfecto. A mi padre le gustan las cosas sencillas.
+
+Perfect. My father likes simple things.
+
+**Diego:** ¿Y quién va a ocupar la segunda silla?
+
+And who is going to sit in the second chair?
+
+**Lucía:** Mi hermana. Llega hoy después de un año fuera.
+
+My sister. She is arriving today after a year away.
+
+**Diego:** Entonces esta cena tiene dos sorpresas.
+
+Then this dinner has two surprises.
+
+**Lucía:** Sí. Pero ahora mi padre me pregunta qué herramientas necesita.
+
+Yes. But now my father is asking me what tools he needs.
+
+**Diego:** Dígale que solo necesita un tenedor.
+
+Tell him he only needs a fork.
+
+**Lucía:** Ya lo he hecho. Dice que también va a traer una cuchara.
+
+I have already done that. He says he is going to bring a spoon too.
+
+**Diego:** Creo que su padre ya sabe que hay tarta.
+
+I think your father already knows there is cake.
+
+## The last train — continuation
+
+**Clara:** Mamá dice que nos espera despierta.
+
+Mum says she will stay up and wait for us.
+
+**Pablo:** Espero que no haya preparado demasiada comida.
+
+I hope she has not prepared too much food.
+
+**Clara:** Ha preparado sopa para seis personas, aunque solo vamos nosotros dos.
+
+She has made soup for six people, although only the two of us are going.
+
+**Pablo:** Entonces tendremos comida para mañana también.
+
+Then we will have food for tomorrow too.
+
+**Clara:** Antes siempre pensaba que estas visitas podían esperar.
+
+I used to think these visits could always wait.
+
+**Pablo:** Yo también, hasta que encontré una caja de fotos antiguas.
+
+So did I, until I found a box of old photographs.
+
+**Clara:** ¿Las fotos de cuando vivíamos junto al río?
+
+The photographs from when we lived by the river?
+
+**Pablo:** Sí. En casi todas aparecemos haciendo cosas normales, pero ahora significan mucho.
+
+Yes. In almost all of them we are doing ordinary things, but now they mean a lot.
+
+**Clara:** Esta noche podríamos hacernos otra foto, aunque lleguemos despeinados.
+
+Tonight we could take another photograph together, even if we arrive with messy hair.
+
+**Pablo:** Sobre todo si llegamos despeinados. Así recordaremos el viaje.
+
+Especially if we arrive with messy hair. That way we will remember the journey.
+
+**Clara:** Mira, ya viene el autobús. Esta vez no lo perdemos.
+
+Look, the bus is coming. We are not missing it this time.
+
+**Pablo:** Tengo los billetes, el regalo y a mi hermana. Podemos salir.
+
+I have the tickets, the present, and my sister. We can leave.
 

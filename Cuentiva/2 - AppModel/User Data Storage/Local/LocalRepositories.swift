@@ -7,7 +7,7 @@ actor BundledBookRepository: BookRepository {
         guard let url else { throw AppFailure.invalidBook }
         let books = try JSONDecoder().decode([Book].self, from: Data(contentsOf: url))
         guard Set(books.map(\.id)).count == books.count,
-              books.allSatisfy({ !$0.sentences.isEmpty && Set($0.sentences.map(\.id)).count == $0.sentences.count && $0.sentences.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty } }) else { throw AppFailure.invalidBook }
+              books.allSatisfy({ !$0.sentences.isEmpty && Set($0.fullScript.map(\.id)).count == $0.fullScript.count && $0.fullScript.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty } }) else { throw AppFailure.invalidBook }
         return books
     }
 }

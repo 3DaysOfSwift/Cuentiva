@@ -8,6 +8,7 @@ import Observation
     var recording: Bool { get }
     var error: String? { get }
     func speak(_ text: String, slow: Bool)
+    func speakAndWait(_ text: String, slow: Bool) async -> Bool
     func startRecording() async
     func stopRecording()
     func stop()
@@ -26,6 +27,8 @@ import Observation
     private var recognizer: SFSpeechRecognizer?
     private var tapInstalled = false
     private var generation = UUID()
+    private var playbackRequestID: UUID?
+    private var playbackContinuation: CheckedContinuation<Bool, Never>?
     private var activeUtterance: ObjectIdentifier?
     override init() { super.init(); synthesizer.delegate = self }
     func speak(_ text: String, slow: Bool) {
@@ -40,6 +43,28 @@ import Observation
             activeUtterance = ObjectIdentifier(utterance)
             synthesizer.speak(utterance)
         } catch { self.error = error.localizedDescription }
+    }
+    func speakAndWait(_ text: String, slow: Bool) async -> Bool {
+        guard !Task.isCancelled else { return false }
+        let requestID = UUID()
+        return await withTaskCancellationHandler {
+            await withCheckedContinuation { continuation in
+                speak(text, slow: slow)
+                guard activeUtterance != nil else { continuation.resume(returning: false); return }
+                playbackRequestID = requestID
+                playbackContinuation = continuation
+            }
+        } onCancel: {
+            Task { @MainActor [weak self] in
+                guard self?.playbackRequestID == requestID else { return }; self?.stop()
+            }
+        }
+    }
+    private func finishPlayback(_ succeeded: Bool) {
+        let continuation = playbackContinuation
+        playbackContinuation = nil
+        playbackRequestID = nil
+        continuation?.resume(returning: succeeded)
     }
     func startRecording() async {
         stop(); error = nil; transcript = ""
@@ -107,13 +132,23 @@ import Observation
         do { try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation) }
         catch { self.error = error.localizedDescription }
     }
-    func stop() { activeUtterance = nil; stopRecording(); synthesizer.stopSpeaking(at: .immediate); spokenRange = nil }
+    func stop() { finishPlayback(false); activeUtterance = nil; stopRecording(); synthesizer.stopSpeaking(at: .immediate); spokenRange = nil }
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString range: NSRange, utterance: AVSpeechUtterance) {
         let identity = ObjectIdentifier(utterance)
         Task { @MainActor [weak self] in guard self?.activeUtterance == identity else { return }; self?.spokenRange = range }
     }
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
         let identity = ObjectIdentifier(utterance)
-        Task { @MainActor [weak self] in guard self?.activeUtterance == identity else { return }; self?.spokenRange = nil; self?.activeUtterance = nil }
+        Task { @MainActor [weak self] in guard self?.activeUtterance == identity else { return }; self?.spokenRange = nil; self?.activeUtterance = nil; self?.finishPlayback(true) }
+    }
+}
+
+extension AppleLessonAudio {
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        let identity = ObjectIdentifier(utterance)
+        Task { @MainActor [weak self] in
+            guard self?.activeUtterance == identity else { return }
+            self?.spokenRange = nil; self?.activeUtterance = nil; self?.finishPlayback(false)
+        }
     }
 }
