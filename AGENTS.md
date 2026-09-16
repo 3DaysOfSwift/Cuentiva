@@ -20,3 +20,6 @@ Keep exactly one app-owned ThemeManager in its own file under `1 - View/Theme`.
 Provide at least two complete palettes and a persistent Settings selector. Every
 screen and presentation uses the selected palette; do not force light appearance
 or hard-code UI surface/text colours outside the theme definitions.
+
+Keep independent reusable views in their own named files. Do not hide unrelated
+components such as streak indicators or error messages in another view’s file.
