@@ -32458,5 +32458,1928 @@
       }
     ],
     "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
+  },
+  {
+    "id": "nearby-bangkok",
+    "title": "Una mesa, muchos mundos",
+    "englishTitle": "One table, many worlds",
+    "author": "Cuentiva · fictional traveller",
+    "level": "A2",
+    "symbol": "globe.asia.australia",
+    "palette": 1,
+    "summary": "One table, many worlds. An original fictional travel encounter.",
+    "sentences": [
+      {
+        "id": "nearby-bangkok-1",
+        "spanish": "Llego a Bangkok con una mochila y muchas preguntas.",
+        "english": "I arrive in Bangkok with a backpack and many questions."
+      },
+      {
+        "id": "nearby-bangkok-2",
+        "spanish": "En un café conozco a una pareja rusa.",
+        "english": "In a café I meet a Russian couple."
+      },
+      {
+        "id": "nearby-bangkok-3",
+        "spanish": "Un estadounidense nos pregunta si hay una silla libre.",
+        "english": "An American asks us if there is a free chair."
+      },
+      {
+        "id": "nearby-bangkok-4",
+        "spanish": "Después llega Lucía, una viajera de Estados Unidos.",
+        "english": "Then Lucía arrives, a traveller from the United States."
+      },
+      {
+        "id": "nearby-bangkok-5",
+        "spanish": "Su familia es mexicana y en casa habla español.",
+        "english": "Her family is Mexican, and she speaks Spanish at home."
+      },
+      {
+        "id": "nearby-bangkok-6",
+        "spanish": "Yo le pregunto si es española y ella sonríe.",
+        "english": "I ask her if she is from Spain, and she smiles."
+      },
+      {
+        "id": "nearby-bangkok-7",
+        "spanish": "Me explica que hablar español no significa ser de España.",
+        "english": "She explains that speaking Spanish does not mean being from Spain."
+      },
+      {
+        "id": "nearby-bangkok-8",
+        "spanish": "En nuestra mesa hay varias lenguas y muchas historias.",
+        "english": "At our table there are several languages and many stories."
+      }
+    ],
+    "continuation": [
+      {
+        "id": "nearby-bangkok-9",
+        "spanish": "Al día siguiente volvemos al mismo café.",
+        "english": "The next day we return to the same café."
+      },
+      {
+        "id": "nearby-bangkok-10",
+        "spanish": "Lucía trae a un amigo colombiano que vive cerca.",
+        "english": "Lucía brings a Colombian friend who lives nearby."
+      },
+      {
+        "id": "nearby-bangkok-11",
+        "spanish": "La dueña tailandesa nos enseña a saludar en su idioma.",
+        "english": "The Thai owner teaches us to say hello in her language."
+      },
+      {
+        "id": "nearby-bangkok-12",
+        "spanish": "Todos lo intentamos, y ella nos ayuda con paciencia.",
+        "english": "We all try, and she helps us patiently."
+      },
+      {
+        "id": "nearby-bangkok-13",
+        "spanish": "Hablamos de las comidas que extrañamos y de nuestras familias.",
+        "english": "We talk about the foods we miss and our families."
+      },
+      {
+        "id": "nearby-bangkok-14",
+        "spanish": "Dejo de adivinar de dónde es alguien por su acento.",
+        "english": "I stop guessing where someone is from by their accent."
+      },
+      {
+        "id": "nearby-bangkok-15",
+        "spanish": "Prefiero preguntar qué lugares forman parte de su historia.",
+        "english": "I prefer to ask which places are part of their story."
+      },
+      {
+        "id": "nearby-bangkok-16",
+        "spanish": "Para mí, Bangkok empieza a parecer una conversación con el mundo.",
+        "english": "To me, Bangkok begins to feel like a conversation with the world."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 5
+      },
+      {
+        "word": "acento",
+        "lemma": "acento",
+        "occurrences": 1
+      },
+      {
+        "word": "adivinar",
+        "lemma": "adivinar",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 2
+      },
+      {
+        "word": "alguien",
+        "lemma": "alguien",
+        "occurrences": 1
+      },
+      {
+        "word": "amigo",
+        "lemma": "amigo",
+        "occurrences": 1
+      },
+      {
+        "word": "ayuda",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "bangkok",
+        "lemma": "bangkok",
+        "occurrences": 2
+      },
+      {
+        "word": "café",
+        "lemma": "café",
+        "occurrences": 2
+      },
+      {
+        "word": "casa",
+        "lemma": "casa",
+        "occurrences": 1
+      },
+      {
+        "word": "cerca",
+        "lemma": "cerca",
+        "occurrences": 1
+      },
+      {
+        "word": "colombiano",
+        "lemma": "colombiano",
+        "occurrences": 1
+      },
+      {
+        "word": "comidas",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 3
+      },
+      {
+        "word": "conozco",
+        "lemma": "conocer",
+        "occurrences": 1
+      },
+      {
+        "word": "conversación",
+        "lemma": "conversación",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 7
+      },
+      {
+        "word": "dejo",
+        "lemma": "dejar",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "dueña",
+        "lemma": "dueña",
+        "occurrences": 1
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "dónde",
+        "lemma": "dónde",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 2
+      },
+      {
+        "word": "empieza",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 4
+      },
+      {
+        "word": "enseña",
+        "lemma": "enseñar",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 3
+      },
+      {
+        "word": "españa",
+        "lemma": "españa",
+        "occurrences": 1
+      },
+      {
+        "word": "español",
+        "lemma": "español",
+        "occurrences": 2
+      },
+      {
+        "word": "española",
+        "lemma": "española",
+        "occurrences": 1
+      },
+      {
+        "word": "estados",
+        "lemma": "estados",
+        "occurrences": 1
+      },
+      {
+        "word": "estadounidense",
+        "lemma": "estadounidense",
+        "occurrences": 1
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "extrañamos",
+        "lemma": "extrañar",
+        "occurrences": 1
+      },
+      {
+        "word": "familia",
+        "lemma": "familia",
+        "occurrences": 1
+      },
+      {
+        "word": "familias",
+        "lemma": "familia",
+        "occurrences": 1
+      },
+      {
+        "word": "forman",
+        "lemma": "formar",
+        "occurrences": 1
+      },
+      {
+        "word": "habla",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hablamos",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hablar",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hay",
+        "lemma": "haber",
+        "occurrences": 2
+      },
+      {
+        "word": "historia",
+        "lemma": "historia",
+        "occurrences": 1
+      },
+      {
+        "word": "historias",
+        "lemma": "historia",
+        "occurrences": 1
+      },
+      {
+        "word": "idioma",
+        "lemma": "idioma",
+        "occurrences": 1
+      },
+      {
+        "word": "intentamos",
+        "lemma": "intentar",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "lenguas",
+        "lemma": "lengua",
+        "occurrences": 1
+      },
+      {
+        "word": "libre",
+        "lemma": "libre",
+        "occurrences": 1
+      },
+      {
+        "word": "llega",
+        "lemma": "llegar",
+        "occurrences": 1
+      },
+      {
+        "word": "llego",
+        "lemma": "llegar",
+        "occurrences": 1
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 1
+      },
+      {
+        "word": "lucía",
+        "lemma": "lucía",
+        "occurrences": 2
+      },
+      {
+        "word": "lugares",
+        "lemma": "lugar",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 1
+      },
+      {
+        "word": "mesa",
+        "lemma": "mesa",
+        "occurrences": 1
+      },
+      {
+        "word": "mexicana",
+        "lemma": "mexicana",
+        "occurrences": 1
+      },
+      {
+        "word": "mismo",
+        "lemma": "mismo",
+        "occurrences": 1
+      },
+      {
+        "word": "mochila",
+        "lemma": "mochila",
+        "occurrences": 1
+      },
+      {
+        "word": "muchas",
+        "lemma": "muchas",
+        "occurrences": 2
+      },
+      {
+        "word": "mundo",
+        "lemma": "mundo",
+        "occurrences": 1
+      },
+      {
+        "word": "mí",
+        "lemma": "mí",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 3
+      },
+      {
+        "word": "nuestra",
+        "lemma": "nuestro",
+        "occurrences": 1
+      },
+      {
+        "word": "nuestras",
+        "lemma": "nuestro",
+        "occurrences": 1
+      },
+      {
+        "word": "paciencia",
+        "lemma": "paciencia",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "parecer",
+        "lemma": "parecer",
+        "occurrences": 1
+      },
+      {
+        "word": "pareja",
+        "lemma": "pareja",
+        "occurrences": 1
+      },
+      {
+        "word": "parte",
+        "lemma": "parte",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "prefiero",
+        "lemma": "preferir",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "preguntar",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "preguntas",
+        "lemma": "pregunta",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunto",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 3
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 1
+      },
+      {
+        "word": "rusa",
+        "lemma": "rusa",
+        "occurrences": 1
+      },
+      {
+        "word": "saludar",
+        "lemma": "saludar",
+        "occurrences": 1
+      },
+      {
+        "word": "ser",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 2
+      },
+      {
+        "word": "significa",
+        "lemma": "significar",
+        "occurrences": 1
+      },
+      {
+        "word": "siguiente",
+        "lemma": "siguiente",
+        "occurrences": 1
+      },
+      {
+        "word": "silla",
+        "lemma": "silla",
+        "occurrences": 1
+      },
+      {
+        "word": "sonríe",
+        "lemma": "sonreír",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 4
+      },
+      {
+        "word": "tailandesa",
+        "lemma": "tailandesa",
+        "occurrences": 1
+      },
+      {
+        "word": "todos",
+        "lemma": "todos",
+        "occurrences": 1
+      },
+      {
+        "word": "trae",
+        "lemma": "traer",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 5
+      },
+      {
+        "word": "unidos",
+        "lemma": "unidos",
+        "occurrences": 1
+      },
+      {
+        "word": "varias",
+        "lemma": "varias",
+        "occurrences": 1
+      },
+      {
+        "word": "viajera",
+        "lemma": "viajera",
+        "occurrences": 1
+      },
+      {
+        "word": "vive",
+        "lemma": "vivir",
+        "occurrences": 1
+      },
+      {
+        "word": "volvemos",
+        "lemma": "volver",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 6
+      },
+      {
+        "word": "yo",
+        "lemma": "yo",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo story created for Cuentiva. The location is an illustrative seed, not a verified submission.",
+    "format": "story",
+    "isDemoLocation": true,
+    "submissionLocation": {
+      "latitude": 13.7563,
+      "longitude": 100.5018,
+      "accuracy": 1000,
+      "capturedAt": 811641600,
+      "placeName": "Bangkok, Thailand"
+    }
+  },
+  {
+    "id": "nearby-pattaya",
+    "title": "Dos ritmos junto al mar",
+    "englishTitle": "Two rhythms by the sea",
+    "author": "Cuentiva · fictional traveller",
+    "level": "A2",
+    "symbol": "sun.horizon",
+    "palette": 0,
+    "summary": "Two rhythms by the sea. An original fictional travel encounter.",
+    "sentences": [
+      {
+        "id": "nearby-pattaya-1",
+        "spanish": "Mi primera mañana en Pattaya empieza junto al mar.",
+        "english": "My first morning in Pattaya begins by the sea."
+      },
+      {
+        "id": "nearby-pattaya-2",
+        "spanish": "Conozco a Jorge, un hombre jubilado que pasea temprano.",
+        "english": "I meet Jorge, a retired man who walks early."
+      },
+      {
+        "id": "nearby-pattaya-3",
+        "spanish": "Busca tranquilidad, un buen desayuno y alguien con quien hablar.",
+        "english": "He is looking for peace, a good breakfast and someone to talk to."
+      },
+      {
+        "id": "nearby-pattaya-4",
+        "spanish": "Por la tarde conozco a unos viajeros que quieren bailar.",
+        "english": "In the afternoon I meet some travellers who want to dance."
+      },
+      {
+        "id": "nearby-pattaya-5",
+        "spanish": "Me invitan a salir cuando se encienden las luces.",
+        "english": "They invite me to go out when the lights come on."
+      },
+      {
+        "id": "nearby-pattaya-6",
+        "spanish": "Encuentro una cena que cuesta menos de lo que esperaba.",
+        "english": "I find a dinner that costs less than I expected."
+      },
+      {
+        "id": "nearby-pattaya-7",
+        "spanish": "En una terraza, algunos piden cerveza y yo pido agua.",
+        "english": "On a terrace, some order beer and I order water."
+      },
+      {
+        "id": "nearby-pattaya-8",
+        "spanish": "Esta noche quiero disfrutar de la música y recordar cada momento.",
+        "english": "Tonight I want to enjoy the music and remember every moment."
+      }
+    ],
+    "continuation": [
+      {
+        "id": "nearby-pattaya-9",
+        "spanish": "A la mañana siguiente vuelvo a encontrar a Jorge.",
+        "english": "The next morning I meet Jorge again."
+      },
+      {
+        "id": "nearby-pattaya-10",
+        "spanish": "Me pregunta si he descubierto la otra cara de la ciudad.",
+        "english": "He asks me if I have discovered the other side of the city."
+      },
+      {
+        "id": "nearby-pattaya-11",
+        "spanish": "Le cuento que he bailado y conocido a gente muy diferente.",
+        "english": "I tell him that I have danced and met very different people."
+      },
+      {
+        "id": "nearby-pattaya-12",
+        "spanish": "Él me invita a sentarme y escuchar las olas.",
+        "english": "He invites me to sit down and listen to the waves."
+      },
+      {
+        "id": "nearby-pattaya-13",
+        "spanish": "No todos vienen por lo mismo, me dice.",
+        "english": "Not everyone comes for the same reason, he tells me."
+      },
+      {
+        "id": "nearby-pattaya-14",
+        "spanish": "Mientras hablamos, una familia pasa con cubos y juguetes.",
+        "english": "While we talk, a family passes with buckets and toys."
+      },
+      {
+        "id": "nearby-pattaya-15",
+        "spanish": "Comprendo que una ciudad tiene más de dos tipos de personas.",
+        "english": "I understand that a city has more than two kinds of people."
+      },
+      {
+        "id": "nearby-pattaya-16",
+        "spanish": "En Pattaya encuentro una noche de fiesta y una mañana de amistad.",
+        "english": "In Pattaya I find a night of celebration and a morning of friendship."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 8
+      },
+      {
+        "word": "agua",
+        "lemma": "agua",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "alguien",
+        "lemma": "alguien",
+        "occurrences": 1
+      },
+      {
+        "word": "algunos",
+        "lemma": "algunos",
+        "occurrences": 1
+      },
+      {
+        "word": "amistad",
+        "lemma": "amistad",
+        "occurrences": 1
+      },
+      {
+        "word": "bailado",
+        "lemma": "bailar",
+        "occurrences": 1
+      },
+      {
+        "word": "bailar",
+        "lemma": "bailar",
+        "occurrences": 1
+      },
+      {
+        "word": "buen",
+        "lemma": "buen",
+        "occurrences": 1
+      },
+      {
+        "word": "busca",
+        "lemma": "buscar",
+        "occurrences": 1
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 1
+      },
+      {
+        "word": "cara",
+        "lemma": "cara",
+        "occurrences": 1
+      },
+      {
+        "word": "cena",
+        "lemma": "cena",
+        "occurrences": 1
+      },
+      {
+        "word": "cerveza",
+        "lemma": "cerveza",
+        "occurrences": 1
+      },
+      {
+        "word": "ciudad",
+        "lemma": "ciudad",
+        "occurrences": 2
+      },
+      {
+        "word": "comprendo",
+        "lemma": "comprender",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 2
+      },
+      {
+        "word": "conocido",
+        "lemma": "conocer",
+        "occurrences": 1
+      },
+      {
+        "word": "conozco",
+        "lemma": "conocer",
+        "occurrences": 2
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "cubos",
+        "lemma": "cubo",
+        "occurrences": 1
+      },
+      {
+        "word": "cuento",
+        "lemma": "contar",
+        "occurrences": 1
+      },
+      {
+        "word": "cuesta",
+        "lemma": "costar",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 7
+      },
+      {
+        "word": "desayuno",
+        "lemma": "desayuno",
+        "occurrences": 1
+      },
+      {
+        "word": "descubierto",
+        "lemma": "descubierto",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 1
+      },
+      {
+        "word": "diferente",
+        "lemma": "diferente",
+        "occurrences": 1
+      },
+      {
+        "word": "disfrutar",
+        "lemma": "disfrutar",
+        "occurrences": 1
+      },
+      {
+        "word": "dos",
+        "lemma": "dos",
+        "occurrences": 1
+      },
+      {
+        "word": "empieza",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
+        "word": "encienden",
+        "lemma": "encender",
+        "occurrences": 1
+      },
+      {
+        "word": "encontrar",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
+        "word": "encuentro",
+        "lemma": "encontrar",
+        "occurrences": 2
+      },
+      {
+        "word": "escuchar",
+        "lemma": "escuchar",
+        "occurrences": 1
+      },
+      {
+        "word": "esperaba",
+        "lemma": "esperar",
+        "occurrences": 1
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 1
+      },
+      {
+        "word": "familia",
+        "lemma": "familia",
+        "occurrences": 1
+      },
+      {
+        "word": "fiesta",
+        "lemma": "fiesta",
+        "occurrences": 1
+      },
+      {
+        "word": "gente",
+        "lemma": "gente",
+        "occurrences": 1
+      },
+      {
+        "word": "hablamos",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hablar",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "he",
+        "lemma": "haber",
+        "occurrences": 2
+      },
+      {
+        "word": "hombre",
+        "lemma": "hombre",
+        "occurrences": 1
+      },
+      {
+        "word": "invita",
+        "lemma": "invitar",
+        "occurrences": 1
+      },
+      {
+        "word": "invitan",
+        "lemma": "invitar",
+        "occurrences": 1
+      },
+      {
+        "word": "jorge",
+        "lemma": "jorge",
+        "occurrences": 2
+      },
+      {
+        "word": "jubilado",
+        "lemma": "jubilado",
+        "occurrences": 1
+      },
+      {
+        "word": "juguetes",
+        "lemma": "juguete",
+        "occurrences": 1
+      },
+      {
+        "word": "junto",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 5
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 2
+      },
+      {
+        "word": "luces",
+        "lemma": "luz",
+        "occurrences": 1
+      },
+      {
+        "word": "mar",
+        "lemma": "mar",
+        "occurrences": 1
+      },
+      {
+        "word": "mañana",
+        "lemma": "mañana",
+        "occurrences": 3
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 4
+      },
+      {
+        "word": "menos",
+        "lemma": "menos",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 1
+      },
+      {
+        "word": "mientras",
+        "lemma": "mientras",
+        "occurrences": 1
+      },
+      {
+        "word": "mismo",
+        "lemma": "mismo",
+        "occurrences": 1
+      },
+      {
+        "word": "momento",
+        "lemma": "momento",
+        "occurrences": 1
+      },
+      {
+        "word": "muy",
+        "lemma": "muy",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 1
+      },
+      {
+        "word": "música",
+        "lemma": "música",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "noche",
+        "lemma": "noche",
+        "occurrences": 2
+      },
+      {
+        "word": "olas",
+        "lemma": "ola",
+        "occurrences": 1
+      },
+      {
+        "word": "otra",
+        "lemma": "otra",
+        "occurrences": 1
+      },
+      {
+        "word": "pasa",
+        "lemma": "pasar",
+        "occurrences": 1
+      },
+      {
+        "word": "pasea",
+        "lemma": "pasea",
+        "occurrences": 1
+      },
+      {
+        "word": "pattaya",
+        "lemma": "pattaya",
+        "occurrences": 2
+      },
+      {
+        "word": "personas",
+        "lemma": "persona",
+        "occurrences": 1
+      },
+      {
+        "word": "piden",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "pido",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 2
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "primera",
+        "lemma": "primero",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 6
+      },
+      {
+        "word": "quien",
+        "lemma": "quien",
+        "occurrences": 1
+      },
+      {
+        "word": "quieren",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "quiero",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "recordar",
+        "lemma": "recordar",
+        "occurrences": 1
+      },
+      {
+        "word": "salir",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "sentarme",
+        "lemma": "sentarme",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "siguiente",
+        "lemma": "siguiente",
+        "occurrences": 1
+      },
+      {
+        "word": "tarde",
+        "lemma": "tarde",
+        "occurrences": 1
+      },
+      {
+        "word": "temprano",
+        "lemma": "temprano",
+        "occurrences": 1
+      },
+      {
+        "word": "terraza",
+        "lemma": "terraza",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tipos",
+        "lemma": "tipo",
+        "occurrences": 1
+      },
+      {
+        "word": "todos",
+        "lemma": "todos",
+        "occurrences": 1
+      },
+      {
+        "word": "tranquilidad",
+        "lemma": "tranquilidad",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 6
+      },
+      {
+        "word": "unos",
+        "lemma": "unos",
+        "occurrences": 1
+      },
+      {
+        "word": "viajeros",
+        "lemma": "viajero",
+        "occurrences": 1
+      },
+      {
+        "word": "vienen",
+        "lemma": "venir",
+        "occurrences": 1
+      },
+      {
+        "word": "vuelvo",
+        "lemma": "volver",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 7
+      },
+      {
+        "word": "yo",
+        "lemma": "yo",
+        "occurrences": 1
+      },
+      {
+        "word": "él",
+        "lemma": "él",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo story created for Cuentiva. The location is an illustrative seed, not a verified submission.",
+    "format": "story",
+    "isDemoLocation": true,
+    "submissionLocation": {
+      "latitude": 12.9236,
+      "longitude": 100.8825,
+      "accuracy": 1000,
+      "capturedAt": 811641600,
+      "placeName": "Pattaya, Thailand"
+    }
+  },
+  {
+    "id": "nearby-thailand",
+    "title": "Entre el silencio y la fiesta",
+    "englishTitle": "Between silence and celebration",
+    "author": "Cuentiva · fictional traveller",
+    "level": "A2",
+    "symbol": "sparkles",
+    "palette": 3,
+    "summary": "Between silence and celebration. An original fictional travel encounter.",
+    "sentences": [
+      {
+        "id": "nearby-thailand-1",
+        "spanish": "En Chiang Mai decido empezar el día sin mirar el teléfono.",
+        "english": "In Chiang Mai I decide to begin the day without looking at my phone."
+      },
+      {
+        "id": "nearby-thailand-2",
+        "spanish": "Una amiga me invita a una sesión de meditación.",
+        "english": "A friend invites me to a meditation session."
+      },
+      {
+        "id": "nearby-thailand-3",
+        "spanish": "Me siento y noto que mi mente no quiere quedarse quieta.",
+        "english": "I sit down and notice that my mind does not want to stay still."
+      },
+      {
+        "id": "nearby-thailand-4",
+        "spanish": "La persona que nos guía dice que podemos volver a la respiración.",
+        "english": "The person guiding us says that we can return to our breathing."
+      },
+      {
+        "id": "nearby-thailand-5",
+        "spanish": "No necesito hacerlo perfecto; solo intento prestar atención.",
+        "english": "I do not need to do it perfectly; I just try to pay attention."
+      },
+      {
+        "id": "nearby-thailand-6",
+        "spanish": "Por la tarde mi amiga me lleva a una fiesta del barrio.",
+        "english": "In the afternoon my friend takes me to a neighbourhood celebration."
+      },
+      {
+        "id": "nearby-thailand-7",
+        "spanish": "Hay música, luces y mesas donde la gente comparte comida.",
+        "english": "There is music, lights and tables where people share food."
+      },
+      {
+        "id": "nearby-thailand-8",
+        "spanish": "Después de una mañana en silencio, todo parece más intenso.",
+        "english": "After a morning in silence, everything seems more intense."
+      }
+    ],
+    "continuation": [
+      {
+        "id": "nearby-thailand-9",
+        "spanish": "Antes de sacar una foto, pregunto si está bien.",
+        "english": "Before taking a photo, I ask if it is all right."
+      },
+      {
+        "id": "nearby-thailand-10",
+        "spanish": "Una mujer me invita a sentarme con su familia.",
+        "english": "A woman invites me to sit with her family."
+      },
+      {
+        "id": "nearby-thailand-11",
+        "spanish": "No entiendo todas sus palabras, pero entiendo su bienvenida.",
+        "english": "I do not understand all her words, but I understand her welcome."
+      },
+      {
+        "id": "nearby-thailand-12",
+        "spanish": "Mi amiga me explica qué significa esta celebración para ella.",
+        "english": "My friend explains what this celebration means to her."
+      },
+      {
+        "id": "nearby-thailand-13",
+        "spanish": "Escucho sin pensar en la siguiente foto que quiero publicar.",
+        "english": "I listen without thinking about the next photo I want to post."
+      },
+      {
+        "id": "nearby-thailand-14",
+        "spanish": "Más tarde ayudo a recoger los vasos de nuestra mesa.",
+        "english": "Later I help clear the cups from our table."
+      },
+      {
+        "id": "nearby-thailand-15",
+        "spanish": "Esta es una de las noches más bonitas de mi viaje por Tailandia.",
+        "english": "This is one of the loveliest nights of my trip through Thailand."
+      },
+      {
+        "id": "nearby-thailand-16",
+        "spanish": "Me llevo una idea sencilla: puedo estar presente en el silencio y en la alegría.",
+        "english": "I take away a simple idea: I can be present in silence and in joy."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 5
+      },
+      {
+        "word": "alegría",
+        "lemma": "alegría",
+        "occurrences": 1
+      },
+      {
+        "word": "amiga",
+        "lemma": "amiga",
+        "occurrences": 3
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 1
+      },
+      {
+        "word": "atención",
+        "lemma": "atención",
+        "occurrences": 1
+      },
+      {
+        "word": "ayudo",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "barrio",
+        "lemma": "barrio",
+        "occurrences": 1
+      },
+      {
+        "word": "bien",
+        "lemma": "bien",
+        "occurrences": 1
+      },
+      {
+        "word": "bienvenida",
+        "lemma": "bienvenida",
+        "occurrences": 1
+      },
+      {
+        "word": "bonitas",
+        "lemma": "bonitas",
+        "occurrences": 1
+      },
+      {
+        "word": "celebración",
+        "lemma": "celebración",
+        "occurrences": 1
+      },
+      {
+        "word": "chiang",
+        "lemma": "chiang",
+        "occurrences": 1
+      },
+      {
+        "word": "comida",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "comparte",
+        "lemma": "compartir",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 6
+      },
+      {
+        "word": "decido",
+        "lemma": "decidir",
+        "occurrences": 1
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 1
+      },
+      {
+        "word": "donde",
+        "lemma": "donde",
+        "occurrences": 1
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 1
+      },
+      {
+        "word": "empezar",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 5
+      },
+      {
+        "word": "entiendo",
+        "lemma": "entender",
+        "occurrences": 2
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "escucho",
+        "lemma": "escuchar",
+        "occurrences": 1
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 2
+      },
+      {
+        "word": "estar",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "está",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "familia",
+        "lemma": "familia",
+        "occurrences": 1
+      },
+      {
+        "word": "fiesta",
+        "lemma": "fiesta",
+        "occurrences": 1
+      },
+      {
+        "word": "foto",
+        "lemma": "foto",
+        "occurrences": 2
+      },
+      {
+        "word": "gente",
+        "lemma": "gente",
+        "occurrences": 1
+      },
+      {
+        "word": "guía",
+        "lemma": "guiar",
+        "occurrences": 1
+      },
+      {
+        "word": "hacerlo",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "hay",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "idea",
+        "lemma": "idea",
+        "occurrences": 1
+      },
+      {
+        "word": "intenso",
+        "lemma": "intenso",
+        "occurrences": 1
+      },
+      {
+        "word": "intento",
+        "lemma": "intentar",
+        "occurrences": 1
+      },
+      {
+        "word": "invita",
+        "lemma": "invitar",
+        "occurrences": 2
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 6
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "lleva",
+        "lemma": "llevar",
+        "occurrences": 1
+      },
+      {
+        "word": "llevo",
+        "lemma": "llevar",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "luces",
+        "lemma": "luz",
+        "occurrences": 1
+      },
+      {
+        "word": "mai",
+        "lemma": "mai",
+        "occurrences": 1
+      },
+      {
+        "word": "mañana",
+        "lemma": "mañana",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 6
+      },
+      {
+        "word": "meditación",
+        "lemma": "meditación",
+        "occurrences": 1
+      },
+      {
+        "word": "mente",
+        "lemma": "mente",
+        "occurrences": 1
+      },
+      {
+        "word": "mesa",
+        "lemma": "mesa",
+        "occurrences": 1
+      },
+      {
+        "word": "mesas",
+        "lemma": "mesa",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 4
+      },
+      {
+        "word": "mirar",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "mujer",
+        "lemma": "mujer",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 3
+      },
+      {
+        "word": "música",
+        "lemma": "música",
+        "occurrences": 1
+      },
+      {
+        "word": "necesito",
+        "lemma": "necesitar",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 3
+      },
+      {
+        "word": "noches",
+        "lemma": "noche",
+        "occurrences": 1
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "noto",
+        "lemma": "notar",
+        "occurrences": 1
+      },
+      {
+        "word": "nuestra",
+        "lemma": "nuestro",
+        "occurrences": 1
+      },
+      {
+        "word": "palabras",
+        "lemma": "palabra",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "parece",
+        "lemma": "parecer",
+        "occurrences": 1
+      },
+      {
+        "word": "pensar",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "perfecto",
+        "lemma": "perfecto",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "persona",
+        "lemma": "persona",
+        "occurrences": 1
+      },
+      {
+        "word": "podemos",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 2
+      },
+      {
+        "word": "pregunto",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "presente",
+        "lemma": "presente",
+        "occurrences": 1
+      },
+      {
+        "word": "prestar",
+        "lemma": "prestar",
+        "occurrences": 1
+      },
+      {
+        "word": "publicar",
+        "lemma": "publicar",
+        "occurrences": 1
+      },
+      {
+        "word": "puedo",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 4
+      },
+      {
+        "word": "quedarse",
+        "lemma": "quedarse",
+        "occurrences": 1
+      },
+      {
+        "word": "quiere",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "quiero",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "quieta",
+        "lemma": "quieta",
+        "occurrences": 1
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 1
+      },
+      {
+        "word": "recoger",
+        "lemma": "recoger",
+        "occurrences": 1
+      },
+      {
+        "word": "respiración",
+        "lemma": "respiración",
+        "occurrences": 1
+      },
+      {
+        "word": "sacar",
+        "lemma": "sacar",
+        "occurrences": 1
+      },
+      {
+        "word": "sencilla",
+        "lemma": "sencillo",
+        "occurrences": 1
+      },
+      {
+        "word": "sentarme",
+        "lemma": "sentarme",
+        "occurrences": 1
+      },
+      {
+        "word": "sesión",
+        "lemma": "sesión",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "siento",
+        "lemma": "sentir",
+        "occurrences": 1
+      },
+      {
+        "word": "significa",
+        "lemma": "significar",
+        "occurrences": 1
+      },
+      {
+        "word": "siguiente",
+        "lemma": "siguiente",
+        "occurrences": 1
+      },
+      {
+        "word": "silencio",
+        "lemma": "silencio",
+        "occurrences": 2
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 2
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 2
+      },
+      {
+        "word": "sus",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
+        "word": "tailandia",
+        "lemma": "tailandia",
+        "occurrences": 1
+      },
+      {
+        "word": "tarde",
+        "lemma": "tarde",
+        "occurrences": 2
+      },
+      {
+        "word": "teléfono",
+        "lemma": "teléfono",
+        "occurrences": 1
+      },
+      {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 8
+      },
+      {
+        "word": "vasos",
+        "lemma": "vaso",
+        "occurrences": 1
+      },
+      {
+        "word": "viaje",
+        "lemma": "viaje",
+        "occurrences": 1
+      },
+      {
+        "word": "volver",
+        "lemma": "volver",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 3
+      }
+    ],
+    "license": "Original fictional demo story created for Cuentiva. The location is an illustrative seed, not a verified submission.",
+    "format": "story",
+    "isDemoLocation": true,
+    "submissionLocation": {
+      "latitude": 18.7883,
+      "longitude": 98.9853,
+      "accuracy": 1000,
+      "capturedAt": 811641600,
+      "placeName": "Chiang Mai, Thailand"
+    }
   }
 ]

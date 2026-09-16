@@ -7,7 +7,7 @@ import Observation
     private let progress: any ProgressFeature
     private var generation = UUID()
     var location: StoryLocation?
-    var radius = 25.0
+    var radius = 1609.344
     var busy = false
     var error: String?
     var selectedBook: Book?

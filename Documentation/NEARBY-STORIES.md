@@ -1,12 +1,12 @@
 # Nearby Stories
 
-A separate paid-library tab discovers location-tagged books within 5, 25 or 100 km of a fresh, one-shot device location. It sorts by distance. Discover continues to show the general library; location-tagged books join it and Completed after completion, so readers retain their travel souvenirs. No background tracking is requested. Browsing coordinates are memory-only and discarded on backgrounding. Refresh explicitly after moving; a fix older than five minutes is no longer used for new results.
+A separate paid-library tab discovers location-tagged books within 5, 25 or 100 km, or 1,000 miles (the default) of a fresh, one-shot device location. It sorts by distance. Discover continues to show the general library; location-tagged books join it and Completed after completion, so readers retain their travel souvenirs. No background tracking is requested. Browsing coordinates are memory-only and discarded on backgrounding. Refresh explicitly after moving; a fix older than five minutes is no longer used for new results.
 
 Contribute offers “Leave this story here”. “Leave a story here” from Nearby preselects it. Submission requests When In Use access, resolves a locality using iOS 26 MapKit, then asks for confirmation. Coordinates, horizontal accuracy, timestamp and approximate place name are saved with the submission. GPS is an estimate, not proof of exact presence. Fixes older than five minutes or less accurate than 5 km cannot be submitted. Denied permission or lookup failure leaves general discovery and unlocated contributions available.
 
 The feature manager rejects changes/removal of an existing submission location, including after restart, by comparing the saved repository record. Text edits preserve the location. Users can explicitly delete their local story and location with confirmation. This is a deletion, not a way to move a published pin.
 
-The current demo has no publishing server and no location-tagged seed books. It does not relabel fictional samples as real community submissions or insert local drafts into the published library. Pending submissions stay local. Tests supply synthetic coordinates to exercise populated results without claiming real authorship.
+The current demo has no publishing server. Three original fictional Thailand stories are seeded near Bangkok, Pattaya and Chiang Mai, explicitly marked as example stories with demo locations. They are not verified community submissions. Local drafts do not enter the published library. Pending submissions stay local. Tests supply synthetic coordinates to exercise populated results without claiming real authorship.
 
 ## Server integration
 

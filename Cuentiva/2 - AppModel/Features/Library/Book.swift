@@ -12,6 +12,7 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     let sentences: [Sentence]
     let vocabulary: [VocabularyEntry]
     let license: String
+    var isDemoLocation: Bool? = nil
     var submissionLocation: StoryLocation? = nil
     var format: BookFormat? = nil
     var scene: String? = nil

@@ -1,3 +1,9 @@
+## Thailand Nearby examples — 17 September 2026
+
+Added three original A2 fictional travel stories at explicit example locations in Bangkok, Pattaya and Chiang Mai. Each has eight guided and eight continuation sentence pairs, with full vocabulary indexing. Nearby defaults to 1,000 miles (1,609.344 km), while smaller radii remain available. The reader's location still comes from the location provider; it is not hard-coded to Pattaya.
+
+Xcode tests and all 25 core tests passed. Bundled-content checks verify 52 books, aligned text and vocabulary counts, three valid example geotags, and all three within 1,000 miles of Pattaya. Live GPS/location permission on the user's phone was not exercised in this content update.
+
 ## Nearby Stories — 17 September 2026
 
 - Xcode Simulator tests passed; all 25 core tests passed. Final view-only changes built successfully afterward.

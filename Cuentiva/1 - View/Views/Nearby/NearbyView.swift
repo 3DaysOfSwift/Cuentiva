@@ -16,6 +16,7 @@ struct NearbyView: View {
                     .font(.caption).foregroundStyle(theme.theme.muted)
                 Picker("Distance", selection: $viewModel.radius) {
                     ForEach([5.0, 25, 100], id: \.self) { Text("\(Int($0)) km").tag($0) }
+                    Text("1,000 mi").tag(1609.344)
                 }.pickerStyle(.segmented)
                 InlineError(message: viewModel.error)
                 if let place = viewModel.location {
@@ -33,13 +34,14 @@ struct NearbyView: View {
                                     Text(book.englishTitle).font(.headline)
                                     Text(book.submissionLocation?.placeName ?? "").font(.subheadline)
                                     Text(book.level).font(.caption)
+                                    if book.isDemoLocation == true { Text("EXAMPLE STORY · DEMO LOCATION").font(.caption2).foregroundStyle(theme.theme.muted) }
                                 }
                             }
                         }.buttonStyle(.plain)
                     }
                 }
                 NavigationLink { ContributionView(nearby: true) } label: { Label("Leave a story here", systemImage: "square.and.pencil") }
-                Text("Finish a nearby story to keep it in Completed wherever you travel. Existing demo books have no invented submission locations. Community publishing is not connected yet.")
+                Text("Finish a nearby story to keep it in Completed wherever you travel. Three fictional Thailand stories have example locations for exploring Nearby. Community publishing is not connected yet.")
                     .font(.caption).foregroundStyle(theme.theme.muted)
             }.padding(25)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
