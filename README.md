@@ -8,7 +8,7 @@ A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift
 
 1. Open `Cuentiva.xcodeproj` in Xcode 26.2 or later.
 2. Select the **Cuentiva** scheme and an iOS 26 simulator or device.
-3. The shared scheme selects `Cuentiva.storekit`. Confirm it under Edit Scheme → Run → Options → StoreKit Configuration.
+3. The shared scheme selects `Cuentiva/3 - App Resources/Cuentiva.storekit`. Confirm it under Edit Scheme → Run → Options → StoreKit Configuration.
 4. Run. Complete the introductory book using Speak or Write, check every sentence, then tap Finish book.
 5. Continue from the celebration to the subscription offer. Start the trial in the local StoreKit purchase sheet to unlock the full library.
 
