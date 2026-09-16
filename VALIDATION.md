@@ -1,3 +1,10 @@
+## Reader audio-session warnings — 17 September 2026
+
+- Removed manual playback category/activation and unconditional deactivation on every sentence. AVSpeechSynthesizer now manages its separate playback session (`usesApplicationAudioSession = false`), as documented in the installed Apple SDK.
+- Microphone category/activation/deactivation are serialized on a dedicated queue, off MainActor. Generation checks prevent a stopped or superseded activation from starting recognition or publishing a stale error. Only requested microphone sessions are deactivated.
+- Xcode iOS Simulator test suite passed. All 23 core tests passed. These tests do not validate physical-device audio routing or reproduce the supplied underflow log.
+- Retest continuous story narration, speaker toggling, microphone switching, headphones and interruptions on the affected iPhone. System accessibility, buffer-underflow and unsafeForcedSync diagnostics are not claimed to be fixed without a device reproduction/call stack.
+
 ## Completion first-appearance timing — 17 September 2026
 
 - Initialize the previous total before the completion view renders. Run entrance, a short settled pause, counter animation and confetti in one cancellable sequence.

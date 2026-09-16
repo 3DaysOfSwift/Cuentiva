@@ -30,12 +30,18 @@ import Observation
     private var playbackRequestID: UUID?
     private var playbackContinuation: CheckedContinuation<Bool, Never>?
     private var activeUtterance: ObjectIdentifier?
-    override init() { super.init(); synthesizer.delegate = self }
+    // Serialize microphone session changes away from the UI thread.
+    private nonisolated static let sessionQueue = DispatchQueue(label: "Cuentiva.microphone-session")
+    private var microphoneSessionRequested = false
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+        // Speech owns its playback session across consecutive reader sentences.
+        synthesizer.usesApplicationAudioSession = false
+    }
     func speak(_ text: String, slow: Bool) {
         stop(); error = nil
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: .duckOthers)
-            try AVAudioSession.sharedInstance().setActive(true)
             let utterance = AVSpeechUtterance(string: text)
             guard let voice = AVSpeechSynthesisVoice(language: "es-ES") else { throw AppFailure.unavailable("A Spanish voice is unavailable on this device. You can continue with Write.") }
             utterance.voice = voice
@@ -82,9 +88,19 @@ import Observation
         }
         self.recognizer = recognizer
         do {
-            let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.record, mode: .measurement, options: .duckOthers)
-            try session.setActive(true)
+            microphoneSessionRequested = true
+            try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, any Error>) in
+                Self.sessionQueue.async {
+                    do {
+                        let session = AVAudioSession.sharedInstance()
+                        try session.setCategory(.record, mode: .measurement, options: .duckOthers)
+                        try session.setActive(true)
+                        continuation.resume()
+                    } catch { continuation.resume(throwing: error) }
+                }
+            }
+            guard token == generation else { return }
+            guard !Task.isCancelled else { stopRecording(); return }
             let request = SFSpeechAudioBufferRecognitionRequest()
             request.requiresOnDeviceRecognition = true; request.shouldReportPartialResults = true
             self.request = request
@@ -101,7 +117,10 @@ import Observation
                 }
             })
             engine.prepare(); try engine.start(); recording = true
-        } catch { stopRecording(); self.error = error.localizedDescription }
+        } catch {
+            guard token == generation else { return }
+            stopRecording(); self.error = error.localizedDescription
+        }
     }
     // Extract only Sendable values before hopping from Speech's callback queue.
     nonisolated static func makeRecognitionHandler(
@@ -125,12 +144,23 @@ import Observation
     }
     func stopRecording() {
         generation = UUID()
-        engine.stop()
+        if engine.isRunning { engine.stop() }
         if tapInstalled { engine.inputNode.removeTap(onBus: 0); tapInstalled = false }
         request?.endAudio(); recognition?.cancel(); recognition = nil; request = nil
         recording = false
-        do { try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation) }
-        catch { self.error = error.localizedDescription }
+        guard microphoneSessionRequested else { return }
+        microphoneSessionRequested = false
+        let token = generation
+        Self.sessionQueue.async { [weak self] in
+            do { try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation) }
+            catch {
+                let message = error.localizedDescription
+                Task { @MainActor [weak self] in
+                    guard self?.generation == token else { return }
+                    self?.error = message
+                }
+            }
+        }
     }
     func stop() { finishPlayback(false); activeUtterance = nil; stopRecording(); synthesizer.stopSpeaking(at: .immediate); spokenRange = nil }
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString range: NSRange, utterance: AVSpeechUtterance) {
