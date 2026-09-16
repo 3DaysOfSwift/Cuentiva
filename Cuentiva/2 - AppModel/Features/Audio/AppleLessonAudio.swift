@@ -36,7 +36,7 @@ import Observation
             let utterance = AVSpeechUtterance(string: text)
             guard let voice = AVSpeechSynthesisVoice(language: "es-ES") else { throw AppFailure.unavailable("A Spanish voice is unavailable on this device. You can continue with Write.") }
             utterance.voice = voice
-            utterance.rate = slow ? 0.35 : 0.47
+            utterance.rate = slow ? 0.20 : 0.47
             activeUtterance = ObjectIdentifier(utterance)
             synthesizer.speak(utterance)
         } catch { self.error = error.localizedDescription }

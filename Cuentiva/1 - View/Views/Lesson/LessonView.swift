@@ -16,7 +16,12 @@ struct LessonView: View {
                         if let sentence = viewModel.sentence {
                             if viewModel.mode == "Speak" || viewModel.showSpanish || viewModel.feedback != nil {
                                 highlighted(sentence.spanish).font(.system(.title, design: .serif)).lineSpacing(8).environment(\.locale, Locale(identifier: "es-ES"))
-                            } else { Text("Write it in Spanish.").font(.system(.title, design: .serif)) }
+                            } else {
+                                Text(sentence.spanish)
+                                    .font(.system(.title, design: .serif)).lineSpacing(8)
+                                    .redacted(reason: .placeholder)
+                                    .accessibilityLabel("Spanish sentence hidden. Use Show a hint to reveal it.")
+                            }
                             Text(sentence.english).font(.title3).foregroundStyle(theme.theme.muted).environment(\.locale, Locale(identifier: "en-US"))
                             HStack {
                                 Button { viewModel.listen() } label: { Label("Listen", systemImage: "speaker.wave.2.fill").padding(.vertical, 10) }.buttonStyle(.bordered)

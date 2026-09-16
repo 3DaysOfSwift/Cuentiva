@@ -1,5 +1,16 @@
 # Validation — 16 September 2026
 
+## Slow playback, redaction, and demo icon
+
+The iOS Simulator build/test run passed, and all 16 core tests passed. Slow speech
+now uses rate 0.20 (previously 0.35); normal remains 0.47. Write uses native
+placeholder redaction with the Spanish sentence layout and an accessibility label
+that does not expose the answer. Speak, hint, and checked feedback still reveal it.
+The new forest/cream community-book icon is included in the app asset catalog as
+an opaque 1024px image, configured for both app build configurations.
+Perceived speech speed and VoiceOver/redaction presentation still need hands-on
+verification; automated tests do not assess those experiences.
+
 ## Reading-first refinement
 
 The Simulator test suite passed after removing compulsory sentence checks.
