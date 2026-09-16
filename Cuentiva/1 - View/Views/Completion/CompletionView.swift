@@ -1,13 +1,17 @@
 import SwiftUI
 struct CompletionView: View {
     let receipt: CompletionReceipt
-    @State private var viewModel = CompletionViewModel()
+    @State private var viewModel: CompletionViewModel
     @State private var contentVisible = false
-    @State private var isOnScreen = false
     @State private var confettiStart: Date?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(ThemeManager.self) private var theme
+    init(receipt: CompletionReceipt) {
+        self.receipt = receipt
+        // Seed the previous total before the first rendered frame, not in onAppear.
+        _viewModel = State(initialValue: CompletionViewModel(receipt: receipt))
+    }
     var body: some View {
         ScrollView {
             VStack(spacing: 25) {
@@ -33,37 +37,43 @@ struct CompletionView: View {
                         .ignoresSafeArea().allowsHitTesting(false).accessibilityHidden(true)
                 }
             }
-            .onAppear {
-                isOnScreen = true
+            .task(id: receipt.id) {
                 viewModel.prepare(receipt)
-            }
-            .task {
-                guard !contentVisible else { return }
+                guard !viewModel.hasCelebrated else { contentVisible = true; return }
                 if reduceMotion {
                     contentVisible = true
                     viewModel.celebrate(receipt)
-                } else {
-                    // Completion is inserted into an already visible lesson. Its own
-                    // SwiftUI animation completion is the reliable appearance signal.
+                    return
+                }
+                // Give a newly inserted screen a rendered starting state. On a cold
+                // appearance, animating immediately can collapse into its first frame.
+                contentVisible = false
+                do { try await Task.sleep(for: .milliseconds(150)) } catch { return }
+                await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
                     withAnimation(.easeOut(duration: 0.4), completionCriteria: .removed) {
                         contentVisible = true
                     } completion: {
-                        guard isOnScreen else { return }
-                        withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) {
-                            viewModel.celebrate(receipt)
-                        }
-                        if !reduceMotion { confettiStart = .now }
+                        continuation.resume()
                     }
                 }
-            }
-            .task(id: confettiStart) {
-                guard confettiStart != nil else { return }
+                guard !Task.isCancelled else { return }
+                // Let the reader see the old number after the entrance has finished.
+                do { try await Task.sleep(for: .milliseconds(350)) } catch { return }
+                guard !Task.isCancelled, !viewModel.hasCelebrated else { return }
+                withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) {
+                    viewModel.celebrate(receipt)
+                }
+                if !reduceMotion { confettiStart = .now }
                 do { try await Task.sleep(for: .seconds(ConfettiBurst.duration)) } catch { return }
                 confettiStart = nil
             }
-            .onDisappear {
-                isOnScreen = false
-                confettiStart = nil
+            .onChange(of: reduceMotion) { _, enabled in
+                if enabled {
+                    contentVisible = true
+                    confettiStart = nil
+                    viewModel.celebrate(receipt)
+                }
             }
+            .onDisappear { confettiStart = nil }
     }
 }

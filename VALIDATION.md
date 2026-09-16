@@ -1,3 +1,10 @@
+## Completion first-appearance timing — 17 September 2026
+
+- Initialize the previous total before the completion view renders. Run entrance, a short settled pause, counter animation and confetti in one cancellable sequence.
+- Xcode simulator test suite passed, including new first-receipt/repeated-preparation/new-receipt and reread counter checks.
+- On iPhone Air Simulator, the first completion after launch visibly animated the number to 9. A subsequent completion animated 9 to 10; captured frames show the confetti beginning to enter from below the screen.
+- Reduce Motion continues to display the final total immediately and suppress confetti. The affected physical iPhone's setting and behavior with this build remain unverified.
+
 ## Contribution topic requests — 17 September 2026
 
 All 23 core tests and the Xcode simulator suite pass. Coverage includes legacy draft decoding, exact word/diacritic checks, incomplete topic submission rejection, persisted topic links and teaching notes, no publication/coverage increment after submission, and preserving work when changing writing paths. Visually verified Contribute → Topic requests → Haber selection on iPhone Air, including the missing-coverage card and linked draft with teaching fields, form counts, and self-review checklist. Latest build installed. Editorial priorities and coverage are seeded local data; shared assignments, real demand analytics, server moderation, and publishing are not connected.
