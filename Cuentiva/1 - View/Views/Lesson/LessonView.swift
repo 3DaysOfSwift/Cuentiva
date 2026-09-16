@@ -13,8 +13,19 @@ struct LessonView: View {
                     VStack(alignment: .leading, spacing: 25) {
                         HStack { Text(viewModel.positionLabel).font(.system(.caption, design: .monospaced)); Spacer(); Text(book.level).font(.caption.bold()) }
                         ProgressView(value: viewModel.fraction)
+                        if book.kind == .movieScript {
+                            if let scene = book.scene { Text(scene).font(.subheadline).foregroundStyle(theme.theme.muted) }
+                            Picker("Your role", selection: $viewModel.role) {
+                                Text("Read all roles").tag("")
+                                ForEach(book.cast, id: \.self) { Text("Play \($0)").tag($0) }
+                            }.onChange(of: viewModel.role) { viewModel.changeMode() }
+                        }
                         if let sentence = viewModel.sentence {
-                            if viewModel.mode == "Speak" || viewModel.showSpanish || viewModel.feedback != nil {
+                            if let speaker = sentence.speaker {
+                                Text("\(speaker)\(viewModel.role.isEmpty ? "" : viewModel.isPartnerLine ? " · Listen to your scene partner" : " · Your line")")
+                                    .font(.headline).foregroundStyle(theme.theme.accent)
+                            }
+                            if viewModel.mode == "Speak" || viewModel.isPartnerLine || viewModel.showSpanish || viewModel.feedback != nil {
                                 highlighted(sentence.spanish).font(.system(.title, design: .serif)).lineSpacing(8).environment(\.locale, Locale(identifier: "es-ES"))
                             } else {
                                 Text(sentence.spanish)
@@ -24,7 +35,7 @@ struct LessonView: View {
                             }
                             Text(sentence.english).font(.title3).foregroundStyle(theme.theme.muted).environment(\.locale, Locale(identifier: "en-US"))
                             HStack {
-                                Button { viewModel.listen() } label: { Label("Listen", systemImage: "speaker.wave.2.fill").padding(.vertical, 10) }.buttonStyle(.bordered)
+                                Button { viewModel.listen() } label: { Label(viewModel.isPartnerLine ? "Listen to \(viewModel.sentence?.speaker ?? "partner")" : "Listen", systemImage: "speaker.wave.2.fill").padding(.vertical, 10) }.buttonStyle(.bordered)
                                 Toggle("Slow", isOn: $viewModel.slow).font(.subheadline).fixedSize().padding(.leading)
                             }
                             Picker("Practice mode", selection: $viewModel.mode) { Text("Speak").tag("Speak"); Text("Write").tag("Write") }.pickerStyle(.segmented).disabled(viewModel.busy).onChange(of: viewModel.mode) { viewModel.changeMode() }

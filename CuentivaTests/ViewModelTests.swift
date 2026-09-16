@@ -64,6 +64,21 @@ import Testing
         vm.load(sample()); await vm.next()
         #expect(vm.receipt?.total == 1); #expect(vm.error == nil)
     }
+    @Test func scriptRoleKeepsDraftAndManualCompletion() async throws {
+        let (p,_,_,learning,_) = try await graph(); p.hasAccess = true
+        let source = sample()
+        let book = Book(id: "script", title: source.title, englishTitle: source.englishTitle, author: source.author, level: source.level, symbol: source.symbol, palette: 0, summary: source.summary,
+            sentences: [Sentence(id: "a", spanish: "Hola.", english: "Hello.", speaker: "Ana"), Sentence(id: "b", spanish: "Buenos días.", english: "Good morning.", speaker: "Leo")], vocabulary: [], license: "Test", format: .movieScript, scene: "A café")
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(book); vm.role = "Ana"; vm.mode = "Write"; vm.answer = "Hola"
+        vm.changeMode()
+        #expect(vm.answer == "Hola"); #expect(!vm.isPartnerLine)
+        #expect(vm.nextTitle == "Next line")
+        await vm.next()
+        #expect(vm.isPartnerLine); #expect(vm.nextTitle == "Finish script")
+        await vm.next()
+        #expect(vm.receipt?.total == 1); #expect(vm.error == nil)
+    }
     @Test func celebrationCountsOnce() {
         let receipt = CompletionReceipt(book: sample(), isNew: true, total: 2), vm = CompletionViewModel()
         vm.prepare(receipt); #expect(vm.displayedTotal == 1); vm.celebrate(receipt); vm.prepare(receipt); #expect(vm.displayedTotal == 2)

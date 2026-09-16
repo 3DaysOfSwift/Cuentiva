@@ -5,8 +5,10 @@ import Observation
     private let progress: any ProgressFeature
     var selectedBook: Book?
     var query = ""
+    var format: BookFormat?
+    var sort: BookSort = .library
     var level = "All"
-    var books: [Book] { library.search(query, level: level == "All" ? nil : level, completedOnly: false) }
+    var books: [Book] { library.search(query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort) }
     var total: Int { progress.snapshot.completed.count }
     var streak: Int { progress.streak }
     var week: [WeekDay] { progress.week }

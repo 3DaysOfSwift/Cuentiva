@@ -155,6 +155,28 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         try await progress.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
         #expect(library.search("", level: nil, completedOnly: true).count == 1)
     }
+    @Test func formatsCombineWithSearchLevelCompletionAndAccess() async throws {
+        let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let story = sample("story")
+        var script = sample("script"); script.format = .movieScript; script.scene = "A café"
+        let library = LibraryManager(repository: MemoryBooks(values: [story, script]), purchases: purchases, progress: progress)
+        try await library.load()
+        #expect(library.search("", level: nil, completedOnly: false, format: .movieScript, sort: .title).isEmpty)
+        purchases.hasAccess = true
+        #expect(library.search("cafe", level: "A1", completedOnly: false, format: .movieScript, sort: .title).map(\.id) == ["script"])
+        #expect(library.search("cafe", level: "B1", completedOnly: false, format: .movieScript, sort: .title).isEmpty)
+        #expect(library.search("", level: nil, completedOnly: false, format: .story, sort: .library).map(\.id) == ["story"])
+        #expect(library.search("", level: nil, completedOnly: false, format: nil, sort: .type).map(\.id) == ["script", "story"])
+        // Equal titles/difficulty use the stable ID tie-breaker.
+        for sort in [BookSort.title, .difficulty] {
+            #expect(library.search("", level: nil, completedOnly: false, format: nil, sort: sort).map(\.id) == ["script", "story"])
+        }
+        #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).isEmpty)
+        try await progress.recordEncounter(book: script, sentence: script.sentences[0])
+        _ = try await progress.complete(book: script)
+        #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).map(\.id) == ["script"])
+    }
     @Test func localSubmissionNeverClaimsPublication() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), repo = MemoryContributions()
         try await progress.load(); purchases.hasAccess = true
@@ -174,8 +196,15 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let url = Bundle.main.url(forResource: "Books", withExtension: "json")!
         #endif
         let books = try await BundledBookRepository(url: url).books()
-        #expect(books.count == 43); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
+        #expect(books.count == 46); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
+        #expect(books.filter { $0.kind == .movieScript }.count == 3)
+        #expect(books.filter { $0.kind == .story }.count == 43)
         for book in books {
+            if book.kind == .movieScript {
+                #expect(book.scene?.isEmpty == false)
+                #expect(book.cast.count == 2)
+                #expect(book.sentences.allSatisfy { $0.speaker?.isEmpty == false })
+            }
             let words = book.sentences.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
             #expect(Set(words) == Set(book.vocabulary.map(\.word)))
             #expect(Set(book.vocabulary.map(\.word)).count == book.vocabulary.count)

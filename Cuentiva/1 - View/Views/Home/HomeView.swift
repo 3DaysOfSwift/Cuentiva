@@ -13,13 +13,14 @@ struct HomeView: View {
                     VStack { Text("\(viewModel.total)").font(.system(.largeTitle, design: .serif)); Text("BOOKS\nLEARNED").font(.system(size: 9, weight: .bold, design: .monospaced)).multilineTextAlignment(.center) }
                 }
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
+                LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 26) {
                     ForEach(viewModel.books) { book in
                         Button { viewModel.selectedBook = book } label: {
                             VStack(alignment: .leading, spacing: 10) {
                                 BookCover(book: book, completed: viewModel.completed(book), compact: true)
                                 Text(book.englishTitle).font(.subheadline.weight(.semibold)).foregroundStyle(theme.theme.ink)
-                                Text("\(book.level) · \(book.sentences.count) sentences").font(.caption).foregroundStyle(theme.theme.muted)
+                                Text("\(book.level) · \(book.sentences.count) \(book.unitName)").font(.caption).foregroundStyle(theme.theme.muted)
                                 Text(viewModel.coverage(book)).font(.caption2).foregroundStyle(theme.theme.muted)
                             }
                         }.buttonStyle(.plain)

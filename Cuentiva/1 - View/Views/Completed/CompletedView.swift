@@ -7,7 +7,8 @@ struct CompletedView: View {
             VStack(alignment: .leading, spacing: 25) {
                 Text("Look how far\nyou’ve read.").font(.system(.largeTitle, design: .serif))
                 Text("Every finished story belongs here. Your collection stays with you, even when a streak ends.").foregroundStyle(theme.theme.muted)
-                if viewModel.books.isEmpty { ContentUnavailableView("Your collection starts here", systemImage: "books.vertical", description: Text("Finish a book to add its cover to your shelf.")) }
+                LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
+                if viewModel.books.isEmpty { ContentUnavailableView("No completed books here", systemImage: "books.vertical", description: Text("Try another filter or finish a book to add it to your shelf.")) }
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 25) {
                     ForEach(viewModel.books) { book in Button { viewModel.selectedBook = book } label: { BookCover(book: book, completed: true, compact: true) }.buttonStyle(.plain) }
                 }

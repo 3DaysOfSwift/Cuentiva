@@ -1,3 +1,7 @@
+## Movie Scripts and library controls — 16 September 2026
+
+Added three original scripts (46 books total), optional format/scene/speaker metadata, role selection, and shared type filtering and sorting for Discover and Completed. Existing JSON decodes as Stories. All 17 core tests and the Xcode simulator test suite pass, including combined access/filter/completion checks and role-selection/manual-completion behavior. Verified Movie Scripts filtering, title sorting, and role selection visually on iPhone Air. Installed the updated build there. Dialogue uses the existing single Spanish voice with manual playback.
+
 # Validation — 16 September 2026
 
 ## Gravity, the Sun, and gas giants

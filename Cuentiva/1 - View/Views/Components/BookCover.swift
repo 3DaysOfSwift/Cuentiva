@@ -18,6 +18,7 @@ struct BookCover: View {
                 Rectangle().fill(theme.theme.coverShadow.opacity(0.1)).frame(width: 8).frame(maxWidth: .infinity, alignment: .leading)
                 VStack(alignment: .leading, spacing: compact ? 8 : 12) {
                     HStack { Text("CUENTIVA / \(book.level)").font(.system(size: 9, weight: .bold, design: .monospaced)); Spacer() }
+                    if book.kind == .movieScript { Text("MOVIE SCRIPT").font(.system(size: 9, weight: .bold, design: .monospaced)) }
                     Text(book.title).font(.system(compact ? .title3 : .largeTitle, design: .serif, weight: .medium)).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 4)
                     Image(systemName: book.symbol).font(.system(size: compact ? 38 : 70, weight: .ultraLight)).frame(maxWidth: .infinity).padding(.vertical, compact ? 8 : 10)
@@ -32,6 +33,6 @@ struct BookCover: View {
         }.frame(height: compact ? compactHeight : fullHeight).clipShape(RoundedRectangle(cornerRadius: 8))
             .shadow(color: color.opacity(0.18), radius: 10, x: 0, y: 5)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(book.title), \(book.level)\(completed ? ", completed" : "")")
+            .accessibilityLabel("\(book.title), \(book.kind.singular), \(book.level)\(completed ? ", completed" : "")")
     }
 }

@@ -2,7 +2,7 @@
 
 Learn Spanish through community-written stories about real people.
 
-A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 43 bundled stories are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
+A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 46 bundled stories and scripts are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
 
 ## Run
 
@@ -86,3 +86,9 @@ The next 14 stories, extracted from a personal journal, are in [JOURNAL-STORIES.
 Six more stories about work, travel, curiosity, and a speculative AI future appear in [WORLD-STORIES.md](Documentation/WORLD-STORIES.md), with editorial notes and cattle terminology sources.
 
 Three factual-science stories with fictional characters are in [SPACE-STORIES.md](Documentation/SPACE-STORIES.md), alongside NASA references.
+
+## Stories and Movie Scripts
+
+The library now includes 46 books: 43 stories and three original Movie Scripts (A1, A2, B1). Discover and Completed offer All types / Stories / Movie Scripts filters, plus library order, English title, difficulty, and book-type sorting. Search and difficulty filtering combine with the format filter.
+
+Scripts show their scene and named speakers. Choose a role or read all roles; use Listen manually for either character and advance freely with Next line. They share the permanent Books Learned collection. This first version uses the existing Spanish voice; automatic partner playback and distinct character voices are not implemented. See [the scripts](Documentation/MOVIE-SCRIPTS.md).

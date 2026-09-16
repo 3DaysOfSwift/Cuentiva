@@ -5,7 +5,7 @@ import Observation
     var books: [Book] { get }
     var introduction: Book? { get }
     func load() async throws
-    func search(_ query: String, level: String?, completedOnly: Bool) -> [Book]
+    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book]
     func coverage(_ book: Book) -> String
 }
 @MainActor @Observable final class LibraryManager: LibraryFeature {
@@ -18,16 +18,32 @@ import Observation
     }
     var introduction: Book? { books.first { $0.id == "cafe" } }
     func load() async throws { if books.isEmpty { books = try await repository.books() } }
-    func search(_ query: String, level: String?, completedOnly: Bool) -> [Book] {
+    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book] {
         guard purchases.hasAccess else { return [] }
-        return books.filter { book in
-            (query.isEmpty || "\(book.title) \(book.englishTitle) \(book.author)".localizedStandardContains(query)) &&
-            (level == nil || book.level == level) && (!completedOnly || progress.snapshot.completed.contains(book.id))
+        let matches = books.filter { book in
+            (query.isEmpty || "\(book.title) \(book.englishTitle) \(book.author) \(book.cast.joined(separator: " "))".localizedStandardContains(query)) &&
+            (format == nil || book.kind == format) && (level == nil || book.level == level) && (!completedOnly || progress.snapshot.completed.contains(book.id))
         }
+        switch sort {
+        case .library: return matches
+        case .title: return matches.sorted(by: titleOrder)
+        case .difficulty: return matches.sorted { $0.level == $1.level ? titleOrder($0, $1) : $0.level < $1.level }
+        case .type: return matches.sorted { $0.kind == $1.kind ? titleOrder($0, $1) : $0.kind.title < $1.kind.title }
+        }
+    }
+    private func titleOrder(_ lhs: Book, _ rhs: Book) -> Bool {
+        let comparison = lhs.englishTitle.localizedCaseInsensitiveCompare(rhs.englishTitle)
+        return comparison == .orderedSame ? lhs.id < rhs.id : comparison == .orderedAscending
     }
     func coverage(_ book: Book) -> String {
         let lemmas = Set(book.vocabulary.map(\.lemma))
         let known = lemmas.filter { progress.snapshot.vocabulary[$0] == .known }.count
         return "\(known) of \(lemmas.count) words known"
+    }
+}
+
+extension LibraryFeature {
+    func search(_ query: String, level: String?, completedOnly: Bool) -> [Book] {
+        search(query, level: level, completedOnly: completedOnly, format: nil, sort: .library)
     }
 }

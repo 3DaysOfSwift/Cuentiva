@@ -11,11 +11,11 @@ struct CompletionView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 25) {
-                Label("BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
+                Label(receipt.book.kind == .movieScript ? "SCRIPT COMPLETED" : "BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
                 Text("One more story.\nA little more you.").font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
                 BookCover(book: receipt.book, completed: true, compact: true).frame(width: 155)
                 Text(receipt.book.englishTitle).font(.title3.weight(.semibold))
-                Text("\(receipt.book.sentences.count) sentences · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
+                Text("\(receipt.book.sentences.count) \(receipt.book.unitName) · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
                 VStack(spacing: 5) {
                     Text("\(viewModel.displayedTotal)").font(.system(size: 72, weight: .medium, design: .serif)).contentTransition(.numericText())
                     Text("BOOKS LEARNED").font(.caption.bold()).tracking(3)

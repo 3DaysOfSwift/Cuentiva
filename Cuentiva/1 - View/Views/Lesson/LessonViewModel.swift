@@ -7,6 +7,8 @@ import Observation
     private(set) var book: Book?
     private(set) var index = 0
     var mode = "Speak"
+    var role = ""
+    var isPartnerLine: Bool { !role.isEmpty && sentence?.speaker != role }
     private var writingDrafts: [String: String] = [:]
     var answer = "" {
         didSet { if let sentence { writingDrafts[sentence.id] = answer } }
@@ -19,9 +21,9 @@ import Observation
     var receipt: CompletionReceipt?
     private var recordingTask: Task<Void, Never>?
     var sentence: Sentence? { guard let book else { return nil }; return book.sentences[index] }
-    var positionLabel: String { guard let book else { return "" }; return "\(index + 1) OF \(book.sentences.count) SENTENCES" }
+    var positionLabel: String { guard let book else { return "" }; return "\(index + 1) OF \(book.sentences.count) \(book.unitName.uppercased())" }
     var fraction: Double { guard let book else { return 0 }; return Double(index + 1) / Double(book.sentences.count) }
-    var nextTitle: String { guard let book else { return "Next" }; return index == book.sentences.count - 1 ? "Finish book" : "Next sentence" }
+    var nextTitle: String { guard let book else { return "Next" }; return index == book.sentences.count - 1 ? (book.kind == .movieScript ? "Finish script" : "Finish book") : (book.kind == .movieScript ? "Next line" : "Next sentence") }
     var allowed: Bool { guard let book else { return false }; return learning.canRead(book) }
     init(learning: any LearningFeature = AppModel.shared.learning, audio: (any LessonAudio)? = nil) { self.learning = learning; self.audio = audio ?? AppModel.shared.makeAudio() }
     func load(_ book: Book) { guard self.book == nil else { return }; self.book = book; index = learning.position(book) }
