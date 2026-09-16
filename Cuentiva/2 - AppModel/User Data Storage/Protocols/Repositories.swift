@@ -6,6 +6,7 @@ protocol ProgressRepository: Sendable {
 }
 protocol ContributionRepository: Sendable {
     func drafts() async throws -> [Contribution]
+    func remove(_ id: UUID) async throws
     func save(_ draft: Contribution) async throws
 }
 

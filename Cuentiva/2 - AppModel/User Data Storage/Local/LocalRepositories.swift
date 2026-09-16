@@ -32,6 +32,11 @@ actor LocalContributionRepository: ContributionRepository {
         guard FileManager.default.fileExists(atPath: url.path) else { return [] }
         return try JSONDecoder().decode([Contribution].self, from: Data(contentsOf: url))
     }
+    func remove(_ id: UUID) throws {
+        let remaining = try drafts().filter { $0.id != id }
+        try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try JSONEncoder().encode(remaining).write(to: url, options: .atomic)
+    }
     func save(_ draft: Contribution) throws {
         var all = try drafts()
         all.removeAll { $0.id == draft.id }; all.append(draft)

@@ -9,6 +9,7 @@ struct RootView: View {
                 if viewModel.hasAccess {
                     TabView {
                         Tab("Discover", systemImage: "books.vertical") { NavigationStack { HomeView() } }
+                        Tab("Nearby", systemImage: "location") { NavigationStack { NearbyView() } }
                         Tab("Completed", systemImage: "checkmark.seal") { NavigationStack { CompletedView() } }
                         Tab("Contribute", systemImage: "square.and.pencil") { NavigationStack { ContributionView() } }
                     }

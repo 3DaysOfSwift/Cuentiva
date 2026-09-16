@@ -21,6 +21,7 @@ import Observation
     func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book] {
         guard purchases.hasAccess else { return [] }
         let matches = books.filter { book in
+            (book.submissionLocation == nil || progress.snapshot.completed.contains(book.id)) &&
             (query.isEmpty || "\(book.title) \(book.englishTitle) \(book.author) \(book.cast.joined(separator: " "))".localizedStandardContains(query)) &&
             (format == nil || book.kind == format) && (level == nil || book.level == level) && (!completedOnly || progress.snapshot.completed.contains(book.id))
         }

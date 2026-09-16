@@ -6,6 +6,7 @@ struct Contribution: Identifiable, Codable, Sendable, Equatable {
     var title = ""
     var spanish = ""
     var status = "Draft"
+    var submissionLocation: StoryLocation? = nil
     var topicID: String? = nil
     var teachingNote: String? = nil
     var checkedRequirements: [String]? = nil
@@ -18,6 +19,7 @@ struct Contribution: Identifiable, Codable, Sendable, Equatable {
     func load() async throws
     func save(_ draft: Contribution, submit: Bool) async throws
     func coaching(_ text: String) -> [String]
+    func remove(_ id: UUID) async throws
 }
 @MainActor @Observable final class ContributionManager: ContributionFeature {
     private(set) var drafts: [Contribution] = []
@@ -44,9 +46,24 @@ struct Contribution: Identifiable, Codable, Sendable, Equatable {
             if submit && !topic.ready(draft) { throw AppFailure.unavailable("Complete the teaching note, self-review checklist, and required form counts before submitting this topic draft.") }
         }
         saving = true; defer { saving = false }
+        let existing = try await repository.drafts().first { $0.id == draft.id }
+        if let locked = existing?.submissionLocation {
+            guard draft.submissionLocation == locked else { throw AppFailure.unavailable("The submitted location is permanent. It cannot be moved or removed by editing this draft.") }
+        } else if let location = draft.submissionLocation {
+            guard submit, location.fresh(), location.accuracy <= 5000 else {
+                throw AppFailure.unavailable("Confirm a fresh location before submitting. For a more accurate location, enable Precise Location in Settings.")
+            }
+        }
         var saved = draft; saved.status = submit ? "Pending review · local demo" : "Draft"
         try await repository.save(saved)
         drafts.removeAll { $0.id == saved.id }; drafts.append(saved)
+    }
+    func remove(_ id: UUID) async throws {
+        guard purchases.hasAccess else { throw AppFailure.locked }
+        guard !saving else { throw AppFailure.busy }
+        saving = true; defer { saving = false }
+        try await repository.remove(id)
+        drafts.removeAll { $0.id == id }
     }
     func coaching(_ text: String) -> [String] {
         var tips = ["Keep your own voice. Describe one moment, place, or person in a few short sentences.", "Check verb tense and agreement. Read each sentence aloud before submitting."]

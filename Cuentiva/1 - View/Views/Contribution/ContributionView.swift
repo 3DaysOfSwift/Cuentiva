@@ -1,6 +1,10 @@
 import SwiftUI
 struct ContributionView: View {
-    @State private var viewModel = ContributionViewModel()
+    @State private var viewModel: ContributionViewModel
+    init(nearby: Bool = false) {
+        let model = ContributionViewModel(); model.attachLocation = nearby
+        _viewModel = State(initialValue: model)
+    }
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         ScrollView {
@@ -44,8 +48,17 @@ struct ContributionView: View {
                         ForEach(viewModel.tips, id: \.self) { Text($0).font(.subheadline) }
                         Text("These are local prompts, not an AI review. A future AI editor will suggest changes for you to accept; it will not write your story for you.").font(.caption).foregroundStyle(theme.theme.muted)
                     }
+                    if let place = viewModel.draft.submissionLocation {
+                        Label("Submitted near \(place.placeName) · location locked", systemImage: "mappin.and.ellipse").font(.subheadline)
+                    } else {
+                        Toggle("Leave this story here", isOn: $viewModel.attachLocation)
+                        Text("On submission, confirm your current place. Its coordinates stay fixed; readers see only the approximate place name. You can also submit without a location.").font(.caption).foregroundStyle(theme.theme.muted)
+                    }
                     Button("Save draft") { Task { await viewModel.save(submit: false) } }.buttonStyle(.bordered).disabled(viewModel.busy)
-                    Button("Submit for review · demo") { Task { await viewModel.save(submit: true) } }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)
+                    Button("Submit for review · demo") { Task { await viewModel.requestSubmission() } }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)
+                    if viewModel.drafts.contains(where: { $0.id == viewModel.draft.id }) {
+                        Button("Delete local story and location", role: .destructive) { viewModel.confirmingRemoval = true }.disabled(viewModel.busy)
+                    }
                     if let notice = viewModel.notice { Text(notice).font(.footnote).foregroundStyle(theme.theme.accent) }
                     Text("Local demo only. Review and publishing are not connected. Only accepted, published books count toward your goal.").font(.caption).foregroundStyle(theme.theme.muted)
                     if !viewModel.drafts.isEmpty { Text("YOUR DRAFTS").font(.caption.bold()); ForEach(viewModel.drafts) { draft in Button { viewModel.edit(draft) } label: { HStack { Text(draft.title); Spacer(); Text(draft.status).font(.caption) } }.padding(.vertical, 8) } }
@@ -57,5 +70,15 @@ struct ContributionView: View {
                 InlineError(message: viewModel.error)
             }.padding(25)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Contribute").navigationBarTitleDisplayMode(.inline).task { await viewModel.load() }
+            .alert("Delete this local story?", isPresented: $viewModel.confirmingRemoval) {
+                Button("Delete", role: .destructive) { Task { await viewModel.removeDraft() } }
+                Button("Cancel", role: .cancel) { }
+            } message: { Text("Its text and submission location will be removed from this device. This cannot be undone.") }
+            .confirmationDialog("Leave this story near \(viewModel.locationToConfirm?.placeName ?? "here")?", isPresented: $viewModel.confirmingLocation, titleVisibility: .visible) {
+                Button("Confirm location and submit") { Task { await viewModel.confirmSubmission() } }
+                Button("Cancel", role: .cancel) { viewModel.locationToConfirm = nil }
+            } message: {
+                Text("This submission location stays fixed. Only the approximate place name is shown to readers. In this demo, the story and its location stay on this device pending review.")
+            }
     }
 }

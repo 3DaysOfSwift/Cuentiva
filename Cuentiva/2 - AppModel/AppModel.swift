@@ -7,9 +7,11 @@ import Foundation
     let purchases: any PurchaseFeature
     let learning: any LearningFeature
     let contributions: any ContributionFeature
+    let nearby: any NearbyFeature
     let makeAudio: () -> any LessonAudio
     init(library: any LibraryFeature, progress: any ProgressFeature, purchases: any PurchaseFeature,
          learning: any LearningFeature, contributions: any ContributionFeature, makeAudio: @escaping () -> any LessonAudio) {
+        self.nearby = NearbyManager(library: library, purchases: purchases)
         self.library = library; self.progress = progress; self.purchases = purchases
         self.learning = learning; self.contributions = contributions; self.makeAudio = makeAudio
     }

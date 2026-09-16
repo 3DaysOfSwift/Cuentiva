@@ -106,3 +106,7 @@ Verbs is a third content type in the shared Discover/Completed type picker. The 
 ## Contribution requests
 
 Contributors can write freely or pick a topic request with a teaching brief, coverage target, form counts, and self-review checklist. Picking a request creates/resumes a local draft and switching paths preserves current work. Haber leads six editorially seeded requests. Counts distinguish reviewed coverage from drafts and demo examples. Submitting locally never completes a topic or publishes a book. See [topic requests](Documentation/TOPIC-REQUESTS.md) for review boundaries and backend integration.
+
+## Nearby Stories
+
+Nearby discovers geotagged books within 5, 25 or 100 km. Contributions can capture and confirm a fixed submission location; completed stories remain readable after travel. This demo keeps submissions local and does not invent locations for the bundled samples. See [Nearby Stories](Documentation/NEARBY-STORIES.md) for behavior, privacy and server integration.

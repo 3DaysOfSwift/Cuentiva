@@ -1,3 +1,11 @@
+## Nearby Stories — 17 September 2026
+
+- Xcode Simulator tests passed; all 25 core tests passed. Final view-only changes built successfully afterward.
+- New tests cover distance/radius filtering, stale browsing fixes, purchase gating, ordinary versus geographically restricted discovery, completed-book access after travel, immutable submission coordinates, stale submission rejection, and local deletion.
+- iPhone Air Simulator: installed and opened Nearby Stories; verified the themed tab, distance control and contribution navigation with “Leave this story here” enabled. Existing progress and drafts remained available.
+- Live device permission, GPS accuracy, MapKit locality lookup, denial/timeout and confirmation persistence still need on-device checks. No real location was obtained in the UI test. No fabricated community locations were attached to existing books.
+- Server publishing, server-side geographic access enforcement, immutable server metadata and remote privacy withdrawal remain future integration work; local drafts do not appear as published nearby books.
+
 ## Reader audio-session warnings — 17 September 2026
 
 - Removed manual playback category/activation and unconditional deactivation on every sentence. AVSpeechSynthesizer now manages its separate playback session (`usesApplicationAudioSession = false`), as documented in the installed Apple SDK.
