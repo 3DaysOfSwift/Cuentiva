@@ -1,5 +1,20 @@
 # Validation — 16 September 2026
 
+## Speech callback correction
+
+A subsequent Simulator test run passed after correcting the audio callback boundaries.
+The recognition-result handler is explicitly Sendable/nonisolated, extracts value data,
+and publishes on MainActor. The audio tap is constructed in a nonisolated factory and
+skips empty buffers without moving PCM buffers across a Task boundary. Speech permission
+completion is explicitly Sendable. Two regression tests invoke the result handler and
+audio tap from detached tasks; the result test asserts main-actor publication.
+
+This addresses a callback-isolation defect consistent with the reported dispatch queue
+assertion. The screenshot did not show the full call stack, so the exact reported crash
+has not been conclusively matched. Live microphone and voice-asset behavior still need
+retesting on the affected simulator/device. Simulator voice metadata warnings were not
+claimed to be repaired by this app change.
+
 ## Latest verification — theme update
 
 A direct standalone Xcode invocation successfully built and executed **25 tests in six suites** on the iPhone 17 / iOS 26.2 Simulator. This includes all eight screen-model tests, the fifteen core tests, and two new tests for theme persistence and obsolete-selection fallback. No compiler sandbox workaround was needed for this invocation.

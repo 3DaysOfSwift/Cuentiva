@@ -45,7 +45,9 @@ import Observation
         stop(); error = nil; transcript = ""
         let token = generation
         let speechAllowed = await withCheckedContinuation { continuation in
-            SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0 == .authorized) }
+            SFSpeechRecognizer.requestAuthorization { @Sendable status in
+                continuation.resume(returning: status == .authorized)
+            }
         }
         let micAllowed = await AVAudioApplication.requestRecordPermission()
         guard token == generation else { return }
@@ -63,23 +65,38 @@ import Observation
             self.request = request
             let input = engine.inputNode, format = input.outputFormat(forBus: 0)
             guard format.sampleRate > 0 && format.channelCount > 0 else { throw AppFailure.unavailable("No microphone is available. Please use Write.") }
-            input.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, _ in request.append(buffer) }
+            input.installTap(onBus: 0, bufferSize: 1024, format: format, block: Self.makeAudioTap(request: request))
             tapInstalled = true
-            recognition = recognizer.recognitionTask(with: request) { [weak self] result, failure in
-                let text = result?.bestTranscription.formattedString
-                let finished = result?.isFinal == true
-                let message = failure?.localizedDescription
-                Task { @MainActor [weak self] in
-                    guard let self, self.generation == token else { return }
-                    if let text { self.transcript = text }
-                    if finished || message != nil {
-                        self.stopRecording()
-                        if let message, self.transcript.isEmpty { self.error = message }
-                    }
+            recognition = recognizer.recognitionTask(with: request, resultHandler: Self.makeRecognitionHandler { [weak self] text, finished, message in
+                guard let self, self.generation == token else { return }
+                if let text { self.transcript = text }
+                if finished || message != nil {
+                    self.stopRecording()
+                    if let message, self.transcript.isEmpty { self.error = message }
                 }
-            }
+            })
             engine.prepare(); try engine.start(); recording = true
         } catch { stopRecording(); self.error = error.localizedDescription }
+    }
+    // Extract only Sendable values before hopping from Speech's callback queue.
+    nonisolated static func makeRecognitionHandler(
+        publish: @escaping @MainActor @Sendable (String?, Bool, String?) -> Void
+    ) -> @Sendable (SFSpeechRecognitionResult?, (any Error)?) -> Void {
+        { result, failure in
+            let text = result?.bestTranscription.formattedString
+            let finished = result?.isFinal == true
+            let message = failure?.localizedDescription
+            Task { @MainActor in publish(text, finished, message) }
+        }
+    }
+    // AVAudioEngine invokes the tap on its audio queue, never on MainActor.
+    // Construct this legacy callback outside actor isolation; append stays on the
+    // audio queue and the PCM buffer never crosses an asynchronous boundary.
+    nonisolated static func makeAudioTap(request: SFSpeechAudioBufferRecognitionRequest) -> AVAudioNodeTapBlock {
+        { buffer, _ in
+            guard buffer.frameLength > 0 else { return }
+            request.append(buffer)
+        }
     }
     func stopRecording() {
         generation = UUID()
