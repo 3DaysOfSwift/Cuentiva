@@ -9,8 +9,26 @@ struct ContributionView: View {
                 Text("\(viewModel.count) / 5 books contributed").font(.headline).foregroundStyle(theme.theme.accent)
                 Text("Write about a person, a place, or a moment that stayed with you. Fiction is welcome too.").foregroundStyle(theme.theme.muted)
                 if viewModel.eligible {
-                    TextField("Your story’s title", text: $viewModel.draft.title).font(.title3).padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
-                    TextEditor(text: $viewModel.draft.spanish).frame(minHeight: 210).padding(10).scrollContentBackground(.hidden).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12)).accessibilityLabel("Your story in Spanish")
+                    TextField("Your story’s title in Spanish", text: $viewModel.draft.title)
+                        .autocorrectionDisabled().textInputAutocapitalization(.never)
+                        .font(.title3).padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
+                    ZStack(alignment: .topLeading) {
+                        if viewModel.draft.spanish.isEmpty {
+                            Text("Write your story in Spanish…")
+                                .foregroundStyle(theme.theme.muted)
+                                .padding(.horizontal, 15).padding(.vertical, 18)
+                                .allowsHitTesting(false).accessibilityHidden(true)
+                        }
+                        TextEditor(text: $viewModel.draft.spanish)
+                            .autocorrectionDisabled().textInputAutocapitalization(.never)
+                            .frame(minHeight: 210).padding(10)
+                            .scrollContentBackground(.hidden)
+                            .accessibilityLabel("Your story in Spanish")
+                    }.background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
+                    Text("Autocorrection is off, so your words stay yours. Remember accents, capitals, and punctuation.")
+                        .font(.footnote).foregroundStyle(theme.theme.muted)
+                    Label("Add a Spanish keyboard in Settings for easy access to ñ, accents, ¿ and ¡.", systemImage: "keyboard")
+                        .font(.footnote).foregroundStyle(theme.theme.muted)
                     HStack { Button("Preview") { viewModel.preview.toggle() }; Spacer(); Button("Coaching prompts") { viewModel.coach() } }
                     if viewModel.preview { VStack(alignment: .leading, spacing: 10) { Text(viewModel.draft.title).font(.title2); Text(viewModel.draft.spanish) }.padding().background(theme.theme.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12)) }
                     if !viewModel.tips.isEmpty {
