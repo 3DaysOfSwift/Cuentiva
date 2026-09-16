@@ -26,18 +26,20 @@ struct NearbyView: View {
                         Text("A place waiting for a voice.").font(.system(.title2, design: .serif))
                         Text("There are no published stories nearby in this local demo. Tell the next traveller what you discovered.").foregroundStyle(theme.theme.muted)
                     }
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 24)], alignment: .leading, spacing: 28) {
                     ForEach(viewModel.books) { book in
                         Button { viewModel.selectedBook = book } label: {
-                            HStack(spacing: 18) {
-                                BookCover(book: book, completed: viewModel.completed(book), compact: true).frame(width: 120)
+                            VStack(alignment: .leading, spacing: 14) {
+                                BookCover(book: book, completed: viewModel.completed(book), compact: true)
                                 VStack(alignment: .leading, spacing: 8) {
                                     Text(book.englishTitle).font(.headline)
                                     Text(book.submissionLocation?.placeName ?? "").font(.subheadline)
                                     Text(book.level).font(.caption)
                                     if book.isDemoLocation == true { Text("EXAMPLE STORY · DEMO LOCATION").font(.caption2).foregroundStyle(theme.theme.muted) }
-                                }
-                            }
+                                }.frame(maxWidth: .infinity, alignment: .leading)
+                            }.frame(maxWidth: .infinity, alignment: .leading)
                         }.buttonStyle(.plain)
+                    }
                     }
                 }
                 NavigationLink { ContributionView(nearby: true) } label: { Label("Leave a story here", systemImage: "square.and.pencil") }

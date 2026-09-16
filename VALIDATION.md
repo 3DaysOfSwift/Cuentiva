@@ -1,3 +1,7 @@
+## Nearby layout correction — 17 September 2026
+
+Moved the fixed-size decorative circle into an overlay so it cannot impose a minimum cover width. Nearby uses adaptive vertical cards with descriptions below the covers, replacing the cramped 120-point horizontal cover rows. Xcode build passed. On iPhone Air Simulator with a simulated Pattaya coordinate, permission and place-name lookup succeeded and all three example stories loaded. The visible first card stays inside the horizontal margins; Discover's existing two-column covers were also visually checked. Full lower-card scrolling and physical iPhone layout were not verified by automation.
+
 ## Thailand Nearby examples — 17 September 2026
 
 Added three original A2 fictional travel stories at explicit example locations in Bangkok, Pattaya and Chiang Mai. Each has eight guided and eight continuation sentence pairs, with full vocabulary indexing. Nearby defaults to 1,000 miles (1,609.344 km), while smaller radii remain available. The reader's location still comes from the location provider; it is not hard-coded to Pattaya.

@@ -13,8 +13,11 @@ struct BookCover: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             ZStack {
-                color
-                Circle().stroke(theme.theme.coverInk.opacity(0.12), lineWidth: 35).frame(width: 180).offset(x: 65, y: 85)
+                color.overlay {
+                    // Decoration must not impose a minimum width on the cover.
+                    Circle().stroke(theme.theme.coverInk.opacity(0.12), lineWidth: 35)
+                        .frame(width: 180, height: 180).offset(x: 65, y: 85)
+                }
                 Rectangle().fill(theme.theme.coverShadow.opacity(0.1)).frame(width: 8).frame(maxWidth: .infinity, alignment: .leading)
                 VStack(alignment: .leading, spacing: compact ? 8 : 12) {
                     HStack { Text("CUENTIVA / \(book.level)").font(.system(size: 9, weight: .bold, design: .monospaced)); Spacer() }
