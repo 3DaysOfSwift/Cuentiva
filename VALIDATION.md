@@ -1,5 +1,14 @@
 # Validation — 16 September 2026
 
+## Second journal-derived collection
+
+Added 14 original fictional microbooks with 112 bilingual sentence pairs.
+All 34 books decode and pass the per-word occurrence/index checks; all 16 core
+tests and the iOS Simulator suite pass. Library distribution is 8 A1, 14 A2,
+12 B1. Existing IDs and progress are preserved. Installed on iPhone Air Simulator.
+Health/science assertions and literary scope are documented in JOURNAL-CONTENT-NOTES.md;
+full bilingual text is in JOURNAL-STORIES.md. Native-speaker review remains pending.
+
 ## Expanded life-skills library
 
 Added 15 original fictional microbooks: 122 bilingual sentence pairs and 1,034

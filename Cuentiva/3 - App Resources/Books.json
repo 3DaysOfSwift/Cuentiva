@@ -6548,5 +6548,4985 @@
       }
     ],
     "license": "Original fictional learning story created for Cuentiva. Not adapted from a named self-help book. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "first-invitation",
+    "title": "La primera invitación",
+    "englishTitle": "The first invitation",
+    "author": "Cuentiva · fictional story",
+    "level": "A1",
+    "symbol": "sun.max",
+    "palette": 0,
+    "summary": "A small yes makes space for a new friendship.",
+    "sentences": [
+      {
+        "id": "first-invitation-1",
+        "spanish": "Cada sábado me quedo en casa.",
+        "english": "Every Saturday I stay at home."
+      },
+      {
+        "id": "first-invitation-2",
+        "spanish": "Hoy mi vecino me invita a caminar.",
+        "english": "Today my neighbor invites me to go for a walk."
+      },
+      {
+        "id": "first-invitation-3",
+        "spanish": "No conozco a sus amigos.",
+        "english": "I do not know his friends."
+      },
+      {
+        "id": "first-invitation-4",
+        "spanish": "Tengo un poco de miedo, pero digo que sí.",
+        "english": "I am a little afraid, but I say yes."
+      },
+      {
+        "id": "first-invitation-5",
+        "spanish": "Caminamos hasta un parque cerca del río.",
+        "english": "We walk to a park near the river."
+      },
+      {
+        "id": "first-invitation-6",
+        "spanish": "Una mujer me pregunta por mi libro.",
+        "english": "A woman asks me about my book."
+      },
+      {
+        "id": "first-invitation-7",
+        "spanish": "Hablamos y nos reímos durante el paseo.",
+        "english": "We talk and laugh during the walk."
+      },
+      {
+        "id": "first-invitation-8",
+        "spanish": "Vuelvo a casa con una nueva amiga.",
+        "english": "I come home with a new friend."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 3
+      },
+      {
+        "word": "amiga",
+        "lemma": "amiga",
+        "occurrences": 1
+      },
+      {
+        "word": "amigos",
+        "lemma": "amigo",
+        "occurrences": 1
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 1
+      },
+      {
+        "word": "caminamos",
+        "lemma": "caminar",
+        "occurrences": 1
+      },
+      {
+        "word": "caminar",
+        "lemma": "caminar",
+        "occurrences": 1
+      },
+      {
+        "word": "casa",
+        "lemma": "casa",
+        "occurrences": 2
+      },
+      {
+        "word": "cerca",
+        "lemma": "cerca",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "conozco",
+        "lemma": "conocer",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 1
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "digo",
+        "lemma": "decir",
+        "occurrences": 1
+      },
+      {
+        "word": "durante",
+        "lemma": "durante",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 1
+      },
+      {
+        "word": "hablamos",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hasta",
+        "lemma": "hasta",
+        "occurrences": 1
+      },
+      {
+        "word": "hoy",
+        "lemma": "hoy",
+        "occurrences": 1
+      },
+      {
+        "word": "invita",
+        "lemma": "invitar",
+        "occurrences": 1
+      },
+      {
+        "word": "libro",
+        "lemma": "libro",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 3
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "miedo",
+        "lemma": "miedo",
+        "occurrences": 1
+      },
+      {
+        "word": "mujer",
+        "lemma": "mujer",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "nueva",
+        "lemma": "nuevo",
+        "occurrences": 1
+      },
+      {
+        "word": "parque",
+        "lemma": "parque",
+        "occurrences": 1
+      },
+      {
+        "word": "paseo",
+        "lemma": "paseo",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "poco",
+        "lemma": "poco",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 1
+      },
+      {
+        "word": "quedo",
+        "lemma": "quedar",
+        "occurrences": 1
+      },
+      {
+        "word": "reímos",
+        "lemma": "reír",
+        "occurrences": 1
+      },
+      {
+        "word": "río",
+        "lemma": "río",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "sábado",
+        "lemma": "sábado",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "tengo",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "vecino",
+        "lemma": "vecino",
+        "occurrences": 1
+      },
+      {
+        "word": "vuelvo",
+        "lemma": "volver",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "thoughtful-yes",
+    "title": "Un sí con espacio",
+    "englishTitle": "A yes with room to breathe",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "hand.raised",
+    "palette": 1,
+    "summary": "Openness works best alongside personal boundaries.",
+    "sentences": [
+      {
+        "id": "thoughtful-yes-1",
+        "spanish": "Después de leer Yes Man, Laura quiere aceptar más invitaciones.",
+        "english": "After reading Yes Man, Laura wants to accept more invitations."
+      },
+      {
+        "id": "thoughtful-yes-2",
+        "spanish": "El libro de Danny Wallace le despierta curiosidad por otras experiencias.",
+        "english": "Danny Wallace’s book makes her curious about other experiences."
+      },
+      {
+        "id": "thoughtful-yes-3",
+        "spanish": "Se apunta a una clase de baile que siempre le daba vergüenza probar.",
+        "english": "She signs up for a dance class that she always felt embarrassed to try."
+      },
+      {
+        "id": "thoughtful-yes-4",
+        "spanish": "Al día siguiente, un conocido le pide dinero que no puede prestar.",
+        "english": "The next day, an acquaintance asks her for money that she cannot lend."
+      },
+      {
+        "id": "thoughtful-yes-5",
+        "spanish": "Esta vez responde que no.",
+        "english": "This time she says no."
+      },
+      {
+        "id": "thoughtful-yes-6",
+        "spanish": "No tiene que aceptar todo para vivir con más curiosidad.",
+        "english": "She does not have to accept everything to live with more curiosity."
+      },
+      {
+        "id": "thoughtful-yes-7",
+        "spanish": "El viernes vuelve a bailar con sus nuevos compañeros.",
+        "english": "On Friday she goes dancing again with her new classmates."
+      },
+      {
+        "id": "thoughtful-yes-8",
+        "spanish": "Su sí tiene más sentido porque también puede elegir.",
+        "english": "Her yes means more because she can also choose."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 2
+      },
+      {
+        "word": "aceptar",
+        "lemma": "aceptar",
+        "occurrences": 2
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "apunta",
+        "lemma": "apuntar",
+        "occurrences": 1
+      },
+      {
+        "word": "bailar",
+        "lemma": "bailar",
+        "occurrences": 1
+      },
+      {
+        "word": "baile",
+        "lemma": "baile",
+        "occurrences": 1
+      },
+      {
+        "word": "clase",
+        "lemma": "clase",
+        "occurrences": 1
+      },
+      {
+        "word": "compañeros",
+        "lemma": "compañero",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 2
+      },
+      {
+        "word": "conocido",
+        "lemma": "conocido",
+        "occurrences": 1
+      },
+      {
+        "word": "curiosidad",
+        "lemma": "curiosidad",
+        "occurrences": 2
+      },
+      {
+        "word": "daba",
+        "lemma": "dar",
+        "occurrences": 1
+      },
+      {
+        "word": "danny",
+        "lemma": "danny",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "despierta",
+        "lemma": "despertar",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "dinero",
+        "lemma": "dinero",
+        "occurrences": 1
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "elegir",
+        "lemma": "elegir",
+        "occurrences": 1
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 1
+      },
+      {
+        "word": "experiencias",
+        "lemma": "experiencia",
+        "occurrences": 1
+      },
+      {
+        "word": "invitaciones",
+        "lemma": "invitación",
+        "occurrences": 1
+      },
+      {
+        "word": "laura",
+        "lemma": "laura",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 3
+      },
+      {
+        "word": "leer",
+        "lemma": "leer",
+        "occurrences": 1
+      },
+      {
+        "word": "libro",
+        "lemma": "libro",
+        "occurrences": 1
+      },
+      {
+        "word": "man",
+        "lemma": "man",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 3
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 3
+      },
+      {
+        "word": "nuevos",
+        "lemma": "nuevo",
+        "occurrences": 1
+      },
+      {
+        "word": "otras",
+        "lemma": "otro",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "pide",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "porque",
+        "lemma": "porque",
+        "occurrences": 1
+      },
+      {
+        "word": "prestar",
+        "lemma": "prestar",
+        "occurrences": 1
+      },
+      {
+        "word": "probar",
+        "lemma": "probar",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 2
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 4
+      },
+      {
+        "word": "quiere",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "responde",
+        "lemma": "responder",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "sentido",
+        "lemma": "sentido",
+        "occurrences": 1
+      },
+      {
+        "word": "siempre",
+        "lemma": "siempre",
+        "occurrences": 1
+      },
+      {
+        "word": "siguiente",
+        "lemma": "siguiente",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
+        "lemma": "tener",
+        "occurrences": 2
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "vergüenza",
+        "lemma": "vergüenza",
+        "occurrences": 1
+      },
+      {
+        "word": "vez",
+        "lemma": "vez",
+        "occurrences": 1
+      },
+      {
+        "word": "viernes",
+        "lemma": "viernes",
+        "occurrences": 1
+      },
+      {
+        "word": "vivir",
+        "lemma": "vivir",
+        "occurrences": 1
+      },
+      {
+        "word": "vuelve",
+        "lemma": "volver",
+        "occurrences": 1
+      },
+      {
+        "word": "wallace",
+        "lemma": "wallace",
+        "occurrences": 1
+      },
+      {
+        "word": "yes",
+        "lemma": "yes",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "enough-on-paper",
+    "title": "¿Cuánto es suficiente?",
+    "englishTitle": "How much is enough?",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "pencil.and.list.clipboard",
+    "palette": 2,
+    "summary": "A personal definition of enough becomes an honest budget.",
+    "sentences": [
+      {
+        "id": "enough-on-paper-1",
+        "spanish": "Después de leer a Bob Proctor, Óscar piensa en su idea de riqueza.",
+        "english": "After reading Bob Proctor, Óscar thinks about his own idea of wealth."
+      },
+      {
+        "id": "enough-on-paper-2",
+        "spanish": "Para él, también incluye tiempo, amistades y la posibilidad de aprender.",
+        "english": "For him, it also includes time, friendships, and the opportunity to learn."
+      },
+      {
+        "id": "enough-on-paper-3",
+        "spanish": "En una hoja escribe cuánto necesita para vivir durante un año.",
+        "english": "On a sheet of paper he writes how much he needs to live for a year."
+      },
+      {
+        "id": "enough-on-paper-4",
+        "spanish": "Incluye vivienda, comida, transporte, impuestos y un margen para imprevistos.",
+        "english": "He includes housing, food, transport, taxes, and a cushion for unexpected expenses."
+      },
+      {
+        "id": "enough-on-paper-5",
+        "spanish": "Después compara esa cantidad con sus ingresos reales.",
+        "english": "Then he compares that amount with his actual income."
+      },
+      {
+        "id": "enough-on-paper-6",
+        "spanish": "Todavía falta dinero, y escribir un deseo no hace que aparezca.",
+        "english": "There is still a shortfall, and writing down a wish does not make money appear."
+      },
+      {
+        "id": "enough-on-paper-7",
+        "spanish": "Decide buscar un trabajo adicional que pueda realizar sin agotarse.",
+        "english": "He decides to look for additional work that he can do without exhausting himself."
+      },
+      {
+        "id": "enough-on-paper-8",
+        "spanish": "Su plan no garantiza riqueza, pero le permite ver el siguiente paso.",
+        "english": "His plan does not guarantee wealth, but it lets him see the next step."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "adicional",
+        "lemma": "adicional",
+        "occurrences": 1
+      },
+      {
+        "word": "agotarse",
+        "lemma": "agotarse",
+        "occurrences": 1
+      },
+      {
+        "word": "amistades",
+        "lemma": "amistad",
+        "occurrences": 1
+      },
+      {
+        "word": "aparezca",
+        "lemma": "aparecer",
+        "occurrences": 1
+      },
+      {
+        "word": "aprender",
+        "lemma": "aprender",
+        "occurrences": 1
+      },
+      {
+        "word": "año",
+        "lemma": "año",
+        "occurrences": 1
+      },
+      {
+        "word": "bob",
+        "lemma": "bob",
+        "occurrences": 1
+      },
+      {
+        "word": "buscar",
+        "lemma": "buscar",
+        "occurrences": 1
+      },
+      {
+        "word": "cantidad",
+        "lemma": "cantidad",
+        "occurrences": 1
+      },
+      {
+        "word": "comida",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "compara",
+        "lemma": "comparar",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "cuánto",
+        "lemma": "cuánto",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "decide",
+        "lemma": "decidir",
+        "occurrences": 1
+      },
+      {
+        "word": "deseo",
+        "lemma": "deseo",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 2
+      },
+      {
+        "word": "dinero",
+        "lemma": "dinero",
+        "occurrences": 1
+      },
+      {
+        "word": "durante",
+        "lemma": "durante",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "esa",
+        "lemma": "esa",
+        "occurrences": 1
+      },
+      {
+        "word": "escribe",
+        "lemma": "escribir",
+        "occurrences": 1
+      },
+      {
+        "word": "escribir",
+        "lemma": "escribir",
+        "occurrences": 1
+      },
+      {
+        "word": "falta",
+        "lemma": "faltar",
+        "occurrences": 1
+      },
+      {
+        "word": "garantiza",
+        "lemma": "garantizar",
+        "occurrences": 1
+      },
+      {
+        "word": "hace",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "hoja",
+        "lemma": "hoja",
+        "occurrences": 1
+      },
+      {
+        "word": "idea",
+        "lemma": "idea",
+        "occurrences": 1
+      },
+      {
+        "word": "imprevistos",
+        "lemma": "imprevisto",
+        "occurrences": 1
+      },
+      {
+        "word": "impuestos",
+        "lemma": "impuesto",
+        "occurrences": 1
+      },
+      {
+        "word": "incluye",
+        "lemma": "incluir",
+        "occurrences": 2
+      },
+      {
+        "word": "ingresos",
+        "lemma": "ingreso",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "leer",
+        "lemma": "leer",
+        "occurrences": 1
+      },
+      {
+        "word": "margen",
+        "lemma": "margen",
+        "occurrences": 1
+      },
+      {
+        "word": "necesita",
+        "lemma": "necesitar",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 2
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 3
+      },
+      {
+        "word": "paso",
+        "lemma": "paso",
+        "occurrences": 1
+      },
+      {
+        "word": "permite",
+        "lemma": "permitir",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "piensa",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "plan",
+        "lemma": "plan",
+        "occurrences": 1
+      },
+      {
+        "word": "posibilidad",
+        "lemma": "posibilidad",
+        "occurrences": 1
+      },
+      {
+        "word": "proctor",
+        "lemma": "proctor",
+        "occurrences": 1
+      },
+      {
+        "word": "pueda",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "reales",
+        "lemma": "real",
+        "occurrences": 1
+      },
+      {
+        "word": "realizar",
+        "lemma": "realizar",
+        "occurrences": 1
+      },
+      {
+        "word": "riqueza",
+        "lemma": "riqueza",
+        "occurrences": 2
+      },
+      {
+        "word": "siguiente",
+        "lemma": "siguiente",
+        "occurrences": 1
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 2
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tiempo",
+        "lemma": "tiempo",
+        "occurrences": 1
+      },
+      {
+        "word": "todavía",
+        "lemma": "todavía",
+        "occurrences": 1
+      },
+      {
+        "word": "trabajo",
+        "lemma": "trabajo",
+        "occurrences": 1
+      },
+      {
+        "word": "transporte",
+        "lemma": "transporte",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 4
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "ver",
+        "lemma": "ver",
+        "occurrences": 1
+      },
+      {
+        "word": "vivienda",
+        "lemma": "vivienda",
+        "occurrences": 1
+      },
+      {
+        "word": "vivir",
+        "lemma": "vivir",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 3
+      },
+      {
+        "word": "él",
+        "lemma": "él",
+        "occurrences": 1
+      },
+      {
+        "word": "óscar",
+        "lemma": "óscar",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "useful-service",
+    "title": "Un servicio útil",
+    "englishTitle": "A useful service",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "desktopcomputer",
+    "palette": 3,
+    "summary": "An earning idea begins with listening to a real need.",
+    "sentences": [
+      {
+        "id": "useful-service-1",
+        "spanish": "Eva quiere ganar un poco más de dinero.",
+        "english": "Eva wants to earn a little more money."
+      },
+      {
+        "id": "useful-service-2",
+        "spanish": "Pregunta a sus vecinos qué tareas les resultan difíciles.",
+        "english": "She asks her neighbors which tasks they find difficult."
+      },
+      {
+        "id": "useful-service-3",
+        "spanish": "Varios necesitan ayuda para organizar sus fotos digitales.",
+        "english": "Several need help organizing their digital photos."
+      },
+      {
+        "id": "useful-service-4",
+        "spanish": "Eva ofrece una sesión y explica el precio antes de empezar.",
+        "english": "Eva offers a session and explains the price before starting."
+      },
+      {
+        "id": "useful-service-5",
+        "spanish": "Con permiso del cliente, trabaja sin guardar copias personales.",
+        "english": "With the client’s permission, she works without keeping personal copies."
+      },
+      {
+        "id": "useful-service-6",
+        "spanish": "Al terminar, apunta el tiempo y los gastos de cada sesión.",
+        "english": "When she finishes, she records the time and expenses for each session."
+      },
+      {
+        "id": "useful-service-7",
+        "spanish": "Así puede distinguir lo que cobra de lo que realmente gana.",
+        "english": "That way she can distinguish what she charges from what she actually earns."
+      },
+      {
+        "id": "useful-service-8",
+        "spanish": "Su primera oportunidad nace de escuchar, no de parecer importante.",
+        "english": "Her first opportunity comes from listening, not from appearing important."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 1
+      },
+      {
+        "word": "apunta",
+        "lemma": "apuntar",
+        "occurrences": 1
+      },
+      {
+        "word": "así",
+        "lemma": "así",
+        "occurrences": 1
+      },
+      {
+        "word": "ayuda",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 1
+      },
+      {
+        "word": "cliente",
+        "lemma": "cliente",
+        "occurrences": 1
+      },
+      {
+        "word": "cobra",
+        "lemma": "cobrar",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "copias",
+        "lemma": "copia",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 6
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "difíciles",
+        "lemma": "difícil",
+        "occurrences": 1
+      },
+      {
+        "word": "digitales",
+        "lemma": "digital",
+        "occurrences": 1
+      },
+      {
+        "word": "dinero",
+        "lemma": "dinero",
+        "occurrences": 1
+      },
+      {
+        "word": "distinguir",
+        "lemma": "distinguir",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "empezar",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "escuchar",
+        "lemma": "escuchar",
+        "occurrences": 1
+      },
+      {
+        "word": "eva",
+        "lemma": "eva",
+        "occurrences": 2
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "fotos",
+        "lemma": "foto",
+        "occurrences": 1
+      },
+      {
+        "word": "gana",
+        "lemma": "ganar",
+        "occurrences": 1
+      },
+      {
+        "word": "ganar",
+        "lemma": "ganar",
+        "occurrences": 1
+      },
+      {
+        "word": "gastos",
+        "lemma": "gasto",
+        "occurrences": 1
+      },
+      {
+        "word": "guardar",
+        "lemma": "guardar",
+        "occurrences": 1
+      },
+      {
+        "word": "importante",
+        "lemma": "importante",
+        "occurrences": 1
+      },
+      {
+        "word": "les",
+        "lemma": "les",
+        "occurrences": 1
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 2
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 1
+      },
+      {
+        "word": "nace",
+        "lemma": "nacer",
+        "occurrences": 1
+      },
+      {
+        "word": "necesitan",
+        "lemma": "necesitar",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "ofrece",
+        "lemma": "ofrecer",
+        "occurrences": 1
+      },
+      {
+        "word": "oportunidad",
+        "lemma": "oportunidad",
+        "occurrences": 1
+      },
+      {
+        "word": "organizar",
+        "lemma": "organizar",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "parecer",
+        "lemma": "parecer",
+        "occurrences": 1
+      },
+      {
+        "word": "permiso",
+        "lemma": "permiso",
+        "occurrences": 1
+      },
+      {
+        "word": "personales",
+        "lemma": "personal",
+        "occurrences": 1
+      },
+      {
+        "word": "poco",
+        "lemma": "poco",
+        "occurrences": 1
+      },
+      {
+        "word": "precio",
+        "lemma": "precio",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "primera",
+        "lemma": "primero",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "quiere",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 1
+      },
+      {
+        "word": "realmente",
+        "lemma": "realmente",
+        "occurrences": 1
+      },
+      {
+        "word": "resultan",
+        "lemma": "resultar",
+        "occurrences": 1
+      },
+      {
+        "word": "sesión",
+        "lemma": "sesión",
+        "occurrences": 2
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 2
+      },
+      {
+        "word": "tareas",
+        "lemma": "tarea",
+        "occurrences": 1
+      },
+      {
+        "word": "terminar",
+        "lemma": "terminar",
+        "occurrences": 1
+      },
+      {
+        "word": "tiempo",
+        "lemma": "tiempo",
+        "occurrences": 1
+      },
+      {
+        "word": "trabaja",
+        "lemma": "trabajar",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "varios",
+        "lemma": "varios",
+        "occurrences": 1
+      },
+      {
+        "word": "vecinos",
+        "lemma": "vecino",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "travelling-seed",
+    "title": "La semilla viajera",
+    "englishTitle": "The traveling seed",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "bird",
+    "palette": 4,
+    "summary": "A garden visit introduces seed dispersal without giving plants human intentions.",
+    "sentences": [
+      {
+        "id": "travelling-seed-1",
+        "spanish": "En el jardín, Leo ve un pájaro comer una baya.",
+        "english": "In the garden, Leo sees a bird eating a berry."
+      },
+      {
+        "id": "travelling-seed-2",
+        "spanish": "Pregunta a su madre qué pasa con la semilla.",
+        "english": "He asks his mother what happens to the seed."
+      },
+      {
+        "id": "travelling-seed-3",
+        "spanish": "Ella explica que algunas semillas sobreviven al viaje por el intestino.",
+        "english": "She explains that some seeds survive the journey through the intestine."
+      },
+      {
+        "id": "travelling-seed-4",
+        "spanish": "Después salen con los excrementos, lejos de la planta original.",
+        "english": "Afterwards they come out in the droppings, far from the original plant."
+      },
+      {
+        "id": "travelling-seed-5",
+        "spanish": "Si encuentran buenas condiciones, pueden germinar.",
+        "english": "If they find suitable conditions, they can germinate."
+      },
+      {
+        "id": "travelling-seed-6",
+        "spanish": "Otras semillas viajan con el viento o pegadas al pelo de un animal.",
+        "english": "Other seeds travel with the wind or attached to an animal’s fur."
+      },
+      {
+        "id": "travelling-seed-7",
+        "spanish": "Las plantas no hacen planes como nosotros.",
+        "english": "Plants do not make plans as we do."
+      },
+      {
+        "id": "travelling-seed-8",
+        "spanish": "Sin embargo, sus formas nos cuentan una historia de evolución.",
+        "english": "However, their shapes tell us a story of evolution."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 2
+      },
+      {
+        "word": "algunas",
+        "lemma": "algunas",
+        "occurrences": 1
+      },
+      {
+        "word": "animal",
+        "lemma": "animal",
+        "occurrences": 1
+      },
+      {
+        "word": "baya",
+        "lemma": "baya",
+        "occurrences": 1
+      },
+      {
+        "word": "buenas",
+        "lemma": "bueno",
+        "occurrences": 1
+      },
+      {
+        "word": "comer",
+        "lemma": "comer",
+        "occurrences": 1
+      },
+      {
+        "word": "como",
+        "lemma": "como",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 3
+      },
+      {
+        "word": "condiciones",
+        "lemma": "condición",
+        "occurrences": 1
+      },
+      {
+        "word": "cuentan",
+        "lemma": "contar",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 1
+      },
+      {
+        "word": "embargo",
+        "lemma": "embargo",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 1
+      },
+      {
+        "word": "encuentran",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
+        "word": "evolución",
+        "lemma": "evolución",
+        "occurrences": 1
+      },
+      {
+        "word": "excrementos",
+        "lemma": "excremento",
+        "occurrences": 1
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "formas",
+        "lemma": "forma",
+        "occurrences": 1
+      },
+      {
+        "word": "germinar",
+        "lemma": "germinar",
+        "occurrences": 1
+      },
+      {
+        "word": "hacen",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "historia",
+        "lemma": "historia",
+        "occurrences": 1
+      },
+      {
+        "word": "intestino",
+        "lemma": "intestino",
+        "occurrences": 1
+      },
+      {
+        "word": "jardín",
+        "lemma": "jardín",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "lejos",
+        "lemma": "lejos",
+        "occurrences": 1
+      },
+      {
+        "word": "leo",
+        "lemma": "leer",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "madre",
+        "lemma": "madre",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "nosotros",
+        "lemma": "nosotros",
+        "occurrences": 1
+      },
+      {
+        "word": "o",
+        "lemma": "o",
+        "occurrences": 1
+      },
+      {
+        "word": "original",
+        "lemma": "original",
+        "occurrences": 1
+      },
+      {
+        "word": "otras",
+        "lemma": "otro",
+        "occurrences": 1
+      },
+      {
+        "word": "pasa",
+        "lemma": "pasar",
+        "occurrences": 1
+      },
+      {
+        "word": "pegadas",
+        "lemma": "pegado",
+        "occurrences": 1
+      },
+      {
+        "word": "pelo",
+        "lemma": "pelo",
+        "occurrences": 1
+      },
+      {
+        "word": "planes",
+        "lemma": "plan",
+        "occurrences": 1
+      },
+      {
+        "word": "planta",
+        "lemma": "planta",
+        "occurrences": 1
+      },
+      {
+        "word": "plantas",
+        "lemma": "planta",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "pueden",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "pájaro",
+        "lemma": "pájaro",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 1
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 1
+      },
+      {
+        "word": "salen",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "semilla",
+        "lemma": "semilla",
+        "occurrences": 1
+      },
+      {
+        "word": "semillas",
+        "lemma": "semilla",
+        "occurrences": 2
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "sobreviven",
+        "lemma": "sobrevivir",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "ve",
+        "lemma": "ver",
+        "occurrences": 1
+      },
+      {
+        "word": "viajan",
+        "lemma": "viajar",
+        "occurrences": 1
+      },
+      {
+        "word": "viaje",
+        "lemma": "viaje",
+        "occurrences": 1
+      },
+      {
+        "word": "viento",
+        "lemma": "viento",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "tomato-question",
+    "title": "El tomate y la pregunta",
+    "englishTitle": "The tomato and the question",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "questionmark.circle",
+    "palette": 0,
+    "summary": "A surprising chemical fact is a reason to investigate, not panic.",
+    "sentences": [
+      {
+        "id": "tomato-question-1",
+        "spanish": "En la cocina, Marina pregunta si el tomate es una fruta.",
+        "english": "In the kitchen, Marina asks whether a tomato is a fruit."
+      },
+      {
+        "id": "tomato-question-2",
+        "spanish": "Su hermano explica que, en botánica, se forma a partir del ovario de una flor.",
+        "english": "Her brother explains that, in botany, it develops from the ovary of a flower."
+      },
+      {
+        "id": "tomato-question-3",
+        "spanish": "En la cocina solemos tratarlo como una hortaliza.",
+        "english": "In cooking, we usually treat it as a vegetable."
+      },
+      {
+        "id": "tomato-question-4",
+        "spanish": "Más tarde leen que se han medido cantidades muy pequeñas de nicotina en tomates.",
+        "english": "Later they read that very small amounts of nicotine have been measured in tomatoes."
+      },
+      {
+        "id": "tomato-question-5",
+        "spanish": "El nombre de una sustancia, por sí solo, no indica el riesgo de comer un alimento.",
+        "english": "The name of a substance alone does not tell us the risk of eating a food."
+      },
+      {
+        "id": "tomato-question-6",
+        "spanish": "También importan la cantidad y la forma de exposición.",
+        "english": "The amount and the way we are exposed also matter."
+      },
+      {
+        "id": "tomato-question-7",
+        "spanish": "Buscan una fuente fiable antes de compartir un mensaje alarmante.",
+        "english": "They look for a reliable source before sharing an alarming message."
+      },
+      {
+        "id": "tomato-question-8",
+        "spanish": "La curiosidad les enseña más que el miedo.",
+        "english": "Curiosity teaches them more than fear."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "alarmante",
+        "lemma": "alarmante",
+        "occurrences": 1
+      },
+      {
+        "word": "alimento",
+        "lemma": "alimento",
+        "occurrences": 1
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 1
+      },
+      {
+        "word": "botánica",
+        "lemma": "botánica",
+        "occurrences": 1
+      },
+      {
+        "word": "buscan",
+        "lemma": "buscar",
+        "occurrences": 1
+      },
+      {
+        "word": "cantidad",
+        "lemma": "cantidad",
+        "occurrences": 1
+      },
+      {
+        "word": "cantidades",
+        "lemma": "cantidad",
+        "occurrences": 1
+      },
+      {
+        "word": "cocina",
+        "lemma": "cocina",
+        "occurrences": 2
+      },
+      {
+        "word": "comer",
+        "lemma": "comer",
+        "occurrences": 1
+      },
+      {
+        "word": "como",
+        "lemma": "como",
+        "occurrences": 1
+      },
+      {
+        "word": "compartir",
+        "lemma": "compartir",
+        "occurrences": 1
+      },
+      {
+        "word": "curiosidad",
+        "lemma": "curiosidad",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 6
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 4
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 4
+      },
+      {
+        "word": "enseña",
+        "lemma": "enseñar",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "exposición",
+        "lemma": "exposición",
+        "occurrences": 1
+      },
+      {
+        "word": "fiable",
+        "lemma": "fiable",
+        "occurrences": 1
+      },
+      {
+        "word": "flor",
+        "lemma": "flor",
+        "occurrences": 1
+      },
+      {
+        "word": "forma",
+        "lemma": "formar",
+        "occurrences": 2
+      },
+      {
+        "word": "fruta",
+        "lemma": "fruta",
+        "occurrences": 1
+      },
+      {
+        "word": "fuente",
+        "lemma": "fuente",
+        "occurrences": 1
+      },
+      {
+        "word": "han",
+        "lemma": "han",
+        "occurrences": 1
+      },
+      {
+        "word": "hermano",
+        "lemma": "hermano",
+        "occurrences": 1
+      },
+      {
+        "word": "hortaliza",
+        "lemma": "hortaliza",
+        "occurrences": 1
+      },
+      {
+        "word": "importan",
+        "lemma": "importar",
+        "occurrences": 1
+      },
+      {
+        "word": "indica",
+        "lemma": "indicar",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 5
+      },
+      {
+        "word": "leen",
+        "lemma": "leer",
+        "occurrences": 1
+      },
+      {
+        "word": "les",
+        "lemma": "les",
+        "occurrences": 1
+      },
+      {
+        "word": "marina",
+        "lemma": "marina",
+        "occurrences": 1
+      },
+      {
+        "word": "medido",
+        "lemma": "medir",
+        "occurrences": 1
+      },
+      {
+        "word": "mensaje",
+        "lemma": "mensaje",
+        "occurrences": 1
+      },
+      {
+        "word": "miedo",
+        "lemma": "miedo",
+        "occurrences": 1
+      },
+      {
+        "word": "muy",
+        "lemma": "muy",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 2
+      },
+      {
+        "word": "nicotina",
+        "lemma": "nicotina",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nombre",
+        "lemma": "nombre",
+        "occurrences": 1
+      },
+      {
+        "word": "ovario",
+        "lemma": "ovario",
+        "occurrences": 1
+      },
+      {
+        "word": "partir",
+        "lemma": "partir",
+        "occurrences": 1
+      },
+      {
+        "word": "pequeñas",
+        "lemma": "pequeño",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 3
+      },
+      {
+        "word": "riesgo",
+        "lemma": "riesgo",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 2
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "solemos",
+        "lemma": "soler",
+        "occurrences": 1
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
+        "word": "sustancia",
+        "lemma": "sustancia",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tarde",
+        "lemma": "tarde",
+        "occurrences": 1
+      },
+      {
+        "word": "tomate",
+        "lemma": "tomate",
+        "occurrences": 1
+      },
+      {
+        "word": "tomates",
+        "lemma": "tomates",
+        "occurrences": 1
+      },
+      {
+        "word": "tratarlo",
+        "lemma": "tratarlo",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 5
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "garden-colours",
+    "title": "Los colores del jardín",
+    "englishTitle": "The colors of the garden",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "tree",
+    "palette": 1,
+    "summary": "Ripeness and natural defenses vary between plants.",
+    "sentences": [
+      {
+        "id": "garden-colours-1",
+        "spanish": "El abuelo muestra a Inés una rama llena de frutos.",
+        "english": "Grandfather shows Inés a branch full of fruit."
+      },
+      {
+        "id": "garden-colours-2",
+        "spanish": "Algunos cambian de color mientras maduran.",
+        "english": "Some change color as they ripen."
+      },
+      {
+        "id": "garden-colours-3",
+        "spanish": "En ciertas especies también cambian el azúcar, la textura y algunas sustancias defensivas.",
+        "english": "In certain species, sugar, texture, and some defensive substances also change."
+      },
+      {
+        "id": "garden-colours-4",
+        "spanish": "Inés pregunta si toda fruta madura se puede comer.",
+        "english": "Inés asks whether all ripe fruit can be eaten."
+      },
+      {
+        "id": "garden-colours-5",
+        "spanish": "El abuelo explica que hay frutos tóxicos incluso cuando están maduros.",
+        "english": "Grandfather explains that some fruits are toxic even when ripe."
+      },
+      {
+        "id": "garden-colours-6",
+        "spanish": "Ni un color bonito ni un pájaro comiendo demuestran que sean seguros para nosotros.",
+        "english": "Neither an attractive color nor a bird eating them proves that they are safe for us."
+      },
+      {
+        "id": "garden-colours-7",
+        "spanish": "Dejan las bayas desconocidas en la rama.",
+        "english": "They leave the unfamiliar berries on the branch."
+      },
+      {
+        "id": "garden-colours-8",
+        "spanish": "Conocer la naturaleza también significa respetar lo que todavía no sabemos.",
+        "english": "Knowing nature also means respecting what we do not yet know."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "abuelo",
+        "lemma": "abuelo",
+        "occurrences": 2
+      },
+      {
+        "word": "algunas",
+        "lemma": "algunas",
+        "occurrences": 1
+      },
+      {
+        "word": "algunos",
+        "lemma": "algunos",
+        "occurrences": 1
+      },
+      {
+        "word": "azúcar",
+        "lemma": "azúcar",
+        "occurrences": 1
+      },
+      {
+        "word": "bayas",
+        "lemma": "baya",
+        "occurrences": 1
+      },
+      {
+        "word": "bonito",
+        "lemma": "bonito",
+        "occurrences": 1
+      },
+      {
+        "word": "cambian",
+        "lemma": "cambiar",
+        "occurrences": 2
+      },
+      {
+        "word": "ciertas",
+        "lemma": "cierto",
+        "occurrences": 1
+      },
+      {
+        "word": "color",
+        "lemma": "color",
+        "occurrences": 2
+      },
+      {
+        "word": "comer",
+        "lemma": "comer",
+        "occurrences": 1
+      },
+      {
+        "word": "comiendo",
+        "lemma": "comer",
+        "occurrences": 1
+      },
+      {
+        "word": "conocer",
+        "lemma": "conocer",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
+        "word": "defensivas",
+        "lemma": "defensivo",
+        "occurrences": 1
+      },
+      {
+        "word": "dejan",
+        "lemma": "dejar",
+        "occurrences": 1
+      },
+      {
+        "word": "demuestran",
+        "lemma": "demuestran",
+        "occurrences": 1
+      },
+      {
+        "word": "desconocidas",
+        "lemma": "desconocido",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "especies",
+        "lemma": "especie",
+        "occurrences": 1
+      },
+      {
+        "word": "están",
+        "lemma": "están",
+        "occurrences": 1
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "fruta",
+        "lemma": "fruta",
+        "occurrences": 1
+      },
+      {
+        "word": "frutos",
+        "lemma": "fruto",
+        "occurrences": 2
+      },
+      {
+        "word": "hay",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "incluso",
+        "lemma": "incluso",
+        "occurrences": 1
+      },
+      {
+        "word": "inés",
+        "lemma": "inés",
+        "occurrences": 2
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "llena",
+        "lemma": "llena",
+        "occurrences": 1
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 1
+      },
+      {
+        "word": "madura",
+        "lemma": "madura",
+        "occurrences": 1
+      },
+      {
+        "word": "maduran",
+        "lemma": "madurar",
+        "occurrences": 1
+      },
+      {
+        "word": "maduros",
+        "lemma": "maduro",
+        "occurrences": 1
+      },
+      {
+        "word": "mientras",
+        "lemma": "mientras",
+        "occurrences": 1
+      },
+      {
+        "word": "muestra",
+        "lemma": "mostrar",
+        "occurrences": 1
+      },
+      {
+        "word": "naturaleza",
+        "lemma": "naturaleza",
+        "occurrences": 1
+      },
+      {
+        "word": "ni",
+        "lemma": "ni",
+        "occurrences": 2
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nosotros",
+        "lemma": "nosotros",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "pájaro",
+        "lemma": "pájaro",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 3
+      },
+      {
+        "word": "rama",
+        "lemma": "rama",
+        "occurrences": 2
+      },
+      {
+        "word": "respetar",
+        "lemma": "respetar",
+        "occurrences": 1
+      },
+      {
+        "word": "sabemos",
+        "lemma": "saber",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "sean",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "seguros",
+        "lemma": "seguro",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "significa",
+        "lemma": "significa",
+        "occurrences": 1
+      },
+      {
+        "word": "sustancias",
+        "lemma": "sustancia",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 2
+      },
+      {
+        "word": "textura",
+        "lemma": "textura",
+        "occurrences": 1
+      },
+      {
+        "word": "toda",
+        "lemma": "toda",
+        "occurrences": 1
+      },
+      {
+        "word": "todavía",
+        "lemma": "todavía",
+        "occurrences": 1
+      },
+      {
+        "word": "tóxicos",
+        "lemma": "tóxico",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "potato-basket",
+    "title": "La cesta de patatas",
+    "englishTitle": "The basket of potatoes",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "basket",
+    "palette": 2,
+    "summary": "Food safety depends on specific conditions, not alarming generalizations.",
+    "sentences": [
+      {
+        "id": "potato-basket-1",
+        "spanish": "Antes de cocinar, Andrés revisa una cesta de patatas.",
+        "english": "Before cooking, Andrés checks a basket of potatoes."
+      },
+      {
+        "id": "potato-basket-2",
+        "spanish": "Algunas están verdes y tienen muchos brotes.",
+        "english": "Some are green and have many sprouts."
+      },
+      {
+        "id": "potato-basket-3",
+        "spanish": "Las aparta porque pueden contener más toxinas naturales.",
+        "english": "He sets them aside because they may contain more natural toxins."
+      },
+      {
+        "id": "potato-basket-4",
+        "spanish": "Hervirlas no garantiza que esas toxinas desaparezcan.",
+        "english": "Boiling them does not guarantee that those toxins disappear."
+      },
+      {
+        "id": "potato-basket-5",
+        "spanish": "Para la comida elige patatas en buen estado y las cocina.",
+        "english": "For the meal he chooses potatoes in good condition and cooks them."
+      },
+      {
+        "id": "potato-basket-6",
+        "spanish": "Después oye un ruido en su barriga.",
+        "english": "Afterwards he hears a noise in his belly."
+      },
+      {
+        "id": "potato-basket-7",
+        "spanish": "Recuerda que los sonidos suelen formar parte de la digestión normal.",
+        "english": "He remembers that sounds are usually part of normal digestion."
+      },
+      {
+        "id": "potato-basket-8",
+        "spanish": "Un ruido por sí solo no demuestra una intoxicación.",
+        "english": "A noise alone does not prove food poisoning."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "algunas",
+        "lemma": "algunas",
+        "occurrences": 1
+      },
+      {
+        "word": "andrés",
+        "lemma": "andrés",
+        "occurrences": 1
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 1
+      },
+      {
+        "word": "aparta",
+        "lemma": "apartar",
+        "occurrences": 1
+      },
+      {
+        "word": "barriga",
+        "lemma": "barriga",
+        "occurrences": 1
+      },
+      {
+        "word": "brotes",
+        "lemma": "brote",
+        "occurrences": 1
+      },
+      {
+        "word": "buen",
+        "lemma": "buen",
+        "occurrences": 1
+      },
+      {
+        "word": "cesta",
+        "lemma": "cesta",
+        "occurrences": 1
+      },
+      {
+        "word": "cocina",
+        "lemma": "cocina",
+        "occurrences": 1
+      },
+      {
+        "word": "cocinar",
+        "lemma": "cocinar",
+        "occurrences": 1
+      },
+      {
+        "word": "comida",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "contener",
+        "lemma": "contener",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "demuestra",
+        "lemma": "demostrar",
+        "occurrences": 1
+      },
+      {
+        "word": "desaparezcan",
+        "lemma": "desaparecer",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "digestión",
+        "lemma": "digestión",
+        "occurrences": 1
+      },
+      {
+        "word": "elige",
+        "lemma": "elegir",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "esas",
+        "lemma": "esas",
+        "occurrences": 1
+      },
+      {
+        "word": "estado",
+        "lemma": "estado",
+        "occurrences": 1
+      },
+      {
+        "word": "están",
+        "lemma": "están",
+        "occurrences": 1
+      },
+      {
+        "word": "formar",
+        "lemma": "formar",
+        "occurrences": 1
+      },
+      {
+        "word": "garantiza",
+        "lemma": "garantizar",
+        "occurrences": 1
+      },
+      {
+        "word": "hervirlas",
+        "lemma": "hervirlas",
+        "occurrences": 1
+      },
+      {
+        "word": "intoxicación",
+        "lemma": "intoxicación",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "muchos",
+        "lemma": "muchos",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 1
+      },
+      {
+        "word": "naturales",
+        "lemma": "natural",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 2
+      },
+      {
+        "word": "normal",
+        "lemma": "normal",
+        "occurrences": 1
+      },
+      {
+        "word": "oye",
+        "lemma": "oye",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "parte",
+        "lemma": "parte",
+        "occurrences": 1
+      },
+      {
+        "word": "patatas",
+        "lemma": "patata",
+        "occurrences": 2
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "porque",
+        "lemma": "porque",
+        "occurrences": 1
+      },
+      {
+        "word": "pueden",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "recuerda",
+        "lemma": "recordar",
+        "occurrences": 1
+      },
+      {
+        "word": "revisa",
+        "lemma": "revisar",
+        "occurrences": 1
+      },
+      {
+        "word": "ruido",
+        "lemma": "ruido",
+        "occurrences": 2
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
+        "occurrences": 1
+      },
+      {
+        "word": "sonidos",
+        "lemma": "sonido",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 1
+      },
+      {
+        "word": "suelen",
+        "lemma": "soler",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "tienen",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "toxinas",
+        "lemma": "toxina",
+        "occurrences": 2
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "verdes",
+        "lemma": "verde",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "two-carrots",
+    "title": "Dos zanahorias",
+    "englishTitle": "Two carrots",
+    "author": "Cuentiva · fictional story",
+    "level": "A1",
+    "symbol": "carrot",
+    "palette": 3,
+    "summary": "Raw and cooked foods both have a place at the table.",
+    "sentences": [
+      {
+        "id": "two-carrots-1",
+        "spanish": "Tengo dos zanahorias en la cocina.",
+        "english": "I have two carrots in the kitchen."
+      },
+      {
+        "id": "two-carrots-2",
+        "spanish": "Lavo una y la corto para una ensalada.",
+        "english": "I wash one and cut it up for a salad."
+      },
+      {
+        "id": "two-carrots-3",
+        "spanish": "Cocino la otra en una sopa.",
+        "english": "I cook the other in a soup."
+      },
+      {
+        "id": "two-carrots-4",
+        "spanish": "La ensalada es fresca y la sopa está caliente.",
+        "english": "The salad is fresh, and the soup is hot."
+      },
+      {
+        "id": "two-carrots-5",
+        "spanish": "Las dos tienen nutrientes.",
+        "english": "Both contain nutrients."
+      },
+      {
+        "id": "two-carrots-6",
+        "spanish": "También pongo pan y unas judías cocidas en la mesa.",
+        "english": "I also put bread and some cooked beans on the table."
+      },
+      {
+        "id": "two-carrots-7",
+        "spanish": "Mi familia prueba un poco de todo.",
+        "english": "My family tries a little of everything."
+      },
+      {
+        "id": "two-carrots-8",
+        "spanish": "Una comida variada tiene muchos colores y sabores.",
+        "english": "A varied meal has many colors and flavors."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "caliente",
+        "lemma": "caliente",
+        "occurrences": 1
+      },
+      {
+        "word": "cocidas",
+        "lemma": "cocido",
+        "occurrences": 1
+      },
+      {
+        "word": "cocina",
+        "lemma": "cocina",
+        "occurrences": 1
+      },
+      {
+        "word": "cocino",
+        "lemma": "cocinar",
+        "occurrences": 1
+      },
+      {
+        "word": "colores",
+        "lemma": "color",
+        "occurrences": 1
+      },
+      {
+        "word": "comida",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "corto",
+        "lemma": "cortar",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 1
+      },
+      {
+        "word": "dos",
+        "lemma": "dos",
+        "occurrences": 2
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
+        "word": "ensalada",
+        "lemma": "ensalada",
+        "occurrences": 2
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "está",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "familia",
+        "lemma": "familia",
+        "occurrences": 1
+      },
+      {
+        "word": "fresca",
+        "lemma": "fresco",
+        "occurrences": 1
+      },
+      {
+        "word": "judías",
+        "lemma": "judía",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 6
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "lavo",
+        "lemma": "lavar",
+        "occurrences": 1
+      },
+      {
+        "word": "mesa",
+        "lemma": "mesa",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 1
+      },
+      {
+        "word": "muchos",
+        "lemma": "muchos",
+        "occurrences": 1
+      },
+      {
+        "word": "nutrientes",
+        "lemma": "nutriente",
+        "occurrences": 1
+      },
+      {
+        "word": "otra",
+        "lemma": "otra",
+        "occurrences": 1
+      },
+      {
+        "word": "pan",
+        "lemma": "pan",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "poco",
+        "lemma": "poco",
+        "occurrences": 1
+      },
+      {
+        "word": "pongo",
+        "lemma": "poner",
+        "occurrences": 1
+      },
+      {
+        "word": "prueba",
+        "lemma": "probar",
+        "occurrences": 1
+      },
+      {
+        "word": "sabores",
+        "lemma": "sabor",
+        "occurrences": 1
+      },
+      {
+        "word": "sopa",
+        "lemma": "sopa",
+        "occurrences": 2
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tengo",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tienen",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 4
+      },
+      {
+        "word": "unas",
+        "lemma": "unas",
+        "occurrences": 1
+      },
+      {
+        "word": "variada",
+        "lemma": "variado",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 4
+      },
+      {
+        "word": "zanahorias",
+        "lemma": "zanahoria",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "body-care",
+    "title": "El cuidado de cada día",
+    "englishTitle": "Everyday care",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "figure.walk",
+    "palette": 4,
+    "summary": "Care for the body is a practice, not a promise of perfect health.",
+    "sentences": [
+      {
+        "id": "body-care-1",
+        "spanish": "Raúl recuerda siempre la revisión de su coche.",
+        "english": "Raúl always remembers his car’s service."
+      },
+      {
+        "id": "body-care-2",
+        "spanish": "Un día piensa en el cuidado de su propio cuerpo.",
+        "english": "One day he thinks about caring for his own body."
+      },
+      {
+        "id": "body-care-3",
+        "spanish": "No puede cambiarlo por otro cuando está cansado.",
+        "english": "He cannot trade it in for another when he is tired."
+      },
+      {
+        "id": "body-care-4",
+        "spanish": "Empieza por dormir mejor y salir a caminar.",
+        "english": "He starts by sleeping better and going out for walks."
+      },
+      {
+        "id": "body-care-5",
+        "spanish": "También prepara comidas variadas y pide una cita cuando algo le preocupa.",
+        "english": "He also prepares varied meals and makes an appointment when something worries him."
+      },
+      {
+        "id": "body-care-6",
+        "spanish": "Sabe que cuidarse no evita todas las enfermedades.",
+        "english": "He knows that looking after himself does not prevent every illness."
+      },
+      {
+        "id": "body-care-7",
+        "spanish": "Estar enfermo no significa haber fallado.",
+        "english": "Being ill does not mean having failed."
+      },
+      {
+        "id": "body-care-8",
+        "spanish": "Quiere tratarse con la misma paciencia que ofrece a sus amigos.",
+        "english": "He wants to treat himself with the same patience he offers his friends."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 2
+      },
+      {
+        "word": "algo",
+        "lemma": "algo",
+        "occurrences": 1
+      },
+      {
+        "word": "amigos",
+        "lemma": "amigo",
+        "occurrences": 1
+      },
+      {
+        "word": "cambiarlo",
+        "lemma": "cambiarlo",
+        "occurrences": 1
+      },
+      {
+        "word": "caminar",
+        "lemma": "caminar",
+        "occurrences": 1
+      },
+      {
+        "word": "cansado",
+        "lemma": "cansado",
+        "occurrences": 1
+      },
+      {
+        "word": "cita",
+        "lemma": "cita",
+        "occurrences": 1
+      },
+      {
+        "word": "coche",
+        "lemma": "coche",
+        "occurrences": 1
+      },
+      {
+        "word": "comidas",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 2
+      },
+      {
+        "word": "cuerpo",
+        "lemma": "cuerpo",
+        "occurrences": 1
+      },
+      {
+        "word": "cuidado",
+        "lemma": "cuidado",
+        "occurrences": 1
+      },
+      {
+        "word": "cuidarse",
+        "lemma": "cuidarse",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
+        "word": "dormir",
+        "lemma": "dormir",
+        "occurrences": 1
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "empieza",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 1
+      },
+      {
+        "word": "enfermedades",
+        "lemma": "enfermedad",
+        "occurrences": 1
+      },
+      {
+        "word": "enfermo",
+        "lemma": "enfermo",
+        "occurrences": 1
+      },
+      {
+        "word": "estar",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "está",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "evita",
+        "lemma": "evitar",
+        "occurrences": 1
+      },
+      {
+        "word": "fallado",
+        "lemma": "fallar",
+        "occurrences": 1
+      },
+      {
+        "word": "haber",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "mejor",
+        "lemma": "mejor",
+        "occurrences": 1
+      },
+      {
+        "word": "misma",
+        "lemma": "misma",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 3
+      },
+      {
+        "word": "ofrece",
+        "lemma": "ofrecer",
+        "occurrences": 1
+      },
+      {
+        "word": "otro",
+        "lemma": "otro",
+        "occurrences": 1
+      },
+      {
+        "word": "paciencia",
+        "lemma": "paciencia",
+        "occurrences": 1
+      },
+      {
+        "word": "pide",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "piensa",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 2
+      },
+      {
+        "word": "preocupa",
+        "lemma": "preocupar",
+        "occurrences": 1
+      },
+      {
+        "word": "prepara",
+        "lemma": "preparar",
+        "occurrences": 1
+      },
+      {
+        "word": "propio",
+        "lemma": "propio",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "quiere",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "raúl",
+        "lemma": "raúl",
+        "occurrences": 1
+      },
+      {
+        "word": "recuerda",
+        "lemma": "recordar",
+        "occurrences": 1
+      },
+      {
+        "word": "revisión",
+        "lemma": "revisión",
+        "occurrences": 1
+      },
+      {
+        "word": "sabe",
+        "lemma": "saber",
+        "occurrences": 1
+      },
+      {
+        "word": "salir",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "siempre",
+        "lemma": "siempre",
+        "occurrences": 1
+      },
+      {
+        "word": "significa",
+        "lemma": "significa",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 2
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
+        "word": "tratarse",
+        "lemma": "tratar",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "variadas",
+        "lemma": "variado",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "water-toast",
+    "title": "Un brindis con agua",
+    "englishTitle": "A toast with water",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "drop",
+    "palette": 0,
+    "summary": "Celebration does not require alcohol or an explanation.",
+    "sentences": [
+      {
+        "id": "water-toast-1",
+        "spanish": "En una fiesta, alguien ofrece vino a Beatriz.",
+        "english": "At a party, someone offers Beatriz wine."
+      },
+      {
+        "id": "water-toast-2",
+        "spanish": "Ella prefiere agua con una rodaja de limón.",
+        "english": "She prefers water with a slice of lemon."
+      },
+      {
+        "id": "water-toast-3",
+        "spanish": "Ha decidido beber menos alcohol para cuidar su salud.",
+        "english": "She has decided to drink less alcohol to look after her health."
+      },
+      {
+        "id": "water-toast-4",
+        "spanish": "El alcohol puede causar daño aunque forme parte de una celebración.",
+        "english": "Alcohol can cause harm even when it is part of a celebration."
+      },
+      {
+        "id": "water-toast-5",
+        "spanish": "Su amigo le acerca un vaso sin pedir explicaciones.",
+        "english": "Her friend hands her a glass without asking for an explanation."
+      },
+      {
+        "id": "water-toast-6",
+        "spanish": "Los demás levantan sus bebidas y brindan juntos.",
+        "english": "The others raise their drinks and toast together."
+      },
+      {
+        "id": "water-toast-7",
+        "spanish": "Beatriz cuenta una historia que hace reír a todos.",
+        "english": "Beatriz tells a story that makes everyone laugh."
+      },
+      {
+        "id": "water-toast-8",
+        "spanish": "Lo que comparte con ellos es la alegría de estar allí.",
+        "english": "What she shares with them is the joy of being there."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 2
+      },
+      {
+        "word": "acerca",
+        "lemma": "acercar",
+        "occurrences": 1
+      },
+      {
+        "word": "agua",
+        "lemma": "agua",
+        "occurrences": 1
+      },
+      {
+        "word": "alcohol",
+        "lemma": "alcohol",
+        "occurrences": 2
+      },
+      {
+        "word": "alegría",
+        "lemma": "alegría",
+        "occurrences": 1
+      },
+      {
+        "word": "alguien",
+        "lemma": "alguien",
+        "occurrences": 1
+      },
+      {
+        "word": "allí",
+        "lemma": "allí",
+        "occurrences": 1
+      },
+      {
+        "word": "amigo",
+        "lemma": "amigo",
+        "occurrences": 1
+      },
+      {
+        "word": "aunque",
+        "lemma": "aunque",
+        "occurrences": 1
+      },
+      {
+        "word": "beatriz",
+        "lemma": "beatriz",
+        "occurrences": 2
+      },
+      {
+        "word": "beber",
+        "lemma": "beber",
+        "occurrences": 1
+      },
+      {
+        "word": "bebidas",
+        "lemma": "bebida",
+        "occurrences": 1
+      },
+      {
+        "word": "brindan",
+        "lemma": "brindar",
+        "occurrences": 1
+      },
+      {
+        "word": "causar",
+        "lemma": "causar",
+        "occurrences": 1
+      },
+      {
+        "word": "celebración",
+        "lemma": "celebración",
+        "occurrences": 1
+      },
+      {
+        "word": "comparte",
+        "lemma": "comparte",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 2
+      },
+      {
+        "word": "cuenta",
+        "lemma": "contar",
+        "occurrences": 1
+      },
+      {
+        "word": "cuidar",
+        "lemma": "cuidar",
+        "occurrences": 1
+      },
+      {
+        "word": "daño",
+        "lemma": "daño",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "decidido",
+        "lemma": "decidir",
+        "occurrences": 1
+      },
+      {
+        "word": "demás",
+        "lemma": "demás",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 1
+      },
+      {
+        "word": "ellos",
+        "lemma": "ellos",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "estar",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "explicaciones",
+        "lemma": "explicación",
+        "occurrences": 1
+      },
+      {
+        "word": "fiesta",
+        "lemma": "fiesta",
+        "occurrences": 1
+      },
+      {
+        "word": "forme",
+        "lemma": "forme",
+        "occurrences": 1
+      },
+      {
+        "word": "ha",
+        "lemma": "ha",
+        "occurrences": 1
+      },
+      {
+        "word": "hace",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "historia",
+        "lemma": "historia",
+        "occurrences": 1
+      },
+      {
+        "word": "juntos",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "levantan",
+        "lemma": "levantar",
+        "occurrences": 1
+      },
+      {
+        "word": "limón",
+        "lemma": "limón",
+        "occurrences": 1
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "menos",
+        "lemma": "menos",
+        "occurrences": 1
+      },
+      {
+        "word": "ofrece",
+        "lemma": "ofrecer",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "parte",
+        "lemma": "parte",
+        "occurrences": 1
+      },
+      {
+        "word": "pedir",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "prefiere",
+        "lemma": "preferir",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "reír",
+        "lemma": "reír",
+        "occurrences": 1
+      },
+      {
+        "word": "rodaja",
+        "lemma": "rodaja",
+        "occurrences": 1
+      },
+      {
+        "word": "salud",
+        "lemma": "salud",
+        "occurrences": 1
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 2
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "todos",
+        "lemma": "todos",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 4
+      },
+      {
+        "word": "vaso",
+        "lemma": "vaso",
+        "occurrences": 1
+      },
+      {
+        "word": "vino",
+        "lemma": "vino",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "pause-before-plan",
+    "title": "Una pausa antes del plan",
+    "englishTitle": "A pause before the plan",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "pause.circle",
+    "palette": 1,
+    "summary": "A dramatic diet claim becomes an opportunity for a better question.",
+    "sentences": [
+      {
+        "id": "pause-before-plan-1",
+        "spanish": "Un vídeo le dice a Sergio que debe dejar de comer para reparar el intestino.",
+        "english": "A video tells Sergio that he must stop eating to repair his intestine."
+      },
+      {
+        "id": "pause-before-plan-2",
+        "spanish": "La explicación parece sencilla y por eso le atrae.",
+        "english": "The explanation seems simple, which is why it appeals to him."
+      },
+      {
+        "id": "pause-before-plan-3",
+        "spanish": "Antes de seguirla, pregunta a una profesional de salud.",
+        "english": "Before following it, he asks a health professional."
+      },
+      {
+        "id": "pause-before-plan-4",
+        "spanish": "Ella explica que no existe una regla universal que obligue a ayunar para reparar el cuerpo.",
+        "english": "She explains that there is no universal rule requiring fasting to repair the body."
+      },
+      {
+        "id": "pause-before-plan-5",
+        "spanish": "El ayuno no es adecuado para todas las personas y puede afectar a algunos tratamientos.",
+        "english": "Fasting is not suitable for everyone and can affect some treatments."
+      },
+      {
+        "id": "pause-before-plan-6",
+        "spanish": "Sergio decide no cambiar su alimentación ni su medicación de forma brusca.",
+        "english": "Sergio decides not to change his diet or medication abruptly."
+      },
+      {
+        "id": "pause-before-plan-7",
+        "spanish": "Pide ayuda para encontrar hábitos que encajen con sus necesidades.",
+        "english": "He asks for help finding habits that fit his needs."
+      },
+      {
+        "id": "pause-before-plan-8",
+        "spanish": "Su primera pausa es para pensar, no para saltarse una comida.",
+        "english": "His first pause is to think, not to skip a meal."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 4
+      },
+      {
+        "word": "adecuado",
+        "lemma": "adecuado",
+        "occurrences": 1
+      },
+      {
+        "word": "afectar",
+        "lemma": "afectar",
+        "occurrences": 1
+      },
+      {
+        "word": "algunos",
+        "lemma": "algunos",
+        "occurrences": 1
+      },
+      {
+        "word": "alimentación",
+        "lemma": "alimentación",
+        "occurrences": 1
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 1
+      },
+      {
+        "word": "atrae",
+        "lemma": "atraer",
+        "occurrences": 1
+      },
+      {
+        "word": "ayuda",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "ayunar",
+        "lemma": "ayunar",
+        "occurrences": 1
+      },
+      {
+        "word": "ayuno",
+        "lemma": "ayuno",
+        "occurrences": 1
+      },
+      {
+        "word": "brusca",
+        "lemma": "brusco",
+        "occurrences": 1
+      },
+      {
+        "word": "cambiar",
+        "lemma": "cambiar",
+        "occurrences": 1
+      },
+      {
+        "word": "comer",
+        "lemma": "comer",
+        "occurrences": 1
+      },
+      {
+        "word": "comida",
+        "lemma": "comida",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "cuerpo",
+        "lemma": "cuerpo",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 4
+      },
+      {
+        "word": "debe",
+        "lemma": "deber",
+        "occurrences": 1
+      },
+      {
+        "word": "decide",
+        "lemma": "decidir",
+        "occurrences": 1
+      },
+      {
+        "word": "dejar",
+        "lemma": "dejar",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 1
+      },
+      {
+        "word": "encajen",
+        "lemma": "encajar",
+        "occurrences": 1
+      },
+      {
+        "word": "encontrar",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 2
+      },
+      {
+        "word": "eso",
+        "lemma": "eso",
+        "occurrences": 1
+      },
+      {
+        "word": "existe",
+        "lemma": "existe",
+        "occurrences": 1
+      },
+      {
+        "word": "explica",
+        "lemma": "explicar",
+        "occurrences": 1
+      },
+      {
+        "word": "explicación",
+        "lemma": "explicación",
+        "occurrences": 1
+      },
+      {
+        "word": "forma",
+        "lemma": "formar",
+        "occurrences": 1
+      },
+      {
+        "word": "hábitos",
+        "lemma": "hábito",
+        "occurrences": 1
+      },
+      {
+        "word": "intestino",
+        "lemma": "intestino",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 2
+      },
+      {
+        "word": "medicación",
+        "lemma": "medicación",
+        "occurrences": 1
+      },
+      {
+        "word": "necesidades",
+        "lemma": "necesidad",
+        "occurrences": 1
+      },
+      {
+        "word": "ni",
+        "lemma": "ni",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 4
+      },
+      {
+        "word": "obligue",
+        "lemma": "obligue",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 6
+      },
+      {
+        "word": "parece",
+        "lemma": "parecer",
+        "occurrences": 1
+      },
+      {
+        "word": "pausa",
+        "lemma": "pausa",
+        "occurrences": 1
+      },
+      {
+        "word": "pensar",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "personas",
+        "lemma": "persona",
+        "occurrences": 1
+      },
+      {
+        "word": "pide",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "primera",
+        "lemma": "primero",
+        "occurrences": 1
+      },
+      {
+        "word": "profesional",
+        "lemma": "profesional",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 4
+      },
+      {
+        "word": "regla",
+        "lemma": "regla",
+        "occurrences": 1
+      },
+      {
+        "word": "reparar",
+        "lemma": "reparar",
+        "occurrences": 2
+      },
+      {
+        "word": "saltarse",
+        "lemma": "saltarse",
+        "occurrences": 1
+      },
+      {
+        "word": "salud",
+        "lemma": "salud",
+        "occurrences": 1
+      },
+      {
+        "word": "seguirla",
+        "lemma": "seguir",
+        "occurrences": 1
+      },
+      {
+        "word": "sencilla",
+        "lemma": "sencillo",
+        "occurrences": 1
+      },
+      {
+        "word": "sergio",
+        "lemma": "sergio",
+        "occurrences": 2
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 3
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
+        "word": "tratamientos",
+        "lemma": "tratamiento",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "universal",
+        "lemma": "universal",
+        "occurrences": 1
+      },
+      {
+        "word": "vídeo",
+        "lemma": "vídeo",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "ten-pages",
+    "title": "Diez páginas y una pregunta",
+    "englishTitle": "Ten pages and a question",
+    "author": "Cuentiva · fictional story",
+    "level": "A1",
+    "symbol": "books.vertical",
+    "palette": 2,
+    "summary": "Reading becomes a conversation and a small daily practice.",
+    "sentences": [
+      {
+        "id": "ten-pages-1",
+        "spanish": "Cada noche leo diez páginas.",
+        "english": "Every evening I read ten pages."
+      },
+      {
+        "id": "ten-pages-2",
+        "spanish": "No entiendo todas las palabras.",
+        "english": "I do not understand every word."
+      },
+      {
+        "id": "ten-pages-3",
+        "spanish": "Escribo una pregunta en mi cuaderno.",
+        "english": "I write a question in my notebook."
+      },
+      {
+        "id": "ten-pages-4",
+        "spanish": "Al día siguiente hablo del libro con mi hermana.",
+        "english": "The next day I talk about the book with my sister."
+      },
+      {
+        "id": "ten-pages-5",
+        "spanish": "Ella escucha libros cuando viaja en autobús.",
+        "english": "She listens to books when she travels by bus."
+      },
+      {
+        "id": "ten-pages-6",
+        "spanish": "Los dos aprendemos de formas diferentes.",
+        "english": "We both learn in different ways."
+      },
+      {
+        "id": "ten-pages-7",
+        "spanish": "A veces cambiamos de opinión después de hablar.",
+        "english": "Sometimes we change our minds after talking."
+      },
+      {
+        "id": "ten-pages-8",
+        "spanish": "Un libro puede abrir una conversación que dura muchos días.",
+        "english": "A book can open a conversation that lasts many days."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "abrir",
+        "lemma": "abrir",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "aprendemos",
+        "lemma": "aprender",
+        "occurrences": 1
+      },
+      {
+        "word": "autobús",
+        "lemma": "autobús",
+        "occurrences": 1
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 1
+      },
+      {
+        "word": "cambiamos",
+        "lemma": "cambiar",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "conversación",
+        "lemma": "conversación",
+        "occurrences": 1
+      },
+      {
+        "word": "cuaderno",
+        "lemma": "cuaderno",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "diez",
+        "lemma": "diez",
+        "occurrences": 1
+      },
+      {
+        "word": "diferentes",
+        "lemma": "diferentes",
+        "occurrences": 1
+      },
+      {
+        "word": "dos",
+        "lemma": "dos",
+        "occurrences": 1
+      },
+      {
+        "word": "dura",
+        "lemma": "dura",
+        "occurrences": 1
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "días",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "entiendo",
+        "lemma": "entender",
+        "occurrences": 1
+      },
+      {
+        "word": "escribo",
+        "lemma": "escribir",
+        "occurrences": 1
+      },
+      {
+        "word": "escucha",
+        "lemma": "escuchar",
+        "occurrences": 1
+      },
+      {
+        "word": "formas",
+        "lemma": "forma",
+        "occurrences": 1
+      },
+      {
+        "word": "hablar",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hablo",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hermana",
+        "lemma": "hermana",
+        "occurrences": 1
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "leo",
+        "lemma": "leer",
+        "occurrences": 1
+      },
+      {
+        "word": "libro",
+        "lemma": "libro",
+        "occurrences": 2
+      },
+      {
+        "word": "libros",
+        "lemma": "libro",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "muchos",
+        "lemma": "muchos",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "noche",
+        "lemma": "noche",
+        "occurrences": 1
+      },
+      {
+        "word": "opinión",
+        "lemma": "opinión",
+        "occurrences": 1
+      },
+      {
+        "word": "palabras",
+        "lemma": "palabra",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "páginas",
+        "lemma": "página",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 1
+      },
+      {
+        "word": "siguiente",
+        "lemma": "siguiente",
+        "occurrences": 1
+      },
+      {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "veces",
+        "lemma": "veces",
+        "occurrences": 1
+      },
+      {
+        "word": "viaja",
+        "lemma": "viaja",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "metaphor-not-law",
+    "title": "Una idea y una prueba",
+    "englishTitle": "An idea and a test",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "magnifyingglass",
+    "palette": 3,
+    "summary": "A reader distinguishes philosophical inspiration from scientific evidence.",
+    "sentences": [
+      {
+        "id": "metaphor-not-law-1",
+        "spanish": "En el club de lectura, comentamos El Kybalión.",
+        "english": "At the book club, we discuss The Kybalion."
+      },
+      {
+        "id": "metaphor-not-law-2",
+        "spanish": "El texto presenta siete principios de una filosofía hermética.",
+        "english": "The text presents seven principles of a Hermetic philosophy."
+      },
+      {
+        "id": "metaphor-not-law-3",
+        "spanish": "Habla de ideas como el ritmo, la polaridad y la causa y el efecto.",
+        "english": "It discusses ideas such as rhythm, polarity, and cause and effect."
+      },
+      {
+        "id": "metaphor-not-law-4",
+        "spanish": "A Julia le sirve para pensar en cómo responde a los cambios.",
+        "english": "Julia finds it useful for thinking about how she responds to change."
+      },
+      {
+        "id": "metaphor-not-law-5",
+        "spanish": "Pero una metáfora útil no se convierte por eso en una ley física.",
+        "english": "But a useful metaphor does not thereby become a law of physics."
+      },
+      {
+        "id": "metaphor-not-law-6",
+        "spanish": "Para una afirmación científica buscamos observaciones y pruebas que puedan contrastarse.",
+        "english": "For a scientific claim, we look for observations and evidence that can be tested."
+      },
+      {
+        "id": "metaphor-not-law-7",
+        "spanish": "Podemos disfrutar de una lectura sin aceptar todas sus afirmaciones.",
+        "english": "We can enjoy a book without accepting every claim it makes."
+      },
+      {
+        "id": "metaphor-not-law-8",
+        "spanish": "Salimos del club con una idea nueva y una pregunta abierta.",
+        "english": "We leave the club with a new idea and an open question."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 2
+      },
+      {
+        "word": "abierta",
+        "lemma": "abierto",
+        "occurrences": 1
+      },
+      {
+        "word": "aceptar",
+        "lemma": "aceptar",
+        "occurrences": 1
+      },
+      {
+        "word": "afirmaciones",
+        "lemma": "afirmaciones",
+        "occurrences": 1
+      },
+      {
+        "word": "afirmación",
+        "lemma": "afirmación",
+        "occurrences": 1
+      },
+      {
+        "word": "buscamos",
+        "lemma": "buscar",
+        "occurrences": 1
+      },
+      {
+        "word": "cambios",
+        "lemma": "cambio",
+        "occurrences": 1
+      },
+      {
+        "word": "causa",
+        "lemma": "causa",
+        "occurrences": 1
+      },
+      {
+        "word": "científica",
+        "lemma": "científica",
+        "occurrences": 1
+      },
+      {
+        "word": "club",
+        "lemma": "club",
+        "occurrences": 2
+      },
+      {
+        "word": "comentamos",
+        "lemma": "comentar",
+        "occurrences": 1
+      },
+      {
+        "word": "como",
+        "lemma": "como",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "contrastarse",
+        "lemma": "contrastarse",
+        "occurrences": 1
+      },
+      {
+        "word": "convierte",
+        "lemma": "convertir",
+        "occurrences": 1
+      },
+      {
+        "word": "cómo",
+        "lemma": "cómo",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 4
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "disfrutar",
+        "lemma": "disfrutar",
+        "occurrences": 1
+      },
+      {
+        "word": "efecto",
+        "lemma": "efecto",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 5
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
+        "word": "eso",
+        "lemma": "eso",
+        "occurrences": 1
+      },
+      {
+        "word": "filosofía",
+        "lemma": "filosofía",
+        "occurrences": 1
+      },
+      {
+        "word": "física",
+        "lemma": "física",
+        "occurrences": 1
+      },
+      {
+        "word": "habla",
+        "lemma": "habla",
+        "occurrences": 1
+      },
+      {
+        "word": "hermética",
+        "lemma": "hermética",
+        "occurrences": 1
+      },
+      {
+        "word": "idea",
+        "lemma": "idea",
+        "occurrences": 1
+      },
+      {
+        "word": "ideas",
+        "lemma": "idea",
+        "occurrences": 1
+      },
+      {
+        "word": "julia",
+        "lemma": "julia",
+        "occurrences": 1
+      },
+      {
+        "word": "kybalión",
+        "lemma": "kybalión",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "lectura",
+        "lemma": "lectura",
+        "occurrences": 2
+      },
+      {
+        "word": "ley",
+        "lemma": "ley",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "metáfora",
+        "lemma": "metáfora",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nueva",
+        "lemma": "nuevo",
+        "occurrences": 1
+      },
+      {
+        "word": "observaciones",
+        "lemma": "observación",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 2
+      },
+      {
+        "word": "pensar",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "podemos",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "polaridad",
+        "lemma": "polaridad",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "presenta",
+        "lemma": "presentar",
+        "occurrences": 1
+      },
+      {
+        "word": "principios",
+        "lemma": "principio",
+        "occurrences": 1
+      },
+      {
+        "word": "pruebas",
+        "lemma": "prueba",
+        "occurrences": 1
+      },
+      {
+        "word": "puedan",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 1
+      },
+      {
+        "word": "responde",
+        "lemma": "responder",
+        "occurrences": 1
+      },
+      {
+        "word": "ritmo",
+        "lemma": "ritmo",
+        "occurrences": 1
+      },
+      {
+        "word": "salimos",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "siete",
+        "lemma": "siete",
+        "occurrences": 1
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "sirve",
+        "lemma": "servir",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "texto",
+        "lemma": "texto",
+        "occurrences": 1
+      },
+      {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 7
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 4
+      },
+      {
+        "word": "útil",
+        "lemma": "útil",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva; book references identify thematic inspiration, not an authorized adaptation. Production licensing and native-speaker review pending."
   }
 ]
