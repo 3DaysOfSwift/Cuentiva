@@ -1,5 +1,13 @@
 # Validation — 16 September 2026
 
+## Gravity, the Sun, and gas giants
+
+Added three science stories with fictional characters and 30 bilingual sentence
+pairs. All 43 books pass decoding and vocabulary-index checks; all 16 core tests
+and the iOS Simulator suite pass. The catalog has 8 A1, 18 A2, and 17 B1 books.
+NASA references and scientific qualifications are in SPACE-STORIES.md.
+Native-speaker review remains pending.
+
 ## Work, travel, and imagined futures
 
 Added six original bilingual books (62 sentence pairs), bringing the catalog to

@@ -14538,5 +14538,1445 @@
       }
     ],
     "license": "Original fictional learning story created for Cuentiva. Not adapted from a named self-help book. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "feet-on-earth",
+    "title": "Los pies en la Tierra",
+    "englishTitle": "Feet on Earth",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "globe.europe.africa",
+    "palette": 0,
+    "summary": "A playground question separates gravitational attraction from rotation.",
+    "sentences": [
+      {
+        "id": "feet-on-earth-1",
+        "spanish": "En el parque, Alba pregunta por qué no salimos volando si la Tierra gira.",
+        "english": "In the park, Alba asks why we do not fly off if Earth spins."
+      },
+      {
+        "id": "feet-on-earth-2",
+        "spanish": "Su padre deja caer una pelota y le habla de la gravedad.",
+        "english": "Her father drops a ball and tells her about gravity."
+      },
+      {
+        "id": "feet-on-earth-3",
+        "spanish": "En la descripción de Newton, los objetos con masa se atraen entre sí.",
+        "english": "In Newton’s description, objects with mass attract one another."
+      },
+      {
+        "id": "feet-on-earth-4",
+        "spanish": "La atracción depende de la masa y de la distancia, no solo del tamaño.",
+        "english": "The attraction depends on mass and distance, not just size."
+      },
+      {
+        "id": "feet-on-earth-5",
+        "spanish": "Cerca de la superficie terrestre, apunta aproximadamente hacia el centro del planeta.",
+        "english": "Near Earth’s surface, it points approximately toward the planet’s center."
+      },
+      {
+        "id": "feet-on-earth-6",
+        "spanish": "Toda la Tierra contribuye a esa atracción, no únicamente su núcleo.",
+        "english": "The whole Earth contributes to that attraction, not only its core."
+      },
+      {
+        "id": "feet-on-earth-7",
+        "spanish": "El giro produce un efecto centrífugo aparente que reduce un poco nuestro peso, sobre todo en el ecuador.",
+        "english": "The spin produces an apparent centrifugal effect that slightly reduces our weight, especially at the equator."
+      },
+      {
+        "id": "feet-on-earth-8",
+        "spanish": "Pero ese efecto es mucho menor que la atracción gravitatoria.",
+        "english": "But that effect is much smaller than gravitational attraction."
+      },
+      {
+        "id": "feet-on-earth-9",
+        "spanish": "La rotación actual no basta para lanzarnos al espacio, y el suelo nos sostiene.",
+        "english": "Earth’s current rotation is not enough to launch us into space, and the ground supports us."
+      },
+      {
+        "id": "feet-on-earth-10",
+        "spanish": "Alba recoge la pelota y mira el planeta que tiene bajo los pies.",
+        "english": "Alba picks up the ball and looks at the planet beneath her feet."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "actual",
+        "lemma": "actual",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "alba",
+        "lemma": "alba",
+        "occurrences": 2
+      },
+      {
+        "word": "aparente",
+        "lemma": "aparente",
+        "occurrences": 1
+      },
+      {
+        "word": "aproximadamente",
+        "lemma": "aproximadamente",
+        "occurrences": 1
+      },
+      {
+        "word": "apunta",
+        "lemma": "apuntar",
+        "occurrences": 1
+      },
+      {
+        "word": "atracción",
+        "lemma": "atracción",
+        "occurrences": 3
+      },
+      {
+        "word": "atraen",
+        "lemma": "atraer",
+        "occurrences": 1
+      },
+      {
+        "word": "bajo",
+        "lemma": "bajo",
+        "occurrences": 1
+      },
+      {
+        "word": "basta",
+        "lemma": "bastar",
+        "occurrences": 1
+      },
+      {
+        "word": "caer",
+        "lemma": "caer",
+        "occurrences": 1
+      },
+      {
+        "word": "centro",
+        "lemma": "centro",
+        "occurrences": 1
+      },
+      {
+        "word": "centrífugo",
+        "lemma": "centrífugo",
+        "occurrences": 1
+      },
+      {
+        "word": "cerca",
+        "lemma": "cerca",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "contribuye",
+        "lemma": "contribuir",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 5
+      },
+      {
+        "word": "deja",
+        "lemma": "dejar",
+        "occurrences": 1
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 2
+      },
+      {
+        "word": "depende",
+        "lemma": "depender",
+        "occurrences": 1
+      },
+      {
+        "word": "descripción",
+        "lemma": "descripción",
+        "occurrences": 1
+      },
+      {
+        "word": "distancia",
+        "lemma": "distancia",
+        "occurrences": 1
+      },
+      {
+        "word": "ecuador",
+        "lemma": "ecuador",
+        "occurrences": 1
+      },
+      {
+        "word": "efecto",
+        "lemma": "efecto",
+        "occurrences": 2
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 6
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
+        "word": "entre",
+        "lemma": "entre",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "esa",
+        "lemma": "esa",
+        "occurrences": 1
+      },
+      {
+        "word": "ese",
+        "lemma": "ese",
+        "occurrences": 1
+      },
+      {
+        "word": "espacio",
+        "lemma": "espacio",
+        "occurrences": 1
+      },
+      {
+        "word": "gira",
+        "lemma": "girar",
+        "occurrences": 1
+      },
+      {
+        "word": "giro",
+        "lemma": "giro",
+        "occurrences": 1
+      },
+      {
+        "word": "gravedad",
+        "lemma": "gravedad",
+        "occurrences": 1
+      },
+      {
+        "word": "gravitatoria",
+        "lemma": "gravitatoria",
+        "occurrences": 1
+      },
+      {
+        "word": "habla",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "hacia",
+        "lemma": "hacia",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 11
+      },
+      {
+        "word": "lanzarnos",
+        "lemma": "lanzar",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "masa",
+        "lemma": "masa",
+        "occurrences": 2
+      },
+      {
+        "word": "menor",
+        "lemma": "menor",
+        "occurrences": 1
+      },
+      {
+        "word": "mira",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "mucho",
+        "lemma": "mucho",
+        "occurrences": 1
+      },
+      {
+        "word": "newton",
+        "lemma": "newton",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 4
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "nuestro",
+        "lemma": "nuestro",
+        "occurrences": 1
+      },
+      {
+        "word": "núcleo",
+        "lemma": "núcleo",
+        "occurrences": 1
+      },
+      {
+        "word": "objetos",
+        "lemma": "objeto",
+        "occurrences": 1
+      },
+      {
+        "word": "padre",
+        "lemma": "padre",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 1
+      },
+      {
+        "word": "parque",
+        "lemma": "parque",
+        "occurrences": 1
+      },
+      {
+        "word": "pelota",
+        "lemma": "pelota",
+        "occurrences": 2
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "peso",
+        "lemma": "peso",
+        "occurrences": 1
+      },
+      {
+        "word": "pies",
+        "lemma": "pie",
+        "occurrences": 1
+      },
+      {
+        "word": "planeta",
+        "lemma": "planeta",
+        "occurrences": 2
+      },
+      {
+        "word": "poco",
+        "lemma": "poco",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "produce",
+        "lemma": "producir",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 3
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 1
+      },
+      {
+        "word": "recoge",
+        "lemma": "recoger",
+        "occurrences": 1
+      },
+      {
+        "word": "reduce",
+        "lemma": "reducir",
+        "occurrences": 1
+      },
+      {
+        "word": "rotación",
+        "lemma": "rotación",
+        "occurrences": 1
+      },
+      {
+        "word": "salimos",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "sobre",
+        "lemma": "sobre",
+        "occurrences": 1
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
+        "occurrences": 1
+      },
+      {
+        "word": "sostiene",
+        "lemma": "sostener",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 2
+      },
+      {
+        "word": "suelo",
+        "lemma": "suelo",
+        "occurrences": 1
+      },
+      {
+        "word": "superficie",
+        "lemma": "superficie",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "tamaño",
+        "lemma": "tamaño",
+        "occurrences": 1
+      },
+      {
+        "word": "terrestre",
+        "lemma": "terrestre",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tierra",
+        "lemma": "tierra",
+        "occurrences": 2
+      },
+      {
+        "word": "toda",
+        "lemma": "toda",
+        "occurrences": 1
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "volando",
+        "lemma": "volar",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 4
+      },
+      {
+        "word": "únicamente",
+        "lemma": "únicamente",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva. Not adapted from a named self-help book. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "travelling-sun",
+    "title": "El viaje del Sol",
+    "englishTitle": "The Sun’s journey",
+    "author": "Cuentiva · fictional story",
+    "level": "A2",
+    "symbol": "sun.max",
+    "palette": 1,
+    "summary": "A planetarium visit reveals the journey of our whole solar system.",
+    "sentences": [
+      {
+        "id": "travelling-sun-1",
+        "spanish": "En el planetario, Mateo ve la Tierra dar vueltas alrededor del Sol.",
+        "english": "In the planetarium, Mateo sees Earth going around the Sun."
+      },
+      {
+        "id": "travelling-sun-2",
+        "spanish": "Entonces pregunta si el Sol también viaja.",
+        "english": "Then he asks whether the Sun travels too."
+      },
+      {
+        "id": "travelling-sun-3",
+        "spanish": "La guía muestra una imagen de nuestra galaxia, la Vía Láctea.",
+        "english": "The guide shows an image of our galaxy, the Milky Way."
+      },
+      {
+        "id": "travelling-sun-4",
+        "spanish": "El Sol orbita alrededor del centro de esa galaxia.",
+        "english": "The Sun orbits the center of that galaxy."
+      },
+      {
+        "id": "travelling-sun-5",
+        "spanish": "Los planetas lo acompañan en el viaje.",
+        "english": "The planets accompany it on the journey."
+      },
+      {
+        "id": "travelling-sun-6",
+        "spanish": "Una vuelta completa tarda unos doscientos treinta millones de años.",
+        "english": "One complete orbit takes about two hundred and thirty million years."
+      },
+      {
+        "id": "travelling-sun-7",
+        "spanish": "El Sol también gira sobre sí mismo, pero ese es otro movimiento.",
+        "english": "The Sun also spins on its own axis, but that is a different motion."
+      },
+      {
+        "id": "travelling-sun-8",
+        "spanish": "Mateo descubre que girar y recorrer una órbita no significan lo mismo.",
+        "english": "Mateo discovers that spinning and following an orbit do not mean the same thing."
+      },
+      {
+        "id": "travelling-sun-9",
+        "spanish": "Al salir, se sienta en un banco y mira el cielo.",
+        "english": "On leaving, he sits on a bench and looks at the sky."
+      },
+      {
+        "id": "travelling-sun-10",
+        "spanish": "Parece estar quieto, pero sigue viajando con todo el sistema solar.",
+        "english": "He seems to be still, but he is still traveling with the entire solar system."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "acompañan",
+        "lemma": "acompañar",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "alrededor",
+        "lemma": "alrededor",
+        "occurrences": 2
+      },
+      {
+        "word": "años",
+        "lemma": "año",
+        "occurrences": 1
+      },
+      {
+        "word": "banco",
+        "lemma": "banco",
+        "occurrences": 1
+      },
+      {
+        "word": "centro",
+        "lemma": "centro",
+        "occurrences": 1
+      },
+      {
+        "word": "cielo",
+        "lemma": "cielo",
+        "occurrences": 1
+      },
+      {
+        "word": "completa",
+        "lemma": "completa",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "dar",
+        "lemma": "dar",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 3
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 2
+      },
+      {
+        "word": "descubre",
+        "lemma": "descubrir",
+        "occurrences": 1
+      },
+      {
+        "word": "doscientos",
+        "lemma": "doscientos",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 7
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
+        "word": "entonces",
+        "lemma": "entonces",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "esa",
+        "lemma": "esa",
+        "occurrences": 1
+      },
+      {
+        "word": "ese",
+        "lemma": "ese",
+        "occurrences": 1
+      },
+      {
+        "word": "estar",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "galaxia",
+        "lemma": "galaxia",
+        "occurrences": 2
+      },
+      {
+        "word": "gira",
+        "lemma": "girar",
+        "occurrences": 1
+      },
+      {
+        "word": "girar",
+        "lemma": "girar",
+        "occurrences": 1
+      },
+      {
+        "word": "guía",
+        "lemma": "guía",
+        "occurrences": 1
+      },
+      {
+        "word": "imagen",
+        "lemma": "imagen",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 2
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "láctea",
+        "lemma": "láctea",
+        "occurrences": 1
+      },
+      {
+        "word": "mateo",
+        "lemma": "mateo",
+        "occurrences": 2
+      },
+      {
+        "word": "millones",
+        "lemma": "millón",
+        "occurrences": 1
+      },
+      {
+        "word": "mira",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "mismo",
+        "lemma": "mismo",
+        "occurrences": 2
+      },
+      {
+        "word": "movimiento",
+        "lemma": "movimiento",
+        "occurrences": 1
+      },
+      {
+        "word": "muestra",
+        "lemma": "mostrar",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nuestra",
+        "lemma": "nuestro",
+        "occurrences": 1
+      },
+      {
+        "word": "orbita",
+        "lemma": "orbitar",
+        "occurrences": 1
+      },
+      {
+        "word": "otro",
+        "lemma": "otro",
+        "occurrences": 1
+      },
+      {
+        "word": "parece",
+        "lemma": "parecer",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 2
+      },
+      {
+        "word": "planetario",
+        "lemma": "planetario",
+        "occurrences": 1
+      },
+      {
+        "word": "planetas",
+        "lemma": "planeta",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 1
+      },
+      {
+        "word": "quieto",
+        "lemma": "quieto",
+        "occurrences": 1
+      },
+      {
+        "word": "recorrer",
+        "lemma": "recorrer",
+        "occurrences": 1
+      },
+      {
+        "word": "salir",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "sienta",
+        "lemma": "sentar",
+        "occurrences": 1
+      },
+      {
+        "word": "significan",
+        "lemma": "significar",
+        "occurrences": 1
+      },
+      {
+        "word": "sigue",
+        "lemma": "seguir",
+        "occurrences": 1
+      },
+      {
+        "word": "sistema",
+        "lemma": "sistema",
+        "occurrences": 1
+      },
+      {
+        "word": "sobre",
+        "lemma": "sobre",
+        "occurrences": 1
+      },
+      {
+        "word": "sol",
+        "lemma": "sol",
+        "occurrences": 4
+      },
+      {
+        "word": "solar",
+        "lemma": "solar",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 2
+      },
+      {
+        "word": "tarda",
+        "lemma": "tardar",
+        "occurrences": 1
+      },
+      {
+        "word": "tierra",
+        "lemma": "tierra",
+        "occurrences": 1
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "treinta",
+        "lemma": "treinta",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "unos",
+        "lemma": "unos",
+        "occurrences": 1
+      },
+      {
+        "word": "ve",
+        "lemma": "ver",
+        "occurrences": 1
+      },
+      {
+        "word": "viaja",
+        "lemma": "viajar",
+        "occurrences": 1
+      },
+      {
+        "word": "viajando",
+        "lemma": "viajar",
+        "occurrences": 1
+      },
+      {
+        "word": "viaje",
+        "lemma": "viaje",
+        "occurrences": 1
+      },
+      {
+        "word": "vuelta",
+        "lemma": "vuelta",
+        "occurrences": 1
+      },
+      {
+        "word": "vueltas",
+        "lemma": "vuelta",
+        "occurrences": 1
+      },
+      {
+        "word": "vía",
+        "lemma": "vía",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      },
+      {
+        "word": "órbita",
+        "lemma": "órbita",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva. Not adapted from a named self-help book. Production licensing and native-speaker review pending."
+  },
+  {
+    "id": "no-place-to-land",
+    "title": "Un planeta sin suelo",
+    "englishTitle": "A planet without ground",
+    "author": "Cuentiva · fictional story",
+    "level": "B1",
+    "symbol": "sparkles",
+    "palette": 2,
+    "summary": "Jupiter challenges a learner’s picture of a gas giant.",
+    "sentences": [
+      {
+        "id": "no-place-to-land-1",
+        "spanish": "Irene dibuja una nave que quiere aterrizar en Júpiter.",
+        "english": "Irene draws a spacecraft that wants to land on Jupiter."
+      },
+      {
+        "id": "no-place-to-land-2",
+        "spanish": "Su profesora le pregunta dónde pondría las patas.",
+        "english": "Her teacher asks where it would put its landing legs."
+      },
+      {
+        "id": "no-place-to-land-3",
+        "spanish": "Júpiter es un gigante gaseoso, pero no está hecho únicamente de gas.",
+        "english": "Jupiter is a gas giant, but it is not made entirely of gas."
+      },
+      {
+        "id": "no-place-to-land-4",
+        "spanish": "Está compuesto principalmente de hidrógeno y helio.",
+        "english": "It is composed mainly of hydrogen and helium."
+      },
+      {
+        "id": "no-place-to-land-5",
+        "spanish": "En sus regiones profundas, la enorme presión transforma el hidrógeno en un fluido denso.",
+        "english": "In its deep regions, enormous pressure turns hydrogen into a dense fluid."
+      },
+      {
+        "id": "no-place-to-land-6",
+        "spanish": "Más abajo, parte de ese hidrógeno se comporta como un metal líquido.",
+        "english": "Farther down, some of that hydrogen behaves like a liquid metal."
+      },
+      {
+        "id": "no-place-to-land-7",
+        "spanish": "No hay una superficie sólida como el suelo de la Tierra donde podamos aterrizar.",
+        "english": "There is no solid surface like the ground on Earth where we could land."
+      },
+      {
+        "id": "no-place-to-land-8",
+        "spanish": "Los datos de la misión Juno sugieren un núcleo difuso, mezclado con el material que lo rodea.",
+        "english": "Data from the Juno mission suggest a diffuse core, mixed with the material around it."
+      },
+      {
+        "id": "no-place-to-land-9",
+        "spanish": "Saturno también es un gigante gaseoso, y su interior tampoco es solo gas.",
+        "english": "Saturn is also a gas giant, and its interior is not just gas either."
+      },
+      {
+        "id": "no-place-to-land-10",
+        "spanish": "Irene cambia su dibujo: ahora la nave observa el planeta desde una órbita.",
+        "english": "Irene changes her drawing: now the spacecraft observes the planet from orbit."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "abajo",
+        "lemma": "abajo",
+        "occurrences": 1
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
+      },
+      {
+        "word": "aterrizar",
+        "lemma": "aterrizar",
+        "occurrences": 2
+      },
+      {
+        "word": "cambia",
+        "lemma": "cambiar",
+        "occurrences": 1
+      },
+      {
+        "word": "como",
+        "lemma": "como",
+        "occurrences": 2
+      },
+      {
+        "word": "comporta",
+        "lemma": "comportar",
+        "occurrences": 1
+      },
+      {
+        "word": "compuesto",
+        "lemma": "componer",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "datos",
+        "lemma": "dato",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 5
+      },
+      {
+        "word": "denso",
+        "lemma": "denso",
+        "occurrences": 1
+      },
+      {
+        "word": "desde",
+        "lemma": "desde",
+        "occurrences": 1
+      },
+      {
+        "word": "dibuja",
+        "lemma": "dibujar",
+        "occurrences": 1
+      },
+      {
+        "word": "dibujo",
+        "lemma": "dibujo",
+        "occurrences": 1
+      },
+      {
+        "word": "difuso",
+        "lemma": "difuso",
+        "occurrences": 1
+      },
+      {
+        "word": "donde",
+        "lemma": "donde",
+        "occurrences": 1
+      },
+      {
+        "word": "dónde",
+        "lemma": "dónde",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 4
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 3
+      },
+      {
+        "word": "enorme",
+        "lemma": "enorme",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 3
+      },
+      {
+        "word": "ese",
+        "lemma": "ese",
+        "occurrences": 1
+      },
+      {
+        "word": "está",
+        "lemma": "estar",
+        "occurrences": 2
+      },
+      {
+        "word": "fluido",
+        "lemma": "fluido",
+        "occurrences": 1
+      },
+      {
+        "word": "gas",
+        "lemma": "gas",
+        "occurrences": 2
+      },
+      {
+        "word": "gaseoso",
+        "lemma": "gaseoso",
+        "occurrences": 2
+      },
+      {
+        "word": "gigante",
+        "lemma": "gigante",
+        "occurrences": 2
+      },
+      {
+        "word": "hay",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "hecho",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "helio",
+        "lemma": "helio",
+        "occurrences": 1
+      },
+      {
+        "word": "hidrógeno",
+        "lemma": "hidrógeno",
+        "occurrences": 3
+      },
+      {
+        "word": "interior",
+        "lemma": "interior",
+        "occurrences": 1
+      },
+      {
+        "word": "irene",
+        "lemma": "irene",
+        "occurrences": 2
+      },
+      {
+        "word": "juno",
+        "lemma": "juno",
+        "occurrences": 1
+      },
+      {
+        "word": "júpiter",
+        "lemma": "júpiter",
+        "occurrences": 2
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 4
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "líquido",
+        "lemma": "líquido",
+        "occurrences": 1
+      },
+      {
+        "word": "material",
+        "lemma": "material",
+        "occurrences": 1
+      },
+      {
+        "word": "metal",
+        "lemma": "metal",
+        "occurrences": 1
+      },
+      {
+        "word": "mezclado",
+        "lemma": "mezclar",
+        "occurrences": 1
+      },
+      {
+        "word": "misión",
+        "lemma": "misión",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 1
+      },
+      {
+        "word": "nave",
+        "lemma": "nave",
+        "occurrences": 2
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 2
+      },
+      {
+        "word": "núcleo",
+        "lemma": "núcleo",
+        "occurrences": 1
+      },
+      {
+        "word": "observa",
+        "lemma": "observar",
+        "occurrences": 1
+      },
+      {
+        "word": "parte",
+        "lemma": "parte",
+        "occurrences": 1
+      },
+      {
+        "word": "patas",
+        "lemma": "pata",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "planeta",
+        "lemma": "planeta",
+        "occurrences": 1
+      },
+      {
+        "word": "podamos",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "pondría",
+        "lemma": "poner",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "presión",
+        "lemma": "presión",
+        "occurrences": 1
+      },
+      {
+        "word": "principalmente",
+        "lemma": "principalmente",
+        "occurrences": 1
+      },
+      {
+        "word": "profesora",
+        "lemma": "profesora",
+        "occurrences": 1
+      },
+      {
+        "word": "profundas",
+        "lemma": "profundo",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "quiere",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "regiones",
+        "lemma": "región",
+        "occurrences": 1
+      },
+      {
+        "word": "rodea",
+        "lemma": "rodear",
+        "occurrences": 1
+      },
+      {
+        "word": "saturno",
+        "lemma": "saturno",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 1
+      },
+      {
+        "word": "solo",
+        "lemma": "solo",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 3
+      },
+      {
+        "word": "suelo",
+        "lemma": "suelo",
+        "occurrences": 1
+      },
+      {
+        "word": "sugieren",
+        "lemma": "sugerir",
+        "occurrences": 1
+      },
+      {
+        "word": "superficie",
+        "lemma": "superficie",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "sólida",
+        "lemma": "sólida",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tampoco",
+        "lemma": "tampoco",
+        "occurrences": 1
+      },
+      {
+        "word": "tierra",
+        "lemma": "tierra",
+        "occurrences": 1
+      },
+      {
+        "word": "transforma",
+        "lemma": "transformar",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 5
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      },
+      {
+        "word": "órbita",
+        "lemma": "órbita",
+        "occurrences": 1
+      },
+      {
+        "word": "únicamente",
+        "lemma": "únicamente",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional learning story created for Cuentiva. Not adapted from a named self-help book. Production licensing and native-speaker review pending."
   }
 ]
