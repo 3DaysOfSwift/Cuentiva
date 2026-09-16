@@ -8,7 +8,7 @@ struct HomeView: View {
                 StreakBar(count: viewModel.streak, days: viewModel.week)
                 Divider()
                 HStack(alignment: .bottom) {
-                    VStack(alignment: .leading, spacing: 8) { Text("A little Spanish.\nA new perspective.").font(.system(.largeTitle, design: .serif, weight: .medium)); Text("Five lives. Five stories. Yours to discover.").font(.subheadline).foregroundStyle(theme.theme.muted) }
+                    VStack(alignment: .leading, spacing: 8) { Text("A little Spanish.\nA new perspective.").font(.system(.largeTitle, design: .serif, weight: .medium)); Text("Small stories. Ideas for everyday life.").font(.subheadline).foregroundStyle(theme.theme.muted) }
                     Spacer(minLength: 5)
                     VStack { Text("\(viewModel.total)").font(.system(.largeTitle, design: .serif)); Text("BOOKS\nLEARNED").font(.system(size: 9, weight: .bold, design: .monospaced)).multilineTextAlignment(.center) }
                 }

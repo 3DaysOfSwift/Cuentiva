@@ -1,5 +1,15 @@
 # Validation — 16 September 2026
 
+## Expanded life-skills library
+
+Added 15 original fictional microbooks: 122 bilingual sentence pairs and 1,034
+Spanish word occurrences. The library now has 20 books (5 A1, 8 A2, 7 B1).
+All 16 core tests and the iOS Simulator suite pass. The bundled-content test
+checks every vocabulary occurrence count, unique surface entries, alignment,
+and nonempty lemmas. Existing book IDs and the introductory gate are retained.
+Installed on iPhone Air Simulator. Native-speaker editorial review remains
+pending; sources and vocabulary limitations are recorded in CONTENT-NOTES.md.
+
 ## Confetti appearance correction
 
 Replaced the embedded UIKit appearance observer with an explicit SwiftUI entrance
@@ -93,7 +103,7 @@ For compiler verification in this nested sandbox, the invocation used the Swift 
 
 1. Run the Cuentiva scheme with its StoreKit file selected. Complete onboarding with writing, then confirm the celebration and paywall appear.
 2. Decline the offer; confirm no library, completed shelf, or contribution access. Restore remains available.
-3. Make the local one-time purchase. Confirm all five books appear and the introduction already has its completion tick.
+3. Make the local one-time purchase. Confirm all 20 books appear and the introduction already has its completion tick.
 4. Search and filter A1/A2/B1. Complete another book; verify one new counter increment and its appearance in Completed.
 5. Relaunch during a lesson; verify saved position and attempts. Repeat a completed book; verify no duplicate counter increment.
 6. Use Xcode's StoreKit transaction manager to refund/revoke the purchase. Confirm the feature gate returns and preserves progress. Restore a non-revoked purchase; confirm the shelf returns. Verify there is no renewal or trial offer.

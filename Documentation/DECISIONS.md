@@ -4,7 +4,7 @@ Approved direction: a real iOS app, community stories, Spanish/English sentence 
 
 The current purchase model is a free download with one introductory book, followed by a $4.99 one-time non-consumable purchase. Completion of the introduction gates all further learning, including rereading it, until purchase or restore. The purchase permanently unlocks the library, subject to refunds/revocation. No subscription or seven-day trial remains. Production App Store Connect setup is still required.
 
-Five books total, including the introductory book, span A1/A2/B1. These levels are approximate editorial labels, not scores derived solely from vocabulary. Sentence complexity and grammar were considered in authoring. The demo's lemma mappings are a small curated index, not a production morphological analyzer.
+Twenty books total, including the introductory book, span A1/A2/B1. Fifteen original stories explore money, effort, family, and health. These levels are approximate editorial labels, not scores derived solely from vocabulary. Sentence complexity and grammar were considered in authoring. The demo's lemma mappings are a small curated index, not a production morphological analyzer.
 
 The supplied earlier microbook was not represented as a verified real-life story. New, explicitly fictional samples demonstrate the final personal-story product direction. Native-speaker review and author/license verification are required for production content.
 

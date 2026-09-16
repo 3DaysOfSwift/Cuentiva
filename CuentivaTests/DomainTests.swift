@@ -174,10 +174,15 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let url = Bundle.main.url(forResource: "Books", withExtension: "json")!
         #endif
         let books = try await BundledBookRepository(url: url).books()
-        #expect(books.count == 5); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
+        #expect(books.count == 20); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
         for book in books {
             let words = book.sentences.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
             #expect(Set(words) == Set(book.vocabulary.map(\.word)))
+            #expect(Set(book.vocabulary.map(\.word)).count == book.vocabulary.count)
+            for entry in book.vocabulary {
+                #expect(!entry.lemma.isEmpty)
+                #expect(entry.occurrences == words.filter { $0 == entry.word }.count)
+            }
             #expect(book.vocabulary.reduce(0) { $0 + $1.occurrences } == words.count)
         }
     }
