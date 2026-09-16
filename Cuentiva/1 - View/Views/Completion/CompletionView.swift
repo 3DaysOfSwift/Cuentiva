@@ -58,7 +58,7 @@ struct CompletionView: View {
             }
             .task(id: confettiStart) {
                 guard confettiStart != nil else { return }
-                do { try await Task.sleep(for: .seconds(3.2)) } catch { return }
+                do { try await Task.sleep(for: .seconds(ConfettiBurst.duration)) } catch { return }
                 confettiStart = nil
             }
             .onDisappear {

@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// A finite burst from the bottom corners, drawn without creating particle views.
+/// Launch below the viewport so particles spread before crossing its bottom edge.
 struct ConfettiBurst: View {
+    static let duration = 4.2
     let start: Date
     @Environment(ThemeManager.self) private var theme
 
@@ -10,7 +11,7 @@ struct ConfettiBurst: View {
             Canvas { context, size in
                 let elapsed = timeline.date.timeIntervalSince(start)
                 let colours = theme.theme.coverColours + [theme.theme.accent]
-                for index in 0..<100 {
+                for index in 0..<80 {
                     // Deterministic variation keeps trajectories stable between frames.
                     let seed = Double((index * 73 + 19) % 101) / 100
                     let spread = Double((index * 37 + 11) % 103) / 102
@@ -18,20 +19,22 @@ struct ConfettiBurst: View {
                     guard age >= 0 else { continue }
                     let fromLeft = index.isMultiple(of: 2)
                     let originX = size.width * (fromLeft ? 0.12 : 0.88)
-                    let velocityX = (fromLeft ? 1.0 : -1.0) * size.width * (0.10 + spread * 0.42)
-                    let velocityY = -size.height * (0.78 + seed * 0.45)
+                    let velocityX = (fromLeft ? 1.0 : -1.0) * size.width * (-0.08 + spread * 0.52)
+                    let velocityY = -size.height * (0.85 + seed * 0.25)
                     let x = originX + velocityX * age
-                    let y = size.height + 12 + velocityY * age + size.height * 0.40 * age * age
+                    // The hidden initial flight disperses each plume before it is visible.
+                    let y = size.height * 1.38 + velocityY * age + size.height * 0.28 * age * age
+                    guard y > -20, y < size.height + 20 else { continue }
                     var particle = context
-                    particle.opacity = max(0, min(1, (3.1 - age) / 0.65))
+                    particle.opacity = max(0, min(1, (Self.duration - age) / 0.9))
                     particle.translateBy(x: x, y: y)
-                    particle.rotate(by: .degrees(Double(index * 29) + age * (180 + seed * 420)))
-                    let width = 5 + spread * 5
-                    let height = (8 + seed * 7) * (0.35 + abs(cos(age * 7 + seed * 6)) * 0.65)
+                    particle.rotate(by: .degrees(Double(index * 29) + age * (70 + seed * 160)))
+                    let width = 4 + spread * 4
+                    let height = (6 + seed * 5) * (0.35 + abs(cos(age * 7 + seed * 6)) * 0.65)
                     let rect = CGRect(x: -width / 2, y: -height / 2, width: width, height: height)
                     particle.fill(Path(roundedRect: rect, cornerRadius: 1.5), with: .color(colours[index % colours.count]))
                 }
-            }
+            }.clipped()
         }
     }
 }
