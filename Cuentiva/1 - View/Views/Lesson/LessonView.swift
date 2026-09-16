@@ -1,0 +1,74 @@
+import SwiftUI
+struct LessonView: View {
+    let book: Book
+    @State private var viewModel = LessonViewModel()
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.dismiss) private var dismiss
+    @Environment(ThemeManager.self) private var theme
+    var body: some View {
+        Group {
+            if let receipt = viewModel.receipt { CompletionView(receipt: receipt) }
+            else {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 25) {
+                        HStack { Text(viewModel.positionLabel).font(.system(.caption, design: .monospaced)); Spacer(); Text(book.level).font(.caption.bold()) }
+                        ProgressView(value: viewModel.fraction)
+                        if let sentence = viewModel.sentence {
+                            if viewModel.mode == "Speak" || viewModel.showSpanish || viewModel.feedback != nil {
+                                highlighted(sentence.spanish).font(.system(.title, design: .serif)).lineSpacing(8).environment(\.locale, Locale(identifier: "es-ES"))
+                            } else { Text("Write it in Spanish.").font(.system(.title, design: .serif)) }
+                            Text(sentence.english).font(.title3).foregroundStyle(theme.theme.muted).environment(\.locale, Locale(identifier: "en-US"))
+                            HStack {
+                                Button { viewModel.listen() } label: { Label("Listen", systemImage: "speaker.wave.2.fill").padding(.vertical, 10) }.buttonStyle(.bordered)
+                                Toggle("Slow", isOn: $viewModel.slow).font(.subheadline).fixedSize().padding(.leading)
+                            }
+                            Picker("Practice mode", selection: $viewModel.mode) { Text("Speak").tag("Speak"); Text("Write").tag("Write") }.pickerStyle(.segmented).disabled(viewModel.busy).onChange(of: viewModel.mode) { viewModel.changeMode() }
+                            if viewModel.mode == "Speak" {
+                                VStack(spacing: 15) {
+                                    Button { viewModel.toggleRecording() } label: { Label(viewModel.audio.recording ? "Stop recording" : "Read it aloud", systemImage: viewModel.audio.recording ? "stop.circle.fill" : "mic.circle.fill").font(.title3).frame(maxWidth: .infinity).padding(20) }.buttonStyle(.bordered).disabled(viewModel.busy)
+                                    Text(viewModel.audio.transcript.isEmpty ? "Tap the microphone, then read the Spanish sentence." : viewModel.audio.transcript).font(.body).frame(maxWidth: .infinity).foregroundStyle(theme.theme.muted)
+                                }
+                            } else {
+                                TextField("Your Spanish translation", text: $viewModel.answer, axis: .vertical).lineLimit(3...6).textInputAutocapitalization(.sentences).autocorrectionDisabled().padding(18).background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 15)).disabled(viewModel.busy)
+                                Button(viewModel.showSpanish ? "Hide Spanish" : "Show a hint") { viewModel.showSpanish.toggle() }.font(.footnote)
+                            }
+                            Button("Check my words") { Task { await viewModel.check() } }.buttonStyle(.borderedProminent).disabled(viewModel.busy)
+                            if let feedback = viewModel.feedback {
+                                VStack(alignment: .leading, spacing: 10) {
+                                    Text("\(feedback.matched) / \(feedback.words.count) words matched").font(.headline)
+                                    ForEach(feedback.words) { word in
+                                        HStack {
+                                            Image(systemName: word.result == .correct ? "checkmark.circle.fill" : word.result == .accent ? "character.cursor.ibeam" : "arrow.uturn.backward.circle")
+                                            Text(word.expected).bold()
+                                            if word.result == .accent { Text("Check the accent") }
+                                            else if word.result == .missing { Text("Not recognized") }
+                                            else if word.result == .incorrect { Text("You entered: \(word.received ?? "")") }
+                                        }.font(.subheadline).foregroundStyle(word.result == .correct ? theme.theme.accent : theme.theme.ink)
+                                    }
+                                    if !feedback.extraWords.isEmpty { Text("Extra words: \(feedback.extraWords.joined(separator: ", "))").font(.footnote) }
+                                    Text(viewModel.mode == "Speak" ? "Recognition can miss words. This is practice feedback, not a pronunciation score." : "Compared with this book’s sentence. Other translations may also be valid.").font(.caption).foregroundStyle(theme.theme.muted)
+                                }.padding(18).frame(maxWidth: .infinity, alignment: .leading).background(theme.theme.accent.opacity(0.07), in: RoundedRectangle(cornerRadius: 16))
+                            }
+                        }
+                        InlineError(message: viewModel.error ?? viewModel.audio.error)
+                        Button(viewModel.nextTitle + "  →") { Task { await viewModel.next() } }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)
+                        HStack {
+                            Button("Previous") { Task { await viewModel.back() } }.disabled(viewModel.index == 0 || viewModel.busy)
+                            Spacer()
+                            Button("Skip for now") { Task { await viewModel.next(skip: true) } }.disabled(viewModel.busy)
+                        }.font(.footnote)
+                    }.padding(25)
+                }.background(theme.theme.paper)
+            }
+        }.navigationTitle(book.englishTitle).navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .topBarLeading) { Button { viewModel.stop(); dismiss() } label: { Image(systemName: "xmark") }.accessibilityLabel("Close lesson") } }
+            .onAppear { viewModel.load(book) }.onDisappear { viewModel.stop() }
+            .onChange(of: scenePhase) { _, phase in if phase != .active { viewModel.stop() } }
+    }
+    private func highlighted(_ text: String) -> Text {
+        guard let range = viewModel.audio.spokenRange, Range(range, in: text) != nil else { return Text(text) }
+        var styled = AttributedString(text)
+        if let attributedRange = Range(range, in: styled) { styled[attributedRange].foregroundColor = theme.theme.accent; styled[attributedRange].font = .system(.title, design: .serif, weight: .bold) }
+        return Text(styled)
+    }
+}

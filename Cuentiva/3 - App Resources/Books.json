@@ -1,0 +1,1517 @@
+[
+  {
+    "id": "cafe",
+    "title": "El café de Ana",
+    "englishTitle": "Ana’s little café",
+    "author": "Ana · demo narrator",
+    "level": "A1",
+    "symbol": "cup.and.saucer",
+    "palette": 0,
+    "summary": "A morning, a small café, and a familiar face.",
+    "sentences": [
+      {
+        "id": "cafe-1",
+        "spanish": "Me llamo Ana.",
+        "english": "My name is Ana."
+      },
+      {
+        "id": "cafe-2",
+        "spanish": "Vivo en una ciudad pequeña.",
+        "english": "I live in a small city."
+      },
+      {
+        "id": "cafe-3",
+        "spanish": "Trabajo en un café.",
+        "english": "I work in a café."
+      },
+      {
+        "id": "cafe-4",
+        "spanish": "El café está cerca de mi casa.",
+        "english": "The café is near my house."
+      },
+      {
+        "id": "cafe-5",
+        "spanish": "Cada mañana preparo pan y café.",
+        "english": "Every morning I prepare bread and coffee."
+      },
+      {
+        "id": "cafe-6",
+        "spanish": "Mi vecino viene a las ocho.",
+        "english": "My neighbor comes at eight."
+      },
+      {
+        "id": "cafe-7",
+        "spanish": "Hablamos de nuestra familia.",
+        "english": "We talk about our family."
+      },
+      {
+        "id": "cafe-8",
+        "spanish": "Me gusta empezar el día así.",
+        "english": "I like to start the day this way."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 1
+      },
+      {
+        "word": "ana",
+        "lemma": "ana",
+        "occurrences": 1
+      },
+      {
+        "word": "así",
+        "lemma": "así",
+        "occurrences": 1
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 1
+      },
+      {
+        "word": "café",
+        "lemma": "café",
+        "occurrences": 3
+      },
+      {
+        "word": "casa",
+        "lemma": "casa",
+        "occurrences": 1
+      },
+      {
+        "word": "cerca",
+        "lemma": "cerca",
+        "occurrences": 1
+      },
+      {
+        "word": "ciudad",
+        "lemma": "ciudad",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "empezar",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "está",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "familia",
+        "lemma": "familia",
+        "occurrences": 1
+      },
+      {
+        "word": "gusta",
+        "lemma": "gustar",
+        "occurrences": 1
+      },
+      {
+        "word": "hablamos",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "llamo",
+        "lemma": "llamar",
+        "occurrences": 1
+      },
+      {
+        "word": "mañana",
+        "lemma": "mañana",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 2
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "nuestra",
+        "lemma": "nuestra",
+        "occurrences": 1
+      },
+      {
+        "word": "ocho",
+        "lemma": "ocho",
+        "occurrences": 1
+      },
+      {
+        "word": "pan",
+        "lemma": "pan",
+        "occurrences": 1
+      },
+      {
+        "word": "pequeña",
+        "lemma": "pequeña",
+        "occurrences": 1
+      },
+      {
+        "word": "preparo",
+        "lemma": "preparar",
+        "occurrences": 1
+      },
+      {
+        "word": "trabajo",
+        "lemma": "trabajar",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "vecino",
+        "lemma": "vecino",
+        "occurrences": 1
+      },
+      {
+        "word": "viene",
+        "lemma": "venir",
+        "occurrences": 1
+      },
+      {
+        "word": "vivo",
+        "lemma": "vivir",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo text created for this project; not a verified community memoir. Production licensing and linguistic review pending."
+  },
+  {
+    "id": "garden",
+    "title": "El jardín de mi padre",
+    "englishTitle": "My father’s garden",
+    "author": "Luis · demo narrator",
+    "level": "A1",
+    "symbol": "leaf",
+    "palette": 1,
+    "summary": "A father shares the small things that make a garden grow.",
+    "sentences": [
+      {
+        "id": "garden-1",
+        "spanish": "Mi padre tiene un jardín.",
+        "english": "My father has a garden."
+      },
+      {
+        "id": "garden-2",
+        "spanish": "El jardín es pequeño y bonito.",
+        "english": "The garden is small and beautiful."
+      },
+      {
+        "id": "garden-3",
+        "spanish": "Hay flores cerca de la puerta.",
+        "english": "There are flowers near the door."
+      },
+      {
+        "id": "garden-4",
+        "spanish": "Por la tarde voy al jardín.",
+        "english": "In the afternoon I go to the garden."
+      },
+      {
+        "id": "garden-5",
+        "spanish": "Mi padre trabaja y yo miro.",
+        "english": "My father works and I watch."
+      },
+      {
+        "id": "garden-6",
+        "spanish": "Hoy tengo una planta nueva.",
+        "english": "Today I have a new plant."
+      },
+      {
+        "id": "garden-7",
+        "spanish": "Le doy agua todos los días.",
+        "english": "I give it water every day."
+      },
+      {
+        "id": "garden-8",
+        "spanish": "Ahora el jardín también es mío.",
+        "english": "Now the garden is mine too."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "agua",
+        "lemma": "agua",
+        "occurrences": 1
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
+      },
+      {
+        "word": "al",
+        "lemma": "al",
+        "occurrences": 1
+      },
+      {
+        "word": "bonito",
+        "lemma": "bonito",
+        "occurrences": 1
+      },
+      {
+        "word": "cerca",
+        "lemma": "cerca",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 1
+      },
+      {
+        "word": "doy",
+        "lemma": "dar",
+        "occurrences": 1
+      },
+      {
+        "word": "días",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 2
+      },
+      {
+        "word": "flores",
+        "lemma": "flor",
+        "occurrences": 1
+      },
+      {
+        "word": "hay",
+        "lemma": "hay",
+        "occurrences": 1
+      },
+      {
+        "word": "hoy",
+        "lemma": "hoy",
+        "occurrences": 1
+      },
+      {
+        "word": "jardín",
+        "lemma": "jardín",
+        "occurrences": 4
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "miro",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "mío",
+        "lemma": "mío",
+        "occurrences": 1
+      },
+      {
+        "word": "nueva",
+        "lemma": "nueva",
+        "occurrences": 1
+      },
+      {
+        "word": "padre",
+        "lemma": "padre",
+        "occurrences": 2
+      },
+      {
+        "word": "pequeño",
+        "lemma": "pequeño",
+        "occurrences": 1
+      },
+      {
+        "word": "planta",
+        "lemma": "planta",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "puerta",
+        "lemma": "puerta",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tarde",
+        "lemma": "tarde",
+        "occurrences": 1
+      },
+      {
+        "word": "tengo",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "todos",
+        "lemma": "todos",
+        "occurrences": 1
+      },
+      {
+        "word": "trabaja",
+        "lemma": "trabaja",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "voy",
+        "lemma": "ir",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 2
+      },
+      {
+        "word": "yo",
+        "lemma": "yo",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo text created for this project; not a verified community memoir. Production licensing and linguistic review pending."
+  },
+  {
+    "id": "train",
+    "title": "Un billete a casa",
+    "englishTitle": "A ticket home",
+    "author": "Marta · demo narrator",
+    "level": "A2",
+    "symbol": "tram",
+    "palette": 2,
+    "summary": "A train journey turns into a chance to reconnect.",
+    "sentences": [
+      {
+        "id": "train-1",
+        "spanish": "El viernes compré un billete de tren.",
+        "english": "On Friday I bought a train ticket."
+      },
+      {
+        "id": "train-2",
+        "spanish": "Quería visitar a mi abuela.",
+        "english": "I wanted to visit my grandmother."
+      },
+      {
+        "id": "train-3",
+        "spanish": "No la veía desde el verano.",
+        "english": "I had not seen her since the summer."
+      },
+      {
+        "id": "train-4",
+        "spanish": "En la estación había mucha gente.",
+        "english": "There were many people at the station."
+      },
+      {
+        "id": "train-5",
+        "spanish": "Encontré un asiento junto a la ventana.",
+        "english": "I found a seat next to the window."
+      },
+      {
+        "id": "train-6",
+        "spanish": "Durante el viaje miré las montañas.",
+        "english": "During the journey I looked at the mountains."
+      },
+      {
+        "id": "train-7",
+        "spanish": "Mi abuela me esperaba en la puerta.",
+        "english": "My grandmother was waiting for me at the door."
+      },
+      {
+        "id": "train-8",
+        "spanish": "Hicimos sopa y hablamos hasta tarde.",
+        "english": "We made soup and talked until late."
+      },
+      {
+        "id": "train-9",
+        "spanish": "A veces un viaje corto cambia toda la semana.",
+        "english": "Sometimes a short journey changes the whole week."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 3
+      },
+      {
+        "word": "abuela",
+        "lemma": "abuela",
+        "occurrences": 2
+      },
+      {
+        "word": "asiento",
+        "lemma": "asiento",
+        "occurrences": 1
+      },
+      {
+        "word": "billete",
+        "lemma": "billete",
+        "occurrences": 1
+      },
+      {
+        "word": "cambia",
+        "lemma": "cambiar",
+        "occurrences": 1
+      },
+      {
+        "word": "compré",
+        "lemma": "comprar",
+        "occurrences": 1
+      },
+      {
+        "word": "corto",
+        "lemma": "corto",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 1
+      },
+      {
+        "word": "desde",
+        "lemma": "desde",
+        "occurrences": 1
+      },
+      {
+        "word": "durante",
+        "lemma": "durante",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "encontré",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
+        "word": "esperaba",
+        "lemma": "esperar",
+        "occurrences": 1
+      },
+      {
+        "word": "estación",
+        "lemma": "estación",
+        "occurrences": 1
+      },
+      {
+        "word": "gente",
+        "lemma": "gente",
+        "occurrences": 1
+      },
+      {
+        "word": "hablamos",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "había",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "hasta",
+        "lemma": "hasta",
+        "occurrences": 1
+      },
+      {
+        "word": "hicimos",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "junto",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 5
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "miré",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "montañas",
+        "lemma": "montaña",
+        "occurrences": 1
+      },
+      {
+        "word": "mucha",
+        "lemma": "mucha",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "puerta",
+        "lemma": "puerta",
+        "occurrences": 1
+      },
+      {
+        "word": "quería",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "semana",
+        "lemma": "semana",
+        "occurrences": 1
+      },
+      {
+        "word": "sopa",
+        "lemma": "sopa",
+        "occurrences": 1
+      },
+      {
+        "word": "tarde",
+        "lemma": "tarde",
+        "occurrences": 1
+      },
+      {
+        "word": "toda",
+        "lemma": "toda",
+        "occurrences": 1
+      },
+      {
+        "word": "tren",
+        "lemma": "tren",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "veces",
+        "lemma": "veces",
+        "occurrences": 1
+      },
+      {
+        "word": "ventana",
+        "lemma": "ventana",
+        "occurrences": 1
+      },
+      {
+        "word": "verano",
+        "lemma": "verano",
+        "occurrences": 1
+      },
+      {
+        "word": "veía",
+        "lemma": "ver",
+        "occurrences": 1
+      },
+      {
+        "word": "viaje",
+        "lemma": "viaje",
+        "occurrences": 2
+      },
+      {
+        "word": "viernes",
+        "lemma": "viernes",
+        "occurrences": 1
+      },
+      {
+        "word": "visitar",
+        "lemma": "visitar",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo text created for this project; not a verified community memoir. Production licensing and linguistic review pending."
+  },
+  {
+    "id": "sea",
+    "title": "Aprender a nadar",
+    "englishTitle": "Learning to swim",
+    "author": "Diego · demo narrator",
+    "level": "A2",
+    "symbol": "water.waves",
+    "palette": 3,
+    "summary": "Starting something new is easier with a friend beside you.",
+    "sentences": [
+      {
+        "id": "sea-1",
+        "spanish": "Cuando era niño, tenía miedo del agua.",
+        "english": "When I was a child, I was afraid of water."
+      },
+      {
+        "id": "sea-2",
+        "spanish": "Este año decidí aprender a nadar.",
+        "english": "This year I decided to learn to swim."
+      },
+      {
+        "id": "sea-3",
+        "spanish": "Mi amiga Elena vino conmigo a la piscina.",
+        "english": "My friend Elena came with me to the pool."
+      },
+      {
+        "id": "sea-4",
+        "spanish": "La primera clase fue difícil.",
+        "english": "The first lesson was difficult."
+      },
+      {
+        "id": "sea-5",
+        "spanish": "El profesor nos pidió respirar despacio.",
+        "english": "The teacher asked us to breathe slowly."
+      },
+      {
+        "id": "sea-6",
+        "spanish": "Después de varias semanas, me sentí mejor.",
+        "english": "After several weeks, I felt better."
+      },
+      {
+        "id": "sea-7",
+        "spanish": "Ayer nadé sin ayuda por primera vez.",
+        "english": "Yesterday I swam without help for the first time."
+      },
+      {
+        "id": "sea-8",
+        "spanish": "Elena sonrió y yo empecé a reír.",
+        "english": "Elena smiled and I began to laugh."
+      },
+      {
+        "id": "sea-9",
+        "spanish": "Todavía aprendo, pero ya no tengo tanto miedo.",
+        "english": "I am still learning, but I am no longer so afraid."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 3
+      },
+      {
+        "word": "agua",
+        "lemma": "agua",
+        "occurrences": 1
+      },
+      {
+        "word": "amiga",
+        "lemma": "amiga",
+        "occurrences": 1
+      },
+      {
+        "word": "aprender",
+        "lemma": "aprender",
+        "occurrences": 1
+      },
+      {
+        "word": "aprendo",
+        "lemma": "aprender",
+        "occurrences": 1
+      },
+      {
+        "word": "ayer",
+        "lemma": "ayer",
+        "occurrences": 1
+      },
+      {
+        "word": "ayuda",
+        "lemma": "ayuda",
+        "occurrences": 1
+      },
+      {
+        "word": "año",
+        "lemma": "año",
+        "occurrences": 1
+      },
+      {
+        "word": "clase",
+        "lemma": "clase",
+        "occurrences": 1
+      },
+      {
+        "word": "conmigo",
+        "lemma": "conmigo",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 1
+      },
+      {
+        "word": "decidí",
+        "lemma": "decidir",
+        "occurrences": 1
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "despacio",
+        "lemma": "despacio",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "difícil",
+        "lemma": "difícil",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "elena",
+        "lemma": "elena",
+        "occurrences": 2
+      },
+      {
+        "word": "empecé",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "era",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "este",
+        "lemma": "este",
+        "occurrences": 1
+      },
+      {
+        "word": "fue",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 1
+      },
+      {
+        "word": "mejor",
+        "lemma": "mejor",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 1
+      },
+      {
+        "word": "miedo",
+        "lemma": "miedo",
+        "occurrences": 2
+      },
+      {
+        "word": "nadar",
+        "lemma": "nadar",
+        "occurrences": 1
+      },
+      {
+        "word": "nadé",
+        "lemma": "nadar",
+        "occurrences": 1
+      },
+      {
+        "word": "niño",
+        "lemma": "niño",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 1
+      },
+      {
+        "word": "nos",
+        "lemma": "nos",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 1
+      },
+      {
+        "word": "pidió",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "piscina",
+        "lemma": "piscina",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "primera",
+        "lemma": "primera",
+        "occurrences": 2
+      },
+      {
+        "word": "profesor",
+        "lemma": "profesor",
+        "occurrences": 1
+      },
+      {
+        "word": "respirar",
+        "lemma": "respirar",
+        "occurrences": 1
+      },
+      {
+        "word": "reír",
+        "lemma": "reír",
+        "occurrences": 1
+      },
+      {
+        "word": "semanas",
+        "lemma": "semana",
+        "occurrences": 1
+      },
+      {
+        "word": "sentí",
+        "lemma": "sentir",
+        "occurrences": 1
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "sonrió",
+        "lemma": "sonreír",
+        "occurrences": 1
+      },
+      {
+        "word": "tanto",
+        "lemma": "tanto",
+        "occurrences": 1
+      },
+      {
+        "word": "tengo",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tenía",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "todavía",
+        "lemma": "todavía",
+        "occurrences": 1
+      },
+      {
+        "word": "varias",
+        "lemma": "varias",
+        "occurrences": 1
+      },
+      {
+        "word": "vez",
+        "lemma": "vez",
+        "occurrences": 1
+      },
+      {
+        "word": "vino",
+        "lemma": "venir",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      },
+      {
+        "word": "ya",
+        "lemma": "ya",
+        "occurrences": 1
+      },
+      {
+        "word": "yo",
+        "lemma": "yo",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo text created for this project; not a verified community memoir. Production licensing and linguistic review pending."
+  },
+  {
+    "id": "repair",
+    "title": "Una segunda oportunidad",
+    "englishTitle": "A second chance",
+    "author": "Clara · demo narrator",
+    "level": "B1",
+    "symbol": "bicycle",
+    "palette": 4,
+    "summary": "An old bicycle brings a neighborhood a little closer.",
+    "sentences": [
+      {
+        "id": "repair-1",
+        "spanish": "Cuando cerró la tienda donde trabajaba, no sabía qué hacer.",
+        "english": "When the shop where I worked closed, I did not know what to do."
+      },
+      {
+        "id": "repair-2",
+        "spanish": "Llevaba años vendiendo cosas que apenas me interesaban.",
+        "english": "I had spent years selling things that barely interested me."
+      },
+      {
+        "id": "repair-3",
+        "spanish": "Una tarde encontré una bicicleta vieja en el patio.",
+        "english": "One afternoon I found an old bicycle in the courtyard."
+      },
+      {
+        "id": "repair-4",
+        "spanish": "Aunque estaba oxidada, pensé que todavía podía servir.",
+        "english": "Although it was rusty, I thought it could still be useful."
+      },
+      {
+        "id": "repair-5",
+        "spanish": "Mi vecino me prestó herramientas y me enseñó a repararla.",
+        "english": "My neighbor lent me tools and taught me how to repair it."
+      },
+      {
+        "id": "repair-6",
+        "spanish": "Mientras trabajábamos, otras personas se acercaron a hablar.",
+        "english": "While we were working, other people came over to talk."
+      },
+      {
+        "id": "repair-7",
+        "spanish": "Algunas también tenían bicicletas que necesitaban arreglos.",
+        "english": "Some also had bicycles that needed repairs."
+      },
+      {
+        "id": "repair-8",
+        "spanish": "Poco a poco, el patio se convirtió en un pequeño taller.",
+        "english": "Little by little, the courtyard became a small workshop."
+      },
+      {
+        "id": "repair-9",
+        "spanish": "No había planeado cambiar de profesión de esa manera.",
+        "english": "I had not planned to change professions that way."
+      },
+      {
+        "id": "repair-10",
+        "spanish": "Ahora siento que mi trabajo une a las personas del barrio.",
+        "english": "Now I feel that my work brings the people in the neighborhood together."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 4
+      },
+      {
+        "word": "acercaron",
+        "lemma": "acercar",
+        "occurrences": 1
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
+      },
+      {
+        "word": "algunas",
+        "lemma": "algunas",
+        "occurrences": 1
+      },
+      {
+        "word": "apenas",
+        "lemma": "apenas",
+        "occurrences": 1
+      },
+      {
+        "word": "arreglos",
+        "lemma": "arreglo",
+        "occurrences": 1
+      },
+      {
+        "word": "aunque",
+        "lemma": "aunque",
+        "occurrences": 1
+      },
+      {
+        "word": "años",
+        "lemma": "año",
+        "occurrences": 1
+      },
+      {
+        "word": "barrio",
+        "lemma": "barrio",
+        "occurrences": 1
+      },
+      {
+        "word": "bicicleta",
+        "lemma": "bicicleta",
+        "occurrences": 1
+      },
+      {
+        "word": "bicicletas",
+        "lemma": "bicicleta",
+        "occurrences": 1
+      },
+      {
+        "word": "cambiar",
+        "lemma": "cambiar",
+        "occurrences": 1
+      },
+      {
+        "word": "cerró",
+        "lemma": "cerrar",
+        "occurrences": 1
+      },
+      {
+        "word": "convirtió",
+        "lemma": "convertir",
+        "occurrences": 1
+      },
+      {
+        "word": "cosas",
+        "lemma": "cosa",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "donde",
+        "lemma": "donde",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "encontré",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
+        "word": "enseñó",
+        "lemma": "enseñar",
+        "occurrences": 1
+      },
+      {
+        "word": "esa",
+        "lemma": "esa",
+        "occurrences": 1
+      },
+      {
+        "word": "estaba",
+        "lemma": "estar",
+        "occurrences": 1
+      },
+      {
+        "word": "hablar",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "había",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "hacer",
+        "lemma": "hacer",
+        "occurrences": 1
+      },
+      {
+        "word": "herramientas",
+        "lemma": "herramienta",
+        "occurrences": 1
+      },
+      {
+        "word": "interesaban",
+        "lemma": "interesar",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "llevaba",
+        "lemma": "llevar",
+        "occurrences": 1
+      },
+      {
+        "word": "manera",
+        "lemma": "manera",
+        "occurrences": 1
+      },
+      {
+        "word": "me",
+        "lemma": "me",
+        "occurrences": 3
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "mientras",
+        "lemma": "mientras",
+        "occurrences": 1
+      },
+      {
+        "word": "necesitaban",
+        "lemma": "necesitar",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 2
+      },
+      {
+        "word": "otras",
+        "lemma": "otras",
+        "occurrences": 1
+      },
+      {
+        "word": "oxidada",
+        "lemma": "oxidada",
+        "occurrences": 1
+      },
+      {
+        "word": "patio",
+        "lemma": "patio",
+        "occurrences": 2
+      },
+      {
+        "word": "pensé",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "pequeño",
+        "lemma": "pequeño",
+        "occurrences": 1
+      },
+      {
+        "word": "personas",
+        "lemma": "persona",
+        "occurrences": 2
+      },
+      {
+        "word": "planeado",
+        "lemma": "planear",
+        "occurrences": 1
+      },
+      {
+        "word": "poco",
+        "lemma": "poco",
+        "occurrences": 2
+      },
+      {
+        "word": "podía",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "prestó",
+        "lemma": "prestar",
+        "occurrences": 1
+      },
+      {
+        "word": "profesión",
+        "lemma": "profesión",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 4
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 1
+      },
+      {
+        "word": "repararla",
+        "lemma": "repararla",
+        "occurrences": 1
+      },
+      {
+        "word": "sabía",
+        "lemma": "saber",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 2
+      },
+      {
+        "word": "servir",
+        "lemma": "servir",
+        "occurrences": 1
+      },
+      {
+        "word": "siento",
+        "lemma": "sentir",
+        "occurrences": 1
+      },
+      {
+        "word": "taller",
+        "lemma": "taller",
+        "occurrences": 1
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 1
+      },
+      {
+        "word": "tarde",
+        "lemma": "tarde",
+        "occurrences": 1
+      },
+      {
+        "word": "tenían",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tienda",
+        "lemma": "tienda",
+        "occurrences": 1
+      },
+      {
+        "word": "todavía",
+        "lemma": "todavía",
+        "occurrences": 1
+      },
+      {
+        "word": "trabajaba",
+        "lemma": "trabajar",
+        "occurrences": 1
+      },
+      {
+        "word": "trabajo",
+        "lemma": "trabajar",
+        "occurrences": 1
+      },
+      {
+        "word": "trabajábamos",
+        "lemma": "trabajar",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 2
+      },
+      {
+        "word": "une",
+        "lemma": "unir",
+        "occurrences": 1
+      },
+      {
+        "word": "vecino",
+        "lemma": "vecino",
+        "occurrences": 1
+      },
+      {
+        "word": "vendiendo",
+        "lemma": "vender",
+        "occurrences": 1
+      },
+      {
+        "word": "vieja",
+        "lemma": "vieja",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional demo text created for this project; not a verified community memoir. Production licensing and linguistic review pending."
+  }
+]
