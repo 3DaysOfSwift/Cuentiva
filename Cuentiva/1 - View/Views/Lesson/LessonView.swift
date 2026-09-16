@@ -7,8 +7,7 @@ struct LessonView: View {
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         Group {
-            if let receipt = viewModel.receipt { CompletionView(receipt: receipt) }
-            else if viewModel.showingScript { ScriptReaderView(book: book) }
+            if viewModel.showingReader { BookReaderView(book: book) }
             else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 25) {

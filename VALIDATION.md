@@ -1,3 +1,9 @@
+## Extended story reader — 16 September 2026
+
+All 19 core tests and the Xcode simulator suite pass. Both story and script formats exercise delayed completion, save rollback/retry, duplicate-safe totals, slow playback, audio stopping/restarting, and no completion when audio ends. A specific test confirms the free café introduction remains accessible through its continuation and locks only after Mark as read. Story reader-stage resumption is covered by view-model tests. All 46 books have a continuation exactly matching their guided sentence count, aligned translations, unique sentence IDs, and validated vocabulary counts. The 43 stories add 370 new pairs. Original guided text/IDs and existing lemma mappings were checked against the previous committed catalog and retained.
+
+On iPhone Air, entered My father’s garden from its last guided sentence, observed the single-column bilingual reader, automatic playback and following through the new continuation, then used Mark as read. The celebration showed 16 sentences / 104 Spanish words and increased Books Learned from 4 to 5. Latest build installed. Physical-device listening, extreme Dynamic Type/VoiceOver checks, and native-speaker editorial review remain pending. Previously completed books retain their achievement when content expands.
+
 ## Full-script reader — 16 September 2026
 
 All 18 core tests and the Xcode simulator suite pass. Added coverage for delayed script completion, persisted reader-stage resumption, atomic save failure/retry, duplicate-safe totals, slow sequential playback, speaker-change pauses, stopping/restarting audio, and no automatic completion at audio end. Content checks cover original and continuation vocabulary; each continuation has exactly as many turns as its guided script.

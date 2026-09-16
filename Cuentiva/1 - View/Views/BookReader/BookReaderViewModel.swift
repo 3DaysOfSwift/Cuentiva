@@ -1,7 +1,7 @@
 import Foundation
 import Observation
 
-@MainActor @Observable final class ScriptReaderViewModel {
+@MainActor @Observable final class BookReaderViewModel {
     let audio: any LessonAudio
     private let learning: any LearningFeature
     private let pause: @Sendable () async throws -> Void
@@ -24,15 +24,15 @@ import Observation
         playback = Task { [weak self] in
             guard let self else { return }
             defer { if self.generation == token { self.playback = nil; self.audio.stop(); self.activeIndex = nil; self.audioEnabled = false } }
-            while self.nextIndex < book.fullScript.count {
+            while self.nextIndex < book.fullText.count {
                 guard !Task.isCancelled, self.generation == token, self.learning.canRead(book) else { return }
                 let index = self.nextIndex
                 self.activeIndex = index
-                guard await self.audio.speakAndWait(book.fullScript[index].spanish, slow: true),
+                guard await self.audio.speakAndWait(book.fullText[index].spanish, slow: true),
                       !Task.isCancelled, self.generation == token else { return }
                 self.nextIndex = index + 1
-                if self.nextIndex < book.fullScript.count,
-                   book.fullScript[index].speaker != book.fullScript[self.nextIndex].speaker {
+                if self.nextIndex < book.fullText.count,
+                   (book.kind == .story || book.fullText[index].speaker != book.fullText[self.nextIndex].speaker) {
                     do { try await self.pause() } catch { return }
                 }
             }
@@ -50,7 +50,7 @@ import Observation
     func finish(_ book: Book) async {
         guard !busy else { return }
         busy = true; defer { busy = false }; error = nil; stop()
-        do { receipt = try await learning.finishScript(book) }
+        do { receipt = try await learning.finishReading(book) }
         catch { self.error = error.localizedDescription }
     }
 }

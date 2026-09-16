@@ -9,7 +9,7 @@ A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift
 1. Open `Cuentiva.xcodeproj` in Xcode 26.2 or later.
 2. Select the **Cuentiva** scheme and an iOS 26 simulator or device.
 3. The shared scheme selects `Cuentiva/3 - App Resources/Cuentiva.storekit`. Confirm it under Edit Scheme → Run → Options → StoreKit Configuration.
-4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then tap Finish book. Speak, Write, and Check my words are optional.
+4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then Read the full story. Enjoy the extended bilingual reader and use Mark as read at its end. Speak, Write, and Check my words are optional.
 5. Continue from the celebration to the one-time purchase offer. Purchase full access in the local StoreKit purchase sheet to unlock the full library.
 
 The StoreKit file configures a **$4.99 one-time non-consumable purchase**, with no trial or renewal. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
@@ -20,7 +20,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 
 - One free A1 introductory book; onboarding can resume mid-book.
 - One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
-- Forty-three searchable books: eight A1, eighteen A2, seventeen B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
+- Forty-six searchable books: 43 stories and three Movie Scripts across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
 - Writing mode hides the reference sentence and gives aligned word-level feedback. Accents are treated separately; ñ is not treated as n.
@@ -52,7 +52,7 @@ Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replace
 ## Product rules
 
 - Completed books are unique by stable book ID. Re-reading celebrates practice without incrementing the counter again.
-- Next sentence records reading completion and advances immediately. Finish book records the final sentence and book in one atomic save. There is no Skip button or compulsory assessment.
+- Next sentence records an encounter and advances immediately. The final guided sentence opens the full reader without awarding completion. Mark as read records the continuation and book completion in one atomic save. There is no Skip button or compulsory assessment.
 - Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
 - A verified non-consumable purchase unlocks access without an expiry date. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
@@ -92,3 +92,9 @@ Three factual-science stories with fictional characters are in [SPACE-STORIES.md
 The library now includes 46 books: 43 stories and three original Movie Scripts (A1, A2, B1). Discover and Completed offer All types / Stories / Movie Scripts filters, plus library order, English title, difficulty, and book-type sorting. Search and difficulty filtering combine with the format filter.
 
 Scripts show their scene and named speakers. Choose a role or read all roles and advance freely with Next line. After the guided lesson, a full-script reader shows alternating English–Spanish turns and an equally long new continuation (20, 20, and 24 total turns). Slow Spanish audio starts automatically, highlights each word, follows the active turn, and waits one second between speakers. A small toolbar control turns audio off/on. Leaving the reader or backgrounding the app stops playback. The final Mark as read button atomically adds the script to Books Learned; merely finishing the guided lesson or audio does not. The reader stage resumes after reopening. Playback uses the existing single Spanish voice. See [the scripts](Documentation/MOVIE-SCRIPTS.md).
+
+## Extended story reading
+
+All 43 stories now have continuations matching their original sentence counts: 370 additional bilingual pairs. The guided lesson retains its original sentences. Read the full story opens a flowing single-column English–Spanish reader containing both halves, with slow automatic Spanish playback, word highlighting, automatic following, a one-second pause between pairs, and a small audio toggle. Scripts retain their alternating character layout. Both formats share BookReaderViewModel and the same final completion action. Reopening an unfinished book resumes the full-reader stage from its start. Previously earned completions remain intact.
+
+The free café introduction includes its continuation before the purchase gate. Existing sentence IDs and vocabulary lemma mappings are retained. New vocabulary uses curated mappings with surface fallback. All content still needs native-speaker editorial review. Read the [370 new sentence pairs](Documentation/STORY-CONTINUATIONS.md).

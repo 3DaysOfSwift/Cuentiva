@@ -125,14 +125,32 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let restored = ProgressManager(repository: repository); try await restored.load()
         #expect(restored.snapshot.positions[book.id] == 1)
         let result = try await learning.advance(book: book, from: 1)
-        if case .completed(let receipt) = result { #expect(receipt.total == 1); #expect(receipt.isNew) }
-        else { Issue.record("Reading the final sentence did not complete the book") }
+        if case .fullReading = result {} else { Issue.record("Expected the full reader") }
+        #expect(progress.snapshot.completed.isEmpty)
+        #expect(learning.canRead(book))
+        let receipt = try await learning.finishReading(book)
+        #expect(receipt.total == 1); #expect(receipt.isNew)
         #expect(progress.streak == 1)
         #expect(progress.snapshot.vocabulary["estar"] == .learning)
         #expect(!learning.canRead(book))
         purchases.hasAccess = true
         let reread = try await learning.advance(book: book, from: 1)
-        if case .completed(let receipt) = reread { #expect(!receipt.isNew); #expect(receipt.total == 1) }
+        if case .fullReading = reread {} else { Issue.record("Expected the full reader on rereading") }
+        let again = try await learning.finishReading(book)
+        #expect(!again.isNew); #expect(again.total == 1)
+    }
+    @Test func freeIntroductionIncludesContinuationBeforePurchaseGate() async throws {
+        let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let learning = LearningManager(purchases: purchases, progress: progress)
+        var intro = sample()
+        intro.continuation = [Sentence(id: "extra", spanish: "Otra historia.", english: "Another story.")]
+        _ = try await learning.advance(book: intro, from: 0)
+        #expect(learning.canRead(intro)); #expect(progress.snapshot.completed.isEmpty)
+        #expect(learning.position(intro) == 1)
+        _ = try await learning.finishReading(intro)
+        #expect(!learning.canRead(intro)); #expect(!learning.canRead(sample("other")))
+        #expect(progress.snapshot.completed == ["cafe"])
     }
     @Test func failedReadingSaveDoesNotAdvanceOrComplete() async throws {
         let repository = MemoryProgress()
@@ -177,32 +195,33 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         _ = try await progress.complete(book: script)
         #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).map(\.id) == ["script"])
     }
-    @Test func scriptCompletionWaitsForReaderAndPersistsAtomically() async throws {
+    @Test(arguments: [BookFormat.story, .movieScript])
+    func completionWaitsForReaderAndPersistsAtomically(format: BookFormat) async throws {
         let purchases = TestPurchases(), repository = MemoryProgress()
         let progress = ProgressManager(repository: repository); try await progress.load()
         let learning = LearningManager(purchases: purchases, progress: progress)
-        var book = sample("script"); book.format = .movieScript
+        var book = sample("script"); book.format = format
         book.continuation = [Sentence(id: "extra", spanish: "Mañana.", english: "Tomorrow.", speaker: "Ana")]
-        await #expect(throws: AppFailure.self) { try await learning.finishScript(book) }
+        await #expect(throws: AppFailure.self) { try await learning.finishReading(book) }
         purchases.hasAccess = true
-        await #expect(throws: AppFailure.self) { try await learning.finishScript(book) }
+        await #expect(throws: AppFailure.self) { try await learning.finishReading(book) }
         let stage = try await learning.advance(book: book, from: 0)
-        if case .scriptReading = stage {} else { Issue.record("Expected the full reader") }
+        if case .fullReading = stage {} else { Issue.record("Expected the full reader") }
         #expect(progress.snapshot.completed.isEmpty)
         #expect(learning.position(book) == book.sentences.count)
         await #expect(throws: AppFailure.self) { try await learning.finish(book) }
         let restored = ProgressManager(repository: repository); try await restored.load()
         #expect(restored.snapshot.positions[book.id] == 1)
         await repository.setFailure(true)
-        await #expect(throws: AppFailure.self) { try await learning.finishScript(book) }
+        await #expect(throws: AppFailure.self) { try await learning.finishReading(book) }
         #expect(progress.snapshot.completed.isEmpty)
         #expect(progress.snapshot.attempts[book.id]?.contains("extra") == false)
         await repository.setFailure(false)
-        let result = try await learning.finishScript(book)
+        let result = try await learning.finishReading(book)
         #expect(result.isNew); #expect(result.total == 1)
         #expect(progress.snapshot.attempts[book.id]?.contains("extra") == true)
         #expect(progress.snapshot.vocabulary["mañana"] == .learning)
-        let repeated = try await learning.finishScript(book)
+        let repeated = try await learning.finishReading(book)
         #expect(!repeated.isNew); #expect(repeated.total == 1)
     }
     @Test func localSubmissionNeverClaimsPublication() async throws {
@@ -228,13 +247,16 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         #expect(books.filter { $0.kind == .movieScript }.count == 3)
         #expect(books.filter { $0.kind == .story }.count == 43)
         for book in books {
+            #expect(book.continuation?.count == book.sentences.count)
+            #expect(Set(book.fullText.map(\.id)).count == book.fullText.count)
+            #expect(book.continuation?.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty } == true)
             if book.kind == .movieScript {
                 #expect(book.scene?.isEmpty == false)
                 #expect(book.cast.count == 2)
                 #expect(book.continuation?.count == book.sentences.count)
                 #expect(book.sentences.allSatisfy { $0.speaker?.isEmpty == false })
             }
-            let words = book.fullScript.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
+            let words = book.fullText.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
             #expect(Set(words) == Set(book.vocabulary.map(\.word)))
             #expect(Set(book.vocabulary.map(\.word)).count == book.vocabulary.count)
             for entry in book.vocabulary {

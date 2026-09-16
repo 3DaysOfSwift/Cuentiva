@@ -20,7 +20,7 @@ struct HomeView: View {
                             VStack(alignment: .leading, spacing: 10) {
                                 BookCover(book: book, completed: viewModel.completed(book), compact: true)
                                 Text(book.englishTitle).font(.subheadline.weight(.semibold)).foregroundStyle(theme.theme.ink)
-                                Text("\(book.level) · \(book.fullScript.count) \(book.unitName)").font(.caption).foregroundStyle(theme.theme.muted)
+                                Text("\(book.level) · \(book.fullText.count) \(book.unitName)").font(.caption).foregroundStyle(theme.theme.muted)
                                 Text(viewModel.coverage(book)).font(.caption2).foregroundStyle(theme.theme.muted)
                             }
                         }.buttonStyle(.plain)

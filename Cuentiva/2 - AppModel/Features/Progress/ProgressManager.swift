@@ -11,7 +11,7 @@ import Observation
     func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance
     func savePosition(book: Book, position: Int) async throws
     func complete(book: Book) async throws -> CompletionReceipt
-    func completeScript(book: Book) async throws -> CompletionReceipt
+    func completeReading(book: Book) async throws -> CompletionReceipt
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
     func reset() async throws
 }
@@ -73,31 +73,27 @@ import Observation
         try await commit { addEncounter(book: book, sentence: sentence, to: &$0) }
     }
     /// Reading is the core activity. One atomic write records the encounter,
-    /// next position, and story completion. Scripts enter their full-reader stage.
+    /// next position. Every book enters the full-reader stage before completion.
     func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance {
         guard book.sentences.indices.contains(index) else { throw AppFailure.invalidBook }
         let last = index == book.sentences.count - 1
-        let isNew = !snapshot.completed.contains(book.id)
         try await commit { next in
             addEncounter(book: book, sentence: book.sentences[index], to: &next)
-            next.positions[book.id] = last && book.kind != .movieScript ? 0 : index + 1
-            if last && book.kind != .movieScript { next.completed.insert(book.id) }
+            next.positions[book.id] = index + 1
         }
-        if last && book.kind == .movieScript { return .scriptReading }
-        return last ? .completed(.init(book: book, isNew: isNew, total: snapshot.completed.count)) : .position(index + 1)
+        return last ? .fullReading : .position(index + 1)
     }
     func savePosition(book: Book, position: Int) async throws {
         try await commit { $0.positions[book.id] = max(0, min(position, book.sentences.count - 1)) }
     }
     func complete(book: Book) async throws -> CompletionReceipt {
-        guard Set(book.fullScript.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else { throw AppFailure.incomplete }
+        guard Set(book.fullText.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else { throw AppFailure.incomplete }
         let isNew = !snapshot.completed.contains(book.id)
         try await commit { $0.completed.insert(book.id); $0.positions[book.id] = 0 }
         return .init(book: book, isNew: isNew, total: snapshot.completed.count)
     }
-    /// The final reader action records the new dialogue and completion in one save.
-    func completeScript(book: Book) async throws -> CompletionReceipt {
-        guard book.kind == .movieScript else { throw AppFailure.invalidBook }
+    /// The final reader action records the continuation and completion in one save.
+    func completeReading(book: Book) async throws -> CompletionReceipt {
         guard Set(book.sentences.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else { throw AppFailure.incomplete }
         let isNew = !snapshot.completed.contains(book.id)
         try await commit { next in

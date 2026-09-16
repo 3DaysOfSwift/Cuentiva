@@ -44,7 +44,7 @@ import Testing
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
         let (_,_,_,learning,_) = try await graph(); let vm = LessonViewModel(learning: learning, audio: TestAudio())
         vm.load(sample()); vm.mode = "Write"; vm.answer = "El cafe esta aqui"; await vm.check(); await vm.next()
-        #expect(vm.feedback?.matched == 1); #expect(vm.receipt?.total == 1)
+        #expect(vm.feedback?.matched == 1); #expect(vm.showingReader)
     }
     @Test func writingSurvivesTabSwitchesAndSentenceNavigation() async throws {
         let (_,_,_,learning,_) = try await graph()
@@ -62,8 +62,11 @@ import Testing
     @Test func lessonCanFinishWithoutWritingOrSpeaking() async throws {
         let (_,_,_,learning,_) = try await graph()
         let vm = LessonViewModel(learning: learning, audio: TestAudio())
-        vm.load(sample()); await vm.next()
-        #expect(vm.receipt?.total == 1); #expect(vm.error == nil)
+        let book = sample()
+        vm.load(book); #expect(vm.nextTitle == "Read the full story"); await vm.next()
+        #expect(vm.showingReader); #expect(vm.error == nil)
+        let resumed = LessonViewModel(learning: learning, audio: TestAudio()); resumed.load(book)
+        #expect(resumed.showingReader)
     }
     @Test func scriptRoleKeepsDraftAndManualCompletion() async throws {
         let (p,_,_,learning,_) = try await graph(); p.hasAccess = true
@@ -78,9 +81,9 @@ import Testing
         await vm.next()
         #expect(vm.isPartnerLine); #expect(vm.nextTitle == "Read the full script")
         await vm.next()
-        #expect(vm.showingScript); #expect(vm.receipt == nil); #expect(vm.error == nil)
+        #expect(vm.showingReader); #expect(vm.error == nil)
         let resumed = LessonViewModel(learning: learning, audio: TestAudio()); resumed.load(book)
-        #expect(resumed.showingScript)
+        #expect(resumed.showingReader)
     }
     @Test func celebrationCountsOnce() {
         let receipt = CompletionReceipt(book: sample(), isNew: true, total: 2), vm = CompletionViewModel()
@@ -177,18 +180,19 @@ actor ReaderPauseProbe {
     var count = 0
     func pause() { count += 1 }
 }
-@Suite @MainActor struct ScriptReaderTests {
-    @Test func playbackSequencesSlowlyAndStopsWithoutCompleting() async throws {
+@Suite @MainActor struct BookReaderTests {
+    @Test(arguments: [BookFormat.story, .movieScript])
+    func playbackSequencesSlowlyAndStopsWithoutCompleting(format: BookFormat) async throws {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress()); try await progress.load()
         let learning = LearningManager(purchases: purchases, progress: progress)
         let source = sample()
         let book = Book(id: "script", title: source.title, englishTitle: source.englishTitle, author: source.author, level: source.level, symbol: source.symbol, palette: 0, summary: source.summary,
-            sentences: [Sentence(id: "a", spanish: "Hola.", english: "Hello.", speaker: "Ana")], vocabulary: [], license: "Test", format: .movieScript,
+            sentences: [Sentence(id: "a", spanish: "Hola.", english: "Hello.", speaker: "Ana")], vocabulary: [], license: "Test", format: format,
             continuation: [Sentence(id: "b", spanish: "Buenas tardes.", english: "Good afternoon.", speaker: "Leo")])
         _ = try await learning.advance(book: book, from: 0)
         let audio = ReaderTestAudio(), probe = ReaderPauseProbe()
-        let vm = ScriptReaderViewModel(learning: learning, audio: audio, pause: { await probe.pause() })
+        let vm = BookReaderViewModel(learning: learning, audio: audio, pause: { await probe.pause() })
         #expect(vm.audioEnabled)
         vm.start(book)
         for _ in 0..<100 where audio.spoken.isEmpty { await Task.yield() }

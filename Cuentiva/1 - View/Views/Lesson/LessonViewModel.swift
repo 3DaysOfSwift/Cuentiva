@@ -18,16 +18,15 @@ import Observation
     var showSpanish = false
     var error: String?
     var busy = false
-    var receipt: CompletionReceipt?
-    var showingScript = false
+    var showingReader = false
     private var recordingTask: Task<Void, Never>?
     var sentence: Sentence? { guard let book, book.sentences.indices.contains(index) else { return nil }; return book.sentences[index] }
     var positionLabel: String { guard let book else { return "" }; return "\(index + 1) OF \(book.sentences.count) \(book.unitName.uppercased())" }
     var fraction: Double { guard let book else { return 0 }; return Double(index + 1) / Double(book.sentences.count) }
-    var nextTitle: String { guard let book else { return "Next" }; return index == book.sentences.count - 1 ? (book.kind == .movieScript ? "Read the full script" : "Finish book") : (book.kind == .movieScript ? "Next line" : "Next sentence") }
+    var nextTitle: String { guard let book else { return "Next" }; return index == book.sentences.count - 1 ? (book.kind == .movieScript ? "Read the full script" : "Read the full story") : (book.kind == .movieScript ? "Next line" : "Next sentence") }
     var allowed: Bool { guard let book else { return false }; return learning.canRead(book) }
     init(learning: any LearningFeature = AppModel.shared.learning, audio: (any LessonAudio)? = nil) { self.learning = learning; self.audio = audio ?? AppModel.shared.makeAudio() }
-    func load(_ book: Book) { guard self.book == nil else { return }; self.book = book; index = learning.position(book); showingScript = book.kind == .movieScript && index == book.sentences.count }
+    func load(_ book: Book) { guard self.book == nil else { return }; self.book = book; index = learning.position(book); showingReader = index == book.sentences.count }
     func listen() { guard allowed, let sentence else { return }; recordingTask?.cancel(); audio.speak(sentence.spanish, slow: slow) }
     func toggleRecording() {
         if audio.recording { audio.stopRecording() }
@@ -49,8 +48,7 @@ import Observation
         do {
             switch try await learning.advance(book: book, from: index) {
             case .position(let next): index = next
-            case .scriptReading: showingScript = true; return
-            case .completed(let result): receipt = result; return
+            case .fullReading: showingReader = true; return
             }
             answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""; feedback = nil; showSpanish = false
         } catch { self.error = error.localizedDescription }
