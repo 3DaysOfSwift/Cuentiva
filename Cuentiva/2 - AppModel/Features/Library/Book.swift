@@ -28,7 +28,7 @@ enum AppFailure: LocalizedError {
     case locked, incomplete, emptyAnswer, unavailable(String), invalidBook, busy
     var errorDescription: String? {
         switch self {
-        case .locked: "Start a subscription or restore an active purchase to continue."
+        case .locked: "Unlock Cuentiva with a one-time purchase or restore your purchase to continue."
         case .incomplete: "Read every sentence before completing this book."
         case .emptyAnswer: "Write or say a few words before checking your answer."
         case .unavailable(let message): message

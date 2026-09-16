@@ -17,7 +17,7 @@ struct OnboardingView: View {
                                 HStack { Label("A1 · Beginner", systemImage: "leaf"); Spacer(); Text("\(book.sentences.count) sentences") }.font(.caption).foregroundStyle(theme.theme.muted)
                                 Button("Read my first book  →") { viewModel.lesson = book }.buttonStyle(PrimaryButton())
                             }
-                            Text("One complete book, free. No subscription needed to begin.").font(.footnote).frame(maxWidth: .infinity).multilineTextAlignment(.center)
+                            Text("One complete book, free. No purchase needed to begin.").font(.footnote).frame(maxWidth: .infinity).multilineTextAlignment(.center)
                             Button("Already a member? Restore purchases") { Task { await viewModel.restore() } }.font(.footnote).frame(maxWidth: .infinity)
                             InlineError(message: viewModel.error)
                         }.padding(26)

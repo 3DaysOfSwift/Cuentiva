@@ -1,7 +1,23 @@
 {
   "identifier": "26C7E11A",
   "nonRenewingSubscriptions": [],
-  "products": [],
+  "products": [
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "CuentivaLifetime",
+      "localizations": [
+        {
+          "description": "Unlock the Cuentiva library with one purchase.",
+          "displayName": "Cuentiva Full Access",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime",
+      "referenceName": "Cuentiva Full Access",
+      "type": "NonConsumable"
+    }
+  ],
   "settings": {
     "_applicationInternalID": "",
     "_developerTeamID": "",
@@ -12,42 +28,7 @@
     "_storeKitErrors": [],
     "_timeRate": 0
   },
-  "subscriptionGroups": [
-    {
-      "id": "CuentivaMembership",
-      "localizations": [],
-      "name": "Cuentiva Membership",
-      "subscriptions": [
-        {
-          "adHocOffers": [],
-          "codeOffers": [],
-          "displayPrice": "4.99",
-          "familyShareable": false,
-          "groupNumber": 1,
-          "internalID": "CuentivaMonthly",
-          "introductoryOffer": {
-            "internalID": "CuentivaTrial",
-            "paymentMode": "free",
-            "subscriptionPeriod": "P1W",
-            "numberOfPeriods": 1,
-            "displayPrice": "0"
-          },
-          "localizations": [
-            {
-              "description": "Learn Spanish through stories. Demo price only.",
-              "displayName": "Cuentiva Monthly",
-              "locale": "en_US"
-            }
-          ],
-          "productID": "com.3DaysOfSwiftConcurrency.Cuentiva.monthly",
-          "recurringSubscriptionPeriod": "P1M",
-          "referenceName": "Cuentiva Monthly (Demo)",
-          "subscriptionGroupID": "CuentivaMembership",
-          "type": "RecurringSubscription"
-        }
-      ]
-    }
-  ],
+  "subscriptionGroups": [],
   "version": {
     "major": 3,
     "minor": 0

@@ -10,16 +10,16 @@ A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift
 2. Select the **Cuentiva** scheme and an iOS 26 simulator or device.
 3. The shared scheme selects `Cuentiva/3 - App Resources/Cuentiva.storekit`. Confirm it under Edit Scheme → Run → Options → StoreKit Configuration.
 4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then tap Finish book. Speak, Write, and Check my words are optional.
-5. Continue from the celebration to the subscription offer. Start the trial in the local StoreKit purchase sheet to unlock the full library.
+5. Continue from the celebration to the one-time purchase offer. Purchase full access in the local StoreKit purchase sheet to unlock the full library.
 
-The StoreKit file uses **$4.99/month as a test-only placeholder**, with a one-week introductory offer. Production pricing has not been decided. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit and will show purchase options unavailable. There is no hidden subscription bypass in the app.
+The StoreKit file configures a **$4.99 one-time non-consumable purchase**, with no trial or renewal. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
 
 For a physical device, select your signing team. The bundle ID is `com.3DaysOfSwiftConcurrency.Cuentiva`; test targets append their target name. All package dependencies are Apple frameworks—there are no third-party dependencies.
 
 ## Demo experience
 
 - One free A1 introductory book; onboarding can resume mid-book.
-- Subscription gate after completion; Restore Purchases is available before and after the introductory lesson.
+- One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
 - Five searchable books: two A1, two A2, one B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
@@ -55,7 +55,7 @@ Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replace
 - Next sentence records reading completion and advances immediately. Finish book records the final sentence and book in one atomic save. There is no Skip button or compulsory assessment.
 - Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
-- Trial cancellation preserves access until the entitlement expires. Expiration locks features without deleting progress. Active app access is rechecked every 30 seconds, on StoreKit updates, and when returning to the foreground.
+- A verified non-consumable purchase unlocks access without an expiry date. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
 - Demo contribution unlock: active membership plus one completed book. This is explicitly not a CEFR assessment. Real proficiency-based eligibility remains a product decision.
 - Only published contributions count toward the goal of five. The local demo never invents publication approval.
 

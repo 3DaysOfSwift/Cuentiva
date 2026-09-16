@@ -5,10 +5,9 @@ import Observation
     var busy = false
     var error: String?
     var declined = false
-    var title: String { purchases.trialEligible ? "Your next chapter\nstarts free." : "Your next chapter\nis waiting." }
-    var button: String { purchases.trialEligible ? "Start 7-day free trial" : "Subscribe to Cuentiva" }
-    var price: String { purchases.offer.map { "\($0.displayPrice) per month" } ?? "Loading subscription…" }
-    var trial: Bool { purchases.trialEligible }
+    var title: String { "Your next chapter\nis waiting." }
+    var button: String { "Unlock Cuentiva" }
+    var price: String { purchases.offer.map { "\($0.displayPrice) · One-time purchase" } ?? "Loading price…" }
     var available: Bool { purchases.offer != nil }
     var storeMessage: String? { purchases.message }
     init(purchases: any PurchaseFeature = AppModel.shared.purchases) { self.purchases = purchases }

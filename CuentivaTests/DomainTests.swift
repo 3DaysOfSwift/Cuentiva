@@ -30,7 +30,6 @@ struct MemoryBooks: BookRepository {
     var hasAccess = false
     var checking = false
     var offer: Product? { nil }
-    var trialEligible = true
     var message: String?
     func refresh() async {}
     func purchase() async throws { hasAccess = true }
@@ -111,7 +110,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         _ = try await learning.check(book: intro, sentence: intro.sentences[0], answer: "el cafe esta aqui")
         _ = try await learning.finish(intro)
         #expect(!learning.canRead(intro))
-        purchases.hasAccess = true; #expect(learning.canRead(paid))
+        purchases.hasAccess = true; #expect(learning.canRead(paid)); #expect(learning.canRead(intro))
         purchases.hasAccess = false; #expect(!learning.canRead(paid)); #expect(progress.snapshot.completed.count == 1)
     }
     @Test func readingAloneCompletesBookAndResumesWithoutChecks() async throws {

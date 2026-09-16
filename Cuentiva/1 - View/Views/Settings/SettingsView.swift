@@ -1,9 +1,7 @@
 import SwiftUI
-import StoreKit
 struct SettingsView: View {
     @State private var viewModel = SettingsViewModel()
     @Environment(ThemeManager.self) private var themeManager
-    @State private var subscriptions = false
     var body: some View {
         @Bindable var themeManager = themeManager
         List {
@@ -16,8 +14,8 @@ struct SettingsView: View {
                 Text("Your selected theme is used throughout Cuentiva.")
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
-            Section("Membership") {
-                Button("Manage subscription") { subscriptions = true }
+            Section("Purchase") {
+                Text("Cuentiva · One-time purchase")
                 Button("Restore purchases") { Task { await viewModel.restore() } }
             }.listRowBackground(themeManager.theme.surface)
             Section("Your vocabulary") {
@@ -38,7 +36,6 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(themeManager.theme.paper)
             .foregroundStyle(themeManager.theme.ink)
-            .manageSubscriptionsSheet(isPresented: $subscriptions)
             .confirmationDialog("Delete learning progress from this device?", isPresented: $viewModel.resetConfirmation, titleVisibility: .visible) { Button("Reset progress", role: .destructive) { Task { await viewModel.reset() } } }
     }
 }

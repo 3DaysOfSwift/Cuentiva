@@ -1,5 +1,15 @@
 # Validation — 16 September 2026
 
+## One-time purchase
+
+Configured a $4.99 non-consumable lifetime product and removed trial eligibility,
+subscription management, recurring price copy, and expiry polling. Restore and
+verified entitlement/revocation handling remain. All 16 core tests and the iOS
+Simulator test suite pass. Gate coverage verifies that completed onboarding cannot
+be reread before purchase and can be reread after unlock. Actual StoreKit purchase,
+restore, and refund dialogs still require manual verification with the new product.
+App Store Connect has not been configured by this change.
+
 ## Completion confetti
 
 Added a finite 3.2-second Canvas burst from the screen's bottom corners. A UIKit
@@ -73,14 +83,14 @@ For compiler verification in this nested sandbox, the invocation used the Swift 
 
 1. Run the Cuentiva scheme with its StoreKit file selected. Complete onboarding with writing, then confirm the celebration and paywall appear.
 2. Decline the offer; confirm no library, completed shelf, or contribution access. Restore remains available.
-3. Start the local seven-day trial. Confirm all five books appear and the introduction already has its completion tick.
+3. Make the local one-time purchase. Confirm all five books appear and the introduction already has its completion tick.
 4. Search and filter A1/A2/B1. Complete another book; verify one new counter increment and its appearance in Completed.
 5. Relaunch during a lesson; verify saved position and attempts. Repeat a completed book; verify no duplicate counter increment.
-6. Use Xcode's StoreKit transaction manager to expire/refund the subscription. Confirm the feature gate returns and preserves progress. Restore an active subscription; confirm the shelf returns. Verify ineligible accounts see a paid offer rather than another trial.
+6. Use Xcode's StoreKit transaction manager to refund/revoke the purchase. Confirm the feature gate returns and preserves progress. Restore a non-revoked purchase; confirm the shelf returns. Verify there is no renewal or trial offer.
 7. On a supported physical iPhone, check Spanish synthesis, slow playback, highlighting, speech recognition, permission denial, interruptions, screen changes, and app backgrounding. Ensure Write works when recognition is unavailable.
 8. Check VoiceOver, large Dynamic Type, Reduce Motion, landscape, and iPad layout. Spanish text has a Spanish locale, but correct VoiceOver pronunciation needs device verification.
 9. Save and reopen a contribution draft. Submit it locally; verify pending-review status and zero published contributions. Nothing should upload.
 
 ## Not production-ready
 
-No production StoreKit product, final price, hosted privacy policy, remote publishing API, real AI editor, native-speaker content review, or brand clearance is configured. The subscription file's $4.99 monthly price is only a local testing placeholder. App icon and final branding are intentionally not finalized.
+No production StoreKit product, hosted privacy policy, remote publishing API, real AI editor, native-speaker content review, or brand clearance is configured. The approved $4.99 one-time price is configured locally; App Store Connect configuration is pending. App icon and final branding are intentionally not finalized.

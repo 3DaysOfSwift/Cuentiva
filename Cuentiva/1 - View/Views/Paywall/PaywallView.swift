@@ -5,13 +5,13 @@ struct PaywallView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Label("YOUR FIRST BOOK IS YOURS", systemImage: "checkmark.seal.fill").font(.caption.weight(.bold)).tracking(1)
+                Label("YOUR FIRST BOOK, COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.weight(.bold)).tracking(1)
                 Text(viewModel.declined ? "Your stories will\nbe here." : viewModel.title).font(.system(.largeTitle, design: .serif, weight: .medium))
-                Text(viewModel.declined ? "Your first achievement is saved. Subscribe whenever you’re ready to keep learning." : "Small stories. Real progress. Build a collection you can be proud of.").foregroundStyle(theme.theme.muted)
+                Text(viewModel.declined ? "Your first achievement is saved. Unlock Cuentiva whenever you’re ready to keep learning." : "Small stories. Real progress. Build a collection you can be proud of.").foregroundStyle(theme.theme.muted)
                 ForEach(["Explore every story in the library", "Listen, speak, and write in Spanish", "Collect completed books", "Share a story of your own"], id: \.self) { item in Label(item, systemImage: "checkmark").font(.body) }
                 Divider()
-                Text(viewModel.trial ? "7 days free, then \(viewModel.price)." : viewModel.price).font(.headline)
-                Text("Automatically renews until cancelled. Manage or cancel in your Apple subscription settings.").font(.footnote).foregroundStyle(theme.theme.muted)
+                Text(viewModel.price).font(.headline)
+                Text("Pay once. Keep learning. No subscription or recurring charges.").font(.footnote).foregroundStyle(theme.theme.muted)
                 Button(viewModel.button) { Task { await viewModel.purchase() } }.buttonStyle(PrimaryButton()).disabled(viewModel.busy || !viewModel.available)
                 if viewModel.busy { ProgressView().frame(maxWidth: .infinity) }
                 Button("Restore purchases") { Task { await viewModel.restore() } }.frame(maxWidth: .infinity).disabled(viewModel.busy)
