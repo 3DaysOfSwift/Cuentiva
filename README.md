@@ -102,3 +102,7 @@ The free café introduction includes its continuation before the purchase gate. 
 ## Verbs
 
 Verbs is a third content type in the shared Discover/Completed type picker. The first books are Ser: The letter, Estar: Behind the curtain, and Querer: The last dinner. Each includes 12 guided bilingual sentences and 12 new continuation sentences. Every one of the six present-indicative forms appears in each half. The stories explain meaning through emotional situations, with no conjugation charts. This initial set includes Spain’s vosotros forms; it does not claim to cover all tenses, moods, or regional voseo. Verb books use the story layout, anchored guided Next, full-reader autoplay and final Mark as read. See [the manuscripts](Documentation/VERB-STORIES.md).
+
+## Contribution requests
+
+Contributors can write freely or pick a topic request with a teaching brief, coverage target, form counts, and self-review checklist. Picking a request creates/resumes a local draft and switching paths preserves current work. Haber leads six editorially seeded requests. Counts distinguish reviewed coverage from drafts and demo examples. Submitting locally never completes a topic or publishes a book. See [topic requests](Documentation/TOPIC-REQUESTS.md) for review boundaries and backend integration.

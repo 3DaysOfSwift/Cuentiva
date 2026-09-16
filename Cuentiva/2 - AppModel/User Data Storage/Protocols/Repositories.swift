@@ -8,3 +8,7 @@ protocol ContributionRepository: Sendable {
     func drafts() async throws -> [Contribution]
     func save(_ draft: Contribution) async throws
 }
+
+protocol TopicRequestRepository: Sendable {
+    func requests() async throws -> [TopicRequest]
+}

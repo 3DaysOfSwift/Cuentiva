@@ -1,3 +1,7 @@
+## Contribution topic requests — 17 September 2026
+
+All 23 core tests and the Xcode simulator suite pass. Coverage includes legacy draft decoding, exact word/diacritic checks, incomplete topic submission rejection, persisted topic links and teaching notes, no publication/coverage increment after submission, and preserving work when changing writing paths. Visually verified Contribute → Topic requests → Haber selection on iPhone Air, including the missing-coverage card and linked draft with teaching fields, form counts, and self-review checklist. Latest build installed. Editorial priorities and coverage are seeded local data; shared assignments, real demand analytics, server moderation, and publishing are not connected.
+
 ## Verbs content type — 16 September 2026
 
 Added Verbs to Discover/Completed type filtering and sorting, with three original 24-sentence books (12 guided plus 12 continuation). Tests validate all six target present-indicative forms in both halves and their verb lemma mappings. All 20 core tests and the Xcode simulator suite pass, including verb filtering, delayed completion, persistence, and playback. Visually verified Verbs selection, three matching books, and the tense-labelled Ser lesson with anchored Next on iPhone Air. Latest build installed. The initial scope is present indicative with vosotros, not every tense/mood or regional voseo. Native-speaker editorial review is pending.

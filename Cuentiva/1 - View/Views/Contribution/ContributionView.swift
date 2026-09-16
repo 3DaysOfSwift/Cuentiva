@@ -9,6 +9,14 @@ struct ContributionView: View {
                 Text("\(viewModel.count) / 5 books contributed").font(.headline).foregroundStyle(theme.theme.accent)
                 Text("Write about a person, a place, or a moment that stayed with you. Fiction is welcome too.").foregroundStyle(theme.theme.muted)
                 if viewModel.eligible {
+                    HStack {
+                        Button("Write freely") { Task { await viewModel.freestyle() } }.buttonStyle(.bordered)
+                        Button("Topic requests") { viewModel.browsingTopics = true }.buttonStyle(.bordered)
+                    }.disabled(viewModel.busy)
+                    if viewModel.browsingTopics { TopicRequestBoard(viewModel: viewModel) }
+                    else {
+                    if let topic = viewModel.selectedTopic { TopicTeachingBrief(topic: topic, viewModel: viewModel) }
+
                     TextField("Your story’s title in Spanish", text: $viewModel.draft.title)
                         .autocorrectionDisabled().textInputAutocapitalization(.never)
                         .font(.title3).padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
@@ -30,7 +38,7 @@ struct ContributionView: View {
                     Label("Add a Spanish keyboard in Settings for easy access to ñ, accents, ¿ and ¡.", systemImage: "keyboard")
                         .font(.footnote).foregroundStyle(theme.theme.muted)
                     HStack { Button("Preview") { viewModel.preview.toggle() }; Spacer(); Button("Coaching prompts") { viewModel.coach() } }
-                    if viewModel.preview { VStack(alignment: .leading, spacing: 10) { Text(viewModel.draft.title).font(.title2); Text(viewModel.draft.spanish) }.padding().background(theme.theme.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12)) }
+                    if viewModel.preview { VStack(alignment: .leading, spacing: 10) { Text(viewModel.draft.title).font(.title2); if let note = viewModel.draft.teachingNote { Text(note).font(.subheadline) }; Text(viewModel.draft.spanish) }.padding().background(theme.theme.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12)) }
                     if !viewModel.tips.isEmpty {
                         Text("DEMO COACH · GUIDED PROMPTS").font(.caption.bold())
                         ForEach(viewModel.tips, id: \.self) { Text($0).font(.subheadline) }
@@ -41,6 +49,7 @@ struct ContributionView: View {
                     if let notice = viewModel.notice { Text(notice).font(.footnote).foregroundStyle(theme.theme.accent) }
                     Text("Local demo only. Review and publishing are not connected. Only accepted, published books count toward your goal.").font(.caption).foregroundStyle(theme.theme.muted)
                     if !viewModel.drafts.isEmpty { Text("YOUR DRAFTS").font(.caption.bold()); ForEach(viewModel.drafts) { draft in Button { viewModel.edit(draft) } label: { HStack { Text(draft.title); Spacer(); Text(draft.status).font(.caption) } }.padding(.vertical, 8) } }
+                    }
                 } else {
                     Label("Complete your first book to try contributing.", systemImage: "lock.fill").padding()
                 }
