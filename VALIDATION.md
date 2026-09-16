@@ -1,5 +1,16 @@
 # Validation — 16 September 2026
 
+## Completion confetti
+
+Added a finite 3.2-second Canvas burst from the screen's bottom corners. A UIKit
+viewDidAppear observer starts it after presentation, replacing the previous guessed
+450ms delay. The overlay ignores touches and accessibility, honors Reduce Motion,
+and cancels its lifetime task when the completion view leaves. Particle colors use
+the active theme. All 16 core tests and the iOS Simulator test suite pass.
+The Simulator test launch initially failed because the device was shut down;
+booting it and rerunning succeeded. Visual timing and particle appearance
+still require hands-on confirmation on the completion screen.
+
 ## Slow playback, redaction, and demo icon
 
 The iOS Simulator build/test run passed, and all 16 core tests passed. Slow speech

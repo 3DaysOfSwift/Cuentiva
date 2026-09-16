@@ -2,6 +2,8 @@ import SwiftUI
 struct CompletionView: View {
     let receipt: CompletionReceipt
     @State private var viewModel = CompletionViewModel()
+    @State private var fullyAppeared = false
+    @State private var confettiStart: Date?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(ThemeManager.self) private var theme
@@ -21,6 +23,26 @@ struct CompletionView: View {
                 Button("Continue  →") { dismiss() }.buttonStyle(PrimaryButton())
             }.padding(28).frame(maxWidth: .infinity)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
-            .task { viewModel.prepare(receipt); if !reduceMotion { try? await Task.sleep(for: .milliseconds(450)) }; withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) { viewModel.celebrate(receipt) } }
+            .overlay {
+                if let confettiStart, !reduceMotion {
+                    ConfettiBurst(start: confettiStart)
+                        .ignoresSafeArea().allowsHitTesting(false).accessibilityHidden(true)
+                }
+            }
+            .background {
+                ViewDidAppearObserver { fullyAppeared = true }
+                    .frame(width: 0, height: 0)
+            }
+            .onAppear { viewModel.prepare(receipt) }
+            .task(id: fullyAppeared) {
+                guard fullyAppeared else { return }
+                withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) {
+                    viewModel.celebrate(receipt)
+                }
+                guard !reduceMotion else { return }
+                confettiStart = .now
+                defer { confettiStart = nil }
+                do { try await Task.sleep(for: .seconds(3.2)) } catch { return }
+            }
     }
 }
