@@ -13,6 +13,10 @@ struct LessonView: View {
                     VStack(alignment: .leading, spacing: 25) {
                         HStack { Text(viewModel.positionLabel).font(.system(.caption, design: .monospaced)); Spacer(); Text(book.level).font(.caption.bold()) }
                         ProgressView(value: viewModel.fraction)
+                        if let focus = book.verbFocus {
+                            Text("\(focus.infinitive.uppercased()) · \(focus.tense)")
+                                .font(.caption.weight(.semibold)).foregroundStyle(theme.theme.accent)
+                        }
                         if book.kind == .movieScript {
                             if let scene = book.scene { Text(scene).font(.subheadline).foregroundStyle(theme.theme.muted) }
                             Picker("Your role", selection: $viewModel.role) {

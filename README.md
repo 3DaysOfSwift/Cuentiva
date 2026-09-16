@@ -2,7 +2,7 @@
 
 Learn Spanish through community-written stories about real people.
 
-A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 46 bundled stories and scripts are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
+A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 49 bundled stories and scripts are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
 
 ## Run
 
@@ -20,7 +20,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 
 - One free A1 introductory book; onboarding can resume mid-book.
 - One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
-- Forty-six searchable books: 43 stories and three Movie Scripts across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
+- Forty-nine searchable books: 43 stories, three Movie Scripts, and three Verbs books across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
 - Writing mode hides the reference sentence and gives aligned word-level feedback. Accents are treated separately; ñ is not treated as n.
@@ -89,7 +89,7 @@ Three factual-science stories with fictional characters are in [SPACE-STORIES.md
 
 ## Stories and Movie Scripts
 
-The library now includes 46 books: 43 stories and three original Movie Scripts (A1, A2, B1). Discover and Completed offer All types / Stories / Movie Scripts filters, plus library order, English title, difficulty, and book-type sorting. Search and difficulty filtering combine with the format filter.
+The library includes 49 books: 43 stories, three original Movie Scripts, and three Verbs books (A1, A2, B1). Discover and Completed offer All types / Stories / Movie Scripts / Verbs filters, plus library order, English title, difficulty, and book-type sorting. Search and difficulty filtering combine with the format filter.
 
 Scripts show their scene and named speakers. Choose a role or read all roles and advance freely with Next line. After the guided lesson, a full-script reader shows alternating English–Spanish turns and an equally long new continuation (20, 20, and 24 total turns). Slow Spanish audio starts automatically, highlights each word, follows the active turn, and waits one second between speakers. A small toolbar control turns audio off/on. Leaving the reader or backgrounding the app stops playback. The final Mark as read button atomically adds the script to Books Learned; merely finishing the guided lesson or audio does not. The reader stage resumes after reopening. Playback uses the existing single Spanish voice. See [the scripts](Documentation/MOVIE-SCRIPTS.md).
 
@@ -98,3 +98,7 @@ Scripts show their scene and named speakers. Choose a role or read all roles and
 All 43 stories now have continuations matching their original sentence counts: 370 additional bilingual pairs. The guided lesson retains its original sentences. Read the full story opens a flowing single-column English–Spanish reader containing both halves, with slow automatic Spanish playback, word highlighting, automatic following, a one-second pause between pairs, and a small audio toggle. Scripts retain their alternating character layout. Both formats share BookReaderViewModel and the same final completion action. Reopening an unfinished book resumes the full-reader stage from its start. Previously earned completions remain intact.
 
 The free café introduction includes its continuation before the purchase gate. Existing sentence IDs and vocabulary lemma mappings are retained. New vocabulary uses curated mappings with surface fallback. All content still needs native-speaker editorial review. Read the [370 new sentence pairs](Documentation/STORY-CONTINUATIONS.md).
+
+## Verbs
+
+Verbs is a third content type in the shared Discover/Completed type picker. The first books are Ser: The letter, Estar: Behind the curtain, and Querer: The last dinner. Each includes 12 guided bilingual sentences and 12 new continuation sentences. Every one of the six present-indicative forms appears in each half. The stories explain meaning through emotional situations, with no conjugation charts. This initial set includes Spain’s vosotros forms; it does not claim to cover all tenses, moods, or regional voseo. Verb books use the story layout, anchored guided Next, full-reader autoplay and final Mark as read. See [the manuscripts](Documentation/VERB-STORIES.md).

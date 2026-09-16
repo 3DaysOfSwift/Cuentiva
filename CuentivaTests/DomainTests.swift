@@ -195,7 +195,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         _ = try await progress.complete(book: script)
         #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).map(\.id) == ["script"])
     }
-    @Test(arguments: [BookFormat.story, .movieScript])
+    @Test(arguments: [BookFormat.story, .movieScript, .verbs])
     func completionWaitsForReaderAndPersistsAtomically(format: BookFormat) async throws {
         let purchases = TestPurchases(), repository = MemoryProgress()
         let progress = ProgressManager(repository: repository); try await progress.load()
@@ -224,6 +224,15 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let repeated = try await learning.finishReading(book)
         #expect(!repeated.isNew); #expect(repeated.total == 1)
     }
+    @Test func verbTypeCanBeFilteredAndSearched() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress()); try await progress.load()
+        var verb = sample("verb"); verb.format = .verbs
+        let library = LibraryManager(repository: MemoryBooks(values: [sample(), verb]), purchases: purchases, progress: progress)
+        try await library.load()
+        #expect(library.search("cafe", level: "A1", completedOnly: false, format: .verbs, sort: .title).map(\.id) == ["verb"])
+        #expect(library.search("", level: nil, completedOnly: true, format: .verbs, sort: .type).isEmpty)
+    }
     @Test func localSubmissionNeverClaimsPublication() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), repo = MemoryContributions()
         try await progress.load(); purchases.hasAccess = true
@@ -243,13 +252,24 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let url = Bundle.main.url(forResource: "Books", withExtension: "json")!
         #endif
         let books = try await BundledBookRepository(url: url).books()
-        #expect(books.count == 46); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
+        #expect(books.count == 49); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
         #expect(books.filter { $0.kind == .movieScript }.count == 3)
         #expect(books.filter { $0.kind == .story }.count == 43)
+        #expect(books.filter { $0.kind == .verbs }.count == 3)
         for book in books {
             #expect(book.continuation?.count == book.sentences.count)
             #expect(Set(book.fullText.map(\.id)).count == book.fullText.count)
             #expect(book.continuation?.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty } == true)
+            if book.kind == .verbs {
+                let focus = try #require(book.verbFocus)
+                #expect(focus.forms.count == 6)
+                #expect(focus.tense == "Present indicative")
+                for half in [book.sentences, book.continuation ?? []] {
+                    let tokens = half.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
+                    for form in focus.forms { #expect(tokens.contains(form)) }
+                }
+                for form in focus.forms { #expect(book.vocabulary.first { $0.word == form }?.lemma == focus.infinitive) }
+            }
             if book.kind == .movieScript {
                 #expect(book.scene?.isEmpty == false)
                 #expect(book.cast.count == 2)

@@ -32,7 +32,7 @@ import Observation
                       !Task.isCancelled, self.generation == token else { return }
                 self.nextIndex = index + 1
                 if self.nextIndex < book.fullText.count,
-                   (book.kind == .story || book.fullText[index].speaker != book.fullText[self.nextIndex].speaker) {
+                   (book.kind != .movieScript || book.fullText[index].speaker != book.fullText[self.nextIndex].speaker) {
                     do { try await self.pause() } catch { return }
                 }
             }

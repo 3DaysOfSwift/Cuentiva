@@ -29800,5 +29800,2663 @@
         "english": "I have the tickets, the present, and my sister. We can leave."
       }
     ]
+  },
+  {
+    "id": "verb-ser",
+    "title": "Ser: La carta",
+    "englishTitle": "Ser: The letter",
+    "author": "Cuentiva · verb story",
+    "level": "A2",
+    "symbol": "text.book.closed",
+    "palette": 2,
+    "summary": "Identity, relationships, and roles. Six present-indicative forms; vosotros is used in Spain.",
+    "format": "verbs",
+    "verbFocus": {
+      "infinitive": "ser",
+      "tense": "Present indicative",
+      "forms": [
+        "soy",
+        "eres",
+        "es",
+        "somos",
+        "sois",
+        "son"
+      ],
+      "scope": "Identity, relationships, and roles. Six present-indicative forms; vosotros is used in Spain."
+    },
+    "sentences": [
+      {
+        "id": "verb-ser-guided-1",
+        "spanish": "Ana encuentra una carta y descubre que ser puede cambiar la historia de una familia.",
+        "english": "Ana finds a letter and discovers that the verb ser can change a family’s story."
+      },
+      {
+        "id": "verb-ser-guided-2",
+        "spanish": "Su hermano dice: «Soy tu hermano, aunque esta carta diga otra cosa».",
+        "english": "Her brother says, “I am your brother, even if this letter says something else.”"
+      },
+      {
+        "id": "verb-ser-guided-3",
+        "spanish": "Ana responde: «Eres mi hermano, pero necesito entender quién es esta mujer».",
+        "english": "Ana replies, “You are my brother, but I need to understand who this woman is.”"
+      },
+      {
+        "id": "verb-ser-guided-4",
+        "spanish": "Su madre entra y dice: «Es mi hermana; es vuestra tía».",
+        "english": "Their mother comes in and says, “She is my sister; she is your aunt.”"
+      },
+      {
+        "id": "verb-ser-guided-5",
+        "spanish": "«Somos una familia, pero nunca hablamos de ella», protesta Ana.",
+        "english": "“We are a family, but we never talk about her,” Ana protests."
+      },
+      {
+        "id": "verb-ser-guided-6",
+        "spanish": "«Sois mis hijos y merecéis una explicación», responde su madre.",
+        "english": "“You are my children and you deserve an explanation,” their mother replies."
+      },
+      {
+        "id": "verb-ser-guided-7",
+        "spanish": "«Estas cartas son suyas; son parte de una historia difícil».",
+        "english": "“These letters are hers; they are part of a difficult story.”"
+      },
+      {
+        "id": "verb-ser-guided-8",
+        "spanish": "Ana levanta la voz: «Soy su sobrina y no sé ni su nombre».",
+        "english": "Ana raises her voice: “I am her niece and I do not even know her name.”"
+      },
+      {
+        "id": "verb-ser-guided-9",
+        "spanish": "Su hermano añade: «Eres nuestra madre; queremos escucharte».",
+        "english": "Her brother adds, “You are our mother; we want to listen to you.”"
+      },
+      {
+        "id": "verb-ser-guided-10",
+        "spanish": "«Es una conversación que he evitado demasiado tiempo», admite ella.",
+        "english": "“It is a conversation I have avoided for too long,” she admits."
+      },
+      {
+        "id": "verb-ser-guided-11",
+        "spanish": "Ana deja la carta sobre la mesa: «Somos capaces de escuchar algo difícil».",
+        "english": "Ana puts the letter on the table: “We are capable of hearing something difficult.”"
+      },
+      {
+        "id": "verb-ser-guided-12",
+        "spanish": "La madre se sienta y, por primera vez, abre la caja de cartas.",
+        "english": "Their mother sits down and, for the first time, opens the box of letters."
+      }
+    ],
+    "continuation": [
+      {
+        "id": "verb-ser-extra-1",
+        "spanish": "«Soy la hermana mayor, pero eso no significa que siempre tenga razón», empieza.",
+        "english": "“I am the older sister, but that does not mean I am always right,” she begins."
+      },
+      {
+        "id": "verb-ser-extra-2",
+        "spanish": "Ana contesta: «Eres humana, mamá; no tienes que ser perfecta».",
+        "english": "Ana replies, “You are human, Mum; you do not have to be perfect.”"
+      },
+      {
+        "id": "verb-ser-extra-3",
+        "spanish": "«Su nombre es Clara y es una persona muy importante para mí».",
+        "english": "“Her name is Clara and she is a very important person to me.”"
+      },
+      {
+        "id": "verb-ser-extra-4",
+        "spanish": "El hermano mira las fotos: «Somos muy parecidos cuando sonreímos».",
+        "english": "Her brother looks at the photographs: “We look very similar when we smile.”"
+      },
+      {
+        "id": "verb-ser-extra-5",
+        "spanish": "Su madre asiente: «Sois sus sobrinos, aunque todavía no os conozca».",
+        "english": "Their mother nods: “You are her niece and nephew, even though she does not know you yet.”"
+      },
+      {
+        "id": "verb-ser-extra-6",
+        "spanish": "«Estas son las fotos que quería enviarle y nunca envié».",
+        "english": "“These are the photographs I wanted to send her and never sent.”"
+      },
+      {
+        "id": "verb-ser-extra-7",
+        "spanish": "Ana pregunta si pueden escribir juntos una carta nueva.",
+        "english": "Ana asks whether they can write a new letter together."
+      },
+      {
+        "id": "verb-ser-extra-8",
+        "spanish": "Empieza así: «Soy Ana, tu sobrina, y quiero conocerte».",
+        "english": "It begins like this: “I am Ana, your niece, and I want to meet you.”"
+      },
+      {
+        "id": "verb-ser-extra-9",
+        "spanish": "Su hermano añade: «Somos dos, y tenemos muchas preguntas».",
+        "english": "Her brother adds, “There are two of us, and we have lots of questions.”"
+      },
+      {
+        "id": "verb-ser-extra-10",
+        "spanish": "La madre escribe: «Eres mi hermana; esa parte de nuestra historia sigue aquí».",
+        "english": "Their mother writes, “You are my sister; that part of our story is still here.”"
+      },
+      {
+        "id": "verb-ser-extra-11",
+        "spanish": "Ahora ser les sirve para nombrar sus vínculos, no para decidir quién tiene la culpa.",
+        "english": "Now ser helps them name their relationships, rather than decide who is to blame."
+      },
+      {
+        "id": "verb-ser-extra-12",
+        "spanish": "La carta no arregla todo, pero es una puerta que por fin se abre.",
+        "english": "The letter does not fix everything, but it is a door that finally opens."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "abre",
+        "lemma": "abrir",
+        "occurrences": 2
+      },
+      {
+        "word": "admite",
+        "lemma": "admite",
+        "occurrences": 1
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
+      },
+      {
+        "word": "algo",
+        "lemma": "algo",
+        "occurrences": 1
+      },
+      {
+        "word": "ana",
+        "lemma": "ana",
+        "occurrences": 8
+      },
+      {
+        "word": "aquí",
+        "lemma": "aquí",
+        "occurrences": 1
+      },
+      {
+        "word": "arregla",
+        "lemma": "arregla",
+        "occurrences": 1
+      },
+      {
+        "word": "asiente",
+        "lemma": "asiente",
+        "occurrences": 1
+      },
+      {
+        "word": "así",
+        "lemma": "así",
+        "occurrences": 1
+      },
+      {
+        "word": "aunque",
+        "lemma": "aunque",
+        "occurrences": 2
+      },
+      {
+        "word": "añade",
+        "lemma": "añadir",
+        "occurrences": 2
+      },
+      {
+        "word": "caja",
+        "lemma": "caja",
+        "occurrences": 1
+      },
+      {
+        "word": "cambiar",
+        "lemma": "cambiar",
+        "occurrences": 1
+      },
+      {
+        "word": "capaces",
+        "lemma": "capaces",
+        "occurrences": 1
+      },
+      {
+        "word": "carta",
+        "lemma": "carta",
+        "occurrences": 5
+      },
+      {
+        "word": "cartas",
+        "lemma": "carta",
+        "occurrences": 2
+      },
+      {
+        "word": "clara",
+        "lemma": "claro",
+        "occurrences": 1
+      },
+      {
+        "word": "conocerte",
+        "lemma": "conocerte",
+        "occurrences": 1
+      },
+      {
+        "word": "conozca",
+        "lemma": "conozca",
+        "occurrences": 1
+      },
+      {
+        "word": "contesta",
+        "lemma": "contesta",
+        "occurrences": 1
+      },
+      {
+        "word": "conversación",
+        "lemma": "conversación",
+        "occurrences": 1
+      },
+      {
+        "word": "cosa",
+        "lemma": "cosa",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "culpa",
+        "lemma": "culpa",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 6
+      },
+      {
+        "word": "decidir",
+        "lemma": "decidir",
+        "occurrences": 1
+      },
+      {
+        "word": "deja",
+        "lemma": "dejar",
+        "occurrences": 1
+      },
+      {
+        "word": "demasiado",
+        "lemma": "demasiado",
+        "occurrences": 1
+      },
+      {
+        "word": "descubre",
+        "lemma": "descubrir",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 2
+      },
+      {
+        "word": "difícil",
+        "lemma": "difícil",
+        "occurrences": 2
+      },
+      {
+        "word": "diga",
+        "lemma": "diga",
+        "occurrences": 1
+      },
+      {
+        "word": "dos",
+        "lemma": "dos",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 2
+      },
+      {
+        "word": "empieza",
+        "lemma": "empezar",
+        "occurrences": 2
+      },
+      {
+        "word": "encuentra",
+        "lemma": "encuentra",
+        "occurrences": 1
+      },
+      {
+        "word": "entender",
+        "lemma": "entender",
+        "occurrences": 1
+      },
+      {
+        "word": "entra",
+        "lemma": "entrar",
+        "occurrences": 1
+      },
+      {
+        "word": "enviarle",
+        "lemma": "enviarle",
+        "occurrences": 1
+      },
+      {
+        "word": "envié",
+        "lemma": "envié",
+        "occurrences": 1
+      },
+      {
+        "word": "eres",
+        "lemma": "ser",
+        "occurrences": 4
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 7
+      },
+      {
+        "word": "esa",
+        "lemma": "esa",
+        "occurrences": 1
+      },
+      {
+        "word": "escribe",
+        "lemma": "escribir",
+        "occurrences": 1
+      },
+      {
+        "word": "escribir",
+        "lemma": "escribir",
+        "occurrences": 1
+      },
+      {
+        "word": "escuchar",
+        "lemma": "escuchar",
+        "occurrences": 1
+      },
+      {
+        "word": "escucharte",
+        "lemma": "escucharte",
+        "occurrences": 1
+      },
+      {
+        "word": "eso",
+        "lemma": "eso",
+        "occurrences": 1
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 2
+      },
+      {
+        "word": "estas",
+        "lemma": "estas",
+        "occurrences": 2
+      },
+      {
+        "word": "evitado",
+        "lemma": "evitado",
+        "occurrences": 1
+      },
+      {
+        "word": "explicación",
+        "lemma": "explicación",
+        "occurrences": 1
+      },
+      {
+        "word": "familia",
+        "lemma": "familia",
+        "occurrences": 2
+      },
+      {
+        "word": "fin",
+        "lemma": "fin",
+        "occurrences": 1
+      },
+      {
+        "word": "fotos",
+        "lemma": "foto",
+        "occurrences": 2
+      },
+      {
+        "word": "hablamos",
+        "lemma": "hablar",
+        "occurrences": 1
+      },
+      {
+        "word": "he",
+        "lemma": "he",
+        "occurrences": 1
+      },
+      {
+        "word": "hermana",
+        "lemma": "hermana",
+        "occurrences": 3
+      },
+      {
+        "word": "hermano",
+        "lemma": "hermano",
+        "occurrences": 6
+      },
+      {
+        "word": "hijos",
+        "lemma": "hijos",
+        "occurrences": 1
+      },
+      {
+        "word": "historia",
+        "lemma": "historia",
+        "occurrences": 3
+      },
+      {
+        "word": "humana",
+        "lemma": "humana",
+        "occurrences": 1
+      },
+      {
+        "word": "importante",
+        "lemma": "importante",
+        "occurrences": 1
+      },
+      {
+        "word": "juntos",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 10
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 2
+      },
+      {
+        "word": "les",
+        "lemma": "les",
+        "occurrences": 1
+      },
+      {
+        "word": "levanta",
+        "lemma": "levanta",
+        "occurrences": 1
+      },
+      {
+        "word": "madre",
+        "lemma": "madre",
+        "occurrences": 6
+      },
+      {
+        "word": "mamá",
+        "lemma": "mamá",
+        "occurrences": 1
+      },
+      {
+        "word": "mayor",
+        "lemma": "mayor",
+        "occurrences": 1
+      },
+      {
+        "word": "merecéis",
+        "lemma": "merecéis",
+        "occurrences": 1
+      },
+      {
+        "word": "mesa",
+        "lemma": "mesa",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 3
+      },
+      {
+        "word": "mira",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "mis",
+        "lemma": "mis",
+        "occurrences": 1
+      },
+      {
+        "word": "muchas",
+        "lemma": "muchas",
+        "occurrences": 1
+      },
+      {
+        "word": "mujer",
+        "lemma": "mujer",
+        "occurrences": 1
+      },
+      {
+        "word": "muy",
+        "lemma": "muy",
+        "occurrences": 2
+      },
+      {
+        "word": "mí",
+        "lemma": "mí",
+        "occurrences": 1
+      },
+      {
+        "word": "necesito",
+        "lemma": "necesitar",
+        "occurrences": 1
+      },
+      {
+        "word": "ni",
+        "lemma": "ni",
+        "occurrences": 1
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 6
+      },
+      {
+        "word": "nombrar",
+        "lemma": "nombrar",
+        "occurrences": 1
+      },
+      {
+        "word": "nombre",
+        "lemma": "nombre",
+        "occurrences": 2
+      },
+      {
+        "word": "nuestra",
+        "lemma": "nuestro",
+        "occurrences": 2
+      },
+      {
+        "word": "nueva",
+        "lemma": "nuevo",
+        "occurrences": 1
+      },
+      {
+        "word": "nunca",
+        "lemma": "nunca",
+        "occurrences": 2
+      },
+      {
+        "word": "os",
+        "lemma": "os",
+        "occurrences": 1
+      },
+      {
+        "word": "otra",
+        "lemma": "otra",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 3
+      },
+      {
+        "word": "parecidos",
+        "lemma": "parecidos",
+        "occurrences": 1
+      },
+      {
+        "word": "parte",
+        "lemma": "parte",
+        "occurrences": 2
+      },
+      {
+        "word": "perfecta",
+        "lemma": "perfecta",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 4
+      },
+      {
+        "word": "persona",
+        "lemma": "persona",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 2
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 1
+      },
+      {
+        "word": "preguntas",
+        "lemma": "pregunta",
+        "occurrences": 1
+      },
+      {
+        "word": "primera",
+        "lemma": "primero",
+        "occurrences": 1
+      },
+      {
+        "word": "protesta",
+        "lemma": "protesta",
+        "occurrences": 1
+      },
+      {
+        "word": "puede",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "pueden",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "puerta",
+        "lemma": "puerta",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 6
+      },
+      {
+        "word": "queremos",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "quería",
+        "lemma": "querer",
+        "occurrences": 1
+      },
+      {
+        "word": "quiero",
+        "lemma": "quiero",
+        "occurrences": 1
+      },
+      {
+        "word": "quién",
+        "lemma": "quién",
+        "occurrences": 2
+      },
+      {
+        "word": "razón",
+        "lemma": "razón",
+        "occurrences": 1
+      },
+      {
+        "word": "responde",
+        "lemma": "responder",
+        "occurrences": 2
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 2
+      },
+      {
+        "word": "ser",
+        "lemma": "ser",
+        "occurrences": 3
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "siempre",
+        "lemma": "siempre",
+        "occurrences": 1
+      },
+      {
+        "word": "sienta",
+        "lemma": "sentar",
+        "occurrences": 1
+      },
+      {
+        "word": "significa",
+        "lemma": "significa",
+        "occurrences": 1
+      },
+      {
+        "word": "sigue",
+        "lemma": "seguir",
+        "occurrences": 1
+      },
+      {
+        "word": "sirve",
+        "lemma": "servir",
+        "occurrences": 1
+      },
+      {
+        "word": "sobre",
+        "lemma": "sobre",
+        "occurrences": 1
+      },
+      {
+        "word": "sobrina",
+        "lemma": "sobrina",
+        "occurrences": 2
+      },
+      {
+        "word": "sobrinos",
+        "lemma": "sobrinos",
+        "occurrences": 1
+      },
+      {
+        "word": "sois",
+        "lemma": "ser",
+        "occurrences": 2
+      },
+      {
+        "word": "somos",
+        "lemma": "ser",
+        "occurrences": 4
+      },
+      {
+        "word": "son",
+        "lemma": "ser",
+        "occurrences": 3
+      },
+      {
+        "word": "sonreímos",
+        "lemma": "sonreímos",
+        "occurrences": 1
+      },
+      {
+        "word": "soy",
+        "lemma": "ser",
+        "occurrences": 4
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 9
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 2
+      },
+      {
+        "word": "suyas",
+        "lemma": "suyas",
+        "occurrences": 1
+      },
+      {
+        "word": "sé",
+        "lemma": "saber",
+        "occurrences": 1
+      },
+      {
+        "word": "tenemos",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tenga",
+        "lemma": "tenga",
+        "occurrences": 1
+      },
+      {
+        "word": "tiempo",
+        "lemma": "tiempo",
+        "occurrences": 1
+      },
+      {
+        "word": "tiene",
+        "lemma": "tener",
+        "occurrences": 1
+      },
+      {
+        "word": "tienes",
+        "lemma": "tienes",
+        "occurrences": 1
+      },
+      {
+        "word": "todavía",
+        "lemma": "todavía",
+        "occurrences": 1
+      },
+      {
+        "word": "todo",
+        "lemma": "todo",
+        "occurrences": 1
+      },
+      {
+        "word": "tu",
+        "lemma": "tu",
+        "occurrences": 2
+      },
+      {
+        "word": "tía",
+        "lemma": "tía",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 9
+      },
+      {
+        "word": "vez",
+        "lemma": "vez",
+        "occurrences": 1
+      },
+      {
+        "word": "voz",
+        "lemma": "voz",
+        "occurrences": 1
+      },
+      {
+        "word": "vuestra",
+        "lemma": "vuestra",
+        "occurrences": 1
+      },
+      {
+        "word": "vínculos",
+        "lemma": "vínculos",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 9
+      }
+    ],
+    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
+  },
+  {
+    "id": "verb-estar",
+    "title": "Estar: Tras el telón",
+    "englishTitle": "Estar: Behind the curtain",
+    "author": "Cuentiva · verb story",
+    "level": "A2",
+    "symbol": "text.book.closed",
+    "palette": 3,
+    "summary": "Location and how someone feels or is doing. Six present-indicative forms; vosotros is used in Spain.",
+    "format": "verbs",
+    "verbFocus": {
+      "infinitive": "estar",
+      "tense": "Present indicative",
+      "forms": [
+        "estoy",
+        "estás",
+        "está",
+        "estamos",
+        "estáis",
+        "están"
+      ],
+      "scope": "Location and how someone feels or is doing. Six present-indicative forms; vosotros is used in Spain."
+    },
+    "sentences": [
+      {
+        "id": "verb-estar-guided-1",
+        "spanish": "Antes de la función, estar cuenta dónde está cada persona y cómo se siente.",
+        "english": "Before the performance, estar tells us where each person is and how they feel."
+      },
+      {
+        "id": "verb-estar-guided-2",
+        "spanish": "«Estoy detrás del telón y estoy muy nerviosa», dice Inés por teléfono.",
+        "english": "“I am behind the curtain and I am very nervous,” Inés says on the phone."
+      },
+      {
+        "id": "verb-estar-guided-3",
+        "spanish": "Su hermano pregunta: «¿Estás sola o estás con los demás?».",
+        "english": "Her brother asks, “Are you alone or are you with the others?”"
+      },
+      {
+        "id": "verb-estar-guided-4",
+        "spanish": "«La directora está aquí, pero mi vestido no está en su sitio».",
+        "english": "“The director is here, but my dress is not in its place.”"
+      },
+      {
+        "id": "verb-estar-guided-5",
+        "spanish": "Dos actores llegan corriendo: «Estamos listos, pero estamos preocupados por ti».",
+        "english": "Two actors come running: “We are ready, but we are worried about you.”"
+      },
+      {
+        "id": "verb-estar-guided-6",
+        "spanish": "La directora pregunta: «¿Estáis seguros de que habéis mirado en todas las cajas?».",
+        "english": "The director asks, “Are you sure you have looked in all the boxes?”"
+      },
+      {
+        "id": "verb-estar-guided-7",
+        "spanish": "«Los vestidos están allí, pero las cajas están cerradas», responde un actor.",
+        "english": "“The dresses are over there, but the boxes are closed,” an actor replies."
+      },
+      {
+        "id": "verb-estar-guided-8",
+        "spanish": "Inés grita: «¡Estoy cansada de buscar y el público ya está dentro!».",
+        "english": "Inés shouts, “I am tired of searching and the audience is already inside!”"
+      },
+      {
+        "id": "verb-estar-guided-9",
+        "spanish": "La directora baja la voz: «Estás asustada; vamos a buscar juntas».",
+        "english": "The director lowers her voice: “You are frightened; let us look together.”"
+      },
+      {
+        "id": "verb-estar-guided-10",
+        "spanish": "«Estamos contigo», repiten los actores mientras apartan las sillas.",
+        "english": "“We are with you,” the actors repeat as they move the chairs aside."
+      },
+      {
+        "id": "verb-estar-guided-11",
+        "spanish": "Entonces Inés ve una esquina roja debajo de una mesa.",
+        "english": "Then Inés sees a red corner beneath a table."
+      },
+      {
+        "id": "verb-estar-guided-12",
+        "spanish": "El vestido está allí, junto a una nota que no reconoce.",
+        "english": "The dress is there, beside a note she does not recognize."
+      }
+    ],
+    "continuation": [
+      {
+        "id": "verb-estar-extra-1",
+        "spanish": "«Estoy aquí para verte», dice la nota de su hermano.",
+        "english": "“I am here to see you,” says the note from her brother."
+      },
+      {
+        "id": "verb-estar-extra-2",
+        "spanish": "Inés vuelve a llamarlo: «¿Estás en el teatro de verdad?».",
+        "english": "Inés calls him again: “Are you really in the theater?”"
+      },
+      {
+        "id": "verb-estar-extra-3",
+        "spanish": "«Sí, mi asiento está en la primera fila».",
+        "english": "“Yes, my seat is in the front row.”"
+      },
+      {
+        "id": "verb-estar-extra-4",
+        "spanish": "Inés mira a sus compañeros: «Estamos a tiempo; todavía podemos salir».",
+        "english": "Inés looks at her fellow actors: “We are in time; we can still go on.”"
+      },
+      {
+        "id": "verb-estar-extra-5",
+        "spanish": "La directora sonríe: «Estáis preparados y yo estoy a vuestro lado».",
+        "english": "The director smiles: “You are ready and I am by your side.”"
+      },
+      {
+        "id": "verb-estar-extra-6",
+        "spanish": "Las luces están encendidas y las puertas están cerradas.",
+        "english": "The lights are on and the doors are closed."
+      },
+      {
+        "id": "verb-estar-extra-7",
+        "spanish": "«Estoy nerviosa todavía», admite Inés mientras se pone el vestido.",
+        "english": "“I am still nervous,” Inés admits as she puts on the dress."
+      },
+      {
+        "id": "verb-estar-extra-8",
+        "spanish": "«Estás aquí, y eso es suficiente para empezar», responde su amiga.",
+        "english": "“You are here, and that is enough to begin,” her friend replies."
+      },
+      {
+        "id": "verb-estar-extra-9",
+        "spanish": "Cuando se abre el telón, Inés ve que su hermano está sonriendo.",
+        "english": "When the curtain opens, Inés sees that her brother is smiling."
+      },
+      {
+        "id": "verb-estar-extra-10",
+        "spanish": "«Estamos juntos», piensa, aunque él esté entre el público.",
+        "english": "“We are together,” she thinks, even though he is in the audience."
+      },
+      {
+        "id": "verb-estar-extra-11",
+        "spanish": "Estar le ha servido para pedir ayuda, encontrar el vestido y expresar su miedo.",
+        "english": "Estar has helped her ask for help, find the dress, and express her fear."
+      },
+      {
+        "id": "verb-estar-extra-12",
+        "spanish": "Ahora está en el escenario y empieza su primera frase.",
+        "english": "Now she is on stage and begins her first line."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 6
+      },
+      {
+        "word": "abre",
+        "lemma": "abrir",
+        "occurrences": 1
+      },
+      {
+        "word": "actor",
+        "lemma": "actor",
+        "occurrences": 1
+      },
+      {
+        "word": "actores",
+        "lemma": "actores",
+        "occurrences": 2
+      },
+      {
+        "word": "admite",
+        "lemma": "admite",
+        "occurrences": 1
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
+      },
+      {
+        "word": "allí",
+        "lemma": "allí",
+        "occurrences": 2
+      },
+      {
+        "word": "amiga",
+        "lemma": "amiga",
+        "occurrences": 1
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 1
+      },
+      {
+        "word": "apartan",
+        "lemma": "apartan",
+        "occurrences": 1
+      },
+      {
+        "word": "aquí",
+        "lemma": "aquí",
+        "occurrences": 3
+      },
+      {
+        "word": "asiento",
+        "lemma": "asiento",
+        "occurrences": 1
+      },
+      {
+        "word": "asustada",
+        "lemma": "asustada",
+        "occurrences": 1
+      },
+      {
+        "word": "aunque",
+        "lemma": "aunque",
+        "occurrences": 1
+      },
+      {
+        "word": "ayuda",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "baja",
+        "lemma": "baja",
+        "occurrences": 1
+      },
+      {
+        "word": "buscar",
+        "lemma": "buscar",
+        "occurrences": 2
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 1
+      },
+      {
+        "word": "cajas",
+        "lemma": "caja",
+        "occurrences": 2
+      },
+      {
+        "word": "cansada",
+        "lemma": "cansada",
+        "occurrences": 1
+      },
+      {
+        "word": "cerradas",
+        "lemma": "cerradas",
+        "occurrences": 2
+      },
+      {
+        "word": "compañeros",
+        "lemma": "compañero",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 1
+      },
+      {
+        "word": "contigo",
+        "lemma": "contigo",
+        "occurrences": 1
+      },
+      {
+        "word": "corriendo",
+        "lemma": "corriendo",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "cuenta",
+        "lemma": "contar",
+        "occurrences": 1
+      },
+      {
+        "word": "cómo",
+        "lemma": "cómo",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 6
+      },
+      {
+        "word": "debajo",
+        "lemma": "debajo",
+        "occurrences": 1
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "demás",
+        "lemma": "demás",
+        "occurrences": 1
+      },
+      {
+        "word": "dentro",
+        "lemma": "dentro",
+        "occurrences": 1
+      },
+      {
+        "word": "detrás",
+        "lemma": "detrás",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 2
+      },
+      {
+        "word": "directora",
+        "lemma": "directora",
+        "occurrences": 4
+      },
+      {
+        "word": "dos",
+        "lemma": "dos",
+        "occurrences": 1
+      },
+      {
+        "word": "dónde",
+        "lemma": "dónde",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 8
+      },
+      {
+        "word": "empezar",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "empieza",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 5
+      },
+      {
+        "word": "encendidas",
+        "lemma": "encendidas",
+        "occurrences": 1
+      },
+      {
+        "word": "encontrar",
+        "lemma": "encontrar",
+        "occurrences": 1
+      },
+      {
+        "word": "entonces",
+        "lemma": "entonces",
+        "occurrences": 1
+      },
+      {
+        "word": "entre",
+        "lemma": "entre",
+        "occurrences": 1
+      },
+      {
+        "word": "es",
+        "lemma": "ser",
+        "occurrences": 1
+      },
+      {
+        "word": "escenario",
+        "lemma": "escenario",
+        "occurrences": 1
+      },
+      {
+        "word": "eso",
+        "lemma": "eso",
+        "occurrences": 1
+      },
+      {
+        "word": "esquina",
+        "lemma": "esquina",
+        "occurrences": 1
+      },
+      {
+        "word": "estamos",
+        "lemma": "estar",
+        "occurrences": 5
+      },
+      {
+        "word": "estar",
+        "lemma": "estar",
+        "occurrences": 2
+      },
+      {
+        "word": "estoy",
+        "lemma": "estar",
+        "occurrences": 6
+      },
+      {
+        "word": "está",
+        "lemma": "estar",
+        "occurrences": 8
+      },
+      {
+        "word": "estáis",
+        "lemma": "estar",
+        "occurrences": 2
+      },
+      {
+        "word": "están",
+        "lemma": "estar",
+        "occurrences": 4
+      },
+      {
+        "word": "estás",
+        "lemma": "estar",
+        "occurrences": 5
+      },
+      {
+        "word": "esté",
+        "lemma": "esté",
+        "occurrences": 1
+      },
+      {
+        "word": "expresar",
+        "lemma": "expresar",
+        "occurrences": 1
+      },
+      {
+        "word": "fila",
+        "lemma": "fila",
+        "occurrences": 1
+      },
+      {
+        "word": "frase",
+        "lemma": "frase",
+        "occurrences": 1
+      },
+      {
+        "word": "función",
+        "lemma": "función",
+        "occurrences": 1
+      },
+      {
+        "word": "grita",
+        "lemma": "grita",
+        "occurrences": 1
+      },
+      {
+        "word": "ha",
+        "lemma": "ha",
+        "occurrences": 1
+      },
+      {
+        "word": "habéis",
+        "lemma": "habéis",
+        "occurrences": 1
+      },
+      {
+        "word": "hermano",
+        "lemma": "hermano",
+        "occurrences": 3
+      },
+      {
+        "word": "inés",
+        "lemma": "inés",
+        "occurrences": 7
+      },
+      {
+        "word": "juntas",
+        "lemma": "juntas",
+        "occurrences": 1
+      },
+      {
+        "word": "junto",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "juntos",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 8
+      },
+      {
+        "word": "lado",
+        "lemma": "lado",
+        "occurrences": 1
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 5
+      },
+      {
+        "word": "le",
+        "lemma": "le",
+        "occurrences": 1
+      },
+      {
+        "word": "listos",
+        "lemma": "listos",
+        "occurrences": 1
+      },
+      {
+        "word": "llamarlo",
+        "lemma": "llamarlo",
+        "occurrences": 1
+      },
+      {
+        "word": "llegan",
+        "lemma": "llegar",
+        "occurrences": 1
+      },
+      {
+        "word": "los",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "luces",
+        "lemma": "luces",
+        "occurrences": 1
+      },
+      {
+        "word": "mesa",
+        "lemma": "mesa",
+        "occurrences": 1
+      },
+      {
+        "word": "mi",
+        "lemma": "mi",
+        "occurrences": 2
+      },
+      {
+        "word": "miedo",
+        "lemma": "miedo",
+        "occurrences": 1
+      },
+      {
+        "word": "mientras",
+        "lemma": "mientras",
+        "occurrences": 2
+      },
+      {
+        "word": "mira",
+        "lemma": "mirar",
+        "occurrences": 1
+      },
+      {
+        "word": "mirado",
+        "lemma": "mirado",
+        "occurrences": 1
+      },
+      {
+        "word": "muy",
+        "lemma": "muy",
+        "occurrences": 1
+      },
+      {
+        "word": "nerviosa",
+        "lemma": "nerviosa",
+        "occurrences": 2
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 2
+      },
+      {
+        "word": "nota",
+        "lemma": "nota",
+        "occurrences": 2
+      },
+      {
+        "word": "o",
+        "lemma": "o",
+        "occurrences": 1
+      },
+      {
+        "word": "para",
+        "lemma": "para",
+        "occurrences": 3
+      },
+      {
+        "word": "pedir",
+        "lemma": "pedir",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 3
+      },
+      {
+        "word": "persona",
+        "lemma": "persona",
+        "occurrences": 1
+      },
+      {
+        "word": "piensa",
+        "lemma": "pensar",
+        "occurrences": 1
+      },
+      {
+        "word": "podemos",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "pone",
+        "lemma": "poner",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 2
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 2
+      },
+      {
+        "word": "preocupados",
+        "lemma": "preocupados",
+        "occurrences": 1
+      },
+      {
+        "word": "preparados",
+        "lemma": "preparados",
+        "occurrences": 1
+      },
+      {
+        "word": "primera",
+        "lemma": "primero",
+        "occurrences": 2
+      },
+      {
+        "word": "puertas",
+        "lemma": "puertas",
+        "occurrences": 1
+      },
+      {
+        "word": "público",
+        "lemma": "público",
+        "occurrences": 2
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 3
+      },
+      {
+        "word": "reconoce",
+        "lemma": "reconocer",
+        "occurrences": 1
+      },
+      {
+        "word": "repiten",
+        "lemma": "repiten",
+        "occurrences": 1
+      },
+      {
+        "word": "responde",
+        "lemma": "responder",
+        "occurrences": 2
+      },
+      {
+        "word": "roja",
+        "lemma": "roja",
+        "occurrences": 1
+      },
+      {
+        "word": "salir",
+        "lemma": "salir",
+        "occurrences": 1
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 3
+      },
+      {
+        "word": "seguros",
+        "lemma": "seguro",
+        "occurrences": 1
+      },
+      {
+        "word": "servido",
+        "lemma": "servir",
+        "occurrences": 1
+      },
+      {
+        "word": "siente",
+        "lemma": "sentir",
+        "occurrences": 1
+      },
+      {
+        "word": "sillas",
+        "lemma": "silla",
+        "occurrences": 1
+      },
+      {
+        "word": "sitio",
+        "lemma": "sitio",
+        "occurrences": 1
+      },
+      {
+        "word": "sola",
+        "lemma": "sola",
+        "occurrences": 1
+      },
+      {
+        "word": "sonriendo",
+        "lemma": "sonriendo",
+        "occurrences": 1
+      },
+      {
+        "word": "sonríe",
+        "lemma": "sonreír",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 7
+      },
+      {
+        "word": "suficiente",
+        "lemma": "suficiente",
+        "occurrences": 1
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 1
+      },
+      {
+        "word": "sí",
+        "lemma": "sí",
+        "occurrences": 1
+      },
+      {
+        "word": "teatro",
+        "lemma": "teatro",
+        "occurrences": 1
+      },
+      {
+        "word": "teléfono",
+        "lemma": "teléfono",
+        "occurrences": 1
+      },
+      {
+        "word": "telón",
+        "lemma": "telón",
+        "occurrences": 2
+      },
+      {
+        "word": "ti",
+        "lemma": "ti",
+        "occurrences": 1
+      },
+      {
+        "word": "tiempo",
+        "lemma": "tiempo",
+        "occurrences": 1
+      },
+      {
+        "word": "todas",
+        "lemma": "todas",
+        "occurrences": 1
+      },
+      {
+        "word": "todavía",
+        "lemma": "todavía",
+        "occurrences": 2
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "vamos",
+        "lemma": "vamos",
+        "occurrences": 1
+      },
+      {
+        "word": "ve",
+        "lemma": "ver",
+        "occurrences": 2
+      },
+      {
+        "word": "verdad",
+        "lemma": "verdad",
+        "occurrences": 1
+      },
+      {
+        "word": "verte",
+        "lemma": "verte",
+        "occurrences": 1
+      },
+      {
+        "word": "vestido",
+        "lemma": "vestido",
+        "occurrences": 4
+      },
+      {
+        "word": "vestidos",
+        "lemma": "vestidos",
+        "occurrences": 1
+      },
+      {
+        "word": "voz",
+        "lemma": "voz",
+        "occurrences": 1
+      },
+      {
+        "word": "vuelve",
+        "lemma": "volver",
+        "occurrences": 1
+      },
+      {
+        "word": "vuestro",
+        "lemma": "vuestro",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 8
+      },
+      {
+        "word": "ya",
+        "lemma": "ya",
+        "occurrences": 1
+      },
+      {
+        "word": "yo",
+        "lemma": "yo",
+        "occurrences": 1
+      },
+      {
+        "word": "él",
+        "lemma": "él",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
+  },
+  {
+    "id": "verb-querer",
+    "title": "Querer: La última cena",
+    "englishTitle": "Querer: The last dinner",
+    "author": "Cuentiva · verb story",
+    "level": "B1",
+    "symbol": "text.book.closed",
+    "palette": 4,
+    "summary": "Wants, wishes, and affection. Six present-indicative forms; vosotros is used in Spain.",
+    "format": "verbs",
+    "verbFocus": {
+      "infinitive": "querer",
+      "tense": "Present indicative",
+      "forms": [
+        "quiero",
+        "quieres",
+        "quiere",
+        "queremos",
+        "queréis",
+        "quieren"
+      ],
+      "scope": "Wants, wishes, and affection. Six present-indicative forms; vosotros is used in Spain."
+    },
+    "sentences": [
+      {
+        "id": "verb-querer-guided-1",
+        "spanish": "En la última cena antes del viaje, querer expresa deseos y también cariño.",
+        "english": "At the last dinner before the journey, querer expresses wishes and also affection."
+      },
+      {
+        "id": "verb-querer-guided-2",
+        "spanish": "«Quiero irme, pero no quiero haceros daño», dice Lucas.",
+        "english": "“I want to leave, but I do not want to hurt you,” Lucas says."
+      },
+      {
+        "id": "verb-querer-guided-3",
+        "spanish": "Su hermana pregunta: «¿Quieres viajar o quieres escapar de nosotros?».",
+        "english": "His sister asks, “Do you want to travel or do you want to escape from us?”"
+      },
+      {
+        "id": "verb-querer-guided-4",
+        "spanish": "Su padre interviene: «Él quiere conocer otros lugares».",
+        "english": "His father steps in: “He wants to get to know other places.”"
+      },
+      {
+        "id": "verb-querer-guided-5",
+        "spanish": "«Queremos entenderte, pero también queremos verte», dice su madre.",
+        "english": "“We want to understand you, but we also want to see you,” his mother says."
+      },
+      {
+        "id": "verb-querer-guided-6",
+        "spanish": "Lucas responde: «Queréis que sea feliz, pero os cuesta dejarme salir».",
+        "english": "Lucas replies, “You want me to be happy, but it is hard for you to let me leave.”"
+      },
+      {
+        "id": "verb-querer-guided-7",
+        "spanish": "Sus abuelos escuchan desde el sofá; quieren hablar sin discutir.",
+        "english": "His grandparents listen from the sofa; they want to talk without arguing."
+      },
+      {
+        "id": "verb-querer-guided-8",
+        "spanish": "La hermana aparta el plato: «Te quiero y no quiero perderte».",
+        "english": "His sister pushes her plate aside: “I love you and I do not want to lose you.”"
+      },
+      {
+        "id": "verb-querer-guided-9",
+        "spanish": "Lucas se queda callado porque no esperaba escuchar aquello.",
+        "english": "Lucas falls silent because he did not expect to hear that."
+      },
+      {
+        "id": "verb-querer-guided-10",
+        "spanish": "Después dice: «Si quieres, podemos hablar cada domingo».",
+        "english": "Then he says, “If you want, we can talk every Sunday.”"
+      },
+      {
+        "id": "verb-querer-guided-11",
+        "spanish": "«No queremos una promesa imposible», responde su padre.",
+        "english": "“We do not want an impossible promise,” his father replies."
+      },
+      {
+        "id": "verb-querer-guided-12",
+        "spanish": "Lucas deja el teléfono y pregunta qué necesita cada uno.",
+        "english": "Lucas puts down his phone and asks what each person needs."
+      }
+    ],
+    "continuation": [
+      {
+        "id": "verb-querer-extra-1",
+        "spanish": "Su madre empieza: «Quiero saber cómo estás, incluso cuando tengas un mal día».",
+        "english": "His mother begins, “I want to know how you are, even when you have a bad day.”"
+      },
+      {
+        "id": "verb-querer-extra-2",
+        "spanish": "Lucas pregunta a su hermana: «¿Quieres enseñarme tus dibujos por videollamada?».",
+        "english": "Lucas asks his sister, “Do you want to show me your drawings on a video call?”"
+      },
+      {
+        "id": "verb-querer-extra-3",
+        "spanish": "Ella asiente; quiere compartir algo más que despedidas.",
+        "english": "She nods; she wants to share more than goodbyes."
+      },
+      {
+        "id": "verb-querer-extra-4",
+        "spanish": "«Queremos que esta casa siga siendo tu casa», dicen sus padres.",
+        "english": "“We want this house to remain your home,” his parents say."
+      },
+      {
+        "id": "verb-querer-extra-5",
+        "spanish": "«Y vosotros, ¿qué queréis que os traiga?», pregunta Lucas a sus abuelos.",
+        "english": "“And what do you want me to bring you?” Lucas asks his grandparents."
+      },
+      {
+        "id": "verb-querer-extra-6",
+        "spanish": "Ellos no quieren regalos; quieren escuchar historias que él haya vivido.",
+        "english": "They do not want presents; they want to hear stories he has lived through."
+      },
+      {
+        "id": "verb-querer-extra-7",
+        "spanish": "Lucas sonríe: «Quiero aprender a contarlas bien».",
+        "english": "Lucas smiles: “I want to learn to tell them well.”"
+      },
+      {
+        "id": "verb-querer-extra-8",
+        "spanish": "Su hermana se acerca: «Quieres vivir algo nuevo; ahora lo entiendo mejor».",
+        "english": "His sister comes closer: “You want to experience something new; now I understand it better.”"
+      },
+      {
+        "id": "verb-querer-extra-9",
+        "spanish": "La madre quiere una foto antes de que se enfríe la cena.",
+        "english": "Their mother wants a photograph before dinner gets cold."
+      },
+      {
+        "id": "verb-querer-extra-10",
+        "spanish": "Todos quieren salir juntos en la imagen y acercan las sillas.",
+        "english": "Everyone wants to be in the picture together and they move their chairs closer."
+      },
+      {
+        "id": "verb-querer-extra-11",
+        "spanish": "Querer no ha eliminado sus diferencias, pero les ha permitido decir qué les importa.",
+        "english": "Querer has not removed their differences, but it has allowed them to say what matters to them."
+      },
+      {
+        "id": "verb-querer-extra-12",
+        "spanish": "«Os quiero», dice Lucas, y esta vez nadie necesita una explicación.",
+        "english": "“I love you,” Lucas says, and this time nobody needs an explanation."
+      }
+    ],
+    "vocabulary": [
+      {
+        "word": "a",
+        "lemma": "a",
+        "occurrences": 3
+      },
+      {
+        "word": "abuelos",
+        "lemma": "abuelos",
+        "occurrences": 2
+      },
+      {
+        "word": "acerca",
+        "lemma": "acercar",
+        "occurrences": 1
+      },
+      {
+        "word": "acercan",
+        "lemma": "acercar",
+        "occurrences": 1
+      },
+      {
+        "word": "ahora",
+        "lemma": "ahora",
+        "occurrences": 1
+      },
+      {
+        "word": "algo",
+        "lemma": "algo",
+        "occurrences": 2
+      },
+      {
+        "word": "antes",
+        "lemma": "antes",
+        "occurrences": 2
+      },
+      {
+        "word": "aparta",
+        "lemma": "apartar",
+        "occurrences": 1
+      },
+      {
+        "word": "aprender",
+        "lemma": "aprender",
+        "occurrences": 1
+      },
+      {
+        "word": "aquello",
+        "lemma": "aquello",
+        "occurrences": 1
+      },
+      {
+        "word": "asiente",
+        "lemma": "asiente",
+        "occurrences": 1
+      },
+      {
+        "word": "bien",
+        "lemma": "bien",
+        "occurrences": 1
+      },
+      {
+        "word": "cada",
+        "lemma": "cada",
+        "occurrences": 2
+      },
+      {
+        "word": "callado",
+        "lemma": "callado",
+        "occurrences": 1
+      },
+      {
+        "word": "cariño",
+        "lemma": "cariño",
+        "occurrences": 1
+      },
+      {
+        "word": "casa",
+        "lemma": "casa",
+        "occurrences": 2
+      },
+      {
+        "word": "cena",
+        "lemma": "cena",
+        "occurrences": 2
+      },
+      {
+        "word": "compartir",
+        "lemma": "compartir",
+        "occurrences": 1
+      },
+      {
+        "word": "conocer",
+        "lemma": "conocer",
+        "occurrences": 1
+      },
+      {
+        "word": "contarlas",
+        "lemma": "contarlas",
+        "occurrences": 1
+      },
+      {
+        "word": "cuando",
+        "lemma": "cuando",
+        "occurrences": 1
+      },
+      {
+        "word": "cuesta",
+        "lemma": "costar",
+        "occurrences": 1
+      },
+      {
+        "word": "cómo",
+        "lemma": "cómo",
+        "occurrences": 1
+      },
+      {
+        "word": "daño",
+        "lemma": "daño",
+        "occurrences": 1
+      },
+      {
+        "word": "de",
+        "lemma": "de",
+        "occurrences": 2
+      },
+      {
+        "word": "decir",
+        "lemma": "decir",
+        "occurrences": 1
+      },
+      {
+        "word": "deja",
+        "lemma": "dejar",
+        "occurrences": 1
+      },
+      {
+        "word": "dejarme",
+        "lemma": "dejarme",
+        "occurrences": 1
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "desde",
+        "lemma": "desde",
+        "occurrences": 1
+      },
+      {
+        "word": "deseos",
+        "lemma": "deseos",
+        "occurrences": 1
+      },
+      {
+        "word": "despedidas",
+        "lemma": "despedidas",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "dibujos",
+        "lemma": "dibujo",
+        "occurrences": 1
+      },
+      {
+        "word": "dice",
+        "lemma": "decir",
+        "occurrences": 4
+      },
+      {
+        "word": "dicen",
+        "lemma": "dicen",
+        "occurrences": 1
+      },
+      {
+        "word": "diferencias",
+        "lemma": "diferencias",
+        "occurrences": 1
+      },
+      {
+        "word": "discutir",
+        "lemma": "discutir",
+        "occurrences": 1
+      },
+      {
+        "word": "domingo",
+        "lemma": "domingo",
+        "occurrences": 1
+      },
+      {
+        "word": "día",
+        "lemma": "día",
+        "occurrences": 1
+      },
+      {
+        "word": "el",
+        "lemma": "el",
+        "occurrences": 3
+      },
+      {
+        "word": "eliminado",
+        "lemma": "eliminado",
+        "occurrences": 1
+      },
+      {
+        "word": "ella",
+        "lemma": "ella",
+        "occurrences": 1
+      },
+      {
+        "word": "ellos",
+        "lemma": "ellos",
+        "occurrences": 1
+      },
+      {
+        "word": "empieza",
+        "lemma": "empezar",
+        "occurrences": 1
+      },
+      {
+        "word": "en",
+        "lemma": "en",
+        "occurrences": 2
+      },
+      {
+        "word": "enfríe",
+        "lemma": "enfríe",
+        "occurrences": 1
+      },
+      {
+        "word": "enseñarme",
+        "lemma": "enseñarme",
+        "occurrences": 1
+      },
+      {
+        "word": "entenderte",
+        "lemma": "entenderte",
+        "occurrences": 1
+      },
+      {
+        "word": "entiendo",
+        "lemma": "entender",
+        "occurrences": 1
+      },
+      {
+        "word": "escapar",
+        "lemma": "escapar",
+        "occurrences": 1
+      },
+      {
+        "word": "escuchan",
+        "lemma": "escuchar",
+        "occurrences": 1
+      },
+      {
+        "word": "escuchar",
+        "lemma": "escuchar",
+        "occurrences": 2
+      },
+      {
+        "word": "esperaba",
+        "lemma": "esperar",
+        "occurrences": 1
+      },
+      {
+        "word": "esta",
+        "lemma": "esta",
+        "occurrences": 2
+      },
+      {
+        "word": "estás",
+        "lemma": "estás",
+        "occurrences": 1
+      },
+      {
+        "word": "explicación",
+        "lemma": "explicación",
+        "occurrences": 1
+      },
+      {
+        "word": "expresa",
+        "lemma": "expresa",
+        "occurrences": 1
+      },
+      {
+        "word": "feliz",
+        "lemma": "feliz",
+        "occurrences": 1
+      },
+      {
+        "word": "foto",
+        "lemma": "foto",
+        "occurrences": 1
+      },
+      {
+        "word": "ha",
+        "lemma": "ha",
+        "occurrences": 2
+      },
+      {
+        "word": "hablar",
+        "lemma": "hablar",
+        "occurrences": 2
+      },
+      {
+        "word": "haceros",
+        "lemma": "haceros",
+        "occurrences": 1
+      },
+      {
+        "word": "haya",
+        "lemma": "haber",
+        "occurrences": 1
+      },
+      {
+        "word": "hermana",
+        "lemma": "hermana",
+        "occurrences": 4
+      },
+      {
+        "word": "historias",
+        "lemma": "historia",
+        "occurrences": 1
+      },
+      {
+        "word": "imagen",
+        "lemma": "imagen",
+        "occurrences": 1
+      },
+      {
+        "word": "importa",
+        "lemma": "importar",
+        "occurrences": 1
+      },
+      {
+        "word": "imposible",
+        "lemma": "imposible",
+        "occurrences": 1
+      },
+      {
+        "word": "incluso",
+        "lemma": "incluso",
+        "occurrences": 1
+      },
+      {
+        "word": "interviene",
+        "lemma": "interviene",
+        "occurrences": 1
+      },
+      {
+        "word": "irme",
+        "lemma": "irme",
+        "occurrences": 1
+      },
+      {
+        "word": "juntos",
+        "lemma": "junto",
+        "occurrences": 1
+      },
+      {
+        "word": "la",
+        "lemma": "el",
+        "occurrences": 5
+      },
+      {
+        "word": "las",
+        "lemma": "el",
+        "occurrences": 1
+      },
+      {
+        "word": "les",
+        "lemma": "les",
+        "occurrences": 2
+      },
+      {
+        "word": "lo",
+        "lemma": "lo",
+        "occurrences": 1
+      },
+      {
+        "word": "lucas",
+        "lemma": "lucas",
+        "occurrences": 8
+      },
+      {
+        "word": "lugares",
+        "lemma": "lugares",
+        "occurrences": 1
+      },
+      {
+        "word": "madre",
+        "lemma": "madre",
+        "occurrences": 3
+      },
+      {
+        "word": "mal",
+        "lemma": "mal",
+        "occurrences": 1
+      },
+      {
+        "word": "mejor",
+        "lemma": "mejor",
+        "occurrences": 1
+      },
+      {
+        "word": "más",
+        "lemma": "más",
+        "occurrences": 1
+      },
+      {
+        "word": "nadie",
+        "lemma": "nadie",
+        "occurrences": 1
+      },
+      {
+        "word": "necesita",
+        "lemma": "necesitar",
+        "occurrences": 2
+      },
+      {
+        "word": "no",
+        "lemma": "no",
+        "occurrences": 6
+      },
+      {
+        "word": "nosotros",
+        "lemma": "nosotros",
+        "occurrences": 1
+      },
+      {
+        "word": "nuevo",
+        "lemma": "nuevo",
+        "occurrences": 1
+      },
+      {
+        "word": "o",
+        "lemma": "o",
+        "occurrences": 1
+      },
+      {
+        "word": "os",
+        "lemma": "os",
+        "occurrences": 3
+      },
+      {
+        "word": "otros",
+        "lemma": "otro",
+        "occurrences": 1
+      },
+      {
+        "word": "padre",
+        "lemma": "padre",
+        "occurrences": 2
+      },
+      {
+        "word": "padres",
+        "lemma": "padres",
+        "occurrences": 1
+      },
+      {
+        "word": "perderte",
+        "lemma": "perderte",
+        "occurrences": 1
+      },
+      {
+        "word": "permitido",
+        "lemma": "permitido",
+        "occurrences": 1
+      },
+      {
+        "word": "pero",
+        "lemma": "pero",
+        "occurrences": 4
+      },
+      {
+        "word": "plato",
+        "lemma": "plato",
+        "occurrences": 1
+      },
+      {
+        "word": "podemos",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "porque",
+        "lemma": "porque",
+        "occurrences": 1
+      },
+      {
+        "word": "pregunta",
+        "lemma": "preguntar",
+        "occurrences": 4
+      },
+      {
+        "word": "promesa",
+        "lemma": "promesa",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 6
+      },
+      {
+        "word": "queda",
+        "lemma": "quedar",
+        "occurrences": 1
+      },
+      {
+        "word": "queremos",
+        "lemma": "querer",
+        "occurrences": 4
+      },
+      {
+        "word": "querer",
+        "lemma": "querer",
+        "occurrences": 2
+      },
+      {
+        "word": "queréis",
+        "lemma": "querer",
+        "occurrences": 2
+      },
+      {
+        "word": "quiere",
+        "lemma": "querer",
+        "occurrences": 3
+      },
+      {
+        "word": "quieren",
+        "lemma": "querer",
+        "occurrences": 4
+      },
+      {
+        "word": "quieres",
+        "lemma": "querer",
+        "occurrences": 5
+      },
+      {
+        "word": "quiero",
+        "lemma": "querer",
+        "occurrences": 7
+      },
+      {
+        "word": "qué",
+        "lemma": "qué",
+        "occurrences": 3
+      },
+      {
+        "word": "regalos",
+        "lemma": "regalos",
+        "occurrences": 1
+      },
+      {
+        "word": "responde",
+        "lemma": "responder",
+        "occurrences": 2
+      },
+      {
+        "word": "saber",
+        "lemma": "saber",
+        "occurrences": 1
+      },
+      {
+        "word": "salir",
+        "lemma": "salir",
+        "occurrences": 2
+      },
+      {
+        "word": "se",
+        "lemma": "se",
+        "occurrences": 3
+      },
+      {
+        "word": "sea",
+        "lemma": "sea",
+        "occurrences": 1
+      },
+      {
+        "word": "si",
+        "lemma": "si",
+        "occurrences": 1
+      },
+      {
+        "word": "siendo",
+        "lemma": "siendo",
+        "occurrences": 1
+      },
+      {
+        "word": "siga",
+        "lemma": "siga",
+        "occurrences": 1
+      },
+      {
+        "word": "sillas",
+        "lemma": "silla",
+        "occurrences": 1
+      },
+      {
+        "word": "sin",
+        "lemma": "sin",
+        "occurrences": 1
+      },
+      {
+        "word": "sofá",
+        "lemma": "sofá",
+        "occurrences": 1
+      },
+      {
+        "word": "sonríe",
+        "lemma": "sonreír",
+        "occurrences": 1
+      },
+      {
+        "word": "su",
+        "lemma": "su",
+        "occurrences": 7
+      },
+      {
+        "word": "sus",
+        "lemma": "sus",
+        "occurrences": 4
+      },
+      {
+        "word": "también",
+        "lemma": "también",
+        "occurrences": 2
+      },
+      {
+        "word": "te",
+        "lemma": "te",
+        "occurrences": 1
+      },
+      {
+        "word": "teléfono",
+        "lemma": "teléfono",
+        "occurrences": 1
+      },
+      {
+        "word": "tengas",
+        "lemma": "tengas",
+        "occurrences": 1
+      },
+      {
+        "word": "todos",
+        "lemma": "todos",
+        "occurrences": 1
+      },
+      {
+        "word": "traiga",
+        "lemma": "traiga",
+        "occurrences": 1
+      },
+      {
+        "word": "tu",
+        "lemma": "tu",
+        "occurrences": 1
+      },
+      {
+        "word": "tus",
+        "lemma": "tus",
+        "occurrences": 1
+      },
+      {
+        "word": "un",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "una",
+        "lemma": "uno",
+        "occurrences": 3
+      },
+      {
+        "word": "uno",
+        "lemma": "uno",
+        "occurrences": 1
+      },
+      {
+        "word": "verte",
+        "lemma": "verte",
+        "occurrences": 1
+      },
+      {
+        "word": "vez",
+        "lemma": "vez",
+        "occurrences": 1
+      },
+      {
+        "word": "viajar",
+        "lemma": "viajar",
+        "occurrences": 1
+      },
+      {
+        "word": "viaje",
+        "lemma": "viaje",
+        "occurrences": 1
+      },
+      {
+        "word": "videollamada",
+        "lemma": "videollamada",
+        "occurrences": 1
+      },
+      {
+        "word": "vivido",
+        "lemma": "vivido",
+        "occurrences": 1
+      },
+      {
+        "word": "vivir",
+        "lemma": "vivir",
+        "occurrences": 1
+      },
+      {
+        "word": "vosotros",
+        "lemma": "vosotros",
+        "occurrences": 1
+      },
+      {
+        "word": "y",
+        "lemma": "y",
+        "occurrences": 6
+      },
+      {
+        "word": "él",
+        "lemma": "él",
+        "occurrences": 2
+      },
+      {
+        "word": "última",
+        "lemma": "última",
+        "occurrences": 1
+      }
+    ],
+    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
   }
 ]

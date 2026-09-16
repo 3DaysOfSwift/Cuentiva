@@ -19,6 +19,7 @@ struct BookCover: View {
                 VStack(alignment: .leading, spacing: compact ? 8 : 12) {
                     HStack { Text("CUENTIVA / \(book.level)").font(.system(size: 9, weight: .bold, design: .monospaced)); Spacer() }
                     if book.kind == .movieScript { Text("MOVIE SCRIPT").font(.system(size: 9, weight: .bold, design: .monospaced)) }
+                    if book.kind == .verbs { Text("VERBS").font(.system(size: 9, weight: .bold, design: .monospaced)) }
                     Text(book.title).font(.system(compact ? .title3 : .largeTitle, design: .serif, weight: .medium)).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 4)
                     Image(systemName: book.symbol).font(.system(size: compact ? 38 : 70, weight: .ultraLight)).frame(maxWidth: .infinity).padding(.vertical, compact ? 8 : 10)

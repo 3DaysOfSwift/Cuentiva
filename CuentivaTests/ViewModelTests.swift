@@ -181,7 +181,7 @@ actor ReaderPauseProbe {
     func pause() { count += 1 }
 }
 @Suite @MainActor struct BookReaderTests {
-    @Test(arguments: [BookFormat.story, .movieScript])
+    @Test(arguments: [BookFormat.story, .movieScript, .verbs])
     func playbackSequencesSlowlyAndStopsWithoutCompleting(format: BookFormat) async throws {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress()); try await progress.load()

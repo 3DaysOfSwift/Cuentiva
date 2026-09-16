@@ -15,6 +15,7 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     var format: BookFormat? = nil
     var scene: String? = nil
     var continuation: [Sentence]? = nil
+    var verbFocus: VerbFocus? = nil
     var fullText: [Sentence] { sentences + (continuation ?? []) }
     var kind: BookFormat { format ?? .story }
     var unitName: String { kind == .movieScript ? "lines" : "sentences" }
@@ -47,10 +48,10 @@ enum AppFailure: LocalizedError {
 }
 
 enum BookFormat: String, Codable, CaseIterable, Identifiable, Sendable {
-    case story, movieScript
+    case story, movieScript, verbs
     var id: Self { self }
-    var title: String { self == .story ? "Stories" : "Movie Scripts" }
-    var singular: String { self == .story ? "Story" : "Movie Script" }
+    var title: String { switch self { case .story: "Stories"; case .movieScript: "Movie Scripts"; case .verbs: "Verbs" } }
+    var singular: String { switch self { case .story: "Story"; case .movieScript: "Movie Script"; case .verbs: "Verb Story" } }
 }
 enum BookSort: String, CaseIterable, Identifiable, Sendable {
     case library, title, difficulty, type
@@ -58,4 +59,11 @@ enum BookSort: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self { case .library: "Library order"; case .title: "Title A–Z"; case .difficulty: "Difficulty"; case .type: "Book type" }
     }
+}
+
+struct VerbFocus: Codable, Hashable, Sendable {
+    let infinitive: String
+    let tense: String
+    let forms: [String]
+    let scope: String
 }
