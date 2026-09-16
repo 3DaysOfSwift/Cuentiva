@@ -2,7 +2,7 @@
 
 Learn Spanish through community-written stories about real people.
 
-A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 34 bundled stories are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
+A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 40 bundled stories are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
 
 ## Run
 
@@ -20,7 +20,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 
 - One free A1 introductory book; onboarding can resume mid-book.
 - One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
-- Thirty-four searchable books: eight A1, fourteen A2, twelve B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
+- Forty searchable books: eight A1, seventeen A2, fifteen B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
 - Writing mode hides the reference sentence and gives aligned word-level feedback. Accents are treated separately; ñ is not treated as n.
@@ -82,3 +82,5 @@ See `VALIDATION.md` for the checks actually completed and remaining device check
 The 15 additional fictional life-skills stories are available in [NEW-STORIES.md](Documentation/NEW-STORIES.md), with editorial sources and scope in [CONTENT-NOTES.md](Documentation/CONTENT-NOTES.md).
 
 The next 14 stories, extracted from a personal journal, are in [JOURNAL-STORIES.md](Documentation/JOURNAL-STORIES.md). [Journal editorial notes](Documentation/JOURNAL-CONTENT-NOTES.md) distinguish book themes, personal interpretations, and checked factual claims.
+
+Six more stories about work, travel, curiosity, and a speculative AI future appear in [WORLD-STORIES.md](Documentation/WORLD-STORIES.md), with editorial notes and cattle terminology sources.

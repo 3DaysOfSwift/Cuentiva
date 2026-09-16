@@ -1,5 +1,14 @@
 # Validation — 16 September 2026
 
+## Work, travel, and imagined futures
+
+Added six original bilingual books (62 sentence pairs), bringing the catalog to
+40: 8 A1, 17 A2, 15 B1. All 16 core tests and the iOS Simulator suite pass,
+including vocabulary occurrence checks for all 40 books. Existing IDs are unchanged.
+The cattle story distinguishes common and scientific names; the AI future is
+explicit fantasy. Text and sources are in WORLD-STORIES.md. Native-speaker review
+remains pending.
+
 ## Second journal-derived collection
 
 Added 14 original fictional microbooks with 112 bilingual sentence pairs.
