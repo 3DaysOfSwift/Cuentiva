@@ -67,12 +67,18 @@ struct LessonView: View {
                             }
                         }
                         InlineError(message: viewModel.error ?? viewModel.audio.error)
-                        Button(viewModel.nextTitle + "  →") { Task { await viewModel.next() } }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)
                         HStack {
                             Button("Previous") { Task { await viewModel.back() } }.disabled(viewModel.index == 0 || viewModel.busy)
                         }.font(.footnote)
                     }.padding(25)
-                }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
+                }
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    Button(viewModel.nextTitle + "  →") { Task { await viewModel.next() } }
+                        .buttonStyle(PrimaryButton()).disabled(viewModel.busy)
+                        .padding(.horizontal, 25).padding(.top, 12).padding(.bottom, 12)
+                        .background(theme.theme.paper)
+                }
+                .background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             }
         }.navigationTitle(book.englishTitle).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarLeading) { Button { viewModel.stop(); dismiss() } label: { Image(systemName: "xmark") }.accessibilityLabel("Close lesson") } }

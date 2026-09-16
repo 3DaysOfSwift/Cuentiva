@@ -1,3 +1,7 @@
+## Anchored guided-lesson action — 16 September 2026
+
+Moved the shared guided lesson’s Next / Read the full story / Read the full script action into a bottom safe-area inset. It stays outside the scrolling content, uses the current theme, and reserves content space. The second-stage reader’s Mark as read button remains inside its scroll content. Xcode simulator build passed; visually verified the anchored action in both Ana’s little café and The wrong suitcase on iPhone Air. Updated build installed. No progression logic changed.
+
 ## Extended story reader — 16 September 2026
 
 All 19 core tests and the Xcode simulator suite pass. Both story and script formats exercise delayed completion, save rollback/retry, duplicate-safe totals, slow playback, audio stopping/restarting, and no completion when audio ends. A specific test confirms the free café introduction remains accessible through its continuation and locks only after Mark as read. Story reader-stage resumption is covered by view-model tests. All 46 books have a continuation exactly matching their guided sentence count, aligned translations, unique sentence IDs, and validated vocabulary counts. The 43 stories add 370 new pairs. Original guided text/IDs and existing lemma mappings were checked against the previous committed catalog and retained.
