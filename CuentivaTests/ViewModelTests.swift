@@ -37,13 +37,32 @@ import Testing
         let (p,s,l,_,_) = try await graph(); p.hasAccess = true
         let home = HomeViewModel(library: l, progress: s), collection = CompletedViewModel(library: l)
         #expect(home.books.count == 1); #expect(collection.books.isEmpty)
-        let book = sample(); try await s.recordAttempt(book: book, sentence: book.sentences[0]); _ = try await s.complete(book: book)
+        let book = sample(); try await s.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await s.complete(book: book)
         #expect(home.total == 1); #expect(collection.books.count == 1)
     }
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
         let (_,_,_,learning,_) = try await graph(); let vm = LessonViewModel(learning: learning, audio: TestAudio())
         vm.load(sample()); vm.mode = "Write"; vm.answer = "El cafe esta aqui"; await vm.check(); await vm.next()
         #expect(vm.feedback?.matched == 1); #expect(vm.receipt?.total == 1)
+    }
+    @Test func writingSurvivesTabSwitchesAndSentenceNavigation() async throws {
+        let (_,_,_,learning,_) = try await graph()
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(sample(sentences: 2)); vm.mode = "Write"; vm.answer = "El cafe"
+        vm.mode = "Speak"; vm.changeMode()
+        #expect(vm.answer == "El cafe")
+        vm.mode = "Write"; vm.changeMode()
+        #expect(vm.answer == "El cafe"); #expect(!vm.showSpanish)
+        await vm.next()
+        #expect(vm.index == 1); #expect(vm.answer.isEmpty); #expect(vm.error == nil)
+        await vm.back()
+        #expect(vm.answer == "El cafe")
+    }
+    @Test func lessonCanFinishWithoutWritingOrSpeaking() async throws {
+        let (_,_,_,learning,_) = try await graph()
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(sample()); await vm.next()
+        #expect(vm.receipt?.total == 1); #expect(vm.error == nil)
     }
     @Test func celebrationCountsOnce() {
         let receipt = CompletionReceipt(book: sample(), isNew: true, total: 2), vm = CompletionViewModel()

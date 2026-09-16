@@ -11,3 +11,9 @@ The supplied earlier microbook was not represented as a verified real-life story
 Contribution simulation is deliberately labelled. Local guided prompts demonstrate editorial assistance; no AI-generated review or server upload is misrepresented as live. Complete one book to unlock contribution in the demo. A real proficiency gate, AI editor provider, and publication process are future decisions.
 
 Production prerequisites include App Store Connect products, final pricing, hosted privacy policy, device speech testing, content/community licensing and moderation, secure publishing authentication, and verification of brand availability. Do not market the current sample catalog as real community submissions.
+
+Reading-first refinement: fast immersion is the primary learning journey. Next marks
+the current sentence read and advances without speaking, writing, or a successful
+check. Those tools remain available for optional deeper practice. Remove Skip and
+never force a learner to revisit sentences for assessment. Retain writing drafts
+when revealing/hiding the reference through tab changes.

@@ -7,7 +7,8 @@ import Observation
     var streak: Int { get }
     var week: [WeekDay] { get }
     func load() async throws
-    func recordAttempt(book: Book, sentence: Sentence) async throws
+    func recordEncounter(book: Book, sentence: Sentence) async throws
+    func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance
     func savePosition(book: Book, position: Int) async throws
     func complete(book: Book) async throws -> CompletionReceipt
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
@@ -55,19 +56,33 @@ import Observation
         try await repository.save(next)
         snapshot = next
     }
-    func recordAttempt(book: Book, sentence: Sentence) async throws {
-        try await commit { next in
-            let inserted = next.attempts[book.id, default: []].insert(sentence.id).inserted
-            next.practiceDays.insert(dayKey(now()))
-            if inserted {
-                for token in WordComparison.words(sentence.spanish) {
-                    let word = WordComparison.normalized(token)
-                    let lemma = book.vocabulary.first { $0.word == word }?.lemma ?? word
-                    if next.vocabulary[lemma] == nil || next.vocabulary[lemma] == .unknown { next.vocabulary[lemma] = .learning }
-                    next.evidence[lemma, default: 0] += 1
-                }
+    private func addEncounter(book: Book, sentence: Sentence, to next: inout LearnerProgress) {
+        let inserted = next.attempts[book.id, default: []].insert(sentence.id).inserted
+        next.practiceDays.insert(dayKey(now()))
+        if inserted {
+            for token in WordComparison.words(sentence.spanish) {
+                let word = WordComparison.normalized(token)
+                let lemma = book.vocabulary.first { $0.word == word }?.lemma ?? word
+                if next.vocabulary[lemma] == nil || next.vocabulary[lemma] == .unknown { next.vocabulary[lemma] = .learning }
+                next.evidence[lemma, default: 0] += 1
             }
         }
+    }
+    func recordEncounter(book: Book, sentence: Sentence) async throws {
+        try await commit { addEncounter(book: book, sentence: sentence, to: &$0) }
+    }
+    /// Reading is the core activity. One atomic write records the encounter,
+    /// next position, and (on the final page) the permanent book completion.
+    func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance {
+        guard book.sentences.indices.contains(index) else { throw AppFailure.invalidBook }
+        let last = index == book.sentences.count - 1
+        let isNew = !snapshot.completed.contains(book.id)
+        try await commit { next in
+            addEncounter(book: book, sentence: book.sentences[index], to: &next)
+            next.positions[book.id] = last ? 0 : index + 1
+            if last { next.completed.insert(book.id) }
+        }
+        return last ? .completed(.init(book: book, isNew: isNew, total: snapshot.completed.count)) : .position(index + 1)
     }
     func savePosition(book: Book, position: Int) async throws {
         try await commit { $0.positions[book.id] = max(0, min(position, book.sentences.count - 1)) }

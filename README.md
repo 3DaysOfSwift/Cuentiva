@@ -9,7 +9,7 @@ A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift
 1. Open `Cuentiva.xcodeproj` in Xcode 26.2 or later.
 2. Select the **Cuentiva** scheme and an iOS 26 simulator or device.
 3. The shared scheme selects `Cuentiva/3 - App Resources/Cuentiva.storekit`. Confirm it under Edit Scheme → Run → Options → StoreKit Configuration.
-4. Run. Complete the introductory book using Speak or Write, check every sentence, then tap Finish book.
+4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then tap Finish book. Speak, Write, and Check my words are optional.
 5. Continue from the celebration to the subscription offer. Start the trial in the local StoreKit purchase sheet to unlock the full library.
 
 The StoreKit file uses **$4.99/month as a test-only placeholder**, with a one-week introductory offer. Production pricing has not been decided. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit and will show purchase options unavailable. There is no hidden subscription bypass in the app.
@@ -24,7 +24,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
 - Writing mode hides the reference sentence and gives aligned word-level feedback. Accents are treated separately; ñ is not treated as n.
-- Manual advancement, skip-and-revisit, persistent progress, and completion celebration.
+- Immediate manual advancement with no mandatory checks, persistent reading progress, and completion celebration. Writing drafts survive tab switches and revisiting sentences during the lesson.
 - Completed cover ticks, a separate collection screen, and a counter that counts each book once.
 - Weekly streak strip inspired by the requested Trend pattern. A Trend source component was not found, so this is an adaptation, not copied source.
 - Contribution drafts, preview, local coaching prompts, and local pending-review submissions. No uploads or live AI are claimed.
@@ -40,7 +40,7 @@ Each screen owns its adjacent `@MainActor @Observable` ViewModel. Views do not r
 | Feature | Responsibility |
 | --- | --- |
 | LibraryManager | Book loading, search, level filtering, vocabulary coverage |
-| LearningManager | Access checks, answer comparison, progression, skip revisiting, completion workflow |
+| LearningManager | Access checks, answer comparison, reading progression, optional practice, completion workflow |
 | ProgressManager | Committed learner state, streaks, vocabulary evidence, completion counting |
 | PurchaseManager | Verified StoreKit entitlements, introductory eligibility, purchase/restore, transaction updates |
 | ContributionManager | Demo eligibility, draft validation, submission and coaching rules |
@@ -52,8 +52,8 @@ Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replace
 ## Product rules
 
 - Completed books are unique by stable book ID. Re-reading celebrates practice without incrementing the counter again.
-- Every sentence needs a nonempty checked attempt. Perfect matching is not required. Skipped sentences are revisited before completion.
-- A checked attempt qualifies a day for the streak. Opening the app does not.
+- Next sentence records reading completion and advances immediately. Finish book records the final sentence and book in one atomic save. There is no Skip button or compulsory assessment.
+- Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
 - Trial cancellation preserves access until the entitlement expires. Expiration locks features without deleting progress. Active app access is rechecked every 30 seconds, on StoreKit updates, and when returning to the foreground.
 - Demo contribution unlock: active membership plus one completed book. This is explicitly not a CEFR assessment. Real proficiency-based eligibility remains a product decision.

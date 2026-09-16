@@ -1,5 +1,14 @@
 # Validation — 16 September 2026
 
+## Reading-first refinement
+
+The Simulator test suite passed after removing compulsory sentence checks.
+Regression coverage now includes completing a book purely by advancing, saved
+reading position, streak/vocabulary updates from reading, duplicate-safe rereading,
+atomic failure behavior, and retaining writing across tabs and sentence navigation.
+Check my words uses explicit white text on a dark theme-defined background in
+both palettes. The Skip control and forced revisit flow are removed.
+
 ## Speech callback correction
 
 A subsequent Simulator test run passed after correcting the audio callback boundaries.

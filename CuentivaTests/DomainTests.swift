@@ -60,7 +60,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let repository = MemoryProgress(), book = sample()
         let progress = ProgressManager(repository: repository)
         try await progress.load()
-        try await progress.recordAttempt(book: book, sentence: book.sentences[0])
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
         let first = try await progress.complete(book: book), second = try await progress.complete(book: book)
         #expect(first.isNew); #expect(!second.isNew); #expect(second.total == 1)
         let restored = ProgressManager(repository: repository); try await restored.load()
@@ -73,7 +73,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
     }
     @Test func failedPersistenceDoesNotPublishSuccess() async throws {
         let repo = MemoryProgress(), book = sample(); let progress = ProgressManager(repository: repo); try await progress.load()
-        try await progress.recordAttempt(book: book, sentence: book.sentences[0]); await repo.setFailure(true)
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0]); await repo.setFailure(true)
         await #expect(throws: AppFailure.self) { try await progress.complete(book: book) }
         #expect(progress.snapshot.completed.isEmpty)
         await repo.setFailure(false); _ = try await progress.complete(book: book)
@@ -84,17 +84,17 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         var now = Date(timeIntervalSince1970: 1_800_000_000)
         let progress = ProgressManager(repository: MemoryProgress(), now: { now }, calendar: calendar)
         let book = sample(); try await progress.load()
-        try await progress.recordAttempt(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
         #expect(progress.streak == 1)
         now = calendar.date(byAdding: .day, value: 1, to: now)!
         #expect(progress.streak == 1)
-        try await progress.recordAttempt(book: book, sentence: book.sentences[0]); #expect(progress.streak == 2)
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0]); #expect(progress.streak == 2)
         now = calendar.date(byAdding: .day, value: 2, to: now)!
         #expect(progress.streak == 0); #expect(progress.snapshot.completed.count == 1)
     }
     @Test func exposureDoesNotBecomeKnownAutomatically() async throws {
         let progress = ProgressManager(repository: MemoryProgress()), book = sample(); try await progress.load()
-        for _ in 0..<3 { try await progress.recordAttempt(book: book, sentence: book.sentences[0]) }
+        for _ in 0..<3 { try await progress.recordEncounter(book: book, sentence: book.sentences[0]) }
         #expect(progress.snapshot.vocabulary["estar"] == .learning)
         #expect(progress.snapshot.evidence["estar"] == 1)
         try await progress.setVocabulary("estar", state: .known)
@@ -114,16 +114,36 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         purchases.hasAccess = true; #expect(learning.canRead(paid))
         purchases.hasAccess = false; #expect(!learning.canRead(paid)); #expect(progress.snapshot.completed.count == 1)
     }
-    @Test func skippedSentencesReturnBeforeCompletion() async throws {
-        let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()); try await progress.load()
+    @Test func readingAloneCompletesBookAndResumesWithoutChecks() async throws {
+        let repository = MemoryProgress()
+        let purchases = TestPurchases(), progress = ProgressManager(repository: repository)
+        try await progress.load()
         let learning = LearningManager(purchases: purchases, progress: progress), book = sample(sentences: 2)
-        try await learning.move(book: book, position: 1)
-        _ = try await learning.check(book: book, sentence: book.sentences[1], answer: "el cafe")
-        #expect(learning.nextUnpracticed(book) == 0)
-        let step = try await learning.advance(book: book, from: 1, skip: false)
-        if case .position(let position, let revisiting) = step { #expect(position == 0); #expect(revisiting) }
-        else { Issue.record("Skipped sentence was incorrectly counted as complete") }
-        await #expect(throws: AppFailure.self) { try await learning.finish(book) }
+        let step = try await learning.advance(book: book, from: 0)
+        if case .position(let position) = step { #expect(position == 1) }
+        else { Issue.record("The first sentence prematurely completed the book") }
+        #expect(progress.snapshot.attempts[book.id] == ["s0"])
+        let restored = ProgressManager(repository: repository); try await restored.load()
+        #expect(restored.snapshot.positions[book.id] == 1)
+        let result = try await learning.advance(book: book, from: 1)
+        if case .completed(let receipt) = result { #expect(receipt.total == 1); #expect(receipt.isNew) }
+        else { Issue.record("Reading the final sentence did not complete the book") }
+        #expect(progress.streak == 1)
+        #expect(progress.snapshot.vocabulary["estar"] == .learning)
+        #expect(!learning.canRead(book))
+        purchases.hasAccess = true
+        let reread = try await learning.advance(book: book, from: 1)
+        if case .completed(let receipt) = reread { #expect(!receipt.isNew); #expect(receipt.total == 1) }
+    }
+    @Test func failedReadingSaveDoesNotAdvanceOrComplete() async throws {
+        let repository = MemoryProgress()
+        let failingProgress = ProgressManager(repository: repository)
+        try await failingProgress.load(); await repository.setFailure(true)
+        let learning = LearningManager(purchases: TestPurchases(), progress: failingProgress)
+        await #expect(throws: AppFailure.self) { try await learning.advance(book: sample(), from: 0) }
+        #expect(failingProgress.snapshot.completed.isEmpty)
+        #expect(failingProgress.snapshot.attempts.isEmpty)
+        #expect(failingProgress.snapshot.positions.isEmpty)
     }
     @Test func librarySearchAndCompletedCollectionAreGated() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), book = sample(); try await progress.load()
@@ -133,7 +153,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         #expect(library.search("cafe", level: "A1", completedOnly: false).count == 1)
         #expect(library.search("", level: "B1", completedOnly: false).isEmpty)
         #expect(library.search("", level: nil, completedOnly: true).isEmpty)
-        try await progress.recordAttempt(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
         #expect(library.search("", level: nil, completedOnly: true).count == 1)
     }
     @Test func localSubmissionNeverClaimsPublication() async throws {
@@ -141,7 +161,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         try await progress.load(); purchases.hasAccess = true
         let manager = ContributionManager(repository: repo, purchases: purchases, progress: progress)
         #expect(!manager.eligible)
-        let book = sample(); try await progress.recordAttempt(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
+        let book = sample(); try await progress.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
         #expect(manager.eligible)
         var draft = Contribution(); draft.title = "Mi historia"; draft.spanish = "Yo vivo en una casa bonita cerca de un parque pequeño."
         try await manager.save(draft, submit: true)

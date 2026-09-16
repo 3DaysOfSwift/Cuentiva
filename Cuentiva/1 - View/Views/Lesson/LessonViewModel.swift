@@ -7,7 +7,10 @@ import Observation
     private(set) var book: Book?
     private(set) var index = 0
     var mode = "Speak"
-    var answer = ""
+    private var writingDrafts: [String: String] = [:]
+    var answer = "" {
+        didSet { if let sentence { writingDrafts[sentence.id] = answer } }
+    }
     var feedback: AnswerFeedback?
     var slow = false
     var showSpanish = false
@@ -16,7 +19,6 @@ import Observation
     var receipt: CompletionReceipt?
     private var recordingTask: Task<Void, Never>?
     var sentence: Sentence? { guard let book else { return nil }; return book.sentences[index] }
-    var practiced: Bool { guard let book, let sentence else { return false }; return learning.practiced(book, sentence: sentence) }
     var positionLabel: String { guard let book else { return "" }; return "\(index + 1) OF \(book.sentences.count) SENTENCES" }
     var fraction: Double { guard let book else { return 0 }; return Double(index + 1) / Double(book.sentences.count) }
     var nextTitle: String { guard let book else { return "Next" }; return index == book.sentences.count - 1 ? "Finish book" : "Next sentence" }
@@ -28,7 +30,7 @@ import Observation
         if audio.recording { audio.stopRecording() }
         else { guard allowed else { return }; recordingTask?.cancel(); recordingTask = Task { await audio.startRecording() } }
     }
-    func changeMode() { stop(); feedback = nil; answer = ""; showSpanish = false }
+    func changeMode() { stop(); feedback = nil; showSpanish = false; error = nil }
     func stop() { recordingTask?.cancel(); recordingTask = nil; audio.stop() }
     func check() async {
         guard let book, let sentence, !busy else { return }
@@ -38,23 +40,21 @@ import Observation
         do { feedback = try await learning.check(book: book, sentence: sentence, answer: response) }
         catch { self.error = error.localizedDescription }
     }
-    func next(skip: Bool = false) async {
+    func next() async {
         guard let book, !busy else { return }
         busy = true; defer { busy = false }; error = nil; stop()
         do {
-            switch try await learning.advance(book: book, from: index, skip: skip) {
-            case .position(let next, let revisiting):
-                index = next
-                if revisiting { error = "Let’s return to the sentences you skipped." }
+            switch try await learning.advance(book: book, from: index) {
+            case .position(let next): index = next
             case .completed(let result): receipt = result; return
             }
-            answer = ""; feedback = nil; showSpanish = false
+            answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""; feedback = nil; showSpanish = false
         } catch { self.error = error.localizedDescription }
     }
     func back() async {
         guard let book, index > 0, !busy else { return }
         busy = true; defer { busy = false }; stop()
-        do { try await learning.move(book: book, position: index - 1); index -= 1; answer = ""; feedback = nil; showSpanish = false }
+        do { try await learning.move(book: book, position: index - 1); index -= 1; answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""; feedback = nil; showSpanish = false }
         catch { self.error = error.localizedDescription }
     }
 }

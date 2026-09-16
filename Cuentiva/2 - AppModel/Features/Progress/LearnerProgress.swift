@@ -4,6 +4,7 @@ enum VocabularyState: String, Codable, CaseIterable, Sendable { case unknown, le
 struct LearnerProgress: Codable, Sendable {
     var schemaVersion = 1
     var completed: Set<String> = []
+    // Legacy storage key: records sentence encounters (reading or optional practice).
     var attempts: [String: Set<String>] = [:]
     var positions: [String: Int] = [:]
     var practiceDays: Set<String> = []

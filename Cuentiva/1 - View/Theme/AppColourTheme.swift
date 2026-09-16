@@ -16,6 +16,8 @@ struct AppColourTheme {
     let muted: Color
     let error: Color
     let colorScheme: ColorScheme
+    let checkButtonBackground = Color(red: 0.18, green: 0.37, blue: 0.29)
+    let checkButtonForeground: Color = .white
     let coverInk: Color = .white
     let coverShadow: Color = .black
     // Book artwork keeps its identity while surrounding controls follow the theme.

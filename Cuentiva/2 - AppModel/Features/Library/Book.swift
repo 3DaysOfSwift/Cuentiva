@@ -29,7 +29,7 @@ enum AppFailure: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .locked: "Start a subscription or restore an active purchase to continue."
-        case .incomplete: "Practice every sentence before completing this book."
+        case .incomplete: "Read every sentence before completing this book."
         case .emptyAnswer: "Write or say a few words before checking your answer."
         case .unavailable(let message): message
         case .invalidBook: "This book could not be loaded. Please try again."
