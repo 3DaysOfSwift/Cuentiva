@@ -1,5 +1,15 @@
 # Validation — 16 September 2026
 
+## Confetti appearance correction
+
+Replaced the embedded UIKit appearance observer with an explicit SwiftUI entrance
+animation and its completion callback. This handles completion being inserted into
+an already-presented lesson. Confetti starts after the 0.4-second entrance finishes,
+respects Reduce Motion, and clears on dismissal. The iOS Simulator suite passes.
+Installed the updated build on iPhone Air, reread the already-completed café book,
+and visually confirmed confetti over its completion screen; the total stayed at 2.
+This supersedes the earlier unverified UIKit observer implementation below.
+
 ## One-time purchase
 
 Configured a $4.99 non-consumable lifetime product and removed trial eligibility,

@@ -2,7 +2,8 @@ import SwiftUI
 struct CompletionView: View {
     let receipt: CompletionReceipt
     @State private var viewModel = CompletionViewModel()
-    @State private var fullyAppeared = false
+    @State private var contentVisible = false
+    @State private var isOnScreen = false
     @State private var confettiStart: Date?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -22,27 +23,47 @@ struct CompletionView: View {
                 }
                 Button("Continue  →") { dismiss() }.buttonStyle(PrimaryButton())
             }.padding(28).frame(maxWidth: .infinity)
-        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
+        }
+            .opacity(contentVisible ? 1 : 0)
+            .offset(y: contentVisible ? 0 : 18)
+            .background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             .overlay {
                 if let confettiStart, !reduceMotion {
                     ConfettiBurst(start: confettiStart)
                         .ignoresSafeArea().allowsHitTesting(false).accessibilityHidden(true)
                 }
             }
-            .background {
-                ViewDidAppearObserver { fullyAppeared = true }
-                    .frame(width: 0, height: 0)
+            .onAppear {
+                isOnScreen = true
+                viewModel.prepare(receipt)
             }
-            .onAppear { viewModel.prepare(receipt) }
-            .task(id: fullyAppeared) {
-                guard fullyAppeared else { return }
-                withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) {
+            .task {
+                guard !contentVisible else { return }
+                if reduceMotion {
+                    contentVisible = true
                     viewModel.celebrate(receipt)
+                } else {
+                    // Completion is inserted into an already visible lesson. Its own
+                    // SwiftUI animation completion is the reliable appearance signal.
+                    withAnimation(.easeOut(duration: 0.4), completionCriteria: .removed) {
+                        contentVisible = true
+                    } completion: {
+                        guard isOnScreen else { return }
+                        withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) {
+                            viewModel.celebrate(receipt)
+                        }
+                        if !reduceMotion { confettiStart = .now }
+                    }
                 }
-                guard !reduceMotion else { return }
-                confettiStart = .now
-                defer { confettiStart = nil }
+            }
+            .task(id: confettiStart) {
+                guard confettiStart != nil else { return }
                 do { try await Task.sleep(for: .seconds(3.2)) } catch { return }
+                confettiStart = nil
+            }
+            .onDisappear {
+                isOnScreen = false
+                confettiStart = nil
             }
     }
 }
