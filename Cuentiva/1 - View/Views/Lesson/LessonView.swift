@@ -5,6 +5,7 @@ struct LessonView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.dismiss) private var dismiss
     @Environment(ThemeManager.self) private var theme
+    @Environment(\.displayScale) private var displayScale
     var body: some View {
         Group {
             if viewModel.showingReader { BookReaderView(book: book) }
@@ -81,6 +82,11 @@ struct LessonView: View {
                         .buttonStyle(PrimaryButton()).disabled(viewModel.busy)
                         .padding(.horizontal, 25).padding(.top, 12).padding(.bottom, 12)
                         .background(theme.theme.paper)
+                        .overlay(alignment: .top) {
+                            Rectangle().fill(theme.theme.muted.opacity(0.35))
+                                .frame(height: 1 / displayScale)
+                                .allowsHitTesting(false).accessibilityHidden(true)
+                        }
                 }
                 .background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             }
