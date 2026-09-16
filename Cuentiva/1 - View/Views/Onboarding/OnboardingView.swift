@@ -23,7 +23,7 @@ struct OnboardingView: View {
                         }.padding(26)
                     }
                 }
-            }.background(theme.theme.paper)
+            }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
                 .fullScreenCover(item: $viewModel.lesson) { book in NavigationStack { LessonView(book: book) } }
         }
     }

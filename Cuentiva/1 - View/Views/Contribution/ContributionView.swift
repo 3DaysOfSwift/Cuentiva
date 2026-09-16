@@ -9,8 +9,8 @@ struct ContributionView: View {
                 Text("\(viewModel.count) / 5 books contributed").font(.headline).foregroundStyle(theme.theme.accent)
                 Text("Write about a person, a place, or a moment that stayed with you. Fiction is welcome too.").foregroundStyle(theme.theme.muted)
                 if viewModel.eligible {
-                    TextField("Your story’s title", text: $viewModel.draft.title).font(.title3).padding().background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 12))
-                    TextEditor(text: $viewModel.draft.spanish).frame(minHeight: 210).padding(10).scrollContentBackground(.hidden).background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 12)).accessibilityLabel("Your story in Spanish")
+                    TextField("Your story’s title", text: $viewModel.draft.title).font(.title3).padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
+                    TextEditor(text: $viewModel.draft.spanish).frame(minHeight: 210).padding(10).scrollContentBackground(.hidden).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12)).accessibilityLabel("Your story in Spanish")
                     HStack { Button("Preview") { viewModel.preview.toggle() }; Spacer(); Button("Coaching prompts") { viewModel.coach() } }
                     if viewModel.preview { VStack(alignment: .leading, spacing: 10) { Text(viewModel.draft.title).font(.title2); Text(viewModel.draft.spanish) }.padding().background(theme.theme.accent.opacity(0.06), in: RoundedRectangle(cornerRadius: 12)) }
                     if !viewModel.tips.isEmpty {
@@ -29,6 +29,6 @@ struct ContributionView: View {
                 Text("Demo unlock: one completed book. This is a product demonstration, not a language proficiency assessment.").font(.caption2).foregroundStyle(theme.theme.muted)
                 InlineError(message: viewModel.error)
             }.padding(25)
-        }.background(theme.theme.paper).navigationTitle("Contribute").navigationBarTitleDisplayMode(.inline).task { await viewModel.load() }
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Contribute").navigationBarTitleDisplayMode(.inline).task { await viewModel.load() }
     }
 }

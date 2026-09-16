@@ -12,7 +12,7 @@ struct CompletedView: View {
                     ForEach(viewModel.books) { book in Button { viewModel.selectedBook = book } label: { BookCover(book: book, completed: true, compact: true) }.buttonStyle(.plain) }
                 }
             }.padding(24)
-        }.background(theme.theme.paper).navigationTitle("Completed books").searchable(text: $viewModel.query, prompt: "Search your collection")
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Completed books").searchable(text: $viewModel.query, prompt: "Search your collection")
             .fullScreenCover(item: $viewModel.selectedBook) { book in NavigationStack { LessonView(book: book) } }
     }
 }

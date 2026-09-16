@@ -20,7 +20,7 @@ struct CompletionView: View {
                 }
                 Button("Continue  →") { dismiss() }.buttonStyle(PrimaryButton())
             }.padding(28).frame(maxWidth: .infinity)
-        }.background(theme.theme.paper)
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             .task { viewModel.prepare(receipt); if !reduceMotion { try? await Task.sleep(for: .milliseconds(450)) }; withAnimation(reduceMotion ? nil : .spring(duration: 0.7)) { viewModel.celebrate(receipt) } }
     }
 }

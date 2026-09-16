@@ -23,6 +23,6 @@ struct PaywallView: View {
                 #endif
                 HStack { Link("Terms of use", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!); Spacer(); Text("Privacy: audio stays on device") }.font(.caption2)
             }.padding(28)
-        }.background(theme.theme.paper).task { await viewModel.reload() }
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).task { await viewModel.reload() }
     }
 }

@@ -29,6 +29,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 - Weekly streak strip inspired by the requested Trend pattern. A Trend source component was not found, so this is an adaptation, not copied source.
 - Contribution drafts, preview, local coaching prompts, and local pending-review submissions. No uploads or live AI are claimed.
 - Vocabulary states and a settings screen for editing them; exposure marks words learning, never automatically known.
+- Settings → Appearance → Colour theme switches between Library and Midnight immediately and remembers the selection across launches. One app-owned ThemeManager supplies the current palette to every screen and sheet.
 
 ## Architecture
 

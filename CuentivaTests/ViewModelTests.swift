@@ -57,3 +57,26 @@ import Testing
         await vm.set("café", state: .known); #expect(vm.state("café") == .known)
     }
 }
+
+@Suite @MainActor struct ThemeManagerTests {
+    @Test func themeSelectionSurvivesRelaunch() {
+        let suite = "CuentivaThemeTests.\(UUID().uuidString)"
+        let preferences = UserDefaults(suiteName: suite)!
+        defer { preferences.removePersistentDomain(forName: suite) }
+        let manager = ThemeManager(preferences: preferences)
+        #expect(manager.selectedTheme == .library)
+        manager.selectedTheme = .midnight
+        let restored = ThemeManager(preferences: preferences)
+        #expect(restored.selectedTheme == .midnight)
+        #expect(restored.theme.colorScheme == .dark)
+        restored.selectedTheme = .library
+        #expect(ThemeManager(preferences: preferences).theme.colorScheme == .light)
+    }
+    @Test func obsoleteThemeFallsBackToLibrary() {
+        let suite = "CuentivaThemeTests.\(UUID().uuidString)"
+        let preferences = UserDefaults(suiteName: suite)!
+        defer { preferences.removePersistentDomain(forName: suite) }
+        preferences.set("removed-palette", forKey: "appearance.colourTheme")
+        #expect(ThemeManager(preferences: preferences).selectedTheme == .library)
+    }
+}

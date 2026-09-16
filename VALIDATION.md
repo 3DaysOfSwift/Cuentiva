@@ -1,6 +1,14 @@
 # Validation — 16 September 2026
 
-## Completed
+## Latest verification — theme update
+
+A direct standalone Xcode invocation successfully built and executed **25 tests in six suites** on the iPhone 17 / iOS 26.2 Simulator. This includes all eight screen-model tests, the fifteen core tests, and two new tests for theme persistence and obsolete-selection fallback. No compiler sandbox workaround was needed for this invocation.
+
+Library and Midnight are selectable in Settings. Fixed white input surfaces and the app-wide forced light appearance were replaced with the selected palette. ThemeManager is now in its own file; one app-owned instance is shared through the SwiftUI environment. The privacy manifest declares the app-preferences use of UserDefaults.
+
+The earlier Simulator limitation below is historical: shell output redirection reproduced the connection failure, while the otherwise equivalent direct tool invocation succeeded. Visual inspection of every screen in both themes and the physical-device speech checks remain pending.
+
+## Initial verification
 
 - Xcode 26.2, Swift 6 strict-concurrency compilation: **passed**.
 - Generic arm64 iOS Simulator `build-for-testing`: **passed**, including the app and iOS test bundle.

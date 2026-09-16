@@ -28,7 +28,7 @@ struct HomeView: View {
                 if viewModel.books.isEmpty { ContentUnavailableView.search(text: viewModel.query) }
                 Text("DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary.").font(.caption2).foregroundStyle(theme.theme.muted).padding(.top, 8)
             }.padding(.horizontal, 23).padding(.bottom, 30)
-        }.background(theme.theme.paper).navigationTitle("Cuentiva").navigationBarTitleDisplayMode(.inline)
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Cuentiva").navigationBarTitleDisplayMode(.inline)
             .searchable(text: $viewModel.query, prompt: "Find a story or a person")
             .toolbar { ToolbarItem(placement: .topBarTrailing) { NavigationLink { SettingsView() } label: { Image(systemName: "gearshape") }.accessibilityLabel("Settings") } }
             .fullScreenCover(item: $viewModel.selectedBook) { book in NavigationStack { LessonView(book: book) } }

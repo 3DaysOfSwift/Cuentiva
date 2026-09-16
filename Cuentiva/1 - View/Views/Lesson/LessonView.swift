@@ -29,7 +29,7 @@ struct LessonView: View {
                                     Text(viewModel.audio.transcript.isEmpty ? "Tap the microphone, then read the Spanish sentence." : viewModel.audio.transcript).font(.body).frame(maxWidth: .infinity).foregroundStyle(theme.theme.muted)
                                 }
                             } else {
-                                TextField("Your Spanish translation", text: $viewModel.answer, axis: .vertical).lineLimit(3...6).textInputAutocapitalization(.sentences).autocorrectionDisabled().padding(18).background(.white.opacity(0.7), in: RoundedRectangle(cornerRadius: 15)).disabled(viewModel.busy)
+                                TextField("Your Spanish translation", text: $viewModel.answer, axis: .vertical).lineLimit(3...6).textInputAutocapitalization(.sentences).autocorrectionDisabled().padding(18).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 15)).disabled(viewModel.busy)
                                 Button(viewModel.showSpanish ? "Hide Spanish" : "Show a hint") { viewModel.showSpanish.toggle() }.font(.footnote)
                             }
                             Button("Check my words") { Task { await viewModel.check() } }.buttonStyle(.borderedProminent).disabled(viewModel.busy)
@@ -58,7 +58,7 @@ struct LessonView: View {
                             Button("Skip for now") { Task { await viewModel.next(skip: true) } }.disabled(viewModel.busy)
                         }.font(.footnote)
                     }.padding(25)
-                }.background(theme.theme.paper)
+                }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             }
         }.navigationTitle(book.englishTitle).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarLeading) { Button { viewModel.stop(); dismiss() } label: { Image(systemName: "xmark") }.accessibilityLabel("Close lesson") } }

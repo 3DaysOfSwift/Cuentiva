@@ -15,8 +15,8 @@ and reference feature, read before design and implementation.
 - Speech callbacks identify their active utterance/session so obsolete callbacks cannot publish into a new sentence.
 - Independent root loads run concurrently. Initializers start no asynchronous work.
 - Calendar/clock are injectable for streak tests.
-- Selected visual theme lives in the View layer; a second development palette is defined.
-- Core feature tests execute independently of AppModel.shared. Each screen ViewModel has test coverage in the iOS test target (compiled, not runtime-executed in this environment).
+- A dedicated app-owned ThemeManager in the View layer supplies two complete palettes. Settings changes the current palette, and the stable selection is persisted across launches.
+- Core feature tests execute independently of AppModel.shared. Each screen ViewModel has test coverage in the iOS test target (all executed successfully in Simulator).
 
 CFA is an architecture convention, not a runtime framework dependency. Device UI,
 VoiceOver, StoreKit dialogs, and microphone tests remain necessary before release.
