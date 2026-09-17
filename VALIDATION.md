@@ -308,3 +308,20 @@ All Xcode simulator tests and 32 core tests passed. Regression covers default
 hiding, gated suggestions, unfinished priority, unavailable-level fallback and
 completion exhaustion. Simulator screenshot verified the header and Continue
 reading button fit on the initial iPhone Air screen. No physical-device check.
+
+## Community authors — 17 September 2026
+
+Discover's community heading now introduces Ana, Luis and Marta through generated
+illustrated portraits and links to dedicated profiles. Profiles include a short
+introduction, Behind the story note, accessible books and a contribution link.
+All profiles/notes are explicitly fictional demo content, not verified memoirs.
+Book.authorID is optional for backwards compatibility; three bundled books link
+to stable profile IDs. LibraryManager enforces access and location visibility
+when listing author books, and keeps completed books available for rereading.
+No live publication/moderation service or automated approval is represented.
+
+All 33 core tests and Xcode simulator tests passed. Initial Xcode test launch
+failed with Simulator Busy/preflight; a retry passed. Tests cover stable author
+mapping, access gating, legacy decoding and rereading. Simulator confirmed the
+three author links, opened Ana's profile and rendered its portrait, introduction,
+note and completed book correctly. No physical-device check this turn.

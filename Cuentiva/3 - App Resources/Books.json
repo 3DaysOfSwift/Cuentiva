@@ -468,7 +468,8 @@
       "viene": "comes",
       "vivo": "I live",
       "y": "and"
-    }
+    },
+    "authorID": "ana"
   },
   {
     "id": "garden",
@@ -963,7 +964,8 @@
       "y": "and",
       "yo": "I",
       "él": "he"
-    }
+    },
+    "authorID": "luis"
   },
   {
     "id": "train",
@@ -1520,7 +1522,8 @@
         "spanish": "Esta vez seré yo quien espere en la puerta.",
         "english": "This time I will be the one waiting at the door."
       }
-    ]
+    ],
+    "authorID": "marta"
   },
   {
     "id": "sea",

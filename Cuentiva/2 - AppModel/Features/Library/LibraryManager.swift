@@ -8,6 +8,8 @@ import Observation
     func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book]
     func coverage(_ book: Book) -> String
     var nextRead: Book? { get }
+    var authors: [Author] { get }
+    func books(by author: Author) -> [Book]
 }
 @MainActor @Observable final class LibraryManager: LibraryFeature {
     private(set) var books: [Book] = []
@@ -40,6 +42,10 @@ import Observation
         return unread.first { !progress.snapshot.attempts[$0.id, default: []].isEmpty || progress.snapshot.positions[$0.id, default: 0] > 0 }
             ?? unread.first { $0.level == progress.snapshot.selectedLearningLevel?.rawValue }
             ?? unread.first
+    }
+    var authors: [Author] { Author.demoProfiles.filter { !books(by: $0).isEmpty } }
+    func books(by author: Author) -> [Book] {
+        search("", level: nil, completedOnly: false, format: nil, sort: .library).filter { $0.authorID == author.id }
     }
     private func titleOrder(_ lhs: Book, _ rhs: Book) -> Bool {
         let comparison = lhs.englishTitle.localizedCaseInsensitiveCompare(rhs.englishTitle)

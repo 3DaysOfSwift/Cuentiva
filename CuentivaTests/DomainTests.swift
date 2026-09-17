@@ -168,6 +168,25 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         #expect(failingProgress.snapshot.attempts.isEmpty)
         #expect(failingProgress.snapshot.positions.isEmpty)
     }
+    @Test func authorsUseStableIDsAndRespectLibraryAccess() async throws {
+        let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        var anaBook = sample("ana-book"); anaBook.authorID = "ana"
+        let legacyBook = sample("legacy")
+        let library = LibraryManager(repository: MemoryBooks(values: [anaBook, legacyBook]), purchases: purchases, progress: progress)
+        try await library.load()
+        let ana = Author.demoProfiles[0]
+        #expect(library.authors.isEmpty)
+        #expect(library.books(by: ana).isEmpty)
+        purchases.hasAccess = true
+        #expect(library.authors.map(\.id) == ["ana"])
+        #expect(library.books(by: ana).map(\.id) == ["ana-book"])
+        try await progress.recordEncounter(book: anaBook, sentence: anaBook.sentences[0])
+        _ = try await progress.complete(book: anaBook)
+        #expect(library.books(by: ana).count == 1)
+        let oldData = try JSONEncoder().encode(legacyBook)
+        #expect(try JSONDecoder().decode(Book.self, from: oldData).authorID == nil)
+    }
     @Test func nextReadPrioritizesUnfinishedBooksThenSelectedLevel() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
         try await progress.load()

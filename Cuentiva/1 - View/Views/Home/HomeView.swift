@@ -39,6 +39,7 @@ struct HomeView: View {
                 }
                 Divider()
                 Text("Explore our community library").font(.system(.title2, design: .serif, weight: .medium))
+                CommunityAuthors(authors: viewModel.authors)
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
                 Toggle("Hide completed books", isOn: $viewModel.hideCompleted)
