@@ -52,6 +52,12 @@ struct SettingsView: View {
                 Text("Search your words, update what you know and choose your learning level.")
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
+            Section("Community library") {
+                Button { Task { await viewModel.syncLibrary() } } label: {
+                    HStack { Text(viewModel.syncing ? "Updating library…" : "Update library"); Spacer(); if viewModel.syncing { ProgressView() } }
+                }.disabled(viewModel.syncing).foregroundStyle(themeManager.theme.accent)
+                if let message = viewModel.syncMessage { Text(message).font(.footnote).foregroundStyle(themeManager.theme.muted) }
+            }.listRowBackground(themeManager.theme.surface)
             Section("Privacy") {
                 Text("Your progress and drafts are stored on this device. Speech recognition is on-device where supported. Recordings are not saved. There are no analytics or advertising SDKs.")
                 Text("Device backups may include app data. Deleting the app removes its local data; purchases remain with your Apple Account.")

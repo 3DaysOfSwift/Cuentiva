@@ -16,7 +16,7 @@ import Observation
         loading = true; defer { loading = false }
         error = nil
         async let purchaseLoad: Void = purchases.refresh()
-        do { async let books: Void = library.load(); async let state: Void = progress.load(); _ = try await (books, state); await purchaseLoad; ready = true }
+        do { async let books: Void = library.load(); async let state: Void = progress.load(); _ = try await (books, state); await purchaseLoad; ready = true; await library.sync() }
         catch { await purchaseLoad; self.error = error.localizedDescription }
     }
 }

@@ -22,7 +22,10 @@ import Foundation
         let directory = URL.applicationSupportDirectory.appending(path: "Cuentiva")
         let progress = ProgressManager(repository: LocalProgressRepository(url: directory.appending(path: "progress.json")))
         let purchases = PurchaseManager()
-        let library = LibraryManager(repository: BundledBookRepository(), purchases: purchases, progress: progress)
+        let repository = SyncedBookRepository(bundled: BundledBookRepository(),
+            transport: WixCatalogueTransport(endpoint: URL(string: "https://www.3daysofswiftconcurrency.com/_functions/cuentivaCatalogue")!),
+            cacheURL: directory.appending(path: "catalogue.json"))
+        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
         let learning = LearningManager(purchases: purchases, progress: progress)
         let contributions = ContributionManager(repository: LocalContributionRepository(url: directory.appending(path: "drafts.json")), purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
         return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, makeAudio: { AppleLessonAudio() })

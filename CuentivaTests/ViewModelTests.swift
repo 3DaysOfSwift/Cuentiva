@@ -126,8 +126,8 @@ import Testing
         #expect(vm.draft.title == "My memory"); #expect(vm.error != nil)
     }
     @Test func settingsRestoreExplainsExistingAndRecoveredAccess() async throws {
-        let (p,s,_,_,_) = try await graph()
-        let vm = SettingsViewModel(progress: s, purchases: p)
+        let (p,s,l,_,_) = try await graph()
+        let vm = SettingsViewModel(library: l, progress: s, purchases: p)
         p.hasAccess = true
         await vm.restore()
         #expect(vm.restoreMessage?.contains("already have full access") == true)
@@ -139,8 +139,8 @@ import Testing
         #expect(vm.hasAccess)
     }
     @Test func settingsRestoreReplacesStaleFeedbackAndNeverInventsSuccess() async throws {
-        let (p,s,_,_,_) = try await graph()
-        let vm = SettingsViewModel(progress: s, purchases: p)
+        let (p,s,l,_,_) = try await graph()
+        let vm = SettingsViewModel(library: l, progress: s, purchases: p)
         await vm.restore()
         #expect(vm.restoreError != nil)
         #expect(vm.restoreMessage == nil)

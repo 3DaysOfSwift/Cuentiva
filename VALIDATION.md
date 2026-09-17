@@ -333,3 +333,24 @@ profile share-story buttons invoke the root's Contribute selection instead of
 pushing a second contribution screen inside Discover. The existing Contribute
 screen and its draft state are reused. Simulator tap verified the writing screen
 opened with Contribute visibly selected in the tab bar. Xcode build passed.
+
+## Text-only Wix catalogue and app sync — 17 September 2026
+
+Added a Wix/Velo release service, private-CMS storage adapter, administrator-only
+chunked publishing endpoint, publisher CLI, local loopback server and setup guide
+under backend/. No Wix files, collections, secrets or publishing were changed;
+the user requested code handoff instead of UI-driven deployment.
+
+The app uses bundle/verified-cache-first loading and background HTTPS sync with
+1,024-byte response limits, bounded concurrency, SHA-256 checks and atomic cache
+replacement. Stable IDs preserve progress without duplicate catalogue entries.
+A Settings action exposes update status/retry. Public feed/old release availability,
+plan quota limits, absence of member moderation and real location restrictions
+are explicitly documented in backend/README.md.
+
+35 Swift core tests and Xcode simulator tests passed. Three backend service tests
+passed against all 52 bundled books, including exact Unicode reconstruction,
+immutable chunks, incomplete release rejection and unsupported media fields.
+The HTTP integration test was attempted but this sandbox denies binding a local
+port (listen EPERM 127.0.0.1:8787); it is supplied for local execution. Wix runtime,
+secret access, domain routing and live device sync remain unverified until deploy.

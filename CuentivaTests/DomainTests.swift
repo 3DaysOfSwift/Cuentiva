@@ -1,4 +1,5 @@
 import Foundation
+import CryptoKit
 import Testing
 import StoreKit
 #if canImport(CuentivaCore)
@@ -525,5 +526,59 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let oldData = try JSONSerialization.data(withJSONObject: fields)
         let decoded = try JSONDecoder().decode(LearnerProgress.self, from: oldData)
         #expect(decoded.selectedLearningLevel == nil)
+    }
+}
+
+actor TestCatalogueTransport: CatalogueTransport {
+    let manifest: CatalogueManifest
+    let payload: Data
+    var broken = false
+    var partReads = 0
+    init(_ books: [Book]) throws {
+        payload = try JSONEncoder().encode(books)
+        manifest = CatalogueManifest(schema: 1, version: SHA256.hash(data: payload).map { String(format: "%02x", $0) }.joined(), bytes: payload.count, chunks: (payload.count + 1023) / 1024, books: books.count)
+    }
+    func fail() { broken = true }
+    func fetch(version: String?, part: Int?) throws -> Data {
+        guard let part else { return try JSONEncoder().encode(manifest) }
+        partReads += 1
+        if broken { throw AppFailure.unavailable("Offline") }
+        return payload.subdata(in: part * 1024..<min((part + 1) * 1024, payload.count))
+    }
+}
+@Suite struct CatalogueSyncTests {
+    @Test func replacesBundleWithoutDuplicatesAndCachesOffline() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = directory.appending(path: "catalogue.json")
+        let source = MemoryBooks(values: [sample(), sample("old")])
+        let transport = try TestCatalogueTransport([sample(), sample("new")])
+        let repository = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
+        #expect(try await repository.books().map(\.id) == ["cafe", "old"])
+        #expect(try await repository.sync().map(\.id) == ["cafe", "new"])
+        let reads = await transport.partReads
+        _ = try await repository.sync()
+        #expect(await transport.partReads == reads)
+        let reloaded = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
+        #expect(try await reloaded.books().map(\.id) == ["cafe", "new"])
+        let failing = try TestCatalogueTransport([sample(), sample("later")]); await failing.fail()
+        let offline = SyncedBookRepository(bundled: source, transport: failing, cacheURL: cache)
+        await #expect(throws: AppFailure.self) { try await offline.sync() }
+        #expect(try await offline.books().map(\.id) == ["cafe", "new"])
+    }
+    @Test func invalidCatalogueCannotReplaceBundledBooks() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let source = MemoryBooks(values: [sample()])
+        for books in [[sample(),sample()], [sample("missing-intro")]] {
+            let transport = try TestCatalogueTransport(books)
+            let repository = SyncedBookRepository(bundled: source, transport: transport, cacheURL: directory.appending(path: "catalogue.json"))
+            await #expect(throws: AppFailure.self) { try await repository.sync() }
+            #expect(try await repository.books().count == 1)
+        }
+        let transport = try TestCatalogueTransport([sample()])
+        let data = transport.payload, m = transport.manifest
+        var corrupt = data; corrupt[0] = 0
+        #expect(throws: AppFailure.self) { try SyncedBookRepository.decode(corrupt, manifest: m) }
     }
 }

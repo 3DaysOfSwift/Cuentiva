@@ -1,6 +1,10 @@
 import Foundation
 import Observation
 @MainActor @Observable final class SettingsViewModel {
+    private let library: any LibraryFeature
+    var syncing: Bool { library.syncing }
+    var syncMessage: String? { library.syncMessage }
+    func syncLibrary() async { await library.sync() }
     private let progress: any ProgressFeature
     private let purchases: any PurchaseFeature
     var error: String?
@@ -9,7 +13,7 @@ import Observation
     private(set) var restoreMessage: String?
     private(set) var restoreError: String?
     var hasAccess: Bool { purchases.hasAccess }
-    init(progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.progress = progress; self.purchases = purchases }
+    init(library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.library = library; self.progress = progress; self.purchases = purchases }
     func reset() async { do { try await progress.reset() } catch { self.error = error.localizedDescription } }
     func restore() async {
         guard !restoring else { return }

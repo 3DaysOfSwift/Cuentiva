@@ -5,6 +5,9 @@ import Observation
     var books: [Book] { get }
     var introduction: Book? { get }
     func load() async throws
+    func sync() async
+    var syncing: Bool { get }
+    var syncMessage: String? { get }
     func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book]
     func coverage(_ book: Book) -> String
     var nextRead: Book? { get }
@@ -13,6 +16,8 @@ import Observation
 }
 @MainActor @Observable final class LibraryManager: LibraryFeature {
     private(set) var books: [Book] = []
+    private(set) var syncing = false
+    private(set) var syncMessage: String?
     private let repository: any BookRepository
     private let purchases: any PurchaseFeature
     private let progress: any ProgressFeature
@@ -21,6 +26,16 @@ import Observation
     }
     var introduction: Book? { books.first { $0.id == "cafe" } }
     func load() async throws { if books.isEmpty { books = try await repository.books() } }
+    func sync() async {
+        guard !syncing, let repository = repository as? any SyncingBookRepository else { return }
+        syncing = true; defer { syncing = false }
+        do {
+            books = try await repository.sync()
+            syncMessage = "Your community library is up to date."
+        } catch {
+            syncMessage = "Couldn’t update the library. Your current books are still available. Try again when you’re connected."
+        }
+    }
     func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book] {
         guard purchases.hasAccess else { return [] }
         let matches = books.filter { book in
