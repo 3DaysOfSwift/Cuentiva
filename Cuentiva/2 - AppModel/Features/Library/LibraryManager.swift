@@ -5,7 +5,7 @@ import Observation
     var books: [Book] { get }
     var introduction: Book? { get }
     func load() async throws
-    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book]
+    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book]
     func coverage(_ book: Book) -> String
 }
 @MainActor @Observable final class LibraryManager: LibraryFeature {
@@ -18,11 +18,12 @@ import Observation
     }
     var introduction: Book? { books.first { $0.id == "cafe" } }
     func load() async throws { if books.isEmpty { books = try await repository.books() } }
-    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book] {
+    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book] {
         guard purchases.hasAccess else { return [] }
         let matches = books.filter { book in
             (book.submissionLocation == nil || progress.snapshot.completed.contains(book.id)) &&
             (query.isEmpty || "\(book.title) \(book.englishTitle) \(book.author) \(book.cast.joined(separator: " "))".localizedStandardContains(query)) &&
+            (!hideCompleted || !progress.snapshot.completed.contains(book.id)) &&
             (format == nil || book.kind == format) && (level == nil || book.level == level) && (!completedOnly || progress.snapshot.completed.contains(book.id))
         }
         switch sort {
@@ -44,6 +45,9 @@ import Observation
 }
 
 extension LibraryFeature {
+    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book] {
+        search(query, level: level, completedOnly: completedOnly, format: format, sort: sort, hideCompleted: false)
+    }
     func search(_ query: String, level: String?, completedOnly: Bool) -> [Book] {
         search(query, level: level, completedOnly: completedOnly, format: nil, sort: .library)
     }

@@ -38,8 +38,16 @@ import Testing
         let (p,s,l,_,_) = try await graph(); p.hasAccess = true
         let home = HomeViewModel(library: l, progress: s), collection = CompletedViewModel(library: l)
         #expect(home.books.count == 1); #expect(collection.books.isEmpty)
+        home.hideCompleted = true
+        home.query = "cafe"; home.level = "A1"; home.format = .story; home.sort = .title
+        #expect(home.books.count == 1)
         let book = sample(); try await s.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await s.complete(book: book)
         #expect(home.total == 1); #expect(collection.books.count == 1)
+        #expect(home.books.isEmpty)
+        home.hideCompleted = false
+        #expect(home.books.count == 1)
+        home.level = "B1"
+        #expect(home.books.isEmpty)
     }
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
         let (_,_,_,learning,_) = try await graph(); let vm = LessonViewModel(learning: learning, audio: TestAudio())

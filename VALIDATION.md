@@ -285,3 +285,13 @@ Tests cover search, editing, persisted level, failed-save rollback, reset and ol
 JSON. All 59 Xcode tests and 31 core tests passed. Simulator navigation verified the
 short Settings entry, visible search, level choices and word controls. Level choices
 were subsequently arranged into two rows of three; final build passed.
+
+## Hide completed books — 17 September 2026
+
+Discover now offers a themed Hide completed books switch below the existing
+filters. LibraryManager combines this with search, difficulty, type and sorting.
+Completion updates remove the book from filtered results immediately; Completed
+remains available for rereading. Empty results offer Show completed books.
+The existing Home/Completed regression now covers filtering before and after a
+committed completion and combining difficulty/search/type/sort. Xcode simulator
+tests and all 31 core tests passed. No physical-device visual check this change.

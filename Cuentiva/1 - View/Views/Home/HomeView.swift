@@ -14,6 +14,8 @@ struct HomeView: View {
                 }
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
+                Toggle("Hide completed books", isOn: $viewModel.hideCompleted)
+                    .font(.subheadline).tint(theme.theme.accent)
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 26) {
                     ForEach(viewModel.books) { book in
                         Button { viewModel.selectedBook = book } label: {
@@ -26,7 +28,18 @@ struct HomeView: View {
                         }.buttonStyle(.plain)
                     }
                 }
-                if viewModel.books.isEmpty { ContentUnavailableView.search(text: viewModel.query) }
+                if viewModel.books.isEmpty {
+                    ContentUnavailableView {
+                        Label("No matching books", systemImage: "books.vertical")
+                    } description: {
+                        Text(viewModel.hideCompleted ? "Try changing your filters or show completed books to read a favourite again." : "Try a different search or change your filters.")
+                    } actions: {
+                        if viewModel.hideCompleted {
+                            Button("Show completed books") { viewModel.hideCompleted = false }
+                                .tint(theme.theme.accent)
+                        }
+                    }
+                }
                 Text("DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary.").font(.caption2).foregroundStyle(theme.theme.muted).padding(.top, 8)
             }.padding(.horizontal, 23).padding(.bottom, 30)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Cuentiva").navigationBarTitleDisplayMode(.inline)
