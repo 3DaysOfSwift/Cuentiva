@@ -1,5 +1,7 @@
 import SwiftUI
 struct RootView: View {
+    private enum LibraryTab { case discover, nearby, completed, contribute }
+    @State private var selectedTab: LibraryTab = .discover
     @State private var viewModel = RootViewModel()
     @Environment(ThemeManager.self) private var theme
     @Environment(\.scenePhase) private var scenePhase
@@ -7,11 +9,11 @@ struct RootView: View {
         Group {
             if viewModel.ready {
                 if viewModel.hasAccess {
-                    TabView {
-                        Tab("Discover", systemImage: "books.vertical") { NavigationStack { HomeView() } }
-                        Tab("Nearby", systemImage: "location") { NavigationStack { NearbyView() } }
-                        Tab("Completed", systemImage: "checkmark.seal") { NavigationStack { CompletedView() } }
-                        Tab("Contribute", systemImage: "square.and.pencil") { NavigationStack { ContributionView() } }
+                    TabView(selection: $selectedTab) {
+                        Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) { NavigationStack { HomeView(onContribute: { selectedTab = .contribute }) } }
+                        Tab("Nearby", systemImage: "location", value: LibraryTab.nearby) { NavigationStack { NearbyView() } }
+                        Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) { NavigationStack { CompletedView() } }
+                        Tab("Contribute", systemImage: "square.and.pencil", value: LibraryTab.contribute) { NavigationStack { ContributionView() } }
                     }
                 } else { OnboardingView() }
             } else {

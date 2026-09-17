@@ -1,9 +1,13 @@
 import SwiftUI
 
 struct AuthorView: View {
+    let onContribute: () -> Void
     @State private var model: AuthorViewModel
     @Environment(ThemeManager.self) private var theme
-    init(author: Author) { _model = State(initialValue: AuthorViewModel(author: author)) }
+    init(author: Author, onContribute: @escaping () -> Void) {
+        self.onContribute = onContribute
+        _model = State(initialValue: AuthorViewModel(author: author))
+    }
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -27,7 +31,7 @@ struct AuthorView: View {
                 }
                 Text("This profile, its personal note and illustrated portrait are fictional demonstrations. These stories are not verified memoirs.")
                     .font(.footnote).foregroundStyle(theme.theme.muted)
-                NavigationLink { ContributionView() } label: { Label("Share a story of your own", systemImage: "square.and.pencil") }
+                Button(action: onContribute) { Label("Share a story of your own", systemImage: "square.and.pencil") }
             }.padding(23)
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)

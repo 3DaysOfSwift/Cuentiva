@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CommunityAuthors: View {
     let authors: [Author]
+    let onContribute: () -> Void
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -11,7 +12,7 @@ struct CommunityAuthors: View {
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 26) {
                     ForEach(authors) { author in
-                        NavigationLink { AuthorView(author: author) } label: {
+                        NavigationLink { AuthorView(author: author, onContribute: onContribute) } label: {
                             VStack(spacing: 8) {
                                 AuthorPortrait(author: author)
                                 Text(author.name).font(.subheadline.weight(.semibold))
@@ -22,7 +23,7 @@ struct CommunityAuthors: View {
             }.scrollIndicators(.hidden)
             Text("Meet our fictional demo authors. Your voice could be part of the next chapter.")
                 .font(.caption).foregroundStyle(theme.theme.muted)
-            NavigationLink { ContributionView() } label: {
+            Button(action: onContribute) {
                 Label("Share your story", systemImage: "square.and.pencil").font(.subheadline.weight(.semibold))
             }.tint(theme.theme.accent)
         }

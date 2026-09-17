@@ -325,3 +325,11 @@ failed with Simulator Busy/preflight; a retry passed. Tests cover stable author
 mapping, access gating, legacy decoding and rereading. Simulator confirmed the
 three author links, opened Ana's profile and rendered its portrait, introduction,
 note and completed book correctly. No physical-device check this turn.
+
+## Community writing links select the tab — 17 September 2026
+
+RootView now owns an explicit selected tab. The community shelf and author
+profile share-story buttons invoke the root's Contribute selection instead of
+pushing a second contribution screen inside Discover. The existing Contribute
+screen and its draft state are reused. Simulator tap verified the writing screen
+opened with Contribute visibly selected in the tab bar. Xcode build passed.
