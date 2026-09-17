@@ -1,8 +1,30 @@
 # Cuentiva
 
-Learn Spanish through community-written stories about real people.
+[![3 Days of Swift Concurrency — iOS developer training](readme-images/README-Logo-h512.png)](https://www.3daysofswiftconcurrency.com/)
 
-A native SwiftUI iOS 26 demo using Cooperative Feature Architecture (CFA), Swift 6, and Apple speech/audio frameworks. The 49 bundled stories and scripts are original fictional demonstration content, clearly labelled as such; they are not verified community memoirs.
+**Learn Spanish through community-written stories about real people.**
+
+Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Read at your own pace, listen to Spanish, practise speaking or writing, and collect the books you complete.
+
+The vision is a community library where learners share stories and learn by teaching. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with local contribution drafts and example Nearby Stories. Community publishing is not live; the bundled stories are not verified memoirs.
+
+## Cooperative Feature Architecture (CFA)
+
+Like [Trend](https://github.com/3DaysOfSwift/Trend-iOS-App-Swift-Concurrency-CFA), Cuentiva uses **Cooperative Feature Architecture**: explicit feature boundaries, screen-owned ViewModels and replaceable repositories. The structure helps developers and AI coding assistants see where presentation, business rules and storage belong.
+
+```text
+View → ViewModel → Feature API → Feature Manager → Repository
+```
+
+Explore the [open-source CFA skills and toolkit](https://github.com/3DaysOfSwift/cooperative-feature-architecture).
+
+## The publisher and its training
+
+[![3 Days of Swift Concurrency — explore the training](readme-images/README-Logo-h512.png)](https://www.3daysofswiftconcurrency.com/)
+
+**[Explore the training at 3DaysOfSwiftConcurrency.com →](https://www.3daysofswiftconcurrency.com/)**
+
+3 Days of Swift Concurrency provides Swift Concurrency training for iOS developers. Cuentiva demonstrates the same approach to SwiftUI, Observation and maintainable feature architecture in a working language-learning app.
 
 ## Run
 
@@ -20,7 +42,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 
 - One free A1 introductory book; onboarding can resume mid-book.
 - One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
-- Forty-nine searchable books: 43 stories, three Movie Scripts, and three Verbs books across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index.
+- Fifty-two bundled books: 46 stories, three Movie Scripts, and three Verbs books across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index. The three geotagged Thailand examples are discovered through Nearby; the other books appear in Discover.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
 - Writing mode hides the reference sentence and gives aligned word-level feedback. Accents are treated separately; ñ is not treated as n.
@@ -42,7 +64,10 @@ Each screen owns its adjacent `@MainActor @Observable` ViewModel. Views do not r
 | LibraryManager | Book loading, search, level filtering, vocabulary coverage |
 | LearningManager | Access checks, answer comparison, reading progression, optional practice, completion workflow |
 | ProgressManager | Committed learner state, streaks, vocabulary evidence, completion counting |
-| PurchaseManager | Verified StoreKit entitlements, introductory eligibility, purchase/restore, transaction updates |
+| PurchaseManager | Verified StoreKit ownership, purchase/restore, lifetime-transaction recovery, transaction updates |
+| PracticeManager | Completed-book practice eligibility, vocabulary statistics, matching glossaries and rewards |
+| NearbyManager | Location-based discovery within the selected radius |
+| LanguageTermsManager | Searchable bilingual language-term explanations |
 | ContributionManager | Demo eligibility, draft validation, submission and coaching rules |
 
 Repositories isolate bundled JSON and actor-protected local persistence. Writes are atomic and state publishes only after successful persistence. Concurrent progress mutations return a recoverable busy error instead of overwriting one another. Tracked lesson tasks belong to the LessonViewModel; stale audio callbacks are invalidated when a lesson changes. Main-actor managers publish observable state, while file decoding and writes happen in repository actors.
@@ -89,13 +114,13 @@ Three factual-science stories with fictional characters are in [SPACE-STORIES.md
 
 ## Stories and Movie Scripts
 
-The library includes 49 books: 43 stories, three original Movie Scripts, and three Verbs books (A1, A2, B1). Discover and Completed offer All types / Stories / Movie Scripts / Verbs filters, plus library order, English title, difficulty, and book-type sorting. Search and difficulty filtering combine with the format filter.
+The library includes 52 books: 46 stories, three original Movie Scripts, and three Verbs books (A1, A2, B1). Discover and Completed offer All types / Stories / Movie Scripts / Verbs filters, plus library order, English title, difficulty, and book-type sorting. Search and difficulty filtering combine with the format filter.
 
 Scripts show their scene and named speakers. Choose a role or read all roles and advance freely with Next line. After the guided lesson, a full-script reader shows alternating English–Spanish turns and an equally long new continuation (20, 20, and 24 total turns). Slow Spanish audio starts automatically, highlights each word, follows the active turn, and waits one second between speakers. A small toolbar control turns audio off/on. Leaving the reader or backgrounding the app stops playback. The final Mark as read button atomically adds the script to Books Learned; merely finishing the guided lesson or audio does not. The reader stage resumes after reopening. Playback uses the existing single Spanish voice. See [the scripts](Documentation/MOVIE-SCRIPTS.md).
 
 ## Extended story reading
 
-All 43 stories now have continuations matching their original sentence counts: 370 additional bilingual pairs. The guided lesson retains its original sentences. Read the full story opens a flowing single-column English–Spanish reader containing both halves, with slow automatic Spanish playback, word highlighting, automatic following, a one-second pause between pairs, and a small audio toggle. Scripts retain their alternating character layout. Both formats share BookReaderViewModel and the same final completion action. Reopening an unfinished book resumes the full-reader stage from its start. Previously earned completions remain intact.
+All 46 stories have continuations matching their original sentence counts. The original 43-story collection added 370 bilingual pairs, and the three Nearby examples each add eight more. The guided lesson retains its original sentences. Read the full story opens a flowing single-column English–Spanish reader containing both halves, with slow automatic Spanish playback, word highlighting, automatic following, a one-second pause between pairs, and a small audio toggle. Scripts retain their alternating character layout. Both formats share BookReaderViewModel and the same final completion action. Reopening an unfinished book resumes the full-reader stage from its start. Previously earned completions remain intact.
 
 The free café introduction includes its continuation before the purchase gate. Existing sentence IDs and vocabulary lemma mappings are retained. New vocabulary uses curated mappings with surface fallback. All content still needs native-speaker editorial review. Read the [370 new sentence pairs](Documentation/STORY-CONTINUATIONS.md).
 
