@@ -45,15 +45,12 @@ struct SettingsView: View {
                 }
                 InlineError(message: viewModel.restoreError)
             }.listRowBackground(themeManager.theme.surface)
-            Section("Your vocabulary") {
-                if viewModel.words.isEmpty { Text("Words you practice will appear here.") }
-                ForEach(viewModel.words, id: \.self) { word in
-                    Picker(word, selection: Binding(get: { viewModel.state(word) }, set: { state in Task { await viewModel.set(word, state: state) } })) {
-                        ForEach(VocabularyState.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
-                    }
-                    .tint(themeManager.theme.accent)
-                    .id(themeManager.selectedTheme)
+            Section("Your learning") {
+                NavigationLink { VocabularyView() } label: {
+                    Label("Your vocabulary", systemImage: "character.book.closed")
                 }
+                Text("Search your words, update what you know and choose your learning level.")
+                    .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
             Section("Privacy") {
                 Text("Your progress and drafts are stored on this device. Speech recognition is on-device where supported. Recordings are not saved. There are no analytics or advertising SDKs.")

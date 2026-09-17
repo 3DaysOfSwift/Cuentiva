@@ -143,9 +143,16 @@ import Testing
         #expect(vm.restoreError == nil)
         #expect(vm.restoreMessage != nil)
     }
-    @Test func settingsUpdatesVocabularyThroughFeature() async throws {
-        let (p,s,_,_,_) = try await graph(); let vm = SettingsViewModel(progress: s, purchases: p)
+    @Test func vocabularySearchAndEditingUseProgressFeature() async throws {
+        let (_,s,_,_,_) = try await graph(); let vm = VocabularyViewModel(progress: s)
         await vm.set("café", state: .known); #expect(vm.state("café") == .known)
+        await vm.set("casa", state: .learning)
+        vm.query = " CAFE "
+        #expect(vm.words == ["café"])
+        vm.query = "missing"; #expect(vm.words.isEmpty)
+        await vm.select(.b1); #expect(vm.selectedLevel == .b1)
+        #expect(vm.state("casa") == .learning)
+        await vm.select(nil); #expect(vm.selectedLevel == nil)
     }
 }
 

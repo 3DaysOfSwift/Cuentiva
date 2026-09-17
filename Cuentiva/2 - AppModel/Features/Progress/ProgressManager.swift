@@ -13,6 +13,7 @@ import Observation
     func complete(book: Book) async throws -> CompletionReceipt
     func completeReading(book: Book) async throws -> CompletionReceipt
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
+    func setLearningLevel(_ level: LearningLevel?) async throws
     func rewardPractice(book: Book, matches: Int) async throws -> Bool
     func reset() async throws
 }
@@ -135,5 +136,6 @@ import Observation
         }
         return awarded
     }
+    func setLearningLevel(_ level: LearningLevel?) async throws { try await commit { $0.selectedLearningLevel = level } }
     func reset() async throws { try await commit { $0 = .init() } }
 }

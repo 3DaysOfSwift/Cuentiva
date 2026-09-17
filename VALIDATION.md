@@ -273,3 +273,15 @@ action. Existing ownership reports full access already active; new recovery repo
 restored access. Failed/no-access results never show success and stale feedback clears
 on retry. All 57 Xcode tests and 29 core tests passed. Simulator tap confirmed the
 existing-owner success message appears inside the Purchase section.
+
+## Vocabulary screen and self-selected level — 17 September 2026
+
+Settings now links to a dedicated Your vocabulary screen with an always-visible
+search field, editable word states and six A1–C2 choices. The optional self-selected
+level persists through ProgressManager's atomic save, is backward-compatible with
+older JSON, can be cleared and is removed by Reset learning progress. It is not an
+assessed CEFR level and does not auto-promote, rewrite vocabulary or gate books.
+Tests cover search, editing, persisted level, failed-save rollback, reset and older
+JSON. All 59 Xcode tests and 31 core tests passed. Simulator navigation verified the
+short Settings entry, visible search, level choices and word controls. Level choices
+were subsequently arranged into two rows of three; final build passed.

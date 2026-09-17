@@ -9,10 +9,7 @@ import Observation
     private(set) var restoreMessage: String?
     private(set) var restoreError: String?
     var hasAccess: Bool { purchases.hasAccess }
-    var words: [String] { progress.snapshot.vocabulary.keys.sorted() }
-    func state(_ word: String) -> VocabularyState { progress.snapshot.vocabulary[word] ?? .unknown }
     init(progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.progress = progress; self.purchases = purchases }
-    func set(_ word: String, state: VocabularyState) async { do { try await progress.setVocabulary(word, state: state) } catch { self.error = error.localizedDescription } }
     func reset() async { do { try await progress.reset() } catch { self.error = error.localizedDescription } }
     func restore() async {
         guard !restoring else { return }

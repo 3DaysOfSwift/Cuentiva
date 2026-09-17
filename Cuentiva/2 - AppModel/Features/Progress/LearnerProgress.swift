@@ -1,8 +1,10 @@
 import Foundation
 
 enum VocabularyState: String, Codable, CaseIterable, Sendable { case unknown, learning, known }
+enum LearningLevel: String, Codable, CaseIterable, Sendable { case a1 = "A1", a2 = "A2", b1 = "B1", b2 = "B2", c1 = "C1", c2 = "C2" }
 struct LearnerProgress: Codable, Sendable {
     var schemaVersion = 1
+    var selectedLearningLevel: LearningLevel? = nil
     var completed: Set<String> = []
     // Legacy storage key: records sentence encounters (reading or optional practice).
     var attempts: [String: Set<String>] = [:]
