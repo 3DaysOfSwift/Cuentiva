@@ -1,0 +1,51 @@
+{
+  "identifier": "CuentivaChatUK",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "14.99",
+      "familyShareable": false,
+      "internalID": "CuentivaLifetime",
+      "localizations": [
+        {
+          "description": "Unlock the Cuentiva library with one purchase.",
+          "displayName": "Cuentiva Full Access",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime",
+      "referenceName": "Cuentiva Full Access",
+      "type": "NonConsumable"
+    },
+    {
+      "displayPrice": "24.99",
+      "familyShareable": false,
+      "internalID": "CuentivaStorytellerChat",
+      "localizations": [
+        {
+          "description": "One-time unlock for on-device Spanish conversations with Cuentiva storytellers. Requires Apple Intelligence.",
+          "displayName": "Storyteller Chat",
+          "locale": "en_GB"
+        }
+      ],
+      "productID": "com.3DaysOfSwiftConcurrency.Cuentiva.storytellerChat",
+      "referenceName": "Storyteller Chat",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "en_GB",
+    "_storefront": "GBR",
+    "_storeKitErrors": [],
+    "_timeRate": 0
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 3,
+    "minor": 0
+  }
+}

@@ -18,6 +18,13 @@ struct SettingsView: View {
                 Text("Your selected theme is used throughout Cuentiva.")
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
+            Section("Conversation") {
+                NavigationLink { ChatView() } label: {
+                    Label("Storyteller Chat", systemImage: "bubble.left.and.bubble.right")
+                }
+                Text("Practise Spanish with your favourite characters. A separate one-time purchase.")
+                    .font(.footnote).foregroundStyle(themeManager.theme.muted)
+            }.listRowBackground(themeManager.theme.surface)
             Section("Language help") {
                 NavigationLink { LanguageTermsView() } label: {
                     Label("Decipher language terms", systemImage: "text.book.closed")
@@ -59,7 +66,7 @@ struct SettingsView: View {
                 if let message = viewModel.syncMessage { Text(message).font(.footnote).foregroundStyle(themeManager.theme.muted) }
             }.listRowBackground(themeManager.theme.surface)
             Section("Privacy") {
-                Text("Your progress and drafts are stored on this device. Speech recognition is on-device where supported. Recordings are not saved. There are no analytics or advertising SDKs.")
+                Text("Your progress, drafts and chat conversations are stored on this device. Storyteller Chat uses on-device Apple Intelligence. Speech recognition is on-device where supported. Recordings are not saved. There are no analytics or advertising SDKs.")
                 Text("Device backups may include app data. Deleting the app removes its local data; purchases remain with your Apple Account.")
                 Button("Reset learning progress", role: .destructive) { viewModel.resetConfirmation = true }
             }.listRowBackground(themeManager.theme.surface)

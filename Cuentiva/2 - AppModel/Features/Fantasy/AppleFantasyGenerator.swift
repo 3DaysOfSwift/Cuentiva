@@ -16,15 +16,15 @@ struct AppleFantasyGenerator: FantasyGenerator {
                 return nil
             case .unavailable(let reason):
                 switch reason {
-                case .deviceNotEligible: return "Fantasy generation needs a device that supports Apple Intelligence. You can still enjoy every book in your library."
-                case .appleIntelligenceNotEnabled: return "Turn on Apple Intelligence in Settings to create your storyteller and tales, then return here and retry."
+                case .deviceNotEligible: return "On-device AI needs a device that supports Apple Intelligence. You can still enjoy every book in your library."
+                case .appleIntelligenceNotEnabled: return "Turn on Apple Intelligence in Settings to use AI stories and chat, then return here and retry."
                 case .modelNotReady: return "Apple Intelligence is still getting ready. Try again once its on-device model is ready. Your library is available meanwhile."
                 @unknown default: return "Apple Intelligence is unavailable right now. Try again later."
                 }
             }
         }
         #endif
-        return "Fantasy generation requires iOS 26 and Apple Intelligence. Your library is still available."
+        return "On-device AI requires iOS 26 and Apple Intelligence. Your library is still available."
     }
 
     func identity(name: String, biography: String, creature: FantasyCreature) async throws -> FantasyIdentity {

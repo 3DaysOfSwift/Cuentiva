@@ -19,6 +19,9 @@ struct AuthorView: View {
                     Text("Behind the stories").font(.headline)
                     Text(model.author.note).font(.system(.body, design: .serif))
                 }.padding(20).frame(maxWidth: .infinity, alignment: .leading).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
+                NavigationLink { ChatView(author: model.author) } label: {
+                    Label("Talk with \(model.author.name)", systemImage: "bubble.left.and.bubble.right")
+                }
                 Text("Stories by \(model.author.name)").font(.system(.title2, design: .serif))
                 ForEach(model.books) { book in
                     Button { model.selectedBook = book } label: {

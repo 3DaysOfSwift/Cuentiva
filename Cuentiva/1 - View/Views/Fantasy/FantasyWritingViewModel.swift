@@ -8,6 +8,7 @@ import Observation
     var busy = false
     var error: String?
     var showingProfile = false
+    var creature: FantasyCreature? { feature.profile?.creature }
     var needsProfile: Bool { feature.profile?.identity == nil }
     var availabilityMessage: String? { feature.availabilityMessage }
     func refreshAvailability() async { await feature.refreshAvailability() }

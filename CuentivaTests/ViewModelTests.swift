@@ -457,6 +457,28 @@ actor ReaderPauseProbe {
 import StoreKitTest
 
 @Suite(.serialized) @MainActor struct StorePurchaseTests {
+    @Test func chatPurchaseIsSeparateAndRestores() async throws {
+        let configuration = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Cuentiva/3 - App Resources/StorytellerChat.storekit")
+        let session = try SKTestSession(contentsOf: configuration)
+        session.disableDialogs = true; session.clearTransactions()
+        defer { session.clearTransactions() }
+        let chat = PurchaseManager(productID: PurchaseManager.storytellerChatProductID)
+        let library = PurchaseManager()
+        await chat.refresh(); await library.refresh()
+        #expect(!chat.hasAccess); #expect(!library.hasAccess)
+        #expect(chat.offer?.price == Decimal(string: "24.99"))
+        #expect(chat.offer?.type == .nonConsumable)
+        try await chat.purchase()
+        await library.refresh()
+        #expect(chat.hasAccess); #expect(!library.hasAccess)
+        let restored = PurchaseManager(productID: PurchaseManager.storytellerChatProductID)
+        try await restored.restore()
+        #expect(restored.hasAccess)
+        #expect(session.allTransactions().count == 1)
+    }
+
     @Test func lifetimePurchaseSurvivesNewManagerAndRestoresWithoutRepurchase() async throws {
         let configuration = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
@@ -510,3 +532,43 @@ import StoreKitTest
     }
 }
 #endif
+
+@MainActor private final class ChatPresentationFeature: ChatFeature {
+    var hasAccess = false
+    var displayPrice: String? = "£24.99"
+    var preparing = false
+    var unavailable: String?
+    var ready = true
+    var busy = false
+    var purchaseFailure: AppFailure?
+    func prepare() async throws { ready = true }
+    func purchase() async throws {
+        if let purchaseFailure { throw purchaseFailure }
+        // A cancelled store sheet completes without granting an entitlement.
+    }
+    func restore() async throws { }
+    func conversation(for author: Author) -> ChatConversation { .init() }
+    func send(_ message: String, to author: Author, level: String) async throws { }
+    func clear(author: Author) async throws { }
+}
+@Suite @MainActor struct ChatPresentationTests {
+    @Test func cancelledPurchaseNeverShowsUnlockedNotice() async {
+        let feature = ChatPresentationFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.purchase()
+        #expect(!model.unlocked)
+        #expect(model.notice == nil)
+        #expect(!model.purchasing)
+    }
+    @Test func foregroundRefreshPreservesPurchaseFailure() async {
+        let feature = ChatPresentationFeature()
+        feature.purchaseFailure = .unavailable("Purchase awaiting approval")
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.purchase()
+        let failure = model.error
+        #expect(failure != nil)
+        await model.prepare()
+        #expect(model.error == failure)
+        #expect(model.preparationError == nil)
+    }
+}

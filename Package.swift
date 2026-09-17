@@ -6,7 +6,7 @@ let package = Package(
     platforms: [.macOS(.v15)],
     products: [.library(name: "CuentivaCore", targets: ["CuentivaCore"])],
     targets: [
-        .target(name: "CuentivaCore", path: "Cuentiva/2 - AppModel", exclude: ["AppModel.swift", "Features/Audio", "Features/Fantasy/AppleFantasyGenerator.swift", "Features/Nearby/AppleStoryLocationProvider.swift"]),
+        .target(name: "CuentivaCore", path: "Cuentiva/2 - AppModel", exclude: ["AppModel.swift", "Features/Audio", "Features/Chat/AppleChatGenerator.swift", "Features/Fantasy/AppleFantasyGenerator.swift", "Features/Nearby/AppleStoryLocationProvider.swift"]),
         .testTarget(name: "CuentivaCoreTests", dependencies: ["CuentivaCore"], path: "CuentivaTests", exclude: ["ViewModelTests.swift"])
     ]
 )

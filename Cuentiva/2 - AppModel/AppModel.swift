@@ -10,10 +10,12 @@ import Foundation
     let languageTerms: any LanguageTermsFeature = LanguageTermsManager()
     let practice: any PracticeFeature
     let nearby: any NearbyFeature
+    let chat: any ChatFeature
     let fantasy: any FantasyFeature
     let makeAudio: () -> any LessonAudio
     init(library: any LibraryFeature, progress: any ProgressFeature, purchases: any PurchaseFeature,
-         learning: any LearningFeature, contributions: any ContributionFeature, fantasy: any FantasyFeature, makeAudio: @escaping () -> any LessonAudio) {
+         learning: any LearningFeature, contributions: any ContributionFeature, fantasy: any FantasyFeature, chat: any ChatFeature, makeAudio: @escaping () -> any LessonAudio) {
+        self.chat = chat
         self.fantasy = fantasy
         self.practice = PracticeManager(progress: progress, purchases: purchases)
         self.nearby = NearbyManager(library: library, purchases: purchases)
@@ -31,6 +33,8 @@ import Foundation
         let learning = LearningManager(purchases: purchases, progress: progress)
         let contributions = ContributionManager(repository: LocalContributionRepository(url: directory.appending(path: "drafts.json")), purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
         let fantasy = FantasyManager(repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json")), generator: AppleFantasyGenerator())
-        return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, fantasy: fantasy, makeAudio: { AppleLessonAudio() })
+        let chat = ChatManager(purchases: PurchaseManager(productID: PurchaseManager.storytellerChatProductID),
+            generator: AppleChatGenerator(), repository: LocalChatRepository(url: directory.appending(path: "chat.json")))
+        return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, fantasy: fantasy, chat: chat, makeAudio: { AppleLessonAudio() })
     }
 }

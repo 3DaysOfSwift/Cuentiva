@@ -849,3 +849,37 @@ private struct UnavailableFantasyGenerator: FantasyGenerator {
         #expect(feature.profile?.details?.biography == "A traveller.")
     }
 }
+
+@Suite @MainActor struct LaunchAccessTests {
+    @Test func catalogueCanDisplayWhilePaidLessonsRemainLocked() async throws {
+        let purchases = TestPurchases(); purchases.checking = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: [sample(), sample("paid")]), purchases: purchases, progress: progress)
+        try await library.load()
+        #expect(!library.dailyReads.isEmpty)
+        #expect(library.search("", level: nil, completedOnly: false).count == 2)
+        let learning = LearningManager(purchases: purchases, progress: progress)
+        #expect(!learning.canRead(sample("paid")))
+        try await library.prepareDailyReads()
+        #expect(progress.snapshot.dailyReadingIDs == nil)
+        purchases.checking = false
+        #expect(library.dailyReads.isEmpty)
+        purchases.hasAccess = true
+        try await library.prepareDailyReads()
+        #expect(progress.snapshot.dailyReadingIDs?.count == 2)
+    }
+}
+
+@Suite @MainActor struct ChatProductConfigurationTests {
+    @Test func chatIsOneTimeUKPurchaseWithoutChangingLibraryConfiguration() throws {
+        let directory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .appending(path: "Cuentiva/3 - App Resources")
+        let chat = try #require(try JSONSerialization.jsonObject(with: Data(contentsOf: directory.appending(path: "StorytellerChat.storekit"))) as? [String: Any])
+        let settings = try #require(chat["settings"] as? [String: Any])
+        #expect(settings["_storefront"] as? String == "GBR")
+        let products = try #require(chat["products"] as? [[String: Any]])
+        let product = try #require(products.first { $0["productID"] as? String == PurchaseManager.storytellerChatProductID })
+        #expect(product["type"] as? String == "NonConsumable")
+        #expect(product["displayPrice"] as? String == "24.99")
+    }
+}

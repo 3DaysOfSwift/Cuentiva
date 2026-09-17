@@ -16,16 +16,16 @@ struct CompletionView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 25) {
-                Label(receipt.book.kind == .movieScript ? "SCRIPT COMPLETED" : "BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
-                Text("One more story.\nA little more you.").font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
-                BookCover(book: receipt.book, completed: true, compact: true).frame(width: 155)
-                Text(receipt.book.englishTitle).font(.title3.weight(.semibold))
-                Text("\(receipt.book.fullText.count) \(receipt.book.unitName) · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
                 VStack(spacing: 5) {
                     Text("\(viewModel.displayedTotal)").font(.system(size: 72, weight: .medium, design: .serif)).contentTransition(.numericText())
                     Text("BOOKS LEARNED").font(.caption.bold()).tracking(3)
                     Text(receipt.isNew ? "+1 to your collection" : "A familiar story, practiced again").font(.subheadline).foregroundStyle(theme.theme.accent)
                 }
+                Label(receipt.book.kind == .movieScript ? "SCRIPT COMPLETED" : "BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
+                Text("One more story.\nA little more you.").font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
+                BookCover(book: receipt.book, completed: true, compact: true).frame(width: 155)
+                Text(receipt.book.englishTitle).font(.title3.weight(.semibold))
+                Text("\(receipt.book.fullText.count) \(receipt.book.unitName) · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
                 Button("Continue  →") { if receipt.streakCelebration != nil && AppModel.shared.practice.allowed(receipt.book) { showPractice = true } else { dismiss() } }.buttonStyle(PrimaryButton())
                 if AppModel.shared.practice.allowed(receipt.book) {
                     Button("Your turn · read it in Spanish") { showPractice = true }

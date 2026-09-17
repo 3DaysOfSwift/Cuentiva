@@ -55,7 +55,9 @@ import CryptoKit
         }
     }
     func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book] {
-        guard purchases.hasAccess else { return [] }
+        // Catalogue metadata may render during verification; lesson access
+        // remains enforced independently by LearningManager.
+        guard purchases.hasAccess || purchases.checking else { return [] }
         let matches = books.filter { book in
             (book.submissionLocation == nil || progress.snapshot.completed.contains(book.id)) &&
             (query.isEmpty || "\(book.title) \(book.englishTitle) \(book.storytellerName) \(book.cast.joined(separator: " "))".localizedStandardContains(query)) &&
@@ -115,7 +117,9 @@ import CryptoKit
         }
     }
     var dailyReads: [Book] {
-        guard purchases.hasAccess else { return [] }
+        // Catalogue metadata may render during verification; lesson access
+        // remains enforced independently by LearningManager.
+        guard purchases.hasAccess || purchases.checking else { return [] }
         let candidates = discover(level: nil, format: nil)
         guard let date = progress.snapshot.dailyReadingDate, calendar.isDate(date, inSameDayAs: now()),
               let ids = progress.snapshot.dailyReadingIDs else { return Array(candidates.prefix(3)) }

@@ -64,8 +64,19 @@ struct FantasyWritingView: View {
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             .navigationTitle("Write").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .topBarTrailing) {
-                Button("My storyteller", systemImage: "person.crop.circle") { model.showingProfile = true }
-            } }
+                Button { model.showingProfile = true } label: {
+                    if let creature = model.creature {
+                        Image(creature.portrait).resizable().scaledToFill()
+                            .frame(width: 44, height: 44).clipShape(Circle())
+                            .overlay {
+                                Circle().strokeBorder(theme.theme.accent.opacity(0.18), lineWidth: 1)
+                            }
+                    } else {
+                        Image(systemName: "person.crop.circle")
+                            .frame(width: 44, height: 44)
+                    }
+                }.buttonStyle(.plain).accessibilityLabel("My storyteller")
+            }.sharedBackgroundVisibility(.hidden) }
             .sheet(isPresented: $model.showingProfile) {
                 StorytellerRevealView(feature: feature) { model.showingProfile = false }
             }

@@ -8,17 +8,22 @@ struct RootView: View {
     var body: some View {
         Group {
             if viewModel.ready {
-                if viewModel.hasAccess {
+                if viewModel.hasAccess || viewModel.checkingAccess {
                     TabView(selection: $selectedTab) {
                         Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) { NavigationStack { HomeView(onContribute: { selectedTab = .contribute }) } }
                         Tab("Nearby", systemImage: "location", value: LibraryTab.nearby) { NavigationStack { NearbyView() } }
                         Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) { NavigationStack { CompletedView() } }
                         Tab("Write", systemImage: "square.and.pencil", value: LibraryTab.contribute) { NavigationStack { FantasyWritingView(feature: AppModel.shared.fantasy) } }
                     }
-                } else if viewModel.checkingAccess {
-                    // Keep the library shell visible while access is verified;
-                    // never flash a paywall for a returning purchaser.
-                    LibrarySkeletonView()
+                    .disabled(!viewModel.hasAccess)
+                    .overlay(alignment: .bottom) {
+                        if viewModel.checkingAccess && !viewModel.hasAccess {
+                            Text("Checking purchase access…")
+                                .font(.caption).padding(10)
+                                .background(theme.theme.surface, in: Capsule())
+                                .padding(.bottom, 80).allowsHitTesting(false)
+                        }
+                    }
                 } else { OnboardingView() }
             } else {
                 LibrarySkeletonView()
@@ -39,6 +44,9 @@ struct RootView: View {
             .task { await viewModel.load() }
             .task { await viewModel.refreshPurchases() }
             .task(id: viewModel.ready) { if viewModel.ready { await viewModel.syncLibrary() } }
+            .onChange(of: viewModel.hasAccess) { _, allowed in
+                if allowed { Task { await viewModel.prepareReading() } }
+            }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active {
                     Task { await viewModel.refreshPurchases() }
