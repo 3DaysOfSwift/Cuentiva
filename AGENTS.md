@@ -23,3 +23,9 @@ or hard-code UI surface/text colours outside the theme definitions.
 
 Keep independent reusable views in their own named files. Do not hide unrelated
 components such as streak indicators or error messages in another view’s file.
+
+Language help must explain terms without assuming prior grammar knowledge. Start
+with a familiar situation, show what each example word does, and translate Spanish
+examples. Explain any necessary technical term where it appears; related-term links
+are optional exploration, never prerequisites for understanding the current entry.
+Prefer one clear idea at a time over lists of classifications and exceptions.
