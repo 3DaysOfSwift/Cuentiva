@@ -7,6 +7,7 @@ import Foundation
     let purchases: any PurchaseFeature
     let learning: any LearningFeature
     let contributions: any ContributionFeature
+    let languageTerms: any LanguageTermsFeature = LanguageTermsManager()
     let practice: any PracticeFeature
     let nearby: any NearbyFeature
     let makeAudio: () -> any LessonAudio

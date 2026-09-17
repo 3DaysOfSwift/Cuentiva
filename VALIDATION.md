@@ -1,3 +1,9 @@
+## Decipher language terms — 17 September 2026
+
+Added Settings → Language help → Decipher language terms, with 12 bilingual entries, plain-language explanations, highlighted English/Spanish examples and related-term navigation. Search supports either language and accent-insensitive matching. The Your turn word-family statistic links to the lemma explanation. No quiz or new learning rewards are introduced.
+
+All 29 core tests passed, including bilingual search and validation that related links resolve. Xcode Simulator tests passed. On iPhone Air Simulator verified the Settings route, bilingual list and Adjective detail with formatted examples. Both views use the shared theme and scalable text; physical-device VoiceOver and maximum Dynamic Type remain manual checks.
+
 ## Library-shaped startup — 17 September 2026
 
 Replaced the small title/spinner view with a noninteractive library skeleton containing the title, heading, placeholder controls and covers, and tab shell. Root background now fills the window and safe areas. Load errors show Retry over the shell; entitlement checks still gate content. Root load calls are serialized to avoid overlapping launch/foreground work.

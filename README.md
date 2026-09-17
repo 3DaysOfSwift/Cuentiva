@@ -114,3 +114,7 @@ Nearby discovers geotagged books within 5, 25 or 100 km, or 1,000 miles (default
 ## Your turn and Match Pairs
 
 Completed books offer Spanish-only guided rereading, vocabulary statistics and optional matching practice. Match Pairs currently has full glossaries for Ana’s little café and My father’s garden. First qualifying rounds award one persistent doubloon per book; no spending feature yet. See [Your turn](Documentation/YOUR-TURN.md).
+
+## Language help
+
+Settings includes **Decipher language terms**: 12 searchable English–Spanish grammar terms, clear definitions, highlighted examples and related explanations. The word-family statistic opens the lemma entry. This first version is a reference guide, without a quiz.

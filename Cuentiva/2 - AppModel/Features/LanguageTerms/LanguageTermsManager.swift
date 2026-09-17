@@ -1,0 +1,87 @@
+import Foundation
+
+@MainActor protocol LanguageTermsFeature: AnyObject {
+    func search(_ query: String) -> [LanguageTerm]
+    func term(_ id: String) -> LanguageTerm?
+}
+@MainActor final class LanguageTermsManager: LanguageTermsFeature {
+    func search(_ query: String) -> [LanguageTerm] {
+        let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        return Self.terms.filter { query.isEmpty || "\($0.english) \($0.spanish) \($0.meaning)".localizedStandardContains(query) }
+    }
+    func term(_ id: String) -> LanguageTerm? { Self.terms.first { $0.id == id } }
+    private static let terms: [LanguageTerm] = [
+        .init(id: "noun", english: "Noun", spanish: "Sustantivo",
+              meaning: "A word that names a person, place, thing or idea.",
+              explanation: "A noun can name something you can touch, like a book, or something you cannot touch, like happiness. Names such as Ana are proper nouns. Spanish nouns have grammatical gender and can be singular or plural.",
+              englishExample: "The **girl** reads a **book**. Both highlighted words name something.",
+              spanishExample: "La **niña** lee un **libro**. Niña means girl; libro means book.",
+              takeaway: "Ask: what person, place, thing or idea is being named?", related: ["article", "gender", "adjective"]),
+        .init(id: "verb", english: "Verb", spanish: "Verbo",
+              meaning: "A word that expresses an action, event or state.",
+              explanation: "Running and reading are actions, but being and knowing are expressed by verbs too. Spanish verbs change form to tell us things such as who is involved and when something happens. The dictionary usually lists a verb in its infinitive form, such as hablar: to speak.",
+              englishExample: "I **read**. She **knows** the answer. Read and knows are verbs.",
+              spanishExample: "Yo **leo**. Ella **sabe** la respuesta. Leo means I read; sabe means knows.",
+              takeaway: "Verbs do more than describe movement: they can describe how things are.", related: ["conjugation", "tense", "lemma"]),
+        .init(id: "adjective", english: "Adjective", spanish: "Adjetivo",
+              meaning: "A word that describes or gives information about a noun.",
+              explanation: "An adjective can tell us what something is like. In Spanish it often comes after the noun. Many adjectives change their endings to agree with the noun's gender and number, although not all adjectives change for gender.",
+              englishExample: "A **small** house. Two **small** houses. Small describes the houses.",
+              spanishExample: "Una casa **pequeña**. Dos jardines **pequeños**. The adjective changes to fit casa and jardines.",
+              takeaway: "Look for the noun being described, then notice the adjective's ending.", related: ["noun", "agreement", "gender"]),
+        .init(id: "pronoun", english: "Pronoun", spanish: "Pronombre",
+              meaning: "A word that refers to someone or something without naming them again.",
+              explanation: "Pronouns include I, you, she, it and they. Spanish has pronouns such as yo, tú and ella. A Spanish sentence can often leave out the subject pronoun because the verb ending already helps tell us who is involved.",
+              englishExample: "Ana reads. **She** likes the story. She refers back to Ana.",
+              spanishExample: "Ana lee. **Ella** disfruta de la historia. We can also say: Disfruta de la historia, when the context is clear.",
+              takeaway: "Ask: who or what does this small word refer to?", related: ["noun", "verb", "conjugation"]),
+        .init(id: "adverb", english: "Adverb", spanish: "Adverbio",
+              meaning: "A word that adds information about a verb, adjective, another adverb or a whole statement.",
+              explanation: "Adverbs can tell us how, when, where or how often something happens. They can also express degree, as very does in very small. Spanish adverbs normally do not change to match a noun's gender or number.",
+              englishExample: "She speaks **slowly**. The house is **very** small.",
+              spanishExample: "Ella habla **despacio**. La casa es **muy** pequeña. Despacio means slowly; muy means very.",
+              takeaway: "An adjective describes a noun; an adverb often tells us more about an action or description.", related: ["adjective", "verb"]),
+        .init(id: "article", english: "Article", spanish: "Artículo",
+              meaning: "A small word used with a noun, such as the or a.",
+              explanation: "The definite article points to something identifiable: the book. An indefinite article introduces something less specific: a book. Spanish articles generally agree with the noun's gender and number. Common forms include el, la, los, las, un, una, unos and unas.",
+              englishExample: "I see **a** book. **The** book is blue.",
+              spanishExample: "Veo **un** libro. **El** libro es azul. Also: **la** casa and **las** casas.",
+              takeaway: "Learn a noun with its article: la casa, el libro. There are exceptions, such as el agua, which is feminine.", related: ["noun", "gender", "agreement"]),
+        .init(id: "preposition", english: "Preposition", spanish: "Preposición",
+              meaning: "A word that introduces a relationship, such as place, time or direction.",
+              explanation: "Prepositions connect parts of a sentence. English examples include in, with and from; Spanish examples include en, con and de. They do not always translate one for one, so learning them inside a phrase is helpful.",
+              englishExample: "The book is **on** the table. I walk **with** Ana.",
+              spanishExample: "El libro está **sobre** la mesa. Camino **con** Ana.",
+              takeaway: "Notice the whole phrase. In Spanish, a + el becomes al, and de + el becomes del.", related: ["noun", "article"]),
+        .init(id: "conjugation", english: "Conjugation", spanish: "Conjugación",
+              meaning: "Changing a verb's form to fit how it is used in a sentence.",
+              explanation: "Conjugating a verb can show the person, number, tense and mood. You already do this in English when you change I speak to she speaks. Spanish often shows more of this information in the verb ending. Irregular verbs do not follow every usual pattern.",
+              englishExample: "I **speak**. She **speaks**. Yesterday I **spoke**.",
+              spanishExample: "Yo **hablo**. Ella **habla**. Ayer **hablé**. All three forms belong to hablar.",
+              takeaway: "You are meeting different forms of the same verb, not unrelated words.", related: ["verb", "tense", "pronoun", "lemma"]),
+        .init(id: "tense", english: "Tense", spanish: "Tiempo verbal",
+              meaning: "A grammatical way of locating an action or state in time.",
+              explanation: "Tenses help us talk about the present, past and future. They work with context and time expressions. A tense is not quite the same as clock time: a present form can sometimes describe a future plan. Spanish also distinguishes different ways of presenting past events.",
+              englishExample: "Today I **work**. Yesterday I **worked**. Tomorrow I **will work**.",
+              spanishExample: "Hoy **trabajo**. Ayer **trabajé**. Mañana **trabajaré**.",
+              takeaway: "Ask when the speaker places the event, and notice both the verb and the surrounding words.", related: ["verb", "conjugation"]),
+        .init(id: "gender", english: "Grammatical gender", spanish: "Género gramatical",
+              meaning: "A grammatical category that Spanish nouns belong to: masculine or feminine.",
+              explanation: "Grammatical gender helps determine the articles and some adjectives used with a noun. It does not mean that objects are male or female. Endings can give clues, but there are exceptions: el día is masculine even though it ends in a.",
+              englishExample: "The **book**. The **table**. English uses the same article, the, for both.",
+              spanishExample: "**El libro** is masculine. **La mesa** is feminine. Neither object has a biological sex.",
+              takeaway: "Learn the article alongside the noun instead of guessing from its meaning.", related: ["noun", "article", "agreement"]),
+        .init(id: "agreement", english: "Agreement", spanish: "Concordancia",
+              meaning: "Words changing form so that they fit together grammatically.",
+              explanation: "In Spanish, articles and adjectives commonly agree with nouns in gender and number. Subjects and verbs agree in person and number. These matching forms help show which parts of a sentence belong together.",
+              englishExample: "She **walks**. They **walk**. The verb fits its subject.",
+              spanishExample: "**La casa blanca**. **Las casas blancas**. Article, noun and adjective fit together. Also: ella **camina**, ellos **caminan**.",
+              takeaway: "When you change one to many, check the words connected to it too.", related: ["adjective", "article", "gender", "conjugation"]),
+        .init(id: "lemma", english: "Lemma", spanish: "Lema",
+              meaning: "The dictionary form used to group different forms of a word.",
+              explanation: "Hablo, hablas and hablamos are different written forms of hablar. For verbs, the lemma is usually the infinitive; for nouns, it is usually the singular form. A lemma groups forms of one word, not every related word with a similar meaning.",
+              englishExample: "**Walk**, **walks**, **walked** and **walking** can be grouped under the verb **walk**.",
+              spanishExample: "**Hablo**, **hablas** and **hablamos** belong to **hablar**. **Casas** belongs to the noun **casa**.",
+              takeaway: "Cuentiva counts written forms separately and uses lemmas for its approximate word-family totals. Seeing several forms does not mean you have mastered them.", related: ["verb", "conjugation", "noun"])
+    ]
+}

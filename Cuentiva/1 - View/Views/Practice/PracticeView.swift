@@ -109,7 +109,9 @@ struct PracticeView: View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Look how much Spanish\nyou just read.").font(.system(.largeTitle, design: .serif))
             Text("\(model.stats.total) words · \(model.stats.distinct) distinct written words")
-            Text("About \(model.stats.families) word families").foregroundStyle(theme.theme.muted)
+            NavigationLink { LanguageTermDetailView(id: "lemma") } label: {
+                Label("About \(model.stats.families) word families", systemImage: "info.circle")
+            }.accessibilityHint("Learn what a lemma and word family mean")
             if let previous = model.stats.previous, let newWords = model.stats.newWords {
                 Text("\(previous) encountered before this book")
                 Text("\(newWords) first encountered in this book").font(.title2)

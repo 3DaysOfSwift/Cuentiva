@@ -14,6 +14,12 @@ struct SettingsView: View {
                 Text("Your selected theme is used throughout Cuentiva.")
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
+            Section("Language help") {
+                NavigationLink { LanguageTermsView() } label: {
+                    Label("Decipher language terms", systemImage: "text.book.closed")
+                }
+                Text("Nouns, verbs, lemmas and more—with examples in English and Spanish.").font(.footnote).foregroundStyle(themeManager.theme.muted)
+            }.listRowBackground(themeManager.theme.surface)
             Section("Purchase") {
                 Text("Cuentiva · One-time purchase")
                 Button("Restore purchases") { Task { await viewModel.restore() } }
