@@ -11,7 +11,7 @@ import Observation
     var available: Bool { purchases.offer != nil }
     var storeMessage: String? { purchases.message }
     init(purchases: any PurchaseFeature = AppModel.shared.purchases) { self.purchases = purchases }
-    func purchase() async { busy = true; defer { busy = false }; error = nil; do { try await purchases.purchase() } catch { self.error = error.localizedDescription } }
-    func restore() async { busy = true; defer { busy = false }; do { try await purchases.restore() } catch { self.error = error.localizedDescription } }
+    func purchase() async { guard !busy else { return }; busy = true; defer { busy = false }; error = nil; do { try await purchases.purchase() } catch { self.error = error.localizedDescription } }
+    func restore() async { guard !busy else { return }; busy = true; defer { busy = false }; error = nil; do { try await purchases.restore() } catch { self.error = error.localizedDescription } }
     func reload() async { await purchases.refresh() }
 }

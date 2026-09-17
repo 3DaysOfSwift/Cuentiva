@@ -221,3 +221,20 @@ For compiler verification in this nested sandbox, the invocation used the Swift 
 ## Not production-ready
 
 No production StoreKit product, hosted privacy policy, remote publishing API, real AI editor, native-speaker content review, or brand clearance is configured. The approved $4.99 one-time price is configured locally; App Store Connect configuration is pending. App icon and final branding are intentionally not finalized.
+
+## Purchase recovery — 17 September 2026
+
+Verified lifetime purchase results now grant access before finishing the transaction;
+revision checks prevent older in-flight entitlement scans overwriting newer results.
+Unlock first checks existing ownership, purchase errors recheck entitlements, and
+restore clears stale errors. Purchase/restore operations reject overlapping starts.
+Only verified matching non-consumable transactions grant access; refunds remove it.
+
+29 core tests and all 55 Xcode simulator tests passed. Added a real StoreKitTest
+session exercising purchase → root access, a fresh PurchaseManager with existing
+ownership, restore, duplicate Unlock (one transaction only), and asynchronous refund
+revocation followed by refresh. This simulates loss of app-local purchase state;
+it does not constitute deleting/reinstalling on the user's physical phone.
+The specific device-side StoreKit error has not been reproduced or diagnosed from
+its generic screenshot. Rebuild on the phone and use Restore purchases in the same
+StoreKit test environment; purchase errors now include recovery guidance and logs.
