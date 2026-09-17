@@ -20,6 +20,10 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     var scene: String? = nil
     var continuation: [Sentence]? = nil
     var verbFocus: VerbFocus? = nil
+    var storytellerName: String {
+        Author.demoProfiles.first(where: { $0.id == authorID })?.name
+            ?? author.split(whereSeparator: { $0.isWhitespace }).first.map(String.init) ?? author
+    }
     var fullText: [Sentence] { sentences + (continuation ?? []) }
     var kind: BookFormat { format ?? .story }
     var unitName: String { kind == .movieScript ? "lines" : "sentences" }

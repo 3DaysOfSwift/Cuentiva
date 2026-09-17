@@ -1,5 +1,9 @@
 import Foundation
-protocol BookRepository: Sendable { func books() async throws -> [Book] }
+protocol BookRepository: Sendable {
+    func books() async throws -> [Book]
+    func authors() async -> [Author]
+}
+extension BookRepository { func authors() async -> [Author] { Author.demoProfiles } }
 protocol ProgressRepository: Sendable {
     func load() async throws -> LearnerProgress
     func save(_ progress: LearnerProgress) async throws

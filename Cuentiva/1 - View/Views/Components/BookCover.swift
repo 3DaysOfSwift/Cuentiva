@@ -27,7 +27,7 @@ struct BookCover: View {
                     Spacer(minLength: 4)
                     Image(systemName: book.symbol).font(.system(size: compact ? 38 : 70, weight: .ultraLight)).frame(maxWidth: .infinity).padding(.vertical, compact ? 8 : 10)
                     Spacer(minLength: 4)
-                    Text(book.author.uppercased()).font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1)
+                    Text(book.storytellerName.uppercased()).font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1)
                 }.padding(compact ? 17 : 25).foregroundStyle(theme.theme.coverInk)
             }
             if completed {

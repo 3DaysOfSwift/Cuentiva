@@ -13,10 +13,10 @@ struct AuthorView: View {
             VStack(alignment: .leading, spacing: 24) {
                 AuthorPortrait(author: model.author, size: 132).frame(maxWidth: .infinity)
                 Text(model.author.name).font(.system(.largeTitle, design: .serif))
-                Text("FICTIONAL DEMO AUTHOR").font(.caption.weight(.semibold)).foregroundStyle(theme.theme.accent)
+                Text("STORYTELLER").font(.caption.weight(.semibold)).foregroundStyle(theme.theme.accent)
                 Text(model.author.introduction).font(.title3)
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Behind the story").font(.headline)
+                    Text("Behind the stories").font(.headline)
                     Text(model.author.note).font(.system(.body, design: .serif))
                 }.padding(20).frame(maxWidth: .infinity, alignment: .leading).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
                 Text("Stories by \(model.author.name)").font(.system(.title2, design: .serif))
@@ -29,8 +29,6 @@ struct AuthorView: View {
                         }
                     }.buttonStyle(.plain)
                 }
-                Text("This profile, its personal note and illustrated portrait are fictional demonstrations. These stories are not verified memoirs.")
-                    .font(.footnote).foregroundStyle(theme.theme.muted)
                 Button(action: onContribute) { Label("Share a story of your own", systemImage: "square.and.pencil") }
             }.padding(23)
         }

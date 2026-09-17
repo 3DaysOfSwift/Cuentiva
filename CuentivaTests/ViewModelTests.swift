@@ -16,6 +16,23 @@ import Testing
     func stop() { recording = false }
 }
 @Suite @MainActor struct ViewModelTests {
+    @Test func dailyCarouselFocusesNextUnreadAndAllowsBrowsingCompletedBooks() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: (0..<3).map { sample("carousel-\($0)") }), purchases: purchases, progress: progress)
+        try await library.load()
+        let home = HomeViewModel(library: library, progress: progress)
+        await home.prepareDailyReads()
+        let first = try #require(home.focusedRead)
+        try await progress.recordEncounter(book: first, sentence: first.sentences[0])
+        _ = try await progress.complete(book: first)
+        home.focusNextRead()
+        #expect(home.focusedRead?.id != first.id)
+        #expect(home.dailyReads.contains { $0.id == first.id })
+        home.focusedBookID = first.id
+        #expect(home.focusedRead?.id == first.id)
+        #expect(home.completed(first))
+    }
     private func graph() async throws -> (TestPurchases, ProgressManager, LibraryManager, LearningManager, ContributionManager) {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
         try await progress.load()
@@ -45,7 +62,8 @@ import Testing
         let book = sample(); try await s.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await s.complete(book: book)
         #expect(home.total == 1); #expect(collection.books.count == 1)
         #expect(home.books.isEmpty)
-        #expect(home.nextRead == nil)
+        #expect(home.nextRead?.id == "cafe")
+        #expect(home.revisiting)
         home.hideCompleted = false
         #expect(home.books.count == 1)
         home.level = "B1"

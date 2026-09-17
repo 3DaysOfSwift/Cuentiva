@@ -34,7 +34,7 @@ Explore the [open-source CFA skills and toolkit](https://github.com/3DaysOfSwift
 4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then Read the full story. Enjoy the extended bilingual reader and use Mark as read at its end. Speak, Write, and Check my words are optional.
 5. Continue from the celebration to the one-time purchase offer. Purchase full access in the local StoreKit purchase sheet to unlock the full library.
 
-The StoreKit file configures a **$4.99 one-time non-consumable purchase**, with no trial or renewal. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
+The StoreKit file configures a **$14.99 one-time non-consumable purchase**, with no trial or renewal. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
 
 For a physical device, select your signing team. The bundle ID is `com.3DaysOfSwiftConcurrency.Cuentiva`; test targets append their target name. All package dependencies are Apple frameworks—there are no third-party dependencies.
 
@@ -143,3 +143,43 @@ Completed books offer Spanish-only guided rereading, vocabulary statistics and o
 ## Language help
 
 Settings includes **Decipher language terms**: 12 searchable English–Spanish grammar terms, clear definitions, highlighted examples and related explanations. The word-family statistic opens the lemma entry. This first version is a reference guide, without a quiz.
+
+## A fresh daily library
+
+Discover offers up to three daily reads. Arrival dates are recorded per book on the
+reader’s device, so newly downloaded titles lead for 30 days. A corrected pack does
+not make an already-known book new again. Within equal arrival/reading/level priority,
+a deterministic shuffled order rotates by three positions each local calendar day.
+
+Incomplete books last read today or in the previous three calendar days remain
+eligible. Older attempts rest from the default Discover selection but remain
+searchable. Legacy attempts without dates are treated as resting. Completed books
+are excluded until the eligible collection is exhausted; then recommendations cycle
+through the collection again. This never resets completed totals, vocabulary,
+streaks, rewards or saved reading positions. Explicit search, sort and completion
+filters remain available for browsing.
+
+The editorial target of 1,095 distinct stories provides three stories per day for
+365 days. It is a content plan, not a claim that those stories already exist. User
+reading, filters, levels and new releases can change the daily recommendations.
+
+## Storyteller characters
+
+Nine permanent illustrated characters guide the collection: Brasa, Musgo, Pipa,
+Zumi, Luma, Nube, Tilo, Mora and Faro. Their one-word names, biographies and
+bundled portraits appear in the weekly carousel and profile pages. Existing
+author IDs are retained; legacy cached profiles resolve to the current cast,
+and book-cover credits use the character name. These editorial characters do
+not change the people or dialogue inside the stories.
+
+Artwork is bundled locally as 512px JPEGs. Packs carry only text and approved
+asset names, never image downloads. Generation prompts are recorded in
+[docs/storyteller-art.json](docs/storyteller-art.json). Publish revised packs only
+after shipping a client that accepts the new Storyteller asset names.
+
+Today's three are presented in a horizontal carousel. The selection is saved for
+that calendar day, including completed cards, so finishing one adds a tick without
+replacing it. Opening Discover or returning from a lesson focuses the first unread
+book. Swiping or tapping a page indicator selects another book and updates its
+details and reading action. The next day's selection uses the existing freshness
+rules; permanent completion records are retained.

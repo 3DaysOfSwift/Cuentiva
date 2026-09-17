@@ -188,7 +188,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let oldData = try JSONEncoder().encode(legacyBook)
         #expect(try JSONDecoder().decode(Book.self, from: oldData).authorID == nil)
     }
-    @Test func nextReadPrioritizesUnfinishedBooksThenSelectedLevel() async throws {
+    @Test func nextReadKeepsRecentReadingAndRecyclesAfterCompletion() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
         try await progress.load()
         let first = sample("first"), second = sample("second")
@@ -196,16 +196,19 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         try await library.load()
         #expect(library.nextRead == nil)
         purchases.hasAccess = true
-        #expect(library.nextRead?.id == first.id)
+        let initial = library.nextRead?.id
+        #expect(initial != nil)
         try await progress.setLearningLevel(.c2)
-        #expect(library.nextRead?.id == first.id)
+        #expect(library.nextRead?.id == initial)
         try await progress.recordEncounter(book: second, sentence: second.sentences[0])
         #expect(library.nextRead?.id == second.id)
         _ = try await progress.complete(book: second)
         #expect(library.nextRead?.id == first.id)
         try await progress.recordEncounter(book: first, sentence: first.sentences[0])
         _ = try await progress.complete(book: first)
-        #expect(library.nextRead == nil)
+        #expect(library.nextRead != nil)
+        #expect(library.revisiting)
+        #expect(progress.snapshot.completed == [first.id, second.id])
     }
     @Test func librarySearchAndCompletedCollectionAreGated() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), book = sample(); try await progress.load()
@@ -530,20 +533,32 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
 }
 
 actor TestCatalogueTransport: CatalogueTransport {
-    let manifest: CatalogueManifest
-    let payload: Data
+    var manifest: CatalogueManifest
+    var payloads: [String: Data] = [:]
     var broken = false
     var partReads = 0
-    init(_ books: [Book]) throws {
-        payload = try JSONEncoder().encode(books)
-        manifest = CatalogueManifest(schema: 1, version: SHA256.hash(data: payload).map { String(format: "%02x", $0) }.joined(), bytes: payload.count, chunks: (payload.count + 1023) / 1024, books: books.count)
+    var failID: String?
+    init(_ books: [Book], author: Author = Author.demoProfiles[0]) throws {
+        let encoder = JSONEncoder(); encoder.outputFormatting = .sortedKeys
+        var refs: [PackDescriptor] = []
+        for (i, value) in books.enumerated() {
+            var book = value; book.authorID = author.id
+            let id = "pack-\(i)"
+            let payload = try encoder.encode(LibraryPack(schema: 2, id: id, authors: [author], books: [book]))
+            let checksum = SHA256.hash(data: payload).map { String(format: "%02x", $0) }.joined()
+            refs.append(PackDescriptor(id: id, checksum: checksum, bytes: payload.count, books: 1))
+            payloads[id] = payload
+        }
+        manifest = CatalogueManifest(schema: 2, version: String(repeating: "a", count: 64), packs: refs)
     }
     func fail() { broken = true }
-    func fetch(version: String?, part: Int?) throws -> Data {
-        guard let part else { return try JSONEncoder().encode(manifest) }
+    func failOnly(_ id: String?) { failID = id }
+    func corrupt(_ id: String) { payloads[id] = Data("broken".utf8) }
+    func fetch(pack: PackDescriptor?) throws -> Data {
+        guard let pack else { return try JSONEncoder().encode(manifest) }
         partReads += 1
-        if broken { throw AppFailure.unavailable("Offline") }
-        return payload.subdata(in: part * 1024..<min((part + 1) * 1024, payload.count))
+        if broken || failID == pack.id { throw AppFailure.unavailable("Offline") }
+        return payloads[pack.id]!
     }
 }
 @Suite struct CatalogueSyncTests {
@@ -561,10 +576,27 @@ actor TestCatalogueTransport: CatalogueTransport {
         #expect(await transport.partReads == reads)
         let reloaded = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
         #expect(try await reloaded.books().map(\.id) == ["cafe", "new"])
+        #expect(await reloaded.authors() == [Author.demoProfiles[0]])
         let failing = try TestCatalogueTransport([sample(), sample("later")]); await failing.fail()
         let offline = SyncedBookRepository(bundled: source, transport: failing, cacheURL: cache)
         await #expect(throws: AppFailure.self) { try await offline.sync() }
         #expect(try await offline.books().map(\.id) == ["cafe", "new"])
+    }
+    @Test func onlyChangedRevisionDownloadsAndInterruptedSyncResumes() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = directory.appending(path: "catalogue.json"), source = MemoryBooks(values: [sample()])
+        let a = try TestCatalogueTransport([sample(), sample("old")])
+        _ = try await SyncedBookRepository(bundled: source, transport: a, cacheURL: cache).sync()
+        let b = try TestCatalogueTransport([sample(), sample("new"), sample("third")])
+        await b.failOnly("pack-2")
+        let repo = SyncedBookRepository(bundled: source, transport: b, cacheURL: cache)
+        await #expect(throws: AppFailure.self) { try await repo.sync() }
+        #expect(try await repo.books().map(\.id) == ["cafe", "old"])
+        #expect(await b.partReads == 2) // unchanged pack reused; second download fails
+        await b.failOnly(nil)
+        #expect(try await repo.sync().map(\.id) == ["cafe", "new", "third"])
+        #expect(await b.partReads == 3) // successful new pack reused after the interruption
     }
     @Test func invalidCatalogueCannotReplaceBundledBooks() async throws {
         let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
@@ -572,13 +604,140 @@ actor TestCatalogueTransport: CatalogueTransport {
         let source = MemoryBooks(values: [sample()])
         for books in [[sample(),sample()], [sample("missing-intro")]] {
             let transport = try TestCatalogueTransport(books)
-            let repository = SyncedBookRepository(bundled: source, transport: transport, cacheURL: directory.appending(path: "catalogue.json"))
+            let repository = SyncedBookRepository(bundled: source, transport: transport, cacheURL: directory.appending(path: UUID().uuidString + "/catalogue.json"))
             await #expect(throws: AppFailure.self) { try await repository.sync() }
             #expect(try await repository.books().count == 1)
         }
-        let transport = try TestCatalogueTransport([sample()])
-        let data = transport.payload, m = transport.manifest
-        var corrupt = data; corrupt[0] = 0
-        #expect(throws: AppFailure.self) { try SyncedBookRepository.decode(corrupt, manifest: m) }
+        let transport = try TestCatalogueTransport([sample()]); await transport.corrupt("pack-0")
+        let repo = SyncedBookRepository(bundled: source, transport: transport, cacheURL: directory.appending(path: "bad/catalogue.json"))
+        await #expect(throws: AppFailure.self) { try await repo.sync() }
+    }
+    @Test func authorOnlyRevisionUpdatesAlongsideBooks() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = directory.appending(path: "catalogue.json"), source = MemoryBooks(values: [sample()])
+        let a = try TestCatalogueTransport([sample()])
+        _ = try await SyncedBookRepository(bundled: source, transport: a, cacheURL: cache).sync()
+        let author = Author(id: "ana", name: "Ana", portrait: "", introduction: "New introduction", note: "New note")
+        let b = try TestCatalogueTransport([sample()], author: author)
+        let repo = SyncedBookRepository(bundled: source, transport: b, cacheURL: cache)
+        _ = try await repo.sync()
+        #expect(await b.partReads == 1)
+        #expect(await repo.authors() == [author])
+    }
+}
+
+@Suite struct WeeklyAuthorTests {
+    @Test func legacyProfilesResolveToPermanentCharactersWithoutChangingIdentity() {
+        let legacy = Author(id: "ana", name: "Ana · demo narrator", portrait: "AuthorAna", introduction: "Old biography", note: "Old note")
+        #expect(legacy.storyteller.id == legacy.id)
+        #expect(legacy.storyteller.name == "Brasa")
+        #expect(legacy.storyteller.portrait == "StorytellerBrasa")
+        #expect(Set(Author.demoProfiles.map(\.portrait)).count == Author.demoProfiles.count)
+        #expect(Author.demoProfiles.allSatisfy { $0.name.split(whereSeparator: { $0.isWhitespace }).count == 1 })
+        var book = sample()
+        book.authorID = legacy.id
+        #expect(book.storytellerName == "Brasa")
+        #expect(Author.supportedPortraits.contains("AuthorAna"))
+        #expect(!Author.supportedPortraits.contains("https://example.com/portrait.jpg"))
+    }
+    @Test func stableWithinWeekAndRotatesAcrossMondayWithoutDependingOnInputOrder() {
+        let monday = Date(timeIntervalSince1970: 345_600 + 2900 * 604_800)
+        let authors = Author.demoProfiles
+        let current = Author.weeklyOrder(authors, on: monday)
+        #expect(current == Author.weeklyOrder(authors.reversed(), on: monday.addingTimeInterval(604_799)))
+        let next = Author.weeklyOrder(authors, on: monday.addingTimeInterval(604_800))
+        #expect(current.first?.id != next.first?.id)
+        #expect(Set(current.map(\.id)) == Set(next.map(\.id)))
+        #expect(Author.weeklyOrder([], on: monday).isEmpty)
+        #expect(Author.weeklyOrder([authors[0]], on: monday) == [authors[0]])
+    }
+}
+
+@MainActor @Suite struct FreshLibraryTests {
+    final class Clock { var date = Date(timeIntervalSince1970: 1_800_014_400) }
+    @Test func dailySelectionRetainsCompletedBooksAcrossRelaunchAndRenewsTomorrow() async throws {
+        let clock = Clock(), store = MemoryProgress(), purchases = TestPurchases()
+        purchases.hasAccess = true
+        let progress = ProgressManager(repository: store, now: { clock.date })
+        let books = (0..<6).map { sample("daily-\($0)") }
+        let source = MemoryBooks(values: books)
+        let library = LibraryManager(repository: source, purchases: purchases, progress: progress, now: { clock.date })
+        try await library.load()
+        try await library.prepareDailyReads()
+        let original = library.dailyReads
+        for book in original {
+            try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+            _ = try await progress.complete(book: book)
+            #expect(library.dailyReads.map(\.id) == original.map(\.id))
+            #expect(library.nextRead?.id == (original.first { !progress.snapshot.completed.contains($0.id) } ?? original[0]).id)
+        }
+        let reloadedProgress = ProgressManager(repository: store, now: { clock.date })
+        let reloaded = LibraryManager(repository: source, purchases: purchases, progress: reloadedProgress, now: { clock.date })
+        try await reloaded.load(); try await reloaded.prepareDailyReads()
+        #expect(reloaded.dailyReads.map(\.id) == original.map(\.id))
+        clock.date = Calendar.current.date(byAdding: .day, value: 1, to: clock.date)!
+        try await reloaded.prepareDailyReads()
+        #expect(Set(reloaded.dailyReads.map(\.id)).isDisjoint(with: Set(original.map(\.id))))
+        #expect(reloadedProgress.snapshot.completed.count == 3)
+    }
+    @Test func newArrivalsLeadAndOldAttemptsRestWithoutLosingProgress() async throws {
+        let clock = Clock(), store = MemoryProgress(), purchases = TestPurchases(); purchases.hasAccess = true
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let progress = ProgressManager(repository: store, now: { clock.date }, calendar: calendar)
+        let old = sample("old"), ongoing = sample("ongoing"), fresh = sample("fresh")
+        let first = LibraryManager(repository: MemoryBooks(values: [old, ongoing]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
+        try await first.load()
+        try await progress.recordEncounter(book: old, sentence: old.sentences[0])
+        let arrival = progress.snapshot.bookArrivals?[old.id]
+        clock.date = calendar.date(byAdding: .day, value: 40, to: clock.date)!
+        try await progress.recordEncounter(book: ongoing, sentence: ongoing.sentences[0])
+        let updated = LibraryManager(repository: MemoryBooks(values: [old, ongoing, fresh]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
+        try await updated.load()
+        #expect(updated.nextRead?.id == fresh.id)
+        #expect(updated.dailyReads.map(\.id).contains(ongoing.id))
+        #expect(!updated.dailyReads.map(\.id).contains(old.id))
+        #expect(updated.search("", level: nil, completedOnly: false).count == 3)
+        #expect(progress.snapshot.bookArrivals?[old.id] == arrival)
+        clock.date = calendar.date(byAdding: .day, value: 3, to: clock.date)!
+        #expect(updated.dailyReads.map(\.id).contains(ongoing.id))
+        clock.date = calendar.date(byAdding: .day, value: 1, to: clock.date)!
+        #expect(!updated.dailyReads.map(\.id).contains(ongoing.id))
+        #expect(!progress.snapshot.attempts[old.id, default: []].isEmpty)
+        let reloaded = ProgressManager(repository: store); try await reloaded.load()
+        #expect(reloaded.snapshot.bookArrivals == progress.snapshot.bookArrivals)
+        #expect(reloaded.snapshot.bookLastRead == progress.snapshot.bookLastRead)
+    }
+    @Test func dailyThreeAreStableThenRotateWithoutNewDownloads() async throws {
+        let clock = Clock(), purchases = TestPurchases(); purchases.hasAccess = true
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let progress = ProgressManager(repository: MemoryProgress(), now: { clock.date }, calendar: calendar)
+        let books = (0..<6).map { sample("book-\($0)") }
+        let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
+        try await library.load()
+        clock.date = calendar.date(byAdding: .year, value: 1, to: clock.date)!
+        let today = Set(library.dailyReads.map(\.id))
+        #expect(today.count == 3)
+        #expect(today == Set(library.dailyReads.map(\.id)))
+        clock.date = calendar.date(byAdding: .day, value: 1, to: clock.date)!
+        #expect(today.isDisjoint(with: Set(library.dailyReads.map(\.id))))
+        #expect(!library.revisiting)
+    }
+    @Test func restingExhaustionRecyclesWithoutResettingAnything() async throws {
+        let clock = Clock(), purchases = TestPurchases(); purchases.hasAccess = true
+        let store = MemoryProgress(), progress = ProgressManager(repository: store, now: { clock.date })
+        let book = sample()
+        let library = LibraryManager(repository: MemoryBooks(values: [book]), purchases: purchases, progress: progress, now: { clock.date })
+        try await library.load(); try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        try await progress.setVocabulary("café", state: .known)
+        let before = try JSONEncoder().encode(progress.snapshot)
+        #expect(library.revisiting)
+        #expect(library.dailyReads.map(\.id) == [book.id])
+        #expect(progress.snapshot.completed == [book.id])
+        #expect(progress.snapshot.vocabulary["café"] == .known)
+        // Viewing recommendations performs no persistence writes or reset.
+        #expect(try JSONDecoder().decode(LearnerProgress.self, from: before).practiceDays == progress.snapshot.practiceDays)
+        purchases.hasAccess = false; #expect(library.dailyReads.isEmpty)
     }
 }

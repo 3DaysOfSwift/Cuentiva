@@ -7,6 +7,8 @@ import Observation
     var streak: Int { get }
     var week: [WeekDay] { get }
     func load() async throws
+    func registerLibrary(_ books: [Book]) async throws
+    func saveDailyReading(_ ids: [String], date: Date) async throws
     func recordEncounter(book: Book, sentence: Sentence) async throws
     func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance
     func savePosition(book: Book, position: Int) async throws
@@ -59,7 +61,26 @@ import Observation
         try await repository.save(next)
         snapshot = next
     }
+    func registerLibrary(_ books: [Book]) async throws {
+        let missing = books.map(\.id).filter { snapshot.bookArrivals?[$0] == nil }
+        guard !missing.isEmpty else { return }
+        let arrived = now()
+        try await commit { next in
+            if next.bookArrivals == nil { next.bookArrivals = [:] }
+            for id in missing { next.bookArrivals?[id] = arrived }
+        }
+    }
+    func saveDailyReading(_ ids: [String], date: Date) async throws {
+        guard ids.count <= 3, Set(ids).count == ids.count else { throw AppFailure.invalidBook }
+        guard snapshot.dailyReadingIDs != ids || snapshot.dailyReadingDate != date else { return }
+        try await commit { next in
+            next.dailyReadingIDs = ids
+            next.dailyReadingDate = date
+        }
+    }
     private func addEncounter(book: Book, sentence: Sentence, to next: inout LearnerProgress) {
+        if next.bookLastRead == nil { next.bookLastRead = [:] }
+        next.bookLastRead?[book.id] = now()
         if next.wordHistoryComplete == nil { next.wordHistoryComplete = next.evidence.isEmpty }
         if next.wordHistoryComplete == true, next.bookWordBaselines?[book.id] == nil, next.attempts[book.id, default: []].isEmpty {
             if next.bookWordBaselines == nil { next.bookWordBaselines = [:] }
@@ -93,7 +114,11 @@ import Observation
         return last ? .fullReading : .position(index + 1)
     }
     func savePosition(book: Book, position: Int) async throws {
-        try await commit { $0.positions[book.id] = max(0, min(position, book.sentences.count - 1)) }
+        try await commit {
+            $0.positions[book.id] = max(0, min(position, book.sentences.count - 1))
+            if $0.bookLastRead == nil { $0.bookLastRead = [:] }
+            $0.bookLastRead?[book.id] = now()
+        }
     }
     func complete(book: Book) async throws -> CompletionReceipt {
         guard Set(book.fullText.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else { throw AppFailure.incomplete }

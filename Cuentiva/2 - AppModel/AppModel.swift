@@ -23,7 +23,7 @@ import Foundation
         let progress = ProgressManager(repository: LocalProgressRepository(url: directory.appending(path: "progress.json")))
         let purchases = PurchaseManager()
         let repository = SyncedBookRepository(bundled: BundledBookRepository(),
-            transport: WixCatalogueTransport(endpoint: URL(string: "https://www.3daysofswiftconcurrency.com/_functions/cuentivaCatalogue")!),
+            transport: GitHubCatalogueTransport(endpoint: URL(string: "https://github.com/3DaysOfSwift/GlobalEnglish-SpanishLearningBooksCollection")!),
             cacheURL: directory.appending(path: "catalogue.json"))
         let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
         let learning = LearningManager(purchases: purchases, progress: progress)

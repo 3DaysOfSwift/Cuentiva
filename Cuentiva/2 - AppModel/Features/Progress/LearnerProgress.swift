@@ -8,6 +8,11 @@ struct LearnerProgress: Codable, Sendable {
     var completed: Set<String> = []
     // Legacy storage key: records sentence encounters (reading or optional practice).
     var attempts: [String: Set<String>] = [:]
+    // Optional for backward-compatible decoding of existing learner files.
+    var bookArrivals: [String: Date]? = nil
+    var bookLastRead: [String: Date]? = nil
+    var dailyReadingDate: Date? = nil
+    var dailyReadingIDs: [String]? = nil
     var positions: [String: Int] = [:]
     var practiceDays: Set<String> = []
     var vocabulary: [String: VocabularyState] = [:]

@@ -1,0 +1,51 @@
+{
+  "method": "Built-in image_gen tool",
+  "promptTemplate": "Use case: illustration-story. Asset type: square character portrait for Cuentiva, an elegant Spanish-learning storybook app. Create ONE original charming fictional storyteller: SUBJECT. Cohesive hand-painted gouache cartoon illustration with simple rounded silhouettes, subtle paper grain, expressive face, sophisticated muted forest green, terracotta, cream, teal and ochre palette. Warm and whimsical, charming to adults as well as children. Centered head-and-upper-body portrait on a flat warm ivory background, all features contained in the central 75% of the square to fit a circular crop. Strong silhouette legible at 76px. No lettering, no text, no logo, no border, no collage, no additional characters.",
+  "characters": [
+    {
+      "name": "Brasa",
+      "subject": "a small terracotta dragon with tiny horns and folded wings, holding a coffee cup, kindly curious",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerBrasa.imageset/portrait.jpg"
+    },
+    {
+      "name": "Musgo",
+      "subject": "a moss-green little wizard creature with a large floppy pointed hat and round spectacles, holding a leaf, gentle wise smile",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerMusgo.imageset/portrait.jpg"
+    },
+    {
+      "name": "Pipa",
+      "subject": "a teal friendly lizard with rounded snout and tiny coral scarf, holding a little travel notebook, adventurous",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerPipa.imageset/portrait.jpg"
+    },
+    {
+      "name": "Zumi",
+      "subject": "a cute amber fly creature with big expressive eyes, two translucent wings and little round spectacles, holding a pencil",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerZumi.imageset/portrait.jpg"
+    },
+    {
+      "name": "Luma",
+      "subject": "a plum and cream moth creature with feathery antennae and patterned folded wings, holding a tiny lantern, quietly mysterious",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerLuma.imageset/portrait.jpg"
+    },
+    {
+      "name": "Nube",
+      "subject": "a soft cream cloud sprite with tiny arms and a forest-green scarf, holding a small book, dreamy smile",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerNube.imageset/portrait.jpg"
+    },
+    {
+      "name": "Tilo",
+      "subject": "an olive-green tortoise with an ochre shell and round spectacles, holding a book, patient gentle smile",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerTilo.imageset/portrait.jpg"
+    },
+    {
+      "name": "Mora",
+      "subject": "a small mushroom woodland sprite with a dusty-rose spotted mushroom cap and cream face, holding a little envelope, mischievous kind smile",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerMora.imageset/portrait.jpg"
+    },
+    {
+      "name": "Faro",
+      "subject": "a blue-grey owl with cream face, large amber eyes and tiny satchel, holding a folded map, curious",
+      "path": "Cuentiva/3 - App Resources/Assets.xcassets/StorytellerFaro.imageset/portrait.jpg"
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import SwiftUI
 struct HomeView: View {
     let onContribute: () -> Void
     @State private var viewModel = HomeViewModel()
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         ScrollView {
@@ -10,23 +11,43 @@ struct HomeView: View {
                 Divider()
                 HStack(alignment: .bottom) {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Your next read").font(.system(.largeTitle, design: .serif, weight: .medium))
+                        Text("Today’s 3 books").font(.system(.largeTitle, design: .serif, weight: .medium))
                         Text("Bring Spanish to life through stories.").font(.subheadline).foregroundStyle(theme.theme.muted)
                     }
                     Spacer(minLength: 5)
                     VStack { Text("\(viewModel.total)").font(.system(.largeTitle, design: .serif)); Text("BOOKS\nLEARNED").font(.system(size: 9, weight: .bold, design: .monospaced)).multilineTextAlignment(.center) }
                 }
-                if let book = viewModel.nextRead {
+                if !viewModel.dailyReads.isEmpty {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 16) {
+                            ForEach(viewModel.dailyReads) { book in
+                                Button { viewModel.selectedBook = book } label: {
+                                    BookCover(book: book, completed: viewModel.completed(book), compact: true)
+                                        .frame(width: 190)
+                                        .padding(.vertical, 12)
+                                }
+                                .buttonStyle(.plain)
+                                .id(book.id)
+                                .accessibilityLabel("\(book.englishTitle)\(viewModel.completed(book) ? ", completed" : ", unread")")
+                            }
+                        }.scrollTargetLayout()
+                    }
+                    .contentMargins(.horizontal, 23, for: .scrollContent)
+                    .scrollIndicators(.hidden)
+                    .scrollTargetBehavior(.viewAligned)
+                    .scrollPosition(id: $viewModel.focusedBookID, anchor: .center)
+                    .padding(.horizontal, -23)
+
+                }
+                if let book = viewModel.focusedRead {
                     VStack(alignment: .leading, spacing: 16) {
-                        BookCover(book: book, compact: true)
-                            .frame(maxWidth: 190).frame(maxWidth: .infinity)
                         Text(book.englishTitle).font(.title2.weight(.semibold))
                         Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
                             .font(.caption).foregroundStyle(theme.theme.muted)
                         Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
                         Button { viewModel.selectedBook = book } label: {
                             HStack {
-                                Text(viewModel.hasStarted(book) ? "Continue reading" : "Read this book")
+                                Text(viewModel.completed(book) ? "Read again" : (viewModel.hasStarted(book) ? "Continue reading" : "Read this book"))
                                 Image(systemName: "arrow.right")
                             }
                             .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
@@ -35,15 +56,23 @@ struct HomeView: View {
                         }.buttonStyle(.plain)
                     }
                 } else {
-                    Text("You’ve read every available book. Revisit a favourite in Completed, or share a story of your own.")
+                    Text("New stories will appear here as the library grows.")
                         .foregroundStyle(theme.theme.muted)
+                }
+                if let error = viewModel.dailyReadingError {
+                    Text(error).font(.caption).foregroundStyle(theme.theme.muted)
+                    Button("Retry") { Task { await viewModel.prepareDailyReads() } }
+                }
+                if viewModel.revisiting {
+                    Text("A fresh look at your collection. Your reading progress is safely kept.")
+                        .font(.subheadline).foregroundStyle(theme.theme.muted)
                 }
                 Divider()
                 Text("Explore our community library").font(.system(.title2, design: .serif, weight: .medium))
-                CommunityAuthors(authors: viewModel.authors, onContribute: onContribute)
+                CommunityAuthors(authors: viewModel.authors, onContribute: onContribute, horizontalInset: 23)
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
-                Toggle("Hide completed books", isOn: $viewModel.hideCompleted)
+                Toggle(viewModel.revisiting && viewModel.query.isEmpty && viewModel.sort == .library ? "Daily selection · revisiting favourites" : "Hide completed books", isOn: $viewModel.hideCompleted)
                     .font(.subheadline).tint(theme.theme.accent)
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 26) {
                     ForEach(viewModel.books) { book in
@@ -75,6 +104,10 @@ struct HomeView: View {
             .searchable(text: $viewModel.query, placement: .toolbar, prompt: "Find a story or a person")
             .searchToolbarBehavior(.minimize)
             .toolbar { ToolbarItem(placement: .topBarTrailing) { NavigationLink { SettingsView() } label: { Image(systemName: "gearshape") }.accessibilityLabel("Settings") } }
-            .fullScreenCover(item: $viewModel.selectedBook) { book in NavigationStack { LessonView(book: book) } }
+            .task(id: viewModel.dailyReads.map(\.id)) { await viewModel.prepareDailyReads() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await viewModel.prepareDailyReads() } }
+            }
+            .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { viewModel.focusNextRead() }) { book in NavigationStack { LessonView(book: book) } }
     }
 }

@@ -4,15 +4,36 @@ import Observation
     private let library: any LibraryFeature
     private let progress: any ProgressFeature
     var selectedBook: Book?
+    var focusedBookID: String?
+    var dailyReadingError: String?
+    private var preparingDailyReads = false
     var query = ""
     var format: BookFormat?
     var sort: BookSort = .library
     var level = "All"
     var hideCompleted = true
     var authors: [Author] { library.authors }
+    var dailyReads: [Book] { library.dailyReads }
+    var revisiting: Bool { library.revisiting }
     var nextRead: Book? { library.nextRead }
+    var focusedRead: Book? { dailyReads.first { $0.id == focusedBookID } ?? nextRead }
+    func focusNextRead() { focusedBookID = nextRead?.id }
+    func prepareDailyReads() async {
+        guard !preparingDailyReads else { return }
+        preparingDailyReads = true
+        defer { preparingDailyReads = false }
+        do {
+            try await library.prepareDailyReads()
+            dailyReadingError = nil
+            focusNextRead()
+        } catch {
+            dailyReadingError = "Couldn’t save today’s selection. Please try again."
+        }
+    }
     func hasStarted(_ book: Book) -> Bool { !progress.snapshot.attempts[book.id, default: []].isEmpty || progress.snapshot.positions[book.id, default: 0] > 0 }
-    var books: [Book] { library.search(query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort, hideCompleted: hideCompleted) }
+    var books: [Book] {
+        if query.isEmpty && sort == .library && hideCompleted { return library.discover(level: level == "All" ? nil : level, format: format) }
+        return library.search(query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort, hideCompleted: hideCompleted) }
     var total: Int { progress.snapshot.completed.count }
     var streak: Int { progress.streak }
     var week: [WeekDay] { progress.week }

@@ -3,7 +3,7 @@
     "id": "cafe",
     "title": "El café de Ana",
     "englishTitle": "Ana’s little café",
-    "author": "Ana · demo narrator",
+    "author": "Brasa",
     "level": "A1",
     "symbol": "cup.and.saucer",
     "palette": 0,
@@ -475,7 +475,7 @@
     "id": "garden",
     "title": "El jardín de mi padre",
     "englishTitle": "My father’s garden",
-    "author": "Luis · demo narrator",
+    "author": "Musgo",
     "level": "A1",
     "symbol": "leaf",
     "palette": 1,
@@ -971,7 +971,7 @@
     "id": "train",
     "title": "Un billete a casa",
     "englishTitle": "A ticket home",
-    "author": "Marta · demo narrator",
+    "author": "Pipa",
     "level": "A2",
     "symbol": "tram",
     "palette": 2,
@@ -1529,7 +1529,7 @@
     "id": "sea",
     "title": "Aprender a nadar",
     "englishTitle": "Learning to swim",
-    "author": "Diego · demo narrator",
+    "author": "Zumi",
     "level": "A2",
     "symbol": "water.waves",
     "palette": 3,
@@ -2135,13 +2135,14 @@
         "spanish": "Ahora tengo otra razón para seguir aprendiendo.",
         "english": "Now I have another reason to keep learning."
       }
-    ]
+    ],
+    "authorID": "credit-fade9533cfe2"
   },
   {
     "id": "repair",
     "title": "Una segunda oportunidad",
     "englishTitle": "A second chance",
-    "author": "Clara · demo narrator",
+    "author": "Luma",
     "level": "B1",
     "symbol": "bicycle",
     "palette": 4,
@@ -2902,13 +2903,14 @@
         "spanish": "Sin embargo, aquella tarde me recordó por qué había querido abrirlo.",
         "english": "However, that afternoon reminded me why I had wanted to open it."
       }
-    ]
+    ],
+    "authorID": "credit-53e13e40b11a"
   },
   {
     "id": "repair-hour",
     "title": "Una hora de trabajo",
     "englishTitle": "An hour of work",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A1",
     "symbol": "wrench.and.screwdriver",
     "palette": 0,
@@ -3339,13 +3341,14 @@
         "spanish": "A las dos cierro la puerta y voy a buscarla.",
         "english": "At two o’clock I close the door and go to collect her."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "loan-notebook",
     "title": "El cuaderno del préstamo",
     "englishTitle": "The loan notebook",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "book.closed",
     "palette": 1,
@@ -3991,13 +3994,14 @@
         "spanish": "Nuestra conversación termina con una merienda, no con una deuda entre nosotros.",
         "english": "Our conversation ends with an afternoon snack, not a debt between us."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "small-guide",
     "title": "La guía de Clara",
     "englishTitle": "Clara’s little guide",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "map",
     "palette": 2,
@@ -4563,13 +4567,14 @@
         "spanish": "Ahora la guía también le enseña a su autora a mirar mejor.",
         "english": "Now the guide also teaches its author to look more carefully."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "three-paths",
     "title": "Tres caminos en una mesa",
     "englishTitle": "Three paths at one table",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "signpost.right",
     "palette": 3,
@@ -5260,13 +5265,14 @@
         "spanish": "Por primera vez en toda la noche, los tres miran el mismo calendario.",
         "english": "For the first time that evening, all three look at the same calendar."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "three-envelopes",
     "title": "Los tres sobres",
     "englishTitle": "The three envelopes",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A1",
     "symbol": "envelope",
     "palette": 4,
@@ -5702,13 +5708,14 @@
         "spanish": "Guardo el sobre porque también es un regalo.",
         "english": "I keep the envelope because it is a present too."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "rainy-roof",
     "title": "El techo y la lluvia",
     "englishTitle": "The roof and the rain",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "cloud.rain",
     "palette": 0,
@@ -6279,13 +6286,14 @@
         "spanish": "Tienen muchas historias que contar junto a la ventana seca.",
         "english": "They have many stories to tell beside the dry window."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "patient-investor",
     "title": "La pregunta de Elena",
     "englishTitle": "Elena’s question",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "chart.line.uptrend.xyaxis",
     "palette": 1,
@@ -6936,13 +6944,14 @@
         "spanish": "Su conversación no resuelve todos los problemas, pero ya ninguna tiene que pensar sola.",
         "english": "Their conversation does not solve every problem, but neither of them has to think alone now."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "first-stitch",
     "title": "La primera puntada",
     "englishTitle": "The first stitch",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "scissors",
     "palette": 2,
@@ -7473,13 +7482,14 @@
         "spanish": "Ahora quiere aprender la siguiente puntada con todavía más cuidado.",
         "english": "Now she wants to learn the next stitch with even more care."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "different-door",
     "title": "Una puerta diferente",
     "englishTitle": "A different door",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "door.left.hand.open",
     "palette": 3,
@@ -8120,13 +8130,14 @@
         "spanish": "Pero ahora entiende mejor para quién está enseñando a tocar.",
         "english": "But now he understands better who he is teaching people to play for."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "empty-wallet",
     "title": "La cartera vacía",
     "englishTitle": "The empty wallet",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A1",
     "symbol": "heart",
     "palette": 4,
@@ -8612,13 +8623,14 @@
         "spanish": "Ahora la cartera tiene algo que quiero guardar.",
         "english": "Now the wallet holds something I want to keep."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "shared-table",
     "title": "Una mesa para todos",
     "englishTitle": "A table for everyone",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "person.3",
     "palette": 0,
@@ -9194,13 +9206,14 @@
         "spanish": "Esta vez ella quiere preparar los carteles con nosotros.",
         "english": "This time she wants to make the posters with us."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "honest-change",
     "title": "Las monedas de más",
     "englishTitle": "The extra coins",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "eurosign.circle",
     "palette": 1,
@@ -9711,13 +9724,14 @@
         "spanish": "Debajo añade que también podemos volver para arreglarlo.",
         "english": "Underneath he adds that we can also go back to put things right."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "sunday-pot",
     "title": "La olla del domingo",
     "englishTitle": "The Sunday pot",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "carrot",
     "palette": 2,
@@ -10273,13 +10287,14 @@
         "spanish": "La olla nos ha dado más que una comida para dos días.",
         "english": "The pot has given us more than a meal for two days."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "film-conversation",
     "title": "Después del documental",
     "englishTitle": "After the documentary",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "film",
     "palette": 3,
@@ -11145,13 +11160,14 @@
         "spanish": "Lo que quieren conservar de aquella noche son las ganas de cuidarse juntos.",
         "english": "What they want to keep from that evening is the desire to look after themselves together."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "beans-question",
     "title": "Una pregunta sobre las plantas",
     "englishTitle": "A question about plants",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "leaf",
     "palette": 4,
@@ -11857,13 +11873,14 @@
         "spanish": "Aprender a preguntar le ha servido también para escuchar mejor a sus amigas.",
         "english": "Learning to ask questions has also helped her listen to her friends better."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "first-invitation",
     "title": "La primera invitación",
     "englishTitle": "The first invitation",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A1",
     "symbol": "sun.max",
     "palette": 0,
@@ -12314,13 +12331,14 @@
         "spanish": "Ahora soy yo quien invita a otra persona.",
         "english": "Now I am the one inviting someone else."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "thoughtful-yes",
     "title": "Un sí con espacio",
     "englishTitle": "A yes with room to breathe",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "hand.raised",
     "palette": 1,
@@ -12926,13 +12944,14 @@
         "spanish": "Quiere recordar la música y las risas, no solamente sus errores.",
         "english": "She wants to remember the music and the laughter, not just her mistakes."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "enough-on-paper",
     "title": "¿Cuánto es suficiente?",
     "englishTitle": "How much is enough?",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "pencil.and.list.clipboard",
     "palette": 2,
@@ -13618,13 +13637,14 @@
         "spanish": "Todavía tendrá que cambiarla, pero ya sabe qué no quiere perder por el camino.",
         "english": "He will still have to change it, but he now knows what he does not want to lose along the way."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "useful-service",
     "title": "Un servicio útil",
     "englishTitle": "A useful service",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "desktopcomputer",
     "palette": 3,
@@ -14250,13 +14270,14 @@
         "spanish": "Eva se va contenta porque su trabajo ha abierto una conversación.",
         "english": "Eva leaves happy because her work has opened up a conversation."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "travelling-seed",
     "title": "La semilla viajera",
     "englishTitle": "The traveling seed",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "bird",
     "palette": 4,
@@ -14877,13 +14898,14 @@
         "spanish": "Pero ahora tiene una razón para volver y observar mañana.",
         "english": "But now he has a reason to return and observe tomorrow."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "tomato-question",
     "title": "El tomate y la pregunta",
     "englishTitle": "The tomato and the question",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "questionmark.circle",
     "palette": 0,
@@ -15579,13 +15601,14 @@
         "spanish": "Marina guarda la servilleta para seguir investigando otro día.",
         "english": "Marina keeps the napkin to continue investigating another day."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "garden-colours",
     "title": "Los colores del jardín",
     "englishTitle": "The colors of the garden",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "tree",
     "palette": 1,
@@ -16256,13 +16279,14 @@
         "spanish": "Saber más del jardín no significa haber terminado de aprender sobre él.",
         "english": "Knowing more about the garden does not mean having finished learning about it."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "potato-basket",
     "title": "La cesta de patatas",
     "englishTitle": "The basket of potatoes",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "basket",
     "palette": 2,
@@ -16863,13 +16887,14 @@
         "spanish": "A Andrés le gusta que la cocina sea también un lugar para aprender.",
         "english": "Andrés likes the kitchen to be a place for learning too."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "two-carrots",
     "title": "Dos zanahorias",
     "englishTitle": "Two carrots",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A1",
     "symbol": "carrot",
     "palette": 3,
@@ -17335,13 +17360,14 @@
         "spanish": "Hoy la cocina tiene una nueva cocinera.",
         "english": "Today the kitchen has a new cook."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "body-care",
     "title": "El cuidado de cada día",
     "englishTitle": "Everyday care",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "figure.walk",
     "palette": 4,
@@ -17947,13 +17973,14 @@
         "spanish": "Raúl termina el día con menos tareas hechas y un poco más de paciencia.",
         "english": "Raúl ends the day with fewer tasks done and a little more patience."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "water-toast",
     "title": "Un brindis con agua",
     "englishTitle": "A toast with water",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "drop",
     "palette": 0,
@@ -18544,13 +18571,14 @@
         "spanish": "Lo primero que ve es la sonrisa de su amigo.",
         "english": "The first thing she sees is her friend’s smile."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "pause-before-plan",
     "title": "Una pausa antes del plan",
     "englishTitle": "A pause before the plan",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "pause.circle",
     "palette": 1,
@@ -19236,13 +19264,14 @@
         "spanish": "Buscar ayuda le parece ahora una forma de participar en sus propias decisiones.",
         "english": "Seeking help now seems to him a way of taking part in his own decisions."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "ten-pages",
     "title": "Diez páginas y una pregunta",
     "englishTitle": "Ten pages and a question",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A1",
     "symbol": "books.vertical",
     "palette": 2,
@@ -19748,13 +19777,14 @@
         "spanish": "Espero hasta mañana y preparo otra pregunta.",
         "english": "I wait until tomorrow and prepare another question."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "metaphor-not-law",
     "title": "Una idea y una prueba",
     "englishTitle": "An idea and a test",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "magnifyingglass",
     "palette": 3,
@@ -20445,13 +20475,14 @@
         "spanish": "Julia sale con ganas de leer despacio y conversar sin tener que ganar.",
         "english": "Julia leaves wanting to read slowly and talk without having to win."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "world-in-backpack",
     "title": "El mundo en una mochila",
     "englishTitle": "The world in a backpack",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "laptopcomputer",
     "palette": 0,
@@ -21197,13 +21228,14 @@
         "spanish": "Ahora aquellas palabras tienen una voz y una plaza en su memoria.",
         "english": "Now those words have a voice and a square in his memory."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "brand-from-within",
     "title": "Una marca desde dentro",
     "englishTitle": "A brand from within",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "paintpalette",
     "palette": 1,
@@ -22109,13 +22141,14 @@
         "spanish": "Pero escuchar lo que ocurre después de entregar el trabajo también forma parte de diseñar.",
         "english": "But listening to what happens after delivering the work is also part of designing."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "four-years-road",
     "title": "Cuatro años de camino",
     "englishTitle": "Four years on the road",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "globe.americas",
     "palette": 2,
@@ -22886,13 +22919,14 @@
         "spanish": "No necesitan cruzar otra frontera para descubrir algo juntos.",
         "english": "They do not need to cross another border to discover something together."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "calendar-of-later",
     "title": "El calendario de después",
     "englishTitle": "The calendar of later",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "calendar",
     "palette": 3,
@@ -23653,13 +23687,14 @@
         "spanish": "El jueves siguiente ya tiene una razón para volver a salir.",
         "english": "The following Thursday he already has a reason to go out again."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "cow-two-names",
     "title": "Una vaca y dos nombres",
     "englishTitle": "A cow and two names",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "book",
     "palette": 4,
@@ -24405,13 +24440,14 @@
         "spanish": "La libreta acaba reuniendo una explicación del libro y una historia de su familia.",
         "english": "The notebook ends up bringing together an explanation from the book and a family story."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "cube-among-stars",
     "title": "El cubo entre las estrellas",
     "englishTitle": "The cube among the stars",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "cube",
     "palette": 0,
@@ -25512,13 +25548,14 @@
         "spanish": "En aquel universo imaginario, incluso un símbolo terminado podía seguir creciendo.",
         "english": "In that imaginary universe, even a finished symbol could keep growing."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "feet-on-earth",
     "title": "Los pies en la Tierra",
     "englishTitle": "Feet on Earth",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "globe.europe.africa",
     "palette": 0,
@@ -26369,13 +26406,14 @@
         "spanish": "Cuando su hermano hace otra pregunta, deja espacio para una flecha más.",
         "english": "When her brother asks another question, she leaves room for one more arrow."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "travelling-sun",
     "title": "El viaje del Sol",
     "englishTitle": "The Sun’s journey",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "A2",
     "symbol": "sun.max",
     "palette": 1,
@@ -27116,13 +27154,14 @@
         "spanish": "Lo cuelgan en la pared con una pregunta para el próximo viaje al planetario.",
         "english": "They hang it on the wall with a question for their next trip to the planetarium."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "no-place-to-land",
     "title": "Un planeta sin suelo",
     "englishTitle": "A planet without ground",
-    "author": "Cuentiva · fictional story",
+    "author": "Nube",
     "level": "B1",
     "symbol": "sparkles",
     "palette": 2,
@@ -27928,13 +27967,14 @@
         "spanish": "Guarda ambas versiones porque quiere recordar cómo empezó la pregunta.",
         "english": "She keeps both versions because she wants to remember how the question began."
       }
-    ]
+    ],
+    "authorID": "credit-5b644d127a59"
   },
   {
     "id": "wrong-suitcase",
     "title": "La maleta equivocada",
     "englishTitle": "The wrong suitcase",
-    "author": "Cuentiva · original script",
+    "author": "Tilo",
     "level": "A1",
     "symbol": "suitcase",
     "palette": 0,
@@ -28397,13 +28437,14 @@
         "spanish": "No, son para mí. ¡Tengo hambre todo el día!",
         "english": "No, they are for me. I am hungry all day!"
       }
-    ]
+    ],
+    "authorID": "credit-4ffea73372fb"
   },
   {
     "id": "table-for-three",
     "title": "Una mesa para tres",
     "englishTitle": "A table for three",
-    "author": "Cuentiva · original script",
+    "author": "Tilo",
     "level": "A2",
     "symbol": "fork.knife",
     "palette": 1,
@@ -29061,13 +29102,14 @@
         "spanish": "Creo que su padre ya sabe que hay tarta.",
         "english": "I think your father already knows there is cake."
       }
-    ]
+    ],
+    "authorID": "credit-4ffea73372fb"
   },
   {
     "id": "last-train-scene",
     "title": "El último tren",
     "englishTitle": "The last train",
-    "author": "Cuentiva · original script",
+    "author": "Tilo",
     "level": "B1",
     "symbol": "tram",
     "palette": 2,
@@ -29934,13 +29976,14 @@
         "spanish": "Tengo los billetes, el regalo y a mi hermana. Podemos salir.",
         "english": "I have the tickets, the present, and my sister. We can leave."
       }
-    ]
+    ],
+    "authorID": "credit-4ffea73372fb"
   },
   {
     "id": "verb-ser",
     "title": "Ser: La carta",
     "englishTitle": "Ser: The letter",
-    "author": "Cuentiva · verb story",
+    "author": "Mora",
     "level": "A2",
     "symbol": "text.book.closed",
     "palette": 2,
@@ -30820,13 +30863,14 @@
         "occurrences": 9
       }
     ],
-    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
+    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending.",
+    "authorID": "credit-0047224f3651"
   },
   {
     "id": "verb-estar",
     "title": "Estar: Tras el telón",
     "englishTitle": "Estar: Behind the curtain",
-    "author": "Cuentiva · verb story",
+    "author": "Mora",
     "level": "A2",
     "symbol": "text.book.closed",
     "palette": 3,
@@ -31696,13 +31740,14 @@
         "occurrences": 1
       }
     ],
-    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
+    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending.",
+    "authorID": "credit-0047224f3651"
   },
   {
     "id": "verb-querer",
     "title": "Querer: La última cena",
     "englishTitle": "Querer: The last dinner",
-    "author": "Cuentiva · verb story",
+    "author": "Mora",
     "level": "B1",
     "symbol": "text.book.closed",
     "palette": 4,
@@ -32592,13 +32637,14 @@
         "occurrences": 1
       }
     ],
-    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending."
+    "license": "Original fictional verb-learning story created for Cuentiva. Native-speaker editorial review pending.",
+    "authorID": "credit-0047224f3651"
   },
   {
     "id": "nearby-bangkok",
     "title": "Una mesa, muchos mundos",
     "englishTitle": "One table, many worlds",
-    "author": "Cuentiva · fictional traveller",
+    "author": "Faro",
     "level": "A2",
     "symbol": "globe.asia.australia",
     "palette": 1,
@@ -33208,13 +33254,14 @@
       "accuracy": 1000,
       "capturedAt": 811641600,
       "placeName": "Bangkok, Thailand"
-    }
+    },
+    "authorID": "credit-5f7d24711b1b"
   },
   {
     "id": "nearby-pattaya",
     "title": "Dos ritmos junto al mar",
     "englishTitle": "Two rhythms by the sea",
-    "author": "Cuentiva · fictional traveller",
+    "author": "Faro",
     "level": "A2",
     "symbol": "sun.horizon",
     "palette": 0,
@@ -33844,13 +33891,14 @@
       "accuracy": 1000,
       "capturedAt": 811641600,
       "placeName": "Pattaya, Thailand"
-    }
+    },
+    "authorID": "credit-5f7d24711b1b"
   },
   {
     "id": "nearby-thailand",
     "title": "Entre el silencio y la fiesta",
     "englishTitle": "Between silence and celebration",
-    "author": "Cuentiva · fictional traveller",
+    "author": "Faro",
     "level": "A2",
     "symbol": "sparkles",
     "palette": 3,
@@ -34515,6 +34563,7 @@
       "accuracy": 1000,
       "capturedAt": 811641600,
       "placeName": "Chiang Mai, Thailand"
-    }
+    },
+    "authorID": "credit-5f7d24711b1b"
   }
 ]
