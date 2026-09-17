@@ -29,3 +29,6 @@ with a familiar situation, show what each example word does, and translate Spani
 examples. Explain any necessary technical term where it appears; related-term links
 are optional exploration, never prerequisites for understanding the current entry.
 Prefer one clear idea at a time over lists of classifications and exceptions.
+Clearly distinguish words being discussed from the surrounding explanation using
+quotation marks and selective bold emphasis. Keep short paragraphs intact when
+rendering formatted teaching copy.

@@ -13,7 +13,7 @@ struct LanguageTermDetailView: View {
                         Text(term.spanish).font(.title3).foregroundStyle(theme.theme.accent)
                     }
                     Text(term.meaning).font(.title3.weight(.medium))
-                    Text(term.explanation)
+                    Text((try? AttributedString(markdown: term.explanation, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(term.explanation))
                     example("IN ENGLISH", text: term.englishExample)
                     example("IN SPANISH", text: term.spanishExample)
                     VStack(alignment: .leading, spacing: 8) {
