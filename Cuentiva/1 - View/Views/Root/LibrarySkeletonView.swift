@@ -16,8 +16,8 @@ struct LibrarySkeletonView: View {
                                 ForEach(0..<7) { _ in Circle().fill(theme.theme.muted.opacity(0.12)).frame(width: 10, height: 10) }
                             }.redacted(reason: .placeholder).padding(.vertical, 18)
                             Divider()
-                            Text("A little Spanish.\nA new perspective.").font(.system(.largeTitle, design: .serif, weight: .medium))
-                            Text("Small stories. Ideas for everyday life.").font(.subheadline).foregroundStyle(theme.theme.muted)
+                            Text("Bring Spanish to life\nthrough stories.").font(.system(.largeTitle, design: .serif, weight: .medium))
+                            Text("Read a story. Share one of your own.").font(.subheadline).foregroundStyle(theme.theme.muted)
                             RoundedRectangle(cornerRadius: 20).fill(theme.theme.muted.opacity(0.10)).frame(height: 32)
                             RoundedRectangle(cornerRadius: 20).fill(theme.theme.muted.opacity(0.10)).frame(height: 32)
                             LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 26) {

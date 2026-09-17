@@ -60,7 +60,22 @@ struct SettingsView: View {
                 Text("Device backups may include app data. Deleting the app removes its local data; purchases remain with your Apple Account.")
                 Button("Reset learning progress", role: .destructive) { viewModel.resetConfirmation = true }
             }.listRowBackground(themeManager.theme.surface)
-            Section { InlineError(message: viewModel.error) }.listRowBackground(themeManager.theme.surface)
+            Section {
+                if viewModel.error != nil { InlineError(message: viewModel.error) }
+            } footer: {
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("A little story behind the name")
+                        .font(.headline).foregroundStyle(themeManager.theme.ink)
+                    Text("Cuento means “story” or “tale” in Spanish. Viva means “alive” or “living.” Our name, Cuentiva, playfully brings those ideas together.")
+                    Text("Cuentiva — a community bringing Spanish to life through stories.")
+                        .font(.system(.body, design: .serif))
+                        .foregroundStyle(themeManager.theme.accent)
+                }
+                .font(.footnote)
+                .foregroundStyle(themeManager.theme.muted)
+                .textCase(nil)
+                .padding(.vertical, 20)
+            }.listRowBackground(themeManager.theme.surface)
         }.navigationTitle("Settings")
             .scrollContentBackground(.hidden)
             .background(themeManager.theme.paper)

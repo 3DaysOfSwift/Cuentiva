@@ -13,7 +13,7 @@
                     <color key="textColor" red="0.13" green="0.23" blue="0.22" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                 </label>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="search-placeholder"><rect key="frame" x="23" y="116" width="347" height="40"/><color key="backgroundColor" red="0.91" green="0.91" blue="0.87" alpha="1" colorSpace="custom" customColorSpace="sRGB"/></view>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="A little Spanish.&#10;A new perspective." numberOfLines="0" translatesAutoresizingMaskIntoConstraints="NO" id="launch-heading">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Bring Spanish to life&#10;through stories." numberOfLines="0" translatesAutoresizingMaskIntoConstraints="NO" id="launch-heading">
                     <rect key="frame" x="23" y="238" width="347" height="90"/>
                     <fontDescription key="fontDescription" name="Georgia" family="Georgia" pointSize="34"/>
                     <color key="textColor" red="0.13" green="0.23" blue="0.22" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
