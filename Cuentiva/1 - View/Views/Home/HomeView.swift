@@ -38,7 +38,7 @@ struct HomeView: View {
                         .foregroundStyle(theme.theme.muted)
                 }
                 Divider()
-                Text("Explore the library").font(.system(.title2, design: .serif, weight: .medium))
+                Text("Explore our community library").font(.system(.title2, design: .serif, weight: .medium))
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
                 Toggle("Hide completed books", isOn: $viewModel.hideCompleted)
