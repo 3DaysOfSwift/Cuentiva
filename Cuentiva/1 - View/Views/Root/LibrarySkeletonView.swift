@@ -9,7 +9,6 @@ struct LibrarySkeletonView: View {
                 NavigationStack {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 22) {
-                            RoundedRectangle(cornerRadius: 20).fill(theme.theme.muted.opacity(0.10)).frame(height: 40)
                             HStack {
                                 Label("Day streak", systemImage: "flame.fill").font(.headline)
                                 Spacer()
@@ -32,7 +31,10 @@ struct LibrarySkeletonView: View {
                         }.padding(.horizontal, 23).padding(.bottom, 30)
                     }.background(theme.theme.paper)
                         .navigationTitle("Cuentiva").navigationBarTitleDisplayMode(.inline)
-                        .toolbar { ToolbarItem(placement: .topBarTrailing) { Image(systemName: "gearshape").foregroundStyle(theme.theme.ink) } }
+                        .toolbar {
+                            ToolbarItem(placement: .topBarTrailing) { Image(systemName: "gearshape").foregroundStyle(theme.theme.ink) }
+                            ToolbarItem(placement: .topBarTrailing) { Image(systemName: "magnifyingglass").foregroundStyle(theme.theme.ink) }
+                        }
                 }
             }
             Tab("Nearby", systemImage: "location") { Color.clear }
