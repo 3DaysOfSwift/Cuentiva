@@ -238,3 +238,20 @@ it does not constitute deleting/reinstalling on the user's physical phone.
 The specific device-side StoreKit error has not been reproduced or diagnosed from
 its generic screenshot. Rebuild on the phone and use Restore purchases in the same
 StoreKit test environment; purchase errors now include recovery guidance and logs.
+
+## Physical-device lifetime recovery — 17 September 2026
+
+Confirmed in Xcode's transaction manager that J.A.R.V.I.S had a Purchased lifetime
+transaction (12:07:50) while the app's current-entitlements query returned no matching
+purchase and no verification failure. Recovery now also checks Transaction.latest
+for the lifetime product and accepts only verified, matching, non-consumable,
+non-revoked, non-upgraded transactions. Unverified purchases remain locked and
+produce a verification-specific error rather than being described as missing.
+Deployed via Xcode to the connected phone: logs confirmed latest transaction active
+and access true. No transactions were deleted, refunded, or created on that phone.
+The cause of StoreKit's empty index is not established; the recovery path is confirmed.
+
+Regression coverage injects an empty current-entitlement result while using a real
+StoreKitTest lifetime transaction, then verifies recovery and refusal after refund.
+Final verification: all 55 Xcode simulator tests and 29 core tests passed, including
+the empty-index recovery and revoked-latest-transaction regression assertions.

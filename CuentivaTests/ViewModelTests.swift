@@ -336,6 +336,14 @@ import StoreKitTest
         #expect(relaunched.hasAccess)
         #expect(session.allTransactions().count == 1)
 
+        // Reproduce the device failure: the entitlement index returns nothing,
+        // but StoreKit still has a verified lifetime transaction.
+        let emptyIndex = PurchaseManager(readEntitlements: { [] })
+        await emptyIndex.refresh()
+        #expect(emptyIndex.hasAccess)
+        try await emptyIndex.restore()
+        #expect(emptyIndex.hasAccess)
+
         let transaction = try #require(session.allTransactions().first)
         try session.refundTransaction(identifier: transaction.identifier)
         // StoreKit delivers refunds asynchronously through Transaction.updates.
@@ -346,6 +354,8 @@ import StoreKitTest
         #expect(!relaunched.hasAccess)
         await relaunched.refresh()
         #expect(!relaunched.hasAccess)
+        await emptyIndex.refresh()
+        #expect(!emptyIndex.hasAccess)
     }
 }
 #endif
