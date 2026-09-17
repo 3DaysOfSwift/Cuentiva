@@ -8,7 +8,9 @@ import Observation
     var format: BookFormat?
     var sort: BookSort = .library
     var level = "All"
-    var hideCompleted = false
+    var hideCompleted = true
+    var nextRead: Book? { library.nextRead }
+    func hasStarted(_ book: Book) -> Bool { !progress.snapshot.attempts[book.id, default: []].isEmpty || progress.snapshot.positions[book.id, default: 0] > 0 }
     var books: [Book] { library.search(query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort, hideCompleted: hideCompleted) }
     var total: Int { progress.snapshot.completed.count }
     var streak: Int { progress.streak }

@@ -168,6 +168,25 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         #expect(failingProgress.snapshot.attempts.isEmpty)
         #expect(failingProgress.snapshot.positions.isEmpty)
     }
+    @Test func nextReadPrioritizesUnfinishedBooksThenSelectedLevel() async throws {
+        let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let first = sample("first"), second = sample("second")
+        let library = LibraryManager(repository: MemoryBooks(values: [first, second]), purchases: purchases, progress: progress)
+        try await library.load()
+        #expect(library.nextRead == nil)
+        purchases.hasAccess = true
+        #expect(library.nextRead?.id == first.id)
+        try await progress.setLearningLevel(.c2)
+        #expect(library.nextRead?.id == first.id)
+        try await progress.recordEncounter(book: second, sentence: second.sentences[0])
+        #expect(library.nextRead?.id == second.id)
+        _ = try await progress.complete(book: second)
+        #expect(library.nextRead?.id == first.id)
+        try await progress.recordEncounter(book: first, sentence: first.sentences[0])
+        _ = try await progress.complete(book: first)
+        #expect(library.nextRead == nil)
+    }
     @Test func librarySearchAndCompletedCollectionAreGated() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), book = sample(); try await progress.load()
         let library = LibraryManager(repository: MemoryBooks(values: [book]), purchases: purchases, progress: progress); try await library.load()

@@ -38,12 +38,14 @@ import Testing
         let (p,s,l,_,_) = try await graph(); p.hasAccess = true
         let home = HomeViewModel(library: l, progress: s), collection = CompletedViewModel(library: l)
         #expect(home.books.count == 1); #expect(collection.books.isEmpty)
-        home.hideCompleted = true
+        #expect(home.hideCompleted)
+        #expect(home.nextRead?.id == "cafe")
         home.query = "cafe"; home.level = "A1"; home.format = .story; home.sort = .title
         #expect(home.books.count == 1)
         let book = sample(); try await s.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await s.complete(book: book)
         #expect(home.total == 1); #expect(collection.books.count == 1)
         #expect(home.books.isEmpty)
+        #expect(home.nextRead == nil)
         home.hideCompleted = false
         #expect(home.books.count == 1)
         home.level = "B1"

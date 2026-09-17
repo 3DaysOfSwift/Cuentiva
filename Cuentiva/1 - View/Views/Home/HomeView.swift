@@ -8,10 +8,37 @@ struct HomeView: View {
                 StreakBar(count: viewModel.streak, days: viewModel.week)
                 Divider()
                 HStack(alignment: .bottom) {
-                    VStack(alignment: .leading, spacing: 8) { Text("Bring Spanish to life\nthrough stories.").font(.system(.largeTitle, design: .serif, weight: .medium)); Text("Read a story. Share one of your own.").font(.subheadline).foregroundStyle(theme.theme.muted) }
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Your next read").font(.system(.largeTitle, design: .serif, weight: .medium))
+                        Text("Bring Spanish to life through stories.").font(.subheadline).foregroundStyle(theme.theme.muted)
+                    }
                     Spacer(minLength: 5)
                     VStack { Text("\(viewModel.total)").font(.system(.largeTitle, design: .serif)); Text("BOOKS\nLEARNED").font(.system(size: 9, weight: .bold, design: .monospaced)).multilineTextAlignment(.center) }
                 }
+                if let book = viewModel.nextRead {
+                    VStack(alignment: .leading, spacing: 16) {
+                        BookCover(book: book, compact: true)
+                            .frame(maxWidth: 190).frame(maxWidth: .infinity)
+                        Text(book.englishTitle).font(.title2.weight(.semibold))
+                        Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
+                            .font(.caption).foregroundStyle(theme.theme.muted)
+                        Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
+                        Button { viewModel.selectedBook = book } label: {
+                            HStack {
+                                Text(viewModel.hasStarted(book) ? "Continue reading" : "Read this book")
+                                Image(systemName: "arrow.right")
+                            }
+                            .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
+                            .foregroundStyle(theme.theme.onAccent)
+                            .background(theme.theme.accent, in: RoundedRectangle(cornerRadius: 18))
+                        }.buttonStyle(.plain)
+                    }
+                } else {
+                    Text("You’ve read every available book. Revisit a favourite in Completed, or share a story of your own.")
+                        .foregroundStyle(theme.theme.muted)
+                }
+                Divider()
+                Text("Explore the library").font(.system(.title2, design: .serif, weight: .medium))
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
                 Toggle("Hide completed books", isOn: $viewModel.hideCompleted)

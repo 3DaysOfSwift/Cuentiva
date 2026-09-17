@@ -295,3 +295,16 @@ remains available for rereading. Empty results offer Show completed books.
 The existing Home/Completed regression now covers filtering before and after a
 committed completion and combining difficulty/search/type/sort. Xcode simulator
 tests and all 31 core tests passed. No physical-device visual check this change.
+
+## Discover next read — 17 September 2026
+
+Completed books are hidden by default. Discover opens with Your next read, a
+cover, English title, difficulty, length, summary and Read this book / Continue
+reading action. LibraryManager chooses an unfinished accessible book first,
+then an unread book at the self-selected level, then library order. Suggestions
+exclude completed books and respect location/access rules; an exhausted library
+has an explicit message. Browsing controls and the collection remain available.
+All Xcode simulator tests and 32 core tests passed. Regression covers default
+hiding, gated suggestions, unfinished priority, unavailable-level fallback and
+completion exhaustion. Simulator screenshot verified the header and Continue
+reading button fit on the initial iPhone Air screen. No physical-device check.

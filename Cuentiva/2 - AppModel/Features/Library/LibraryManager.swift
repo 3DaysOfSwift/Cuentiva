@@ -7,6 +7,7 @@ import Observation
     func load() async throws
     func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool) -> [Book]
     func coverage(_ book: Book) -> String
+    var nextRead: Book? { get }
 }
 @MainActor @Observable final class LibraryManager: LibraryFeature {
     private(set) var books: [Book] = []
@@ -32,6 +33,13 @@ import Observation
         case .difficulty: return matches.sorted { $0.level == $1.level ? titleOrder($0, $1) : $0.level < $1.level }
         case .type: return matches.sorted { $0.kind == $1.kind ? titleOrder($0, $1) : $0.kind.title < $1.kind.title }
         }
+    }
+    var nextRead: Book? {
+        let unread = search("", level: nil, completedOnly: false, format: nil, sort: .library, hideCompleted: true)
+        // Continue an unfinished book before offering a fresh one. Library order breaks ties.
+        return unread.first { !progress.snapshot.attempts[$0.id, default: []].isEmpty || progress.snapshot.positions[$0.id, default: 0] > 0 }
+            ?? unread.first { $0.level == progress.snapshot.selectedLearningLevel?.rawValue }
+            ?? unread.first
     }
     private func titleOrder(_ lhs: Book, _ rhs: Book) -> Bool {
         let comparison = lhs.englishTitle.localizedCaseInsensitiveCompare(rhs.englishTitle)
