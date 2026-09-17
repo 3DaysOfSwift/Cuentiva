@@ -1,0 +1,11 @@
+# Fantasy storytellers — on-device generation
+
+Cuentiva now composes AppleFantasyGenerator with FantasyManager in AppModel. It uses Foundation Models on iOS 26 with the default Apple Intelligence model and guardrails; no API keys, network service or cloud fallback are used. Availability and English/Spanish support are checked before each generation.
+
+The first launch of this feature offers a persistent creature draw (turtle, winged unicorn or fox), three-second slowdown, number enlargement, portrait/confetti reveal, name and biography entry and AI-generated single-word fantasy name and bio. Continuing to the library is always available outside an active operation. This records introduction completion; users can return via Write > My storyteller. The source name and biography can be saved independently of AI with Save name and bio. They persist locally and reopen in the editable form; generation also saves them first, so generation failure does not discard them. A declined or unavailable AI setup never grants or removes purchase access.
+
+Write uses one memory prompt, generating exactly sixteen paired Spanish/English sentences with A2 instructions. Structured generation plus validation checks shape, not linguistic accuracy. New sessions bound context usage; cancellation and failure do not replace saved results. Tales are saved privately in fantasy.json in Application Support and can be reopened in Write. Existing contribution drafts remain accessible via Earlier drafts and review submissions. New fantasy tales are not automatically published or submitted; the old review flow remains a local demo.
+
+Validation: 48 core tests pass, including persistence, duplicate draws, failed saves, incomplete story output and skipped onboarding. UI test cases also cover the identity reveal and writer state. Swift syntax and project format checks pass. Xcode build/test is blocked in this tool session by the unavailable iOS 26.2 simulator platform. Actual on-device generation quality, the UI and Apple Intelligence availability messages still require device verification.
+
+Portraits were generated with the built-in image generation tool. App copies are in Assets.xcassets/SpiritTurtle.imageset, SpiritUnicorn.imageset and SpiritFox.imageset. Prompt record: fantasy-portrait-prompts.json.

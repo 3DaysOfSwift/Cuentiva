@@ -13,8 +13,12 @@ struct RootView: View {
                         Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) { NavigationStack { HomeView(onContribute: { selectedTab = .contribute }) } }
                         Tab("Nearby", systemImage: "location", value: LibraryTab.nearby) { NavigationStack { NearbyView() } }
                         Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) { NavigationStack { CompletedView() } }
-                        Tab("Contribute", systemImage: "square.and.pencil", value: LibraryTab.contribute) { NavigationStack { ContributionView() } }
+                        Tab("Write", systemImage: "square.and.pencil", value: LibraryTab.contribute) { NavigationStack { FantasyWritingView(feature: AppModel.shared.fantasy) } }
                     }
+                } else if viewModel.checkingAccess {
+                    // Keep the library shell visible while access is verified;
+                    // never flash a paywall for a returning purchaser.
+                    LibrarySkeletonView()
                 } else { OnboardingView() }
             } else {
                 LibrarySkeletonView()
@@ -29,7 +33,17 @@ struct RootView: View {
             }
         }.frame(maxWidth: .infinity, maxHeight: .infinity)
             .background { theme.theme.paper.ignoresSafeArea() }.foregroundStyle(theme.theme.ink)
+            .fullScreenCover(isPresented: $viewModel.showingStoryteller) {
+                StorytellerRevealView(feature: AppModel.shared.fantasy) { viewModel.showingStoryteller = false }
+            }
             .task { await viewModel.load() }
-            .onChange(of: scenePhase) { _, phase in if phase == .active { Task { await viewModel.load() } } }
+            .task { await viewModel.refreshPurchases() }
+            .task(id: viewModel.ready) { if viewModel.ready { await viewModel.syncLibrary() } }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    Task { await viewModel.refreshPurchases() }
+                    Task { await viewModel.syncLibrary() }
+                }
+            }
     }
 }

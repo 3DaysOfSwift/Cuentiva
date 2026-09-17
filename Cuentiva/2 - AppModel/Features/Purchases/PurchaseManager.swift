@@ -22,6 +22,7 @@ import OSLog
     private var verificationFailure: String?
     private var entitlementRevision = 0
     private var operationInProgress = false
+    private var refreshing = false
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Purchases")
     private let readEntitlements: @MainActor () async -> [VerificationResult<Transaction>]
     init(readEntitlements: @escaping @MainActor () async -> [VerificationResult<Transaction>] = {
@@ -32,6 +33,8 @@ import OSLog
         self.readEntitlements = readEntitlements
     }
     func refresh() async {
+        guard !refreshing else { return }
+        refreshing = true; defer { refreshing = false }
         if listener == nil {
             listener = Task { [weak self] in
                 for await update in Transaction.updates {
@@ -48,6 +51,9 @@ import OSLog
         }
         await updateEntitlements()
         checking = false
+        // Owners need verified access, not a network lookup for a price.
+        // Keep an already loaded offer when returning to the foreground.
+        guard !hasAccess, offer == nil else { return }
         do {
             offer = try await Product.products(for: [Self.productID]).first
             if offer?.type != .nonConsumable { offer = nil }

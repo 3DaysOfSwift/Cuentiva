@@ -10,9 +10,11 @@ import Foundation
     let languageTerms: any LanguageTermsFeature = LanguageTermsManager()
     let practice: any PracticeFeature
     let nearby: any NearbyFeature
+    let fantasy: any FantasyFeature
     let makeAudio: () -> any LessonAudio
     init(library: any LibraryFeature, progress: any ProgressFeature, purchases: any PurchaseFeature,
-         learning: any LearningFeature, contributions: any ContributionFeature, makeAudio: @escaping () -> any LessonAudio) {
+         learning: any LearningFeature, contributions: any ContributionFeature, fantasy: any FantasyFeature, makeAudio: @escaping () -> any LessonAudio) {
+        self.fantasy = fantasy
         self.practice = PracticeManager(progress: progress, purchases: purchases)
         self.nearby = NearbyManager(library: library, purchases: purchases)
         self.library = library; self.progress = progress; self.purchases = purchases
@@ -28,6 +30,7 @@ import Foundation
         let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
         let learning = LearningManager(purchases: purchases, progress: progress)
         let contributions = ContributionManager(repository: LocalContributionRepository(url: directory.appending(path: "drafts.json")), purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
-        return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, makeAudio: { AppleLessonAudio() })
+        let fantasy = FantasyManager(repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json")), generator: AppleFantasyGenerator())
+        return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, fantasy: fantasy, makeAudio: { AppleLessonAudio() })
     }
 }

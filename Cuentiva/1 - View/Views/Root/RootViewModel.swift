@@ -5,18 +5,37 @@ import Observation
     private let library: any LibraryFeature
     private let progress: any ProgressFeature
     private var loading = false
+    private let fantasy: any FantasyFeature
+    private var checkedIntroduction = false
+    var showingStoryteller = false
     var ready = false
     var error: String?
     var hasAccess: Bool { purchases.hasAccess }
-    init(purchases: any PurchaseFeature = AppModel.shared.purchases, library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress) {
-        self.purchases = purchases; self.library = library; self.progress = progress
+    init(purchases: any PurchaseFeature = AppModel.shared.purchases, library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress, fantasy: any FantasyFeature = AppModel.shared.fantasy) {
+        self.fantasy = fantasy; self.purchases = purchases; self.library = library; self.progress = progress
+    }
+    var checkingAccess: Bool { purchases.checking }
+    func refreshPurchases() async { await purchases.refresh() }
+    func syncLibrary() async {
+        guard ready else { return }
+        await library.sync()
     }
     func load() async {
-        guard !loading else { return }
+        guard !loading, !ready else { return }
         loading = true; defer { loading = false }
         error = nil
-        async let purchaseLoad: Void = purchases.refresh()
-        do { async let books: Void = library.load(); async let state: Void = progress.load(); _ = try await (books, state); await purchaseLoad; ready = true; await library.sync() }
-        catch { await purchaseLoad; self.error = error.localizedDescription }
+        do {
+            // Library.load owns progress loading. No StoreKit or network request
+            // participates in the first local-content render.
+            try await library.load()
+            ready = true
+            if !checkedIntroduction {
+                do {
+                    try await fantasy.load()
+                    showingStoryteller = !fantasy.introductionSeen
+                    checkedIntroduction = true
+                } catch { /* Profile storage must never block library access. Write offers a retry. */ }
+            }
+        } catch { self.error = error.localizedDescription }
     }
 }

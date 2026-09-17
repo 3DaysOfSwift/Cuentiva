@@ -2,6 +2,7 @@ import SwiftUI
 struct HomeView: View {
     let onContribute: () -> Void
     @State private var viewModel = HomeViewModel()
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @Environment(ThemeManager.self) private var theme
     var body: some View {
@@ -11,21 +12,37 @@ struct HomeView: View {
                 Divider()
                 if !viewModel.dailyReads.isEmpty {
                     Text("Today’s books")
-                        .font(.headline)
-                        .foregroundStyle(theme.theme.muted)
+                        .font(.system(.title2, design: .serif, weight: .medium))
                     ScrollView(.horizontal) {
                         HStack(spacing: 16) {
+                            HStack(spacing: 16) {
                             ForEach(viewModel.dailyReads) { book in
                                 Button { viewModel.selectedBook = book } label: {
                                     BookCover(book: book, completed: viewModel.completed(book), compact: true)
                                         .frame(width: 190)
+                                        .overlay {
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .fill(theme.theme.paper.opacity(viewModel.focusedRead?.id == book.id ? 0 : 0.6))
+                                                .allowsHitTesting(false)
+                                        }
+                                        .overlay {
+                                            RoundedRectangle(cornerRadius: 8)
+                                                .strokeBorder(theme.theme.accent, lineWidth: 3)
+                                                .opacity(viewModel.focusedRead?.id == book.id ? 1 : 0)
+                                                .allowsHitTesting(false)
+                                        }
+                                        .animation(reduceMotion ? nil : .easeInOut(duration: 0.2), value: viewModel.focusedRead?.id)
                                         .padding(.vertical, 12)
                                 }
                                 .buttonStyle(.plain)
                                 .id(book.id)
+                                .accessibilityAddTraits(viewModel.focusedRead?.id == book.id ? .isSelected : [])
                                 .accessibilityLabel("\(book.englishTitle)\(viewModel.completed(book) ? ", completed" : ", unread")")
                             }
-                        }.scrollTargetLayout()
+                            }.scrollTargetLayout()
+                            // Outside the book targets: scrolling here never selects a fourth book.
+                            TomorrowFooter()
+                        }
                     }
                     .contentMargins(.horizontal, 23, for: .scrollContent)
                     .scrollIndicators(.hidden)
@@ -43,7 +60,10 @@ struct HomeView: View {
                             .buttonStyle(.plain)
                             .accessibilityLabel("About \(book.storytellerName)")
                             VStack(alignment: .leading, spacing: 6) {
-                                Text(book.englishTitle).font(.title2.weight(.semibold))
+                                Text(book.title).font(.title2.weight(.semibold))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Text(book.englishTitle).font(.subheadline)
+                                    .foregroundStyle(theme.theme.muted)
                                     .fixedSize(horizontal: false, vertical: true)
                                 Text("By \(book.storytellerName)")
                                     .font(.subheadline).foregroundStyle(theme.theme.muted)
@@ -107,7 +127,13 @@ struct HomeView: View {
                 }
                 Text("DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary.").font(.caption2).foregroundStyle(theme.theme.muted).padding(.top, 8)
             }.padding(.horizontal, 23).padding(.bottom, 30)
-        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("").navigationBarTitleDisplayMode(.inline)
+                .overlay(alignment: .top) {
+                    HiddenProgressView()
+                        .fixedSize(horizontal: false, vertical: true)
+                        .alignmentGuide(.top) { dimensions in dimensions[.bottom] + 80 }
+                }
+        }.scrollBounceBehavior(.always, axes: .vertical)
+            .background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("").navigationBarTitleDisplayMode(.inline)
             .searchable(text: $viewModel.query, placement: .toolbar, prompt: "Find a story or a person")
             .searchToolbarBehavior(.minimize)
             .toolbar {

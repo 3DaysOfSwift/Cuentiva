@@ -15,7 +15,73 @@ import Testing
     func stopRecording() { recording = false }
     func stop() { recording = false }
 }
+actor LaunchBooks: SyncingBookRepository {
+    var syncCalls = 0
+    func books() -> [Book] { [sample()] }
+    func sync() -> [Book] { syncCalls += 1; return [sample()] }
+}
 @Suite @MainActor struct ViewModelTests {
+    @Test func launchRendersLocalContentBeforePurchaseRefreshOrSync() async throws {
+        let purchases = TestPurchases(); purchases.checking = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let repository = LaunchBooks()
+        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
+        let root = RootViewModel(purchases: purchases, library: library, progress: progress,
+            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
+        await root.load()
+        #expect(root.ready)
+        #expect(root.checkingAccess)
+        #expect(!root.hasAccess)
+        #expect(purchases.refreshCalls == 0)
+        #expect(await repository.syncCalls == 0)
+        await root.refreshPurchases()
+        await root.syncLibrary()
+        #expect(purchases.refreshCalls == 1)
+        #expect(await repository.syncCalls == 1)
+    }
+
+    @Test func savedBioReturnsToEditableForm() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
+        try await feature.load(); _ = try await feature.drawCreature()
+        let model = StorytellerRevealViewModel(feature: feature)
+        await model.prepare()
+        model.name = "James"; model.biography = "A traveller who helps others."
+        await model.saveDetails()
+        #expect(model.savedMessage != nil)
+        let reopened = StorytellerRevealViewModel(feature: feature)
+        await reopened.prepare()
+        #expect(reopened.stage == .details)
+        #expect(reopened.name == "James")
+        #expect(reopened.biography == "A traveller who helps others.")
+    }
+
+    @Test func fantasyIdentityRevealUsesSavedCreatureAndPersistsCompletion() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator(), draw: { .turtle })
+        try await feature.load(); _ = try await feature.drawCreature()
+        let model = StorytellerRevealViewModel(feature: feature)
+        await model.prepare()
+        #expect(model.stage == .creature)
+        model.name = "Matt"; model.biography = "I travel and write apps."
+        await model.generateIdentity()
+        #expect(model.stage == .identity)
+        #expect(model.identity?.name == "Lirio")
+        #expect(model.name.isEmpty)
+        #expect(await model.finish())
+        #expect(feature.introductionSeen)
+    }
+    @Test func fantasyWriterLoadsItsSavedTales() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
+        try await feature.load(); _ = try await feature.drawCreature()
+        try await feature.createIdentity(name: "Matt", biography: "A traveller")
+        let model = FantasyWritingViewModel(feature: feature)
+        await model.load(); model.memory = "I danced in Mexico."
+        await model.generate()
+        #expect(model.story != nil)
+        #expect(model.stories.count == 1)
+        #expect(model.error == nil)
+        #expect(!model.busy)
+    }
+
     @Test func statisticsReflectSavedPracticeAndAvoidDuplicateRewards() async throws {
         let progress = ProgressManager(repository: MemoryProgress())
         try await progress.load()
@@ -62,7 +128,7 @@ import Testing
         return (purchases, progress, library, LearningManager(purchases: purchases, progress: progress), ContributionManager(repository: MemoryContributions(), purchases: purchases, progress: progress))
     }
     @Test func rootLoadsIsolatedGraph() async throws {
-        let (p, s, l, _, _) = try await graph(); let vm = RootViewModel(purchases: p, library: l, progress: s)
+        let (p, s, l, _, _) = try await graph(); let vm = RootViewModel(purchases: p, library: l, progress: s, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await vm.load(); #expect(vm.ready); #expect(!vm.hasAccess)
     }
     @Test func onboardingKeepsItsBook() async throws {
@@ -405,7 +471,7 @@ import StoreKitTest
         #expect(purchases.offer != nil)
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library, progress: progress)
+        let root = RootViewModel(purchases: purchases, library: library, progress: progress, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await root.load()
         #expect(!root.hasAccess)
         try await purchases.purchase()

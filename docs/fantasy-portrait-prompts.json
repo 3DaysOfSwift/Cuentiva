@@ -1,0 +1,17 @@
+{
+  "tool": "built-in image_gen",
+  "prompts": [
+    {
+      "name": "Turtle",
+      "prompt": "Create a square profile avatar for Cuentiva's fantasy bookstore: a cheerful anthropomorphic sea turtle storyteller with teal shell, coral embroidered waistcoat, holding a small worn book, curious expressive eyes. Charming hand-painted gouache children's book illustration with soft watercolor edges, warm cream paper background, sage and terracotta palette. Head and upper body centered inside central 75 percent for circle cropping. No text, watermark or border."
+    },
+    {
+      "name": "Unicorn",
+      "prompt": "Square profile portrait for Cuentiva fantasy bookstore: a small winged unicorn, lavender mane, small golden horn, sage scarf, holding a little worn book, friendly curious eyes. Hand painted gouache and watercolor storybook artwork on warm cream paper, soft texture, muted sage and terracotta accents. One creature, head and upper body centered within central 75 percent for circular crop. No words or watermark."
+    },
+    {
+      "name": "Fox",
+      "prompt": "Square profile portrait for Cuentiva fantasy bookstore: an anthropomorphic fox, warm rust fur, indigo wizard hat, cream waistcoat, holding a little worn book, friendly curious eyes. Hand painted gouache and watercolor storybook artwork on warm cream paper, soft texture, muted sage and terracotta accents. One creature, head and upper body centered within central 75 percent for circular crop. No words or watermark."
+    }
+  ]
+}

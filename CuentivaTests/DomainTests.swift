@@ -33,7 +33,8 @@ struct MemoryBooks: BookRepository {
     var checking = false
     var offer: Product? { nil }
     var message: String?
-    func refresh() async {}
+    var refreshCalls = 0
+    func refresh() async { refreshCalls += 1 }
     func purchase() async throws { hasAccess = true }
     var restoresAccess = false
     var restoreFailure: AppFailure?
@@ -739,5 +740,112 @@ actor TestCatalogueTransport: CatalogueTransport {
         // Viewing recommendations performs no persistence writes or reset.
         #expect(try JSONDecoder().decode(LearnerProgress.self, from: before).practiceDays == progress.snapshot.practiceDays)
         purchases.hasAccess = false; #expect(library.dailyReads.isEmpty)
+    }
+}
+
+actor FantasyTestRepository: FantasyRepository {
+    var archive = FantasyArchive()
+    var fail = false
+    func load() -> FantasyArchive { archive }
+    func save(_ value: FantasyArchive) throws {
+        if fail { throw AppFailure.unavailable("Save failed") }
+        archive = value
+    }
+    func setFailure() { fail = true }
+}
+struct FantasyTestGenerator: FantasyGenerator {
+    var invalid = false
+    func identity(name: String, biography: String, creature: FantasyCreature) async throws -> FantasyIdentity {
+        .init(name: invalid ? "Two Names" : "Lirio", biography: "A turtle who dances beside the sea.")
+    }
+    func story(memory: String, profile: FantasyProfile) async throws -> FantasyStory {
+        .init(title: "La fiesta", englishTitle: "The festival", sentences: (0..<16).map { _ in .init(spanish: "La tortuga baila.", english: "The turtle dances.") })
+    }
+}
+@Suite @MainActor struct FantasyTests {
+    @Test func skippedIntroductionPersistsWithoutFakeIdentity() async throws {
+        let repository = FantasyTestRepository()
+        let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        try await feature.load()
+        #expect(!feature.introductionSeen)
+        try await feature.finishIntroduction()
+        let relaunched = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        try await relaunched.load()
+        #expect(relaunched.introductionSeen)
+        #expect(relaunched.profile == nil)
+    }
+    @Test func invalidStoryPairsAreRejected() {
+        let invalid = FantasyStory(title: "Hola", englishTitle: "Hello", sentences: [.init(spanish: "Hola", english: "")])
+        #expect(throws: (any Error).self) { try FantasyValidation.story(invalid) }
+    }
+
+    @Test func creatureSurvivesRelaunchAndStoriesStayPrivate() async throws {
+        let repository = FantasyTestRepository()
+        let first = FantasyManager(repository: repository, generator: FantasyTestGenerator(), draw: { .turtle })
+        try await first.load()
+        #expect(try await first.drawCreature() == .turtle)
+        let revealNumber = try #require(first.profile?.revealNumber)
+        #expect((1...999).contains(revealNumber))
+        #expect((revealNumber - 1) % FantasyCreature.allCases.count == 0)
+        let next = FantasyManager(repository: repository, generator: FantasyTestGenerator(), draw: { .fox })
+        try await next.load()
+        #expect(try await next.drawCreature() == .turtle)
+        #expect(next.profile?.revealNumber == revealNumber)
+        try await next.createIdentity(name: "Matthew", biography: "I travel and build apps.")
+        let story = try await next.createStory(memory: "I danced in Mexico.")
+        #expect(next.profile?.identity?.name == "Lirio")
+        #expect(next.stories.map(\.id) == [story.id])
+    }
+    @Test func failedSaveDoesNotRevealUnpersistedCreature() async throws {
+        let repository = FantasyTestRepository()
+        let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        try await feature.load(); await repository.setFailure()
+        await #expect(throws: (any Error).self) { _ = try await feature.drawCreature() }
+        #expect(feature.profile == nil)
+    }
+    @Test func malformedIdentityDoesNotReplaceProfile() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator(invalid: true))
+        try await feature.load(); _ = try await feature.drawCreature()
+        await #expect(throws: (any Error).self) { try await feature.createIdentity(name: "Matt", biography: "A traveller") }
+        #expect(feature.profile?.identity == nil)
+        #expect(feature.profile?.creature != nil)
+    }
+}
+
+private struct UnavailableFantasyGenerator: FantasyGenerator {
+    func availabilityMessage() async -> String? { "Apple Intelligence is unavailable." }
+    func identity(name: String, biography: String, creature: FantasyCreature) async throws -> FantasyIdentity { throw AppFailure.unavailable("No AI available") }
+    func story(memory: String, profile: FantasyProfile) async throws -> FantasyStory { throw AppFailure.unavailable("No AI available") }
+}
+@Suite @MainActor struct StorytellerDetailsTests {
+    @Test func saveAndReopenBioWithoutAI() async throws {
+        let repository = FantasyTestRepository()
+        let feature = FantasyManager(repository: repository, generator: UnavailableFantasyGenerator())
+        try await feature.load(); _ = try await feature.drawCreature()
+        await feature.refreshAvailability()
+        #expect(feature.availabilityMessage != nil)
+        try await feature.saveDetails(name: " James ", biography: " A traveller who helps others. ")
+        let reopened = FantasyManager(repository: repository, generator: UnavailableFantasyGenerator())
+        try await reopened.load()
+        #expect(reopened.profile?.details?.name == "James")
+        #expect(reopened.profile?.details?.biography == "A traveller who helps others.")
+        #expect(reopened.profile?.identity == nil)
+        #expect(reopened.profile?.revealNumber == feature.profile?.revealNumber)
+    }
+    @Test func saveFailureKeepsPreviousBio() async throws {
+        let repository = FantasyTestRepository()
+        let feature = FantasyManager(repository: repository, generator: UnavailableFantasyGenerator())
+        try await feature.load(); _ = try await feature.drawCreature()
+        try await feature.saveDetails(name: "James", biography: "The original bio.")
+        await repository.setFailure()
+        await #expect(throws: (any Error).self) { try await feature.saveDetails(name: "James", biography: "A replacement.") }
+        #expect(feature.profile?.details?.biography == "The original bio.")
+    }
+    @Test func generationFailureDoesNotEraseSavedBio() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: UnavailableFantasyGenerator())
+        try await feature.load(); _ = try await feature.drawCreature()
+        try await feature.saveDetails(name: "James", biography: "A traveller.")
+        await #expect(throws: (any Error).self) { try await feature.createIdentity(name: "James", biography: "A traveller.") }
+        #expect(feature.profile?.details?.biography == "A traveller.")
     }
 }
