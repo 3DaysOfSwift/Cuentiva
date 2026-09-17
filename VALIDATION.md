@@ -1,3 +1,11 @@
+## Library-shaped startup — 17 September 2026
+
+Replaced the small title/spinner view with a noninteractive library skeleton containing the title, heading, placeholder controls and covers, and tab shell. Root background now fills the window and safe areas. Load errors show Retry over the shell; entitlement checks still gate content. Root load calls are serialized to avoid overlapping launch/foreground work.
+
+Added a static LaunchScreen storyboard in App Resources and verified the built Info.plist points to it. Its cream/green library shell replaces the empty generated launch screen; static launch resources cannot read the user's saved custom theme, while the SwiftUI skeleton immediately uses that theme.
+
+Xcode build/test suite passed. Installed and launched on iPhone Air Simulator; the library loaded with progress preserved. The fleeting pre-SwiftUI frames were not captured by the UI tool, and the physical-device black flash/cache behavior still needs checking with the updated build.
+
 ## Your turn and matching practice — 17 September 2026
 
 - All 28 core tests and the Xcode Simulator test suite passed. Tests cover baseline capture, legacy-history honesty, daily completion celebration idempotence, persistent once-per-book doubloons, failed-save rollback, full glossary coverage, interrupted rounds, countdown timing, expired-input rejection and replay rewards.

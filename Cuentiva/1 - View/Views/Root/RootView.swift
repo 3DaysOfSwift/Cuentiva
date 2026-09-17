@@ -15,9 +15,18 @@ struct RootView: View {
                     }
                 } else { OnboardingView() }
             } else {
-                VStack(spacing: 20) { Text("Cuentiva").font(.largeTitle.bold()); if viewModel.error == nil { ProgressView() }; InlineError(message: viewModel.error); if viewModel.error != nil { Button("Retry") { Task { await viewModel.load() } } } }
+                LibrarySkeletonView()
+                    .overlay(alignment: .center) {
+                        if viewModel.error != nil {
+                            VStack(spacing: 16) {
+                                InlineError(message: viewModel.error)
+                                Button("Retry") { Task { await viewModel.load() } }.buttonStyle(PrimaryButton())
+                            }.padding(24).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18)).padding(24)
+                        }
+                    }
             }
-        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
+        }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background { theme.theme.paper.ignoresSafeArea() }.foregroundStyle(theme.theme.ink)
             .task { await viewModel.load() }
             .onChange(of: scenePhase) { _, phase in if phase == .active { Task { await viewModel.load() } } }
     }
