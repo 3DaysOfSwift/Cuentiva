@@ -40,6 +40,11 @@ struct BookReaderView: View {
                 }
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
+                        NavigationLink { AuthorView(author: book.storyteller) } label: {
+                            AuthorPortrait(author: book.storyteller, size: 44)
+                        }.buttonStyle(.plain).accessibilityLabel("About \(book.storytellerName)")
+                    }.sharedBackgroundVisibility(.hidden)
+                    ToolbarItem(placement: .topBarTrailing) {
                         Button { viewModel.toggleAudio(book) } label: {
                             Image(systemName: viewModel.audioEnabled ? "speaker.wave.2" : "speaker.slash")
                         }

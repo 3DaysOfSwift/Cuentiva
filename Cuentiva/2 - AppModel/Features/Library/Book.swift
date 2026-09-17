@@ -24,6 +24,12 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
         Author.demoProfiles.first(where: { $0.id == authorID })?.name
             ?? author.split(whereSeparator: { $0.isWhitespace }).first.map(String.init) ?? author
     }
+    var storyteller: Author {
+        Author.demoProfiles.first(where: { $0.id == authorID })
+            ?? Author(id: authorID ?? author, name: storytellerName, portrait: "",
+                      introduction: "A storyteller from our shared library.",
+                      note: "Explore this storyteller’s books below.")
+    }
     var fullText: [Sentence] { sentences + (continuation ?? []) }
     var kind: BookFormat { format ?? .story }
     var unitName: String { kind == .movieScript ? "lines" : "sentences" }

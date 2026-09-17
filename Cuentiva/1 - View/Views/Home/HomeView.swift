@@ -7,17 +7,12 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                StreakBar(count: viewModel.streak, days: viewModel.week)
+                StreakBar(days: viewModel.week)
                 Divider()
-                HStack(alignment: .bottom) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Today’s 3 books").font(.system(.largeTitle, design: .serif, weight: .medium))
-                        Text("Bring Spanish to life through stories.").font(.subheadline).foregroundStyle(theme.theme.muted)
-                    }
-                    Spacer(minLength: 5)
-                    VStack { Text("\(viewModel.total)").font(.system(.largeTitle, design: .serif)); Text("BOOKS\nLEARNED").font(.system(size: 9, weight: .bold, design: .monospaced)).multilineTextAlignment(.center) }
-                }
                 if !viewModel.dailyReads.isEmpty {
+                    Text("Today’s books")
+                        .font(.headline)
+                        .foregroundStyle(theme.theme.muted)
                     ScrollView(.horizontal) {
                         HStack(spacing: 16) {
                             ForEach(viewModel.dailyReads) { book in
@@ -41,13 +36,25 @@ struct HomeView: View {
                 }
                 if let book = viewModel.focusedRead {
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(book.englishTitle).font(.title2.weight(.semibold))
+                        HStack(alignment: .center, spacing: 16) {
+                            NavigationLink { AuthorView(author: book.storyteller) } label: {
+                                AuthorPortrait(author: book.storyteller, size: 76)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("About \(book.storytellerName)")
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(book.englishTitle).font(.title2.weight(.semibold))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                Text("By \(book.storytellerName)")
+                                    .font(.subheadline).foregroundStyle(theme.theme.muted)
+                            }
+                        }
                         Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
                             .font(.caption).foregroundStyle(theme.theme.muted)
                         Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
                         Button { viewModel.selectedBook = book } label: {
                             HStack {
-                                Text(viewModel.completed(book) ? "Read again" : (viewModel.hasStarted(book) ? "Continue reading" : "Read this book"))
+                                Text(viewModel.readButtonTitle)
                                 Image(systemName: "arrow.right")
                             }
                             .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
@@ -68,7 +75,7 @@ struct HomeView: View {
                         .font(.subheadline).foregroundStyle(theme.theme.muted)
                 }
                 Divider()
-                Text("Explore our community library").font(.system(.title2, design: .serif, weight: .medium))
+                Text("Bring Spanish to life through stories").font(.system(.title2, design: .serif, weight: .medium))
                 CommunityAuthors(authors: viewModel.authors, onContribute: onContribute, horizontalInset: 23)
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
@@ -100,10 +107,26 @@ struct HomeView: View {
                 }
                 Text("DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary.").font(.caption2).foregroundStyle(theme.theme.muted).padding(.top, 8)
             }.padding(.horizontal, 23).padding(.bottom, 30)
-        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Cuentiva").navigationBarTitleDisplayMode(.inline)
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("").navigationBarTitleDisplayMode(.inline)
             .searchable(text: $viewModel.query, placement: .toolbar, prompt: "Find a story or a person")
             .searchToolbarBehavior(.minimize)
-            .toolbar { ToolbarItem(placement: .topBarTrailing) { NavigationLink { SettingsView() } label: { Image(systemName: "gearshape") }.accessibilityLabel("Settings") } }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink { StatsView() } label: {
+                    HStack(spacing: 7) {
+                        Image(systemName: "flame.fill")
+                        Text("\(viewModel.streak)").monospacedDigit()
+                    }
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(theme.theme.accent)
+                        .fixedSize()
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel("\(viewModel.streak) day streak")
+                    }
+                    .accessibilityHint("View your reading statistics")
+                }
+                ToolbarItem(placement: .topBarTrailing) { NavigationLink { SettingsView() } label: { Image(systemName: "gearshape") }.accessibilityLabel("Settings") }
+            }
             .task(id: viewModel.dailyReads.map(\.id)) { await viewModel.prepareDailyReads() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }

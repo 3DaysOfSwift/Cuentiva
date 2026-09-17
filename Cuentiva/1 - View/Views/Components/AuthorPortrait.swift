@@ -4,6 +4,7 @@ import SwiftUI
 struct AuthorPortrait: View {
     let author: Author
     var size: CGFloat = 76
+    var showsBorder = true
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         Group {
@@ -19,7 +20,9 @@ struct AuthorPortrait: View {
             .frame(width: size, height: size)
             .background(theme.theme.surface, in: Circle())
             .clipShape(Circle())
-            .overlay(Circle().strokeBorder(theme.theme.accent.opacity(0.18), lineWidth: 1))
+            .overlay {
+                if showsBorder { Circle().strokeBorder(theme.theme.accent.opacity(0.18), lineWidth: 1) }
+            }
             .accessibilityHidden(true)
     }
 }

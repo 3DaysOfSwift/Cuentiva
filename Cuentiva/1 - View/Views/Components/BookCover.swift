@@ -27,16 +27,23 @@ struct BookCover: View {
                     Spacer(minLength: 4)
                     Image(systemName: book.symbol).font(.system(size: compact ? 38 : 70, weight: .ultraLight)).frame(maxWidth: .infinity).padding(.vertical, compact ? 8 : 10)
                     Spacer(minLength: 4)
-                    Text(book.storytellerName.uppercased()).font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1)
+                    Text(book.storytellerName.uppercased())
+                        .font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1)
+                        .padding(.trailing, compact ? 52 : 68)
                 }.padding(compact ? 17 : 25).foregroundStyle(theme.theme.coverInk)
             }
             if completed {
                 Image(systemName: "checkmark.seal.fill").font(.title2).symbolRenderingMode(.palette)
                     .foregroundStyle(theme.theme.onAccent, theme.theme.accent).padding(9)
             }
-        }.frame(height: compact ? compactHeight : fullHeight).clipShape(RoundedRectangle(cornerRadius: 8))
+        }.frame(height: compact ? compactHeight : fullHeight)
+            .overlay(alignment: .bottomTrailing) {
+                AuthorPortrait(author: book.storyteller, size: compact ? 52 : 68)
+                    .padding(compact ? 12 : 17)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 8))
             .shadow(color: color.opacity(0.18), radius: 10, x: 0, y: 5)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(book.title), \(book.kind.singular), \(book.level)\(completed ? ", completed" : "")")
+            .accessibilityLabel("\(book.title), by \(book.storytellerName), \(book.kind.singular), \(book.level)\(completed ? ", completed" : "")")
     }
 }

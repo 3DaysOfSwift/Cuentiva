@@ -16,6 +16,25 @@ import Testing
     func stop() { recording = false }
 }
 @Suite @MainActor struct ViewModelTests {
+    @Test func statisticsReflectSavedPracticeAndAvoidDuplicateRewards() async throws {
+        let progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let stats = StatsViewModel(progress: progress)
+        #expect(stats.firstPractice == nil)
+        #expect(stats.booksRead == 0)
+        #expect(stats.doubloons == 0)
+        let book = sample()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        _ = try await progress.rewardPractice(book: book, matches: 2)
+        _ = try await progress.rewardPractice(book: book, matches: 2)
+        #expect(stats.booksRead == 1)
+        #expect(stats.doubloons == 1)
+        #expect(stats.streak == 1)
+        #expect(stats.practiceDays == 1)
+        #expect(stats.firstPractice != nil)
+    }
+
     @Test func dailyCarouselFocusesNextUnreadAndAllowsBrowsingCompletedBooks() async throws {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress())
@@ -24,12 +43,15 @@ import Testing
         let home = HomeViewModel(library: library, progress: progress)
         await home.prepareDailyReads()
         let first = try #require(home.focusedRead)
+        #expect(home.readButtonTitle == "Read book 1")
         try await progress.recordEncounter(book: first, sentence: first.sentences[0])
         _ = try await progress.complete(book: first)
         home.focusNextRead()
+        #expect(home.readButtonTitle == "Read book 2")
         #expect(home.focusedRead?.id != first.id)
         #expect(home.dailyReads.contains { $0.id == first.id })
         home.focusedBookID = first.id
+        #expect(home.readButtonTitle == "Read book 1")
         #expect(home.focusedRead?.id == first.id)
         #expect(home.completed(first))
     }

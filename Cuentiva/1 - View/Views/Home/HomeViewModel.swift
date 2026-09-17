@@ -17,6 +17,10 @@ import Observation
     var revisiting: Bool { library.revisiting }
     var nextRead: Book? { library.nextRead }
     var focusedRead: Book? { dailyReads.first { $0.id == focusedBookID } ?? nextRead }
+    var readButtonTitle: String {
+        guard let book = focusedRead, let index = dailyReads.firstIndex(where: { $0.id == book.id }) else { return "Read book" }
+        return "Read book \(index + 1)"
+    }
     func focusNextRead() { focusedBookID = nextRead?.id }
     func prepareDailyReads() async {
         guard !preparingDailyReads else { return }

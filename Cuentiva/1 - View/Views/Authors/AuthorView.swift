@@ -1,10 +1,10 @@
 import SwiftUI
 
 struct AuthorView: View {
-    let onContribute: () -> Void
+    let onContribute: (() -> Void)?
     @State private var model: AuthorViewModel
     @Environment(ThemeManager.self) private var theme
-    init(author: Author, onContribute: @escaping () -> Void) {
+    init(author: Author, onContribute: (() -> Void)? = nil) {
         self.onContribute = onContribute
         _model = State(initialValue: AuthorViewModel(author: author))
     }
@@ -29,7 +29,9 @@ struct AuthorView: View {
                         }
                     }.buttonStyle(.plain)
                 }
-                Button(action: onContribute) { Label("Share a story of your own", systemImage: "square.and.pencil") }
+                if let onContribute {
+                    Button(action: onContribute) { Label("Share a story of your own", systemImage: "square.and.pencil") }
+                }
             }.padding(23)
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
