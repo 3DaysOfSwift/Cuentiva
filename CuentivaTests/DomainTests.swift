@@ -34,7 +34,12 @@ struct MemoryBooks: BookRepository {
     var message: String?
     func refresh() async {}
     func purchase() async throws { hasAccess = true }
-    func restore() async throws {}
+    var restoresAccess = false
+    var restoreFailure: AppFailure?
+    func restore() async throws {
+        if let restoreFailure { throw restoreFailure }
+        if restoresAccess { hasAccess = true }
+    }
 }
 func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
     Book(id: id, title: "Mi café", englishTitle: "My café", author: "Demo", level: "A1", symbol: "cup.and.saucer", palette: 0, summary: "Sample", sentences: (0..<sentences).map { Sentence(id: "s\($0)", spanish: "El café está aquí.", english: "The café is here.") }, vocabulary: [.init(word: "está", lemma: "estar", occurrences: 1)], license: "Test")

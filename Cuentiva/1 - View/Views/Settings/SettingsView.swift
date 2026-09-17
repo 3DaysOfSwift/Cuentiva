@@ -26,7 +26,24 @@ struct SettingsView: View {
             }.listRowBackground(themeManager.theme.surface)
             Section("Purchase") {
                 Text("Cuentiva · One-time purchase")
-                Button("Restore purchases") { Task { await viewModel.restore() } }
+                if viewModel.hasAccess {
+                    Label("Lifetime access active", systemImage: "checkmark.seal.fill")
+                        .foregroundStyle(themeManager.theme.accent)
+                }
+                Button { Task { await viewModel.restore() } } label: {
+                    HStack {
+                        Text(viewModel.restoring ? "Checking purchases…" : "Restore purchases")
+                        Spacer()
+                        if viewModel.restoring { ProgressView() }
+                    }
+                }
+                .foregroundStyle(themeManager.theme.accent)
+                .disabled(viewModel.restoring)
+                if let message = viewModel.restoreMessage {
+                    Label(message, systemImage: "checkmark.circle")
+                        .font(.footnote).foregroundStyle(themeManager.theme.accent)
+                }
+                InlineError(message: viewModel.restoreError)
             }.listRowBackground(themeManager.theme.surface)
             Section("Your vocabulary") {
                 if viewModel.words.isEmpty { Text("Words you practice will appear here.") }

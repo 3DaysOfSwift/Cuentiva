@@ -264,3 +264,12 @@ without rebuilding the entire Settings screen or discarding its ViewModel.
 Simulator build passed. Switched Library → Midnight on iPhone Air and visually
 confirmed the theme selection and visible vocabulary values use the light green
 accent together. Physical-device scrolling/reuse remains a follow-up check.
+
+## Settings restore feedback — 17 September 2026
+
+Purchase section shows verified lifetime access status. Restore disables repeat taps,
+shows Checking purchases while active, and displays success or failure beside the
+action. Existing ownership reports full access already active; new recovery reports
+restored access. Failed/no-access results never show success and stale feedback clears
+on retry. All 57 Xcode tests and 29 core tests passed. Simulator tap confirmed the
+existing-owner success message appears inside the Purchase section.
