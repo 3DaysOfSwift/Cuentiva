@@ -11,6 +11,10 @@ struct SettingsView: View {
                         Text(theme.title).tag(theme)
                     }
                 }
+                .tint(themeManager.theme.accent)
+                // Recreate the native menu when its palette changes; reused controls
+                // can otherwise retain the previous theme's selected-value tint.
+                .id(themeManager.selectedTheme)
                 Text("Your selected theme is used throughout Cuentiva.")
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
@@ -30,6 +34,8 @@ struct SettingsView: View {
                     Picker(word, selection: Binding(get: { viewModel.state(word) }, set: { state in Task { await viewModel.set(word, state: state) } })) {
                         ForEach(VocabularyState.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
                     }
+                    .tint(themeManager.theme.accent)
+                    .id(themeManager.selectedTheme)
                 }
             }.listRowBackground(themeManager.theme.surface)
             Section("Privacy") {
@@ -42,6 +48,7 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .background(themeManager.theme.paper)
             .foregroundStyle(themeManager.theme.ink)
+            .tint(themeManager.theme.accent)
             .confirmationDialog("Delete learning progress from this device?", isPresented: $viewModel.resetConfirmation, titleVisibility: .visible) { Button("Reset progress", role: .destructive) { Task { await viewModel.reset() } } }
     }
 }

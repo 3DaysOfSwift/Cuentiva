@@ -255,3 +255,12 @@ Regression coverage injects an empty current-entitlement result while using a re
 StoreKitTest lifetime transaction, then verifies recovery and refusal after refund.
 Final verification: all 55 Xcode simulator tests and 29 core tests passed, including
 the empty-index recovery and revoked-latest-transaction regression assertions.
+
+## Settings selection tint — 17 September 2026
+
+Settings applies the active accent explicitly to its selection controls and list.
+Theme-dependent identities rebuild individual native pickers after a palette change,
+without rebuilding the entire Settings screen or discarding its ViewModel.
+Simulator build passed. Switched Library → Midnight on iPhone Air and visually
+confirmed the theme selection and visible vocabulary values use the light green
+accent together. Physical-device scrolling/reuse remains a follow-up check.
