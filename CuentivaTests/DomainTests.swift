@@ -267,6 +267,10 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         }
 
         for book in books {
+            if let glossary = book.matchGlossary {
+                #expect(Set(glossary.keys) == Set(book.vocabulary.map(\.word)))
+                #expect(glossary.values.allSatisfy { !$0.isEmpty })
+            }
             #expect(book.continuation?.count == book.sentences.count)
             #expect(Set(book.fullText.map(\.id)).count == book.fullText.count)
             #expect(book.continuation?.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty } == true)
@@ -396,5 +400,43 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         #expect(await storage.drafts().isEmpty)
         var stale = Contribution(); stale.title = "Yesterday"; stale.spanish = draft.spanish; stale.submissionLocation = place(date: .now.addingTimeInterval(-600))
         await #expect(throws: (any Error).self) { try await feature.save(stale, submit: true) }
+    }
+}
+
+@Suite @MainActor struct PracticeProgressTests {
+    @Test func capturesBaselineAndAwardsOnceAcrossReload() async throws {
+        let repo = MemoryProgress(), progress = ProgressManager(repository: MemoryProgress())
+        let manager = ProgressManager(repository: repo); try await manager.load()
+        let book = sample()
+        try await manager.recordEncounter(book: book, sentence: book.sentences[0])
+        #expect(manager.snapshot.bookWordBaselines?[book.id] == [])
+        #expect(manager.snapshot.seenWords?.contains("café") == true)
+        let receipt = try await manager.complete(book: book)
+        #expect(receipt.streakCelebration == 1)
+        #expect(try await manager.complete(book: book).streakCelebration == nil)
+        #expect(try await manager.rewardPractice(book: book, matches: 1))
+        let restored = ProgressManager(repository: repo); try await restored.load()
+        #expect(try await restored.rewardPractice(book: book, matches: 1) == false)
+        #expect(restored.snapshot.doubloons == 1)
+        #expect(restored.snapshot.completed.count == 1)
+        try await progress.load()
+        await #expect(throws: (any Error).self) { try await progress.rewardPractice(book: book, matches: 1) }
+    }
+    @Test func failedRewardDoesNotMintCoin() async throws {
+        let repo = MemoryProgress(), book = sample()
+        let manager = ProgressManager(repository: repo); try await manager.load()
+        try await manager.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await manager.complete(book: book)
+        await repo.setFailure(true)
+        await #expect(throws: (any Error).self) { try await manager.rewardPractice(book: book, matches: 1) }
+        #expect(manager.snapshot.doubloons == nil)
+        #expect(manager.snapshot.rewardedBooks == nil)
+    }
+    @Test func legacyProgressDoesNotInventBaseline() async throws {
+        let repo = MemoryProgress()
+        var old = LearnerProgress(); old.evidence = ["café": 1]
+        try await repo.save(old)
+        let manager = ProgressManager(repository: repo); try await manager.load()
+        let book = sample(); try await manager.recordEncounter(book: book, sentence: book.sentences[0])
+        #expect(manager.snapshot.bookWordBaselines?[book.id] == nil)
     }
 }

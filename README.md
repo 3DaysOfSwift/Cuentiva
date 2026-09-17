@@ -110,3 +110,7 @@ Contributors can write freely or pick a topic request with a teaching brief, cov
 ## Nearby Stories
 
 Nearby discovers geotagged books within 5, 25 or 100 km, or 1,000 miles (default). Contributions can capture and confirm a fixed submission location; completed stories remain readable after travel. This demo keeps submissions local and includes three clearly labelled fictional Thailand stories with example locations. See [Nearby Stories](Documentation/NEARBY-STORIES.md) for behavior, privacy and server integration.
+
+## Your turn and Match Pairs
+
+Completed books offer Spanish-only guided rereading, vocabulary statistics and optional matching practice. Match Pairs currently has full glossaries for Ana’s little café and My father’s garden. First qualifying rounds award one persistent doubloon per book; no spending feature yet. See [Your turn](Documentation/YOUR-TURN.md).

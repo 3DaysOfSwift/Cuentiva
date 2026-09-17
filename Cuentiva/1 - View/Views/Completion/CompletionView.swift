@@ -2,6 +2,7 @@ import SwiftUI
 struct CompletionView: View {
     let receipt: CompletionReceipt
     @State private var viewModel: CompletionViewModel
+    @State private var showPractice = false
     @State private var contentVisible = false
     @State private var confettiStart: Date?
     @Environment(\.dismiss) private var dismiss
@@ -25,7 +26,11 @@ struct CompletionView: View {
                     Text("BOOKS LEARNED").font(.caption.bold()).tracking(3)
                     Text(receipt.isNew ? "+1 to your collection" : "A familiar story, practiced again").font(.subheadline).foregroundStyle(theme.theme.accent)
                 }
-                Button("Continue  →") { dismiss() }.buttonStyle(PrimaryButton())
+                Button("Continue  →") { if receipt.streakCelebration != nil && AppModel.shared.practice.allowed(receipt.book) { showPractice = true } else { dismiss() } }.buttonStyle(PrimaryButton())
+                if AppModel.shared.practice.allowed(receipt.book) {
+                    Button("Your turn · read it in Spanish") { showPractice = true }
+                    Button("Finish for today") { dismiss() }
+                }
             }.padding(28).frame(maxWidth: .infinity)
         }
             .opacity(contentVisible ? 1 : 0)
@@ -75,5 +80,8 @@ struct CompletionView: View {
                 }
             }
             .onDisappear { confettiStart = nil }
+            .fullScreenCover(isPresented: $showPractice, onDismiss: { dismiss() }) {
+                NavigationStack { PracticeView(book: receipt.book, streak: receipt.streakCelebration) }
+            }
     }
 }

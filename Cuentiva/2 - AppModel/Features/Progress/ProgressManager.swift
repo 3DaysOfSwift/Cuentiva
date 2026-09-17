@@ -13,6 +13,7 @@ import Observation
     func complete(book: Book) async throws -> CompletionReceipt
     func completeReading(book: Book) async throws -> CompletionReceipt
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
+    func rewardPractice(book: Book, matches: Int) async throws -> Bool
     func reset() async throws
 }
 @MainActor @Observable final class ProgressManager: ProgressFeature {
@@ -58,6 +59,13 @@ import Observation
         snapshot = next
     }
     private func addEncounter(book: Book, sentence: Sentence, to next: inout LearnerProgress) {
+        if next.wordHistoryComplete == nil { next.wordHistoryComplete = next.evidence.isEmpty }
+        if next.wordHistoryComplete == true, next.bookWordBaselines?[book.id] == nil, next.attempts[book.id, default: []].isEmpty {
+            if next.bookWordBaselines == nil { next.bookWordBaselines = [:] }
+            next.bookWordBaselines?[book.id] = next.seenWords ?? []
+        }
+        if next.seenWords == nil { next.seenWords = [] }
+        next.seenWords?.formUnion(WordComparison.words(sentence.spanish).map(WordComparison.normalized))
         let inserted = next.attempts[book.id, default: []].insert(sentence.id).inserted
         next.practiceDays.insert(dayKey(now()))
         if inserted {
@@ -89,20 +97,43 @@ import Observation
     func complete(book: Book) async throws -> CompletionReceipt {
         guard Set(book.fullText.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else { throw AppFailure.incomplete }
         let isNew = !snapshot.completed.contains(book.id)
-        try await commit { $0.completed.insert(book.id); $0.positions[book.id] = 0 }
-        return .init(book: book, isNew: isNew, total: snapshot.completed.count)
+        let celebrate = !(snapshot.celebratedCompletionDays ?? []).contains(dayKey(now()))
+        try await commit {
+            $0.completed.insert(book.id); $0.positions[book.id] = 0
+            if $0.celebratedCompletionDays == nil { $0.celebratedCompletionDays = [] }
+            $0.celebratedCompletionDays?.insert(dayKey(now()))
+        }
+        return .init(book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil)
     }
     /// The final reader action records the continuation and completion in one save.
     func completeReading(book: Book) async throws -> CompletionReceipt {
         guard Set(book.sentences.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else { throw AppFailure.incomplete }
         let isNew = !snapshot.completed.contains(book.id)
+        let celebrate = !(snapshot.celebratedCompletionDays ?? []).contains(dayKey(now()))
         try await commit { next in
             for sentence in book.continuation ?? [] { addEncounter(book: book, sentence: sentence, to: &next) }
+            if next.celebratedCompletionDays == nil { next.celebratedCompletionDays = [] }
+            next.celebratedCompletionDays?.insert(dayKey(now()))
             next.completed.insert(book.id)
             next.positions[book.id] = 0
         }
-        return .init(book: book, isNew: isNew, total: snapshot.completed.count)
+        return .init(book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil)
     }
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws { try await commit { $0.vocabulary[lemma] = state } }
+    func rewardPractice(book: Book, matches: Int) async throws -> Bool {
+        guard snapshot.completed.contains(book.id), matches > 0, matches <= Set(book.vocabulary.map(\.word)).count else { throw AppFailure.incomplete }
+        let awarded = !(snapshot.rewardedBooks ?? []).contains(book.id)
+        try await commit { next in
+            if next.bestMatches == nil { next.bestMatches = [:] }
+            let best = max(next.bestMatches?[book.id] ?? 0, matches)
+            next.bestMatches?[book.id] = best
+            if awarded {
+                if next.rewardedBooks == nil { next.rewardedBooks = [] }
+                next.rewardedBooks?.insert(book.id)
+                next.doubloons = (next.doubloons ?? 0) + 1
+            }
+        }
+        return awarded
+    }
     func reset() async throws { try await commit { $0 = .init() } }
 }

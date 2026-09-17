@@ -1,3 +1,10 @@
+## Your turn and matching practice — 17 September 2026
+
+- All 28 core tests and the Xcode Simulator test suite passed. Tests cover baseline capture, legacy-history honesty, daily completion celebration idempotence, persistent once-per-book doubloons, failed-save rollback, full glossary coverage, interrupted rounds, countdown timing, expired-input rejection and replay rewards.
+- iPhone Air Simulator: opened the visible Completed activities menu, ran a 30-second café round, matched a pair, and observed timeout → result → +1 gold doubloon. Opened Your turn, verified Spanish-only content, tapped a sentence to reveal English, and reached the accurate legacy-data statistics screen (95 tokens, 62 forms, about 58 families).
+- Supported matching content: full authored glossaries for café and garden. Other books remain available for unaided reading but explicitly defer Match Pairs until their glossaries exist. No runtime-generated translations or partial decks presented as complete.
+- Physical-device Dynamic Type/VoiceOver, visual streak-entry timing and the full unaided pacing session still need hands-on validation. Existing installations without full historical word-form tracking show unavailable before-book stats rather than invented counts. Coins have no spending feature.
+
 ## Nearby layout correction — 17 September 2026
 
 Moved the fixed-size decorative circle into an overlay so it cannot impose a minimum cover width. Nearby uses adaptive vertical cards with descriptions below the covers, replacing the cramped 120-point horizontal cover rows. Xcode build passed. On iPhone Air Simulator with a simulated Pattaya coordinate, permission and place-name lookup succeeded and all three example stories loaded. The visible first card stays inside the horizontal margins; Discover's existing two-column covers were also visually checked. Full lower-card scrolling and physical iPhone layout were not verified by automation.
