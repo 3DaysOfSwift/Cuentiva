@@ -2,7 +2,7 @@
 
 [![3 Days of Swift Concurrency — iOS developer training](readme-images/README-Logo-h512.png)](https://www.3daysofswiftconcurrency.com/)
 
-**Learn Spanish through community-written stories about real people.**
+**Bring Spanish to life through stories.**
 
 Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Read at your own pace, listen to Spanish, practise speaking or writing, and collect the books you complete.
 
@@ -57,7 +57,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 
 The Xcode navigator follows CFA's `1 - View`, `2 - AppModel`, `3 - App Resources` structure. A `4 - Swift Extensions` folder will be added only when a reusable extension earns a place.
 
-Each screen owns its adjacent `@MainActor @Observable` ViewModel. Views do not receive managers, repositories, or ViewModels. `AppModel.shared` is the production composition root; feature dependencies remain injectable for isolated tests. `AppModel` owns no navigation state.
+Each screen owns its adjacent `@MainActor @Observable` ViewModel. Presentation components receive explicit display data or feature inputs; storage stays behind feature APIs. `AppModel.shared` is the production composition root; feature dependencies remain injectable for isolated tests. `AppModel` owns no navigation state.
 
 | Feature | Responsibility |
 | --- | --- |
@@ -68,23 +68,25 @@ Each screen owns its adjacent `@MainActor @Observable` ViewModel. Views do not r
 | PracticeManager | Completed-book practice eligibility, vocabulary statistics, matching glossaries and rewards |
 | NearbyManager | Location-based discovery within the selected radius |
 | LanguageTermsManager | Searchable bilingual language-term explanations |
-| ContributionManager | Demo eligibility, draft validation, submission and coaching rules |
+| FantasyManager | Private storyteller identity, generated drafts and weekly personal publication |
+| ChatManager | Paid on-device conversation, bounded model context and saved transcripts |
+| ContributionManager | Legacy draft compatibility; no public submission UI |
 
-Repositories isolate bundled JSON and actor-protected local persistence. Writes are atomic and state publishes only after successful persistence. Concurrent progress mutations return a recoverable busy error instead of overwriting one another. Tracked lesson tasks belong to the LessonViewModel; stale audio callbacks are invalidated when a lesson changes. Main-actor managers publish observable state, while file decoding and writes happen in repository actors.
+Repositories isolate bundled/remote JSON from local SwiftData persistence. Database transactions are atomic and state publishes only after successful persistence. Concurrent progress mutations return a recoverable busy error instead of overwriting one another. Tracked lesson tasks belong to the LessonViewModel; stale audio callbacks are invalidated when a lesson changes. Main-actor managers publish observable state, while decoding and database work happen outside MainActor in repository/model actors.
 
 Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replaceable `LessonAudio` boundary. This demo does not depend on SpeechAnalyzer model downloads. Recognition feedback is not a pronunciation assessment.
 
 ## Product rules
 
 - Completed books are unique by stable book ID. Re-reading celebrates practice without incrementing the counter again.
-- Next sentence records an encounter and advances immediately. The final guided sentence opens the full reader without awarding completion. Mark as read records the continuation and book completion in one atomic save. There is no Skip button or compulsory assessment.
+- Next sentence records an encounter and advances after its progress transaction succeeds. The final guided sentence opens the full reader without awarding completion. Mark as read records the continuation and book completion in one atomic save. There is no Skip button or compulsory assessment.
 - Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
 - A verified non-consumable purchase unlocks access without an expiry date. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
 - Public submission, publishing goals and contribution eligibility are retired from the app experience.
 - Existing local drafts are preserved; new personal tales are saved privately on the device.
 
-## Wix later
+## Private writing and legacy drafts
 
 `BookRepository` is the library boundary. `ContributionRepository` currently saves drafts and their local review status. These are legacy records retained for the private draft archive. No remote submission implementation is planned; library delivery remains separate from personal writing.
 
@@ -183,3 +185,7 @@ replacing it. Opening Discover or returning from a lesson focuses the first unre
 book. Swiping or tapping a page indicator selects another book and updates its
 details and reading action. The next day's selection uses the existing freshness
 rules; permanent completion records are retained.
+
+Local storage uses SwiftData for the catalogue, reading progress, storyteller profile, private stories, drafts and chat. Existing JSON data is imported once, then obsolete files are deleted after the database has been verified readable. Bundled seed books and GitHub downloads still use JSON. Downloaded catalogues become active on the next launch. See [startup and storage behavior](docs/startup.md).
+
+For contributors, start with [the architecture guide](docs/architecture.md) and [contribution guidelines](CONTRIBUTING.md). Release preparation is tracked in [App Store submission](docs/app-store/README.md).

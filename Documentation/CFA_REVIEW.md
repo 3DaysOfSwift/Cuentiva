@@ -1,5 +1,7 @@
 # CFA implementation review
 
+Historical review from the initial implementation. For the current storage and startup design, read [the architecture guide](../docs/architecture.md). Earlier simulator results below do not validate the current build.
+
 Source: the user's local CFA Development skill, its canonical specification,
 and reference feature, read before design and implementation.
 

@@ -26,7 +26,7 @@ actor LaunchBooks: SyncingBookRepository {
         let progress = ProgressManager(repository: MemoryProgress())
         let repository = LaunchBooks()
         let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library, progress: progress,
+        let root = RootViewModel(purchases: purchases, library: library,
             fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await root.load()
         #expect(root.ready)
@@ -38,6 +38,26 @@ actor LaunchBooks: SyncingBookRepository {
         await root.syncLibrary()
         #expect(purchases.refreshCalls == 1)
         #expect(await repository.syncCalls == 1)
+        await root.syncLibrary()
+        #expect(await repository.syncCalls == 1) // duplicate scene activation is coalesced
+    }
+
+    @Test func initialSceneActivationDoesNotRepeatStartupPurchaseCheck() async throws {
+        let purchases = TestPurchases()
+        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases,
+            progress: ProgressManager(repository: MemoryProgress()))
+        let root = RootViewModel(purchases: purchases, library: library,
+            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
+        await root.becameActive()
+        #expect(purchases.refreshCalls == 0)
+        await root.start()
+        #expect(root.ready)
+        #expect(purchases.refreshCalls == 1)
+        await root.becameActive()
+        #expect(purchases.refreshCalls == 1)
+        root.enteredBackground()
+        await root.becameActive()
+        #expect(purchases.refreshCalls == 2)
     }
 
     @Test func savedBioReturnsToEditableForm() async throws {
@@ -493,7 +513,7 @@ import StoreKitTest
         #expect(purchases.offer != nil)
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library, progress: progress, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
+        let root = RootViewModel(purchases: purchases, library: library, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await root.load()
         #expect(!root.hasAccess)
         try await purchases.purchase()

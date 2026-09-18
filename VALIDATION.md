@@ -1,3 +1,14 @@
+## First release-cleanup pass — 18 September 2026
+
+- RootViewModel owns parallel local loading and entitlement verification through start(). Initial scene activation is ignored for refresh purposes; a real background/foreground cycle refreshes access. Removed the unused progress dependency and renamed the Write tab's internal case.
+- Added a regression in the iOS ViewModel test suite for initial activation versus foreground return. This new test has not run here because CoreSimulator is unavailable.
+- Formatted the startup, composition, lesson coordination, purchase and storage files with the checked-in swift-format settings. Added the architecture guide, contribution guide and reusable verification script.
+- Removed obsolete location-submission permission wording and Xcode-specific purchase-failure advice from production-facing strings. Existing debug-only StoreKit notices remain debug-only.
+- Prepared App Store listing/review notes, Wix support/privacy drafts and an explicit submission checklist. No remote app record, IAP product, archive upload or review submission was performed.
+- All 81 core tests pass. Swift syntax parsing, project/privacy plist validation and git diff whitespace checks pass. iOS tests cannot find the selected simulator because CoreSimulator services are unavailable. No current physical-device timing or release archive is certified by these checks.
+
+Earlier entries below are historical validation for their respective changes, not proof that the current build has passed all of those device checks.
+
 ## Decipher language terms — 17 September 2026
 
 Added Settings → Language help → Decipher language terms, with 12 bilingual entries, plain-language explanations, highlighted English/Spanish examples and related-term navigation. Search supports either language and accent-insensitive matching. The Your turn word-family statistic links to the lemma explanation. No quiz or new learning rewards are introduced.

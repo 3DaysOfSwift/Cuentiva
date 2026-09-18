@@ -20,43 +20,103 @@ import Observation
     var busy = false
     var showingReader = false
     private var recordingTask: Task<Void, Never>?
-    var sentence: Sentence? { guard let book, book.sentences.indices.contains(index) else { return nil }; return book.sentences[index] }
-    var positionLabel: String { guard let book else { return "" }; return "\(index + 1) OF \(book.sentences.count) \(book.unitName.uppercased())" }
-    var fraction: Double { guard let book else { return 0 }; return Double(index + 1) / Double(book.sentences.count) }
-    var nextTitle: String { guard let book else { return "Next" }; return index == book.sentences.count - 1 ? (book.kind == .movieScript ? "Read the full script" : "Read the full story") : (book.kind == .movieScript ? "Next line" : "Next sentence") }
-    var allowed: Bool { guard let book else { return false }; return learning.canRead(book) }
-    init(learning: any LearningFeature = AppModel.shared.learning, audio: (any LessonAudio)? = nil) { self.learning = learning; self.audio = audio ?? AppModel.shared.makeAudio() }
-    func load(_ book: Book) { guard self.book == nil else { return }; self.book = book; index = learning.position(book); showingReader = index == book.sentences.count }
-    func listen() { guard allowed, let sentence else { return }; recordingTask?.cancel(); audio.speak(sentence.spanish, slow: slow) }
-    func toggleRecording() {
-        if audio.recording { audio.stopRecording() }
-        else { guard allowed else { return }; recordingTask?.cancel(); recordingTask = Task { await audio.startRecording() } }
+    var sentence: Sentence? {
+        guard let book, book.sentences.indices.contains(index) else { return nil }
+        return book.sentences[index]
     }
-    func changeMode() { stop(); feedback = nil; showSpanish = false; error = nil }
-    func stop() { recordingTask?.cancel(); recordingTask = nil; audio.stop() }
+    var positionLabel: String {
+        guard let book else { return "" }
+        return "\(index + 1) OF \(book.sentences.count) \(book.unitName.uppercased())"
+    }
+    var fraction: Double {
+        guard let book else { return 0 }
+        return Double(index + 1) / Double(book.sentences.count)
+    }
+    var nextTitle: String {
+        guard let book else { return "Next" }
+        return index == book.sentences.count - 1
+            ? (book.kind == .movieScript ? "Read the full script" : "Read the full story")
+            : (book.kind == .movieScript ? "Next line" : "Next sentence")
+    }
+    var allowed: Bool {
+        guard let book else { return false }
+        return learning.canRead(book)
+    }
+    init(learning: any LearningFeature = AppModel.shared.learning, audio: (any LessonAudio)? = nil) {
+        self.learning = learning
+        self.audio = audio ?? AppModel.shared.makeAudio()
+    }
+    func load(_ book: Book) {
+        guard self.book == nil else { return }
+        self.book = book
+        index = learning.position(book)
+        showingReader = index == book.sentences.count
+    }
+    func listen() {
+        guard allowed, let sentence else { return }
+        recordingTask?.cancel()
+        audio.speak(sentence.spanish, slow: slow)
+    }
+    func toggleRecording() {
+        if audio.recording {
+            audio.stopRecording()
+        } else {
+            guard allowed else { return }
+            recordingTask?.cancel()
+            recordingTask = Task { await audio.startRecording() }
+        }
+    }
+    func changeMode() {
+        stop()
+        feedback = nil
+        showSpanish = false
+        error = nil
+    }
+    func stop() {
+        recordingTask?.cancel()
+        recordingTask = nil
+        audio.stop()
+    }
     func check() async {
         guard let book, let sentence, !busy else { return }
-        busy = true; defer { busy = false }; error = nil
+        busy = true
+        defer { busy = false }
+        error = nil
         let response = mode == "Speak" ? audio.transcript : answer
         audio.stopRecording()
-        do { feedback = try await learning.check(book: book, sentence: sentence, answer: response) }
-        catch { self.error = error.localizedDescription }
+        do { feedback = try await learning.check(book: book, sentence: sentence, answer: response) } catch {
+            self.error = error.localizedDescription
+        }
     }
     func next() async {
         guard let book, !busy else { return }
-        busy = true; defer { busy = false }; error = nil; stop()
+        busy = true
+        defer { busy = false }
+        error = nil
+        stop()
         do {
             switch try await learning.advance(book: book, from: index) {
             case .position(let next): index = next
-            case .fullReading: showingReader = true; return
+            case .fullReading:
+                showingReader = true
+                return
             }
-            answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""; feedback = nil; showSpanish = false
+            answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""
+            feedback = nil
+            showSpanish = false
         } catch { self.error = error.localizedDescription }
     }
     func back() async {
         guard let book, index > 0, !busy else { return }
-        busy = true; defer { busy = false }; stop()
-        do { try await learning.move(book: book, position: index - 1); index -= 1; answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""; feedback = nil; showSpanish = false }
-        catch { self.error = error.localizedDescription }
+        busy = true
+        defer { busy = false }
+        stop()
+        do {
+            try await learning.move(book: book, position: index - 1)
+            index -= 1
+            answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""
+            feedback = nil
+            showSpanish = false
+        } catch { self.error = error.localizedDescription }
     }
 }

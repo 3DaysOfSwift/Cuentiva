@@ -13,28 +13,48 @@ import Foundation
     let chat: any ChatFeature
     let fantasy: any FantasyFeature
     let makeAudio: () -> any LessonAudio
-    init(library: any LibraryFeature, progress: any ProgressFeature, purchases: any PurchaseFeature,
-         learning: any LearningFeature, contributions: any ContributionFeature, fantasy: any FantasyFeature, chat: any ChatFeature, makeAudio: @escaping () -> any LessonAudio) {
+    init(
+        library: any LibraryFeature, progress: any ProgressFeature, purchases: any PurchaseFeature,
+        learning: any LearningFeature, contributions: any ContributionFeature, fantasy: any FantasyFeature,
+        chat: any ChatFeature, makeAudio: @escaping () -> any LessonAudio
+    ) {
         self.chat = chat
         self.fantasy = fantasy
         self.practice = PracticeManager(progress: progress, purchases: purchases)
         self.nearby = NearbyManager(library: library, purchases: purchases)
-        self.library = library; self.progress = progress; self.purchases = purchases
-        self.learning = learning; self.contributions = contributions; self.makeAudio = makeAudio
+        self.library = library
+        self.progress = progress
+        self.purchases = purchases
+        self.learning = learning
+        self.contributions = contributions
+        self.makeAudio = makeAudio
     }
     static func live() -> AppModel {
         let directory = URL.applicationSupportDirectory.appending(path: "Cuentiva")
-        let progress = ProgressManager(repository: LocalProgressRepository(url: directory.appending(path: "progress.json")))
+        let store = SwiftDataStore(url: directory.appending(path: "Cuentiva.store"))
+        let progress = ProgressManager(
+            repository: LocalProgressRepository(url: directory.appending(path: "progress.json"), store: store))
         let purchases = PurchaseManager()
-        let repository = SyncedBookRepository(bundled: BundledBookRepository(),
-            transport: GitHubCatalogueTransport(endpoint: URL(string: "https://github.com/3DaysOfSwift/GlobalEnglish-SpanishLearningBooksCollection")!),
-            cacheURL: directory.appending(path: "catalogue.json"))
-        let fantasy = FantasyManager(repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json")), generator: AppleFantasyGenerator())
-        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress, personalLibrary: fantasy)
+        let repository = SyncedBookRepository(
+            bundled: BundledBookRepository(),
+            transport: GitHubCatalogueTransport(
+                endpoint: URL(string: "https://github.com/3DaysOfSwift/GlobalEnglish-SpanishLearningBooksCollection")!),
+            cacheURL: directory.appending(path: "catalogue.json"), store: store)
+        let fantasy = FantasyManager(
+            repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json"), store: store),
+            generator: AppleFantasyGenerator())
+        let library = LibraryManager(
+            repository: repository, purchases: purchases, progress: progress, personalLibrary: fantasy)
         let learning = LearningManager(purchases: purchases, progress: progress)
-        let contributions = ContributionManager(repository: LocalContributionRepository(url: directory.appending(path: "drafts.json")), purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
-        let chat = ChatManager(purchases: PurchaseManager(productID: PurchaseManager.storytellerChatProductID),
-            generator: AppleChatGenerator(), repository: LocalChatRepository(url: directory.appending(path: "chat.json")))
-        return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, fantasy: fantasy, chat: chat, makeAudio: { AppleLessonAudio() })
+        let contributions = ContributionManager(
+            repository: LocalContributionRepository(url: directory.appending(path: "drafts.json"), store: store),
+            purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
+        let chat = ChatManager(
+            purchases: PurchaseManager(productID: PurchaseManager.storytellerChatProductID),
+            generator: AppleChatGenerator(),
+            repository: LocalChatRepository(url: directory.appending(path: "chat.json"), store: store))
+        return .init(
+            library: library, progress: progress, purchases: purchases, learning: learning,
+            contributions: contributions, fantasy: fantasy, chat: chat, makeAudio: { AppleLessonAudio() })
     }
 }

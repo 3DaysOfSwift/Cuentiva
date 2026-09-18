@@ -18,7 +18,7 @@ Tap the new-chat button to delete that character’s conversation and start agai
 Conversations with different storytellers are separate. Stop or leave the screen
 to cancel an unfinished reply.
 
-The full transcript is saved atomically in `chat.json` in Application Support.
+The full transcript is saved in SwiftData in Application Support, with separate conversation metadata and chat-turn records in one transaction. Existing `chat.json` files are imported once and deleted after successful database migration.
 No chat content is uploaded. The model receives a rolling summary plus the last
 two exchanges in a fresh session, keeping requests bounded as conversations grow.
 Messages are limited to 500 characters. Long-term memory is approximate: the

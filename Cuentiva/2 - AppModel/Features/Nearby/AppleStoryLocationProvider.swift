@@ -30,7 +30,7 @@ import Foundation
         case .notDetermined: manager.requestWhenInUseAuthorization()
         case .authorizedWhenInUse, .authorizedAlways: manager.requestLocation()
         case .denied, .restricted:
-            finish(.failure(AppFailure.unavailable("Location is unavailable. You can enable it in Settings, or keep using Discover and contribute without a location.")))
+            finish(.failure(AppFailure.unavailable("Location is unavailable. You can enable it in Settings or keep reading in Discover.")))
         @unknown default: finish(.failure(AppFailure.unavailable("Location is unavailable.")))
         }
     }

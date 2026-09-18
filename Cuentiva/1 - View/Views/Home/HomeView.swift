@@ -153,7 +153,8 @@ struct HomeView: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) { NavigationLink { SettingsView() } label: { Image(systemName: "gearshape") }.accessibilityLabel("Settings") }
             }
-            .task(id: viewModel.dailyReads.map(\.id)) { await viewModel.prepareDailyReads() }
+            // Persist the daily selection after this screen is mounted, never from library loading.
+            .task { await viewModel.prepareDailyReads() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }
             }

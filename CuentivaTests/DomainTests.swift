@@ -11,8 +11,10 @@ import StoreKit
 actor MemoryProgress: ProgressRepository {
     var value = LearnerProgress()
     var fail = false
+    var saveAttempts = 0
     func load() -> LearnerProgress { value }
     func save(_ value: LearnerProgress) throws {
+        saveAttempts += 1
         if fail { throw AppFailure.unavailable("Disk full") }
         self.value = value
     }
@@ -351,7 +353,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
 }
 
 @Suite struct PersistenceTests {
-    @Test func atomicProgressFileRoundTrip() async throws {
+    @Test func swiftDataProgressRoundTrip() async throws {
         let folder = URL.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: folder) }
         let repo = LocalProgressRepository(url: folder.appending(path: "progress.json"))
@@ -552,6 +554,7 @@ actor TestCatalogueTransport: CatalogueTransport {
         }
         manifest = CatalogueManifest(schema: 2, version: String(repeating: "a", count: 64), packs: refs)
     }
+    func changeVersion() { manifest = CatalogueManifest(schema: manifest.schema, version: String(repeating: "b", count: 64), packs: manifest.packs) }
     func fail() { broken = true }
     func failOnly(_ id: String?) { failID = id }
     func corrupt(_ id: String) { payloads[id] = Data("broken".utf8) }
@@ -563,6 +566,63 @@ actor TestCatalogueTransport: CatalogueTransport {
     }
 }
 @Suite struct CatalogueSyncTests {
+    @Test func importsLegacyPacksAndFailedReleaseKeepsDatabaseCatalogue() async throws {
+        let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = directory.appending(path: "catalogue.json")
+        let packs = directory.appending(path: "packs-v2")
+        try FileManager.default.createDirectory(at: packs, withIntermediateDirectories: true)
+        let original = try TestCatalogueTransport([sample(), sample("legacy")])
+        let manifestData = try await original.fetch(pack: nil)
+        let manifest = try JSONDecoder().decode(CatalogueManifest.self, from: manifestData)
+        try manifestData.write(to: cache)
+        for ref in manifest.packs {
+            try await original.fetch(pack: ref).write(to: packs.appending(path: ref.id + "-" + ref.checksum + ".json"))
+        }
+        let store = SwiftDataStore(url: directory.appending(path: "app.store"))
+        let source = MemoryBooks(values: [sample()])
+        let repository = SyncedBookRepository(bundled: source, transport: original, cacheURL: cache, store: store)
+        #expect(try await repository.books().map(\.id) == ["cafe", "legacy"])
+        #expect(!FileManager.default.fileExists(atPath: packs.path))
+        #expect(!FileManager.default.fileExists(atPath: cache.path))
+        #expect(try await SyncedBookRepository(bundled: source, transport: original, cacheURL: cache, store: store).books().count == 2)
+        #if DEBUG
+        // Same packs, changed manifest: failure occurs at catalogue commit rather than pack download.
+        let revised = try TestCatalogueTransport([sample(), sample("legacy")])
+        // Cache verified packs before injecting the failure.
+        for ref in manifest.packs {
+            try await store.put("packs", key: ref.id + "-" + ref.checksum, data: original.fetch(pack: ref))
+        }
+        await revised.changeVersion()
+        let update = SyncedBookRepository(bundled: source, transport: revised, cacheURL: cache, store: store)
+        let before = try await store.read("catalogue")
+        try await store.failNextCommitForTesting()
+        await #expect(throws: (any Error).self) { try await update.sync() }
+        #expect(try await store.read("catalogue") == before)
+        _ = try await update.sync()
+        #expect(try await store.read("catalogue") != before)
+        #endif
+    }
+    @Test func databaseLaunchDoesNotNeedLegacyJSONFiles() async throws {
+        let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = directory.appending(path: "catalogue.json")
+        let source = MemoryBooks(values: [sample()])
+        let transport = try TestCatalogueTransport([sample(), sample("downloaded")])
+        let repository = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
+        _ = try await repository.sync()
+        #expect(!FileManager.default.fileExists(atPath: directory.appending(path: "packs-v2").path))
+        let reloaded = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
+        #expect(try await reloaded.books().map(\.id) == ["cafe", "downloaded"])
+        #expect(await reloaded.arrivals()["downloaded"] != nil)
+        try Data("broken".utf8).write(to: cache.appendingPathExtension("prepared"))
+        let fallback = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
+        #expect(try await fallback.books().map(\.id) == ["cafe", "downloaded"])
+        // The database is authoritative; obsolete JSON cannot replace it.
+        _ = try await fallback.sync()
+        let repaired = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
+        #expect(try await repaired.books().count == 2)
+    }
     @Test func replacesBundleWithoutDuplicatesAndCachesOffline() async throws {
         let directory = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -572,6 +632,7 @@ actor TestCatalogueTransport: CatalogueTransport {
         let repository = SyncedBookRepository(bundled: source, transport: transport, cacheURL: cache)
         #expect(try await repository.books().map(\.id) == ["cafe", "old"])
         #expect(try await repository.sync().map(\.id) == ["cafe", "new"])
+        #expect(try await repository.books().map(\.id) == ["cafe", "old"])
         let reads = await transport.partReads
         _ = try await repository.sync()
         #expect(await transport.partReads == reads)
@@ -624,7 +685,10 @@ actor TestCatalogueTransport: CatalogueTransport {
         let repo = SyncedBookRepository(bundled: source, transport: b, cacheURL: cache)
         _ = try await repo.sync()
         #expect(await b.partReads == 1)
-        #expect(await repo.authors() == [author])
+        #expect(await repo.authors() == [Author.demoProfiles[0]])
+        let nextLaunch = SyncedBookRepository(bundled: source, transport: b, cacheURL: cache)
+        _ = try await nextLaunch.books()
+        #expect(await nextLaunch.authors() == [author])
     }
 }
 
@@ -657,6 +721,40 @@ actor TestCatalogueTransport: CatalogueTransport {
 
 @MainActor @Suite struct FreshLibraryTests {
     final class Clock { var date = Date(timeIntervalSince1970: 1_800_014_400) }
+    @Test func loadingAndDisplayingLibraryNeverWritesProgress() async throws {
+        let store = MemoryProgress(), purchases = TestPurchases(); purchases.hasAccess = true
+        await store.setFailure(true)
+        let progress = ProgressManager(repository: store)
+        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
+        try await library.load()
+        #expect(library.dailyReads.count == 1)
+        #expect(library.discover(level: nil, format: nil).count == 1)
+        #expect(await store.saveAttempts == 0)
+        // A persistence failure belongs to post-display preparation, not launch.
+        await #expect(throws: AppFailure.self) { try await library.prepareDailyReads() }
+        #expect(library.books.count == 1)
+    }
+    @Test func recommendationSortIsReusedUntilDayOrReadingStateChanges() async throws {
+        let clock = Clock(), purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress(), now: { clock.date })
+        let library = LibraryManager(repository: MemoryBooks(values: (0..<8).map { sample("cache-\($0)") }),
+            purchases: purchases, progress: progress, now: { clock.date })
+        try await library.load()
+        let initial = library.discover(level: nil, format: nil)
+        for _ in 0..<10 {
+            _ = library.dailyReads; _ = library.nextRead
+            #expect(library.discover(level: "A1", format: nil).map(\.id) == initial.map(\.id))
+        }
+        #expect(library.recommendationBuildCount == 1)
+        clock.date = Calendar.current.date(byAdding: .day, value: 1, to: clock.date)!
+        _ = library.dailyReads
+        #expect(library.recommendationBuildCount == 2)
+        let book = initial[0]
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        #expect(!library.discover(level: nil, format: nil).contains { $0.id == book.id })
+        #expect(library.recommendationBuildCount == 3)
+    }
     @Test func dailySelectionRetainsCompletedBooksAcrossRelaunchAndRenewsTomorrow() async throws {
         let clock = Clock(), store = MemoryProgress(), purchases = TestPurchases()
         purchases.hasAccess = true
@@ -689,12 +787,14 @@ actor TestCatalogueTransport: CatalogueTransport {
         let old = sample("old"), ongoing = sample("ongoing"), fresh = sample("fresh")
         let first = LibraryManager(repository: MemoryBooks(values: [old, ongoing]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
         try await first.load()
+        try await first.prepareDailyReads()
         try await progress.recordEncounter(book: old, sentence: old.sentences[0])
         let arrival = progress.snapshot.bookArrivals?[old.id]
         clock.date = calendar.date(byAdding: .day, value: 40, to: clock.date)!
         try await progress.recordEncounter(book: ongoing, sentence: ongoing.sentences[0])
         let updated = LibraryManager(repository: MemoryBooks(values: [old, ongoing, fresh]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
         try await updated.load()
+        try await updated.prepareDailyReads()
         #expect(updated.nextRead?.id == fresh.id)
         #expect(updated.dailyReads.map(\.id).contains(ongoing.id))
         #expect(!updated.dailyReads.map(\.id).contains(old.id))
@@ -936,7 +1036,7 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         #expect(manager.publishedBooks.isEmpty)
         #expect(manager.nextPublicationDate == nil)
     }
-    @Test func publishedBookSurvivesCatalogueReplacementAndCanBeRead() async throws {
+    @Test func publishedBookRemainsAlongsideActiveCatalogueDuringSyncAndCanBeRead() async throws {
         let fantasy = try await prepared(FantasyTestRepository())
         let story = try await fantasy.createStory(memory: "A dance")
         let purchases = TestPurchases(); purchases.hasAccess = true
@@ -946,7 +1046,7 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         let book = try await fantasy.publish(story)
         #expect(library.discover(level: nil, format: nil).first?.id == book.id)
         await library.sync()
-        #expect(Set(library.books.map(\.id)) == [book.id, "replacement"])
+        #expect(Set(library.books.map(\.id)) == [book.id, "original"])
         #expect(library.books(by: book.storyteller).map(\.id) == [book.id])
         #expect(library.authors.contains { $0.id == book.authorID })
         let learning = LearningManager(purchases: purchases, progress: progress)
@@ -958,5 +1058,121 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
     @Test func earlierArchiveDecodesWithoutPublications() throws {
         let archive = try JSONDecoder().decode(FantasyArchive.self, from: Data("{\"stories\":[]}".utf8))
         #expect(archive.publications == nil)
+    }
+}
+
+@Suite struct SwiftDataMigrationTests {
+    private func folder() throws -> URL {
+        let url = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        return url
+    }
+    @Test func allProgressFieldsMigrateOnceAndResetDoesNotResurrectLegacyData() async throws {
+        let directory = try folder(); defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "progress.json")
+        var value = LearnerProgress()
+        value.selectedLearningLevel = .b2; value.completed = ["cafe"]
+        value.attempts = ["cafe": ["s0", "s1"]]; value.positions = ["cafe": 2]
+        value.bookArrivals = ["cafe": Date(timeIntervalSince1970: 123)]
+        value.bookLastRead = value.bookArrivals; value.dailyReadingDate = Date(timeIntervalSince1970: 456)
+        value.dailyReadingIDs = ["cafe"]; value.practiceDays = ["2026-09-18"]
+        value.vocabulary = ["café": .known]; value.seenWords = ["café", "el"]
+        value.wordHistoryComplete = true; value.bookWordBaselines = ["cafe": ["el"]]
+        value.celebratedCompletionDays = ["2026-09-18"]; value.rewardedBooks = ["cafe"]
+        value.bestMatches = ["cafe/s0": 3]; value.doubloons = 5; value.evidence = ["café": 2]
+        let original = try JSONEncoder().encode(value); try original.write(to: url)
+        let repository = LocalProgressRepository(url: url)
+        #expect(try await repository.load() == value)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+        value.positions["cafe"] = 3; try await repository.save(value)
+        try original.write(to: url) // leftover from a previous app version
+        #expect(try await LocalProgressRepository(url: url).load() == value)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+        try await repository.save(.init())
+        #expect(try await LocalProgressRepository(url: url).load() == LearnerProgress())
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+    }
+    @Test func sentencePositionChangesOneRecordAndFailureRollsBack() async throws {
+        let directory = try folder(); defer { try? FileManager.default.removeItem(at: directory) }
+        let store = SwiftDataStore(url: directory.appending(path: "app.store"))
+        let repository = LocalProgressRepository(url: directory.appending(path: "progress.json"), store: store)
+        var value = try await repository.load(); value.positions = ["one": 1, "two": 5]
+        value.vocabulary = ["árbol": .known]; try await repository.save(value)
+        let before = try #require(try await store.read("progress"))
+        value.positions["one"] = 2; try await repository.save(value)
+        let after = try #require(try await store.read("progress"))
+        #expect(after.keys.filter { after[$0] != before[$0] } == ["positions/one"])
+        #expect(before.count == after.count)
+        #if DEBUG
+        try await store.failNextCommitForTesting()
+        var failed = value; failed.positions["one"] = 99; failed.vocabulary["nuevo"] = .learning
+        await #expect(throws: (any Error).self) { try await repository.save(failed) }
+        #expect(try await repository.load() == value)
+        try await repository.save(failed)
+        #expect(try await repository.load() == failed)
+        #endif
+        #expect(!FileManager.default.fileExists(atPath: directory.appending(path: "progress.json").path))
+    }
+    @Test func failedImportRetriesWithoutCreatingAnEmptyProgressStore() async throws {
+        let directory = try folder(); defer { try? FileManager.default.removeItem(at: directory) }
+        let store = SwiftDataStore(url: directory.appending(path: "app.store"))
+        let url = directory.appending(path: "progress.json")
+        var value = LearnerProgress(); value.doubloons = 9
+        try JSONEncoder().encode(value).write(to: url)
+        let repository = LocalProgressRepository(url: url, store: store)
+        #if DEBUG
+        try await store.failNextCommitForTesting()
+        await #expect(throws: (any Error).self) { try await repository.load() }
+        #expect(try await store.read("progress") == nil)
+        #expect(FileManager.default.fileExists(atPath: url.path))
+        #endif
+        #expect(try await repository.load() == value)
+    }
+    @Test func legacyDraftsMigrateAndDeletionDoesNotReimportThem() async throws {
+        let directory = try folder(); defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "drafts.json")
+        var draft = Contribution(); draft.title = "A saved draft"; draft.spanish = "Hola"; draft.teachingNote = "A greeting"
+        try JSONEncoder().encode([draft]).write(to: url)
+        let repository = LocalContributionRepository(url: url)
+        #expect(try await repository.drafts() == [draft])
+        try await repository.remove(draft.id)
+        #expect(try await LocalContributionRepository(url: url).drafts().isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+    }
+    @Test func chatMigrationPreservesOrderAndDeletionSurvivesRelaunch() async throws {
+        let directory = try folder(); defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "chat.json")
+        let first = ChatTurn(question: "Hola", spanish: "Hola", english: "Hello", correction: "", suggestion: "¿Qué tal?")
+        let second = ChatTurn(question: "Bien", spanish: "Muy bien", english: "Very well", correction: "", suggestion: "¿Y tú?")
+        let legacy = ["fox": ChatConversation(turns: [first, second], memory: "Travel")]
+        try JSONEncoder().encode(legacy).write(to: url)
+        let repository = LocalChatRepository(url: url)
+        #expect(try await repository.load()["fox"]?.turns.map(\.id) == [first.id, second.id])
+        try await repository.save([:])
+        #expect(try await LocalChatRepository(url: url).load().isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+    }
+    @Test func fantasyMigrationPreservesProfileDraftsAndPublicationAllowance() async throws {
+        let directory = try folder(); defer { try? FileManager.default.removeItem(at: directory) }
+        let url = directory.appending(path: "fantasy.json")
+        let profile = FantasyProfile(creature: .fox, revealNumber: 333,
+            details: .init(name: "Matt", biography: "I travel."), identity: .init(name: "Foxy", biography: "A travelling fox."))
+        let story = FantasyStory(title: "El viaje", englishTitle: "The journey",
+            sentences: (0..<16).map { _ in .init(spanish: "El zorro viaja.", english: "The fox travels.") })
+        let date = Date(timeIntervalSince1970: 1_800_000_000)
+        let publication = FantasyPublication(storyID: story.id, publishedAt: date, book: story.personalBook(author: Author.demoProfiles[0]))
+        let legacy = FantasyArchive(introductionSeen: true, profile: profile, stories: [story], publications: [publication])
+        try JSONEncoder().encode(legacy).write(to: url)
+        let repository = LocalFantasyRepository(url: url)
+        let loaded = try await repository.load()
+        #expect(loaded.introductionSeen == true)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+        #expect(loaded.profile == profile)
+        #expect(loaded.stories == [story])
+        #expect(loaded.publications?.first?.publishedAt == date)
+        #expect(loaded.publications?.first?.book.id == publication.book.id)
+        var updated = loaded; updated.introductionSeen = false
+        try await repository.save(updated)
+        #expect(try await LocalFantasyRepository(url: url).load().introductionSeen == false)
     }
 }
