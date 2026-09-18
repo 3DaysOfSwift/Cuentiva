@@ -32,9 +32,11 @@ struct LibraryPack: Codable, Sendable {
 }
 protocol CatalogueTransport: Sendable { func fetch(pack: PackDescriptor?) async throws -> Data }
 struct GitHubCatalogueTransport: CatalogueTransport {
-    let endpoint: URL
+    let endpoint: URL?
     func fetch(pack: PackDescriptor?) async throws -> Data {
-        guard endpoint.scheme == "https" else { throw AppFailure.invalidBook }
+        guard let endpoint, endpoint.scheme == "https" else {
+            throw AppFailure.unavailable("The library download address is invalid.")
+        }
         let url: URL
         if let pack {
             guard pack.valid, let release = pack.release, !release.isEmpty, release.count <= 100,

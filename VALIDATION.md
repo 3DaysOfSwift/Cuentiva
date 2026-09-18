@@ -1,3 +1,37 @@
+## Optional safety audit — 18 September 2026
+
+- Removed forced unwraps from calendar/streak/week calculations, nearby distances, fantasy vocabulary grouping, catalogue URL configuration and the terms link. Invalid download configuration throws an actionable error; calendar failures stop traversal/omit unavailable dates without inventing saved progress.
+- Replaced forced test-fixture unwraps with Swift Testing requirements, including audio buffers and calendar fixtures. Re-scanned first-party Swift source/tests for postfix unwraps, try!, as! and implicitly unwrapped optionals; remaining exclamation matches were negation, inequality or string punctuation.
+- Added the policy to AGENTS.md and the externally stored cfa-codebase-tidy/SKILL.md at the user-provided path.
+- All 85 core tests in 22 suites pass, including missing catalogue address rejection. Swift syntax parse, project/privacy plist checks and diff whitespace checks pass. iOS test execution remains blocked by the unavailable simulator destination/service.
+- Skill frontmatter and appended guidance inspected manually. Bundled quick_validate.py could not run because its Python environment lacks PyYAML; no dependency was installed.
+- Logs: /tmp/cuentiva-unwrap-final.log and /tmp/cuentiva-unwrap-ios.log.
+
+## KISS review — 18 September 2026
+
+- Reviewed startup coordination, composition, Settings, chat persistence and Discover ordering for unnecessary complexity. Kept access rechecks, persistence boundaries and migration safeguards.
+- Simplified recommendation ranking: one Candidate holds each book's computed priority rather than separate rank/arrival/recent lookup tables. Removed forced dictionary unwraps from the sorter. Stable hash caching, daily rotation and recommendation caching remain.
+- Added a ranking regression covering personal/new/recent priority and recycling that ignores those boosts, independent of input order.
+- All 84 core tests in 21 suites passed. Project/privacy plist validation and whitespace checks passed. Logs: /tmp/cuentiva-kiss-final.log.
+- iOS tests remain blocked by unavailable simulator service/destination (/tmp/cuentiva-kiss-ios.log). No full app runtime validation claimed. The test crash recorded in the earlier cleanup has not been explained.
+
+## Storyteller Chat cleanup — 18 September 2026
+
+- Separated bounded request construction from the send workflow; named author, reply and summary limits in ChatLimits. Centralized reply acceptance there and removed the unused StoreKit import from ChatManager. Formatted the chat manager, models, view model and tests.
+- Kept access checks around suspension points, cancellation checks, atomic transcript saving and restore behavior unchanged.
+- Added integration coverage for seven malformed reply cases preserving existing stored/displayed turns and memory, plus exact response-size boundaries, summary truncation, normalized input and fallback learning level.
+- All 83 core tests in 20 suites passed on the first run in this pass. Project/privacy plist checks, Swift syntax parsing and whitespace checks passed. The earlier unexplained test-process crash remains unresolved; this pass did not reproduce it.
+- iOS test execution remains blocked by unavailable CoreSimulator destination/service. No full app build or device AI/StoreKit validation claimed.
+- Logs: /tmp/cuentiva-chat-cleanup.log and /tmp/cuentiva-chat-cleanup-ios.log.
+
+## Discover cleanup — 18 September 2026
+
+- Extracted daily ranking and its cache into LibraryRecommendationOrder; LibraryManager still owns access, eligibility and saved daily selections. Registered the new file in the app target. Formatted HomeView, HomeViewModel and LibraryManager without intentional UI changes.
+- Existing recommendation tests cover cache reuse, daily renewal, new arrivals, old attempts and retained completed cards. Full core suite passes (81 tests); focused FreshLibraryTests passes. Initial full run exited with signal 11 without an assertion failure; rerun passed. This unexplained test-process crash remains an RC investigation item.
+- Swift syntax parsing, Xcode source/group membership, project/privacy plist checks and diff whitespace validation passed.
+- iOS test attempt could not connect to CoreSimulatorService and could not find the requested destination. No full iOS build or runtime UI validation is claimed.
+- Logs: /tmp/cuentiva-tidy-check.log, /tmp/cuentiva-tidy-focused.log, /tmp/cuentiva-tidy-recheck.log, /tmp/cuentiva-tidy-ios.log.
+
 ## First release-cleanup pass — 18 September 2026
 
 - RootViewModel owns parallel local loading and entitlement verification through start(). Initial scene activation is ignored for refresh purposes; a real background/foreground cycle refreshes access. Removed the unused progress dependency and renamed the Write tab's internal case.

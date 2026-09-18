@@ -16,7 +16,10 @@ import Observation
     var translations: Set<UUID> = []
     private var replyTask: Task<Void, Never>?
     init(author: Author, feature: any ChatFeature, audio: any LessonAudio, level: String = "A2") {
-        self.author = author; self.feature = feature; self.audio = audio; self.level = LearningLevel(rawValue: level) ?? .a2
+        self.author = author
+        self.feature = feature
+        self.audio = audio
+        self.level = LearningLevel(rawValue: level) ?? .a2
     }
     var unlocked: Bool { feature.hasAccess }
     var turns: [ChatTurn] { feature.conversation(for: author).turns }
@@ -25,17 +28,18 @@ import Observation
         feature.ready && !feature.preparing && feature.unavailable == nil && price != nil && !purchasing && !unlocked
     }
     var canSend: Bool {
-        unlocked && feature.ready && feature.unavailable == nil && !feature.busy && !sending &&
-        ChatLimits.acceptsMessage(draft)
+        unlocked && feature.ready && feature.unavailable == nil && !feature.busy && !sending
+            && ChatLimits.acceptsMessage(draft)
     }
     func prepare() async {
         preparationError = nil
-        do { try await feature.prepare() }
-        catch { preparationError = error.localizedDescription }
+        do { try await feature.prepare() } catch { preparationError = error.localizedDescription }
     }
     func purchase() async {
         guard canBuy else { return }
-        purchasing = true; error = nil; notice = nil
+        purchasing = true
+        error = nil
+        notice = nil
         defer { purchasing = false }
         do {
             try await feature.purchase()
@@ -44,7 +48,9 @@ import Observation
     }
     func restore() async {
         guard !purchasing else { return }
-        purchasing = true; error = nil; notice = nil
+        purchasing = true
+        error = nil
+        notice = nil
         defer { purchasing = false }
         do {
             try await feature.restore()
@@ -57,22 +63,32 @@ import Observation
     func send() {
         guard canSend else { return }
         let text = draft
-        sending = true; error = nil; notice = nil
+        sending = true
+        error = nil
+        notice = nil
         replyTask = Task {
-            defer { sending = false; replyTask = nil }
+            defer {
+                sending = false
+                replyTask = nil
+            }
             do {
                 try await feature.send(text, to: author, level: level.rawValue)
                 if draft == text { draft = "" }
-            } catch is CancellationError { }
-            catch { self.error = error.localizedDescription }
+            } catch is CancellationError {} catch { self.error = error.localizedDescription }
         }
     }
-    func cancel() { replyTask?.cancel(); audio.stop() }
+    func cancel() {
+        replyTask?.cancel()
+        audio.stop()
+    }
     func listen(_ turn: ChatTurn) { if unlocked { audio.speak(turn.spanish, slow: false) } }
     var audioError: String? { audio.error }
     func clear() async {
-        audio.stop(); error = nil
-        do { try await feature.clear(author: author); translations = [] }
-        catch { self.error = error.localizedDescription }
+        audio.stop()
+        error = nil
+        do {
+            try await feature.clear(author: author)
+            translations = []
+        } catch { self.error = error.localizedDescription }
     }
 }

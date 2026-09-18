@@ -1,6 +1,6 @@
 # First App Store submission
 
-Status: preparation in progress. No app record, products, archive or submission has been created by this cleanup. Matthew is creating the App Store Connect record and Wix support/privacy pages.
+Status: Matthew confirmed that the Cuentiva App Store Connect record is created. Submission preparation is in progress. Product setup, screenshots, archive and submission are not yet verified. Wix support/privacy URLs are pending.
 
 ## Existing project configuration
 
@@ -17,7 +17,7 @@ StoreKit configuration files do not create live products. Configure prices and a
 
 ## Submission blockers
 
-- [ ] Create the app record with the existing bundle identifier.
+- [x] Create the app record (confirmed by Matthew). Before upload, verify it uses `com.3DaysOfSwiftConcurrency.Cuentiva`.
 - [ ] Publish support and privacy pages using the draft copy here; provide real contact details and final URLs.
 - [ ] Add the final privacy/support links inside the app. The current paywall's privacy sentence is not a privacy-policy link.
 - [ ] Configure both non-consumables, agreements/tax/banking where required, localization and review screenshots.
@@ -32,6 +32,9 @@ StoreKit configuration files do not create live products. Configure prices and a
 
 ## Prepared material
 
+- [App Store Connect setup order](connect-setup.md)
+- [Screenshot art direction and capture list](screenshots.md)
+- [Release candidate test plan](release-checks.md)
 - [Listing and review notes](listing.md)
 - [Wix support page draft](support-page.md)
 - [Wix privacy page draft](privacy-page.md)

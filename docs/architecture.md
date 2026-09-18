@@ -25,6 +25,10 @@ RootViewModel owns `start()`. It loads local data and verifies purchases concurr
 
 Library sync prepares the next launch's catalogue. Today's screen does not change underneath the reader when a download finishes. Home owns persisting today's recommendations after it mounts. See [startup and storage](startup.md) for migration and caching details.
 
+## Discover recommendations
+
+LibraryManager handles access, available books and today's saved selection. LibraryRecommendationOrder owns deterministic daily rotation, ranking and its in-memory cache. It receives plain values; it performs no persistence or network calls. Unchanged ordering inputs reuse cached IDs while returning the current book values. Date calculations and stable hashes remain outside the sorting comparator.
+
 ## Storage
 
 One lazily opened SwiftData container is shared by the live repositories. A model actor owns context operations. Changes save explicitly, and failures roll back. Existing JSON is imported once and removed after a successful database read; normal use writes database records.
@@ -44,3 +48,7 @@ Progress changes are confirmed after a transaction succeeds. Overlapping progres
 3. Separate active private writing from obsolete contribution rules while preserving old draft decoding.
 4. Measure launch, audio teardown and Next sentence on a physical device before changing their execution model.
 5. Review large SwiftUI bodies, accessibility and supported iPad layouts one screen at a time.
+
+## Storyteller Chat
+
+ChatManager owns preparation, purchase access, generation and persistence. Its send workflow checks access, builds a bounded request, validates the generated reply, and saves the complete exchange before exposing it. ChatLimits names both input and output limits; the accepted generated summary can be longer than the summary retained for the next request. ChatViewModel owns the composer and its cancellable task. Restore remains independent of loading local chat history or AI availability.

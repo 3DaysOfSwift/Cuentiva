@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+
 @MainActor @Observable final class HomeViewModel {
     private let library: any LibraryFeature
     private let progress: any ProgressFeature
@@ -18,7 +19,9 @@ import Observation
     var nextRead: Book? { library.nextRead }
     var focusedRead: Book? { dailyReads.first { $0.id == focusedBookID } ?? nextRead }
     var readButtonTitle: String {
-        guard let book = focusedRead, let index = dailyReads.firstIndex(where: { $0.id == book.id }) else { return "Read book" }
+        guard let book = focusedRead, let index = dailyReads.firstIndex(where: { $0.id == book.id }) else {
+            return "Read book"
+        }
         return "Read book \(index + 1)"
     }
     func focusNextRead() { focusedBookID = nextRead?.id }
@@ -34,14 +37,27 @@ import Observation
             dailyReadingError = "Couldn’t save today’s selection. Please try again."
         }
     }
-    func hasStarted(_ book: Book) -> Bool { !progress.snapshot.attempts[book.id, default: []].isEmpty || progress.snapshot.positions[book.id, default: 0] > 0 }
+    func hasStarted(_ book: Book) -> Bool {
+        !progress.snapshot.attempts[book.id, default: []].isEmpty
+            || progress.snapshot.positions[book.id, default: 0] > 0
+    }
     var books: [Book] {
-        if query.isEmpty && sort == .library && hideCompleted { return library.discover(level: level == "All" ? nil : level, format: format) }
-        return library.search(query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort, hideCompleted: hideCompleted) }
+        if query.isEmpty && sort == .library && hideCompleted {
+            return library.discover(level: level == "All" ? nil : level, format: format)
+        }
+        return library.search(
+            query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort,
+            hideCompleted: hideCompleted)
+    }
     var total: Int { progress.snapshot.completed.count }
     var streak: Int { progress.streak }
     var week: [WeekDay] { progress.week }
     func completed(_ book: Book) -> Bool { progress.snapshot.completed.contains(book.id) }
     func coverage(_ book: Book) -> String { library.coverage(book) }
-    init(library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress) { self.library = library; self.progress = progress }
+    init(
+        library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress
+    ) {
+        self.library = library
+        self.progress = progress
+    }
 }

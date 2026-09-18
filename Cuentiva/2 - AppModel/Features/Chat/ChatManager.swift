@@ -1,6 +1,5 @@
 import Foundation
 import Observation
-import StoreKit
 
 @MainActor protocol ChatFeature: AnyObject, Sendable {
     var hasAccess: Bool { get }
@@ -30,7 +29,9 @@ import StoreKit
     var hasAccess: Bool { purchases.hasAccess }
     var displayPrice: String? { purchases.offer?.displayPrice }
     init(purchases: any PurchaseFeature, generator: any ChatGenerator, repository: any ChatRepository) {
-        self.purchases = purchases; self.generator = generator; self.repository = repository
+        self.purchases = purchases
+        self.generator = generator
+        self.repository = repository
     }
     func prepare() async throws {
         // All callers await the same setup. Refreshes preserve an already loaded
@@ -47,7 +48,10 @@ import StoreKit
             self.ready = true
         }
         preparationTask = task
-        defer { preparationTask = nil; preparing = false }
+        defer {
+            preparationTask = nil
+            preparing = false
+        }
         try await task.value
     }
     func purchase() async throws {
@@ -69,35 +73,37 @@ import StoreKit
         return conversations[author.id] ?? .init()
     }
     func send(_ message: String, to author: Author, level: String) async throws {
-        guard purchases.hasAccess else { throw AppFailure.unavailable("Unlock Storyteller Chat to start a conversation.") }
+        guard purchases.hasAccess else {
+            throw AppFailure.unavailable("Unlock Storyteller Chat to start a conversation.")
+        }
         guard loaded, ready else { throw AppFailure.unavailable("Please wait for chat to finish loading.") }
         guard !busy else { throw AppFailure.busy }
         let text = ChatLimits.normalizedMessage(message)
-        guard ChatLimits.acceptsMessage(text) else { throw AppFailure.unavailable("Write a message of 1–500 characters.") }
-        busy = true; defer { busy = false }
+        guard ChatLimits.acceptsMessage(text) else {
+            throw AppFailure.unavailable("Write a message of 1–500 characters.")
+        }
+        busy = true
+        defer { busy = false }
         unavailable = await generator.availabilityMessage()
         if let unavailable { throw AppFailure.unavailable(unavailable) }
         try Task.checkCancellation()
         guard purchases.hasAccess else { throw AppFailure.unavailable("Restore your chat purchase before continuing.") }
         let previous = conversations[author.id] ?? .init()
-        // Retain the transcript locally, but keep each model request small. The
-        // rolling summary preserves the topic without an ever-growing session.
-        let reply = try await generator.reply(to: .init(name: String(author.storyteller.name.prefix(30)),
-            biography: String(author.storyteller.introduction.prefix(400)),
-            level: LearningLevel(rawValue: level) != nil ? level : "A2",
-            memory: String(previous.memory.prefix(ChatLimits.memory)), recent: Array(previous.turns.suffix(ChatLimits.recentExchanges)), message: text))
+        let request = makeRequest(message: text, author: author, level: level, conversation: previous)
+        let reply = try await generator.reply(to: request)
         try Task.checkCancellation()
-        guard purchases.hasAccess else { throw AppFailure.unavailable("Your chat purchase is no longer active. Restore purchases to check access.") }
-        guard !reply.spanish.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              !reply.english.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
-              reply.spanish.count <= 900, reply.english.count <= 900,
-              reply.correction.count <= 500, reply.suggestion.count <= 250, reply.memory.count <= 700 else {
+        guard purchases.hasAccess else {
+            throw AppFailure.unavailable("Your chat purchase is no longer active. Restore purchases to check access.")
+        }
+        guard ChatLimits.acceptsReply(reply) else {
             throw AppFailure.unavailable("The storyteller couldn’t finish a short reply. Please try again.")
         }
         var next = conversations
         var conversation = previous
-        conversation.turns.append(.init(question: text, spanish: reply.spanish, english: reply.english,
-                                        correction: reply.correction, suggestion: reply.suggestion))
+        conversation.turns.append(
+            .init(
+                question: text, spanish: reply.spanish, english: reply.english,
+                correction: reply.correction, suggestion: reply.suggestion))
         conversation.memory = String(reply.memory.prefix(ChatLimits.memory))
         next[author.id] = conversation
         // Save both halves together. A failed response or write never leaves a
@@ -105,9 +111,25 @@ import StoreKit
         try await repository.save(next)
         conversations = next
     }
+    private func makeRequest(
+        message: String, author: Author, level: String, conversation: ChatConversation
+    ) -> ChatRequest {
+        // Keep the full transcript locally; send only a summary and recent exchanges to the model.
+        let storyteller = author.storyteller
+        return ChatRequest(
+            name: String(storyteller.name.prefix(ChatLimits.authorName)),
+            biography: String(storyteller.introduction.prefix(ChatLimits.biography)),
+            level: (LearningLevel(rawValue: level) ?? .a2).rawValue,
+            memory: String(conversation.memory.prefix(ChatLimits.memory)),
+            recent: Array(conversation.turns.suffix(ChatLimits.recentExchanges)),
+            message: message
+        )
+    }
+
     func clear(author: Author) async throws {
         guard loaded, !busy else { throw AppFailure.busy }
-        busy = true; defer { busy = false }
+        busy = true
+        defer { busy = false }
         var next = conversations
         next.removeValue(forKey: author.id)
         try await repository.save(next)

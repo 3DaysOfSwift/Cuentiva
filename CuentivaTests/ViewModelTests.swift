@@ -293,9 +293,9 @@ actor LaunchBooks: SyncingBookRepository {
 }
 
 @Suite @MainActor struct ThemeManagerTests {
-    @Test func themeSelectionSurvivesRelaunch() {
+    @Test func themeSelectionSurvivesRelaunch() throws {
         let suite = "CuentivaThemeTests.\(UUID().uuidString)"
-        let preferences = UserDefaults(suiteName: suite)!
+        let preferences = try #require(UserDefaults(suiteName: suite))
         defer { preferences.removePersistentDomain(forName: suite) }
         let manager = ThemeManager(preferences: preferences)
         #expect(manager.selectedTheme == .library)
@@ -306,9 +306,9 @@ actor LaunchBooks: SyncingBookRepository {
         restored.selectedTheme = .library
         #expect(ThemeManager(preferences: preferences).theme.colorScheme == .light)
     }
-    @Test func obsoleteThemeFallsBackToLibrary() {
+    @Test func obsoleteThemeFallsBackToLibrary() throws {
         let suite = "CuentivaThemeTests.\(UUID().uuidString)"
-        let preferences = UserDefaults(suiteName: suite)!
+        let preferences = try #require(UserDefaults(suiteName: suite))
         defer { preferences.removePersistentDomain(forName: suite) }
         preferences.set("removed-palette", forKey: "appearance.colourTheme")
         #expect(ThemeManager(preferences: preferences).selectedTheme == .library)
@@ -333,17 +333,18 @@ actor LaunchBooks: SyncingBookRepository {
         }
     }
 
-    @Test func audioTapAcceptsBackgroundBuffersAndIgnoresEmptyFrames() async {
-        await Task.detached {
+    @Test func audioTapAcceptsBackgroundBuffersAndIgnoresEmptyFrames() async throws {
+        try await Task.detached {
             let request = SFSpeechAudioBufferRecognitionRequest()
             let callback = AppleLessonAudio.makeAudioTap(request: request)
-            let format = AVAudioFormat(standardFormatWithSampleRate: 16_000, channels: 1)!
-            let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 128)!
+            let format = try #require(AVAudioFormat(standardFormatWithSampleRate: 16_000, channels: 1))
+            let buffer = try #require(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 128))
             let time = AVAudioTime(sampleTime: 0, atRate: 16_000)
             buffer.frameLength = 0
             callback(buffer, time)
             buffer.frameLength = 128
-            buffer.floatChannelData![0].initialize(repeating: 0, count: 128)
+            let channels = try #require(buffer.floatChannelData)
+            channels[0].initialize(repeating: 0, count: 128)
             callback(buffer, time)
             request.endAudio()
         }.value

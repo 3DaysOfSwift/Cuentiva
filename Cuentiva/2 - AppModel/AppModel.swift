@@ -38,7 +38,7 @@ import Foundation
         let repository = SyncedBookRepository(
             bundled: BundledBookRepository(),
             transport: GitHubCatalogueTransport(
-                endpoint: URL(string: "https://github.com/3DaysOfSwift/GlobalEnglish-SpanishLearningBooksCollection")!),
+                endpoint: URL(string: "https://github.com/3DaysOfSwift/GlobalEnglish-SpanishLearningBooksCollection")),
             cacheURL: directory.appending(path: "catalogue.json"), store: store)
         let fantasy = FantasyManager(
             repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json"), store: store),

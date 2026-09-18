@@ -1,27 +1,55 @@
 import SwiftUI
+
 struct PaywallView: View {
     @State private var viewModel = PaywallViewModel()
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Label("YOUR FIRST BOOK, COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.weight(.bold)).tracking(1)
-                Text(viewModel.declined ? "Your stories will\nbe here." : viewModel.title).font(.system(.largeTitle, design: .serif, weight: .medium))
-                Text(viewModel.declined ? "Your first achievement is saved. Unlock Cuentiva whenever you’re ready to keep learning." : "Small stories. Real progress. Build a collection you can be proud of.").foregroundStyle(theme.theme.muted)
-                ForEach(["Explore every story in the library", "Listen, speak, and write in Spanish", "Collect completed books", "Keep your learning on this device"], id: \.self) { item in Label(item, systemImage: "checkmark").font(.body) }
+                Label("YOUR FIRST BOOK, COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.weight(.bold))
+                    .tracking(1)
+                Text(viewModel.declined ? "Your stories will\nbe here." : viewModel.title).font(
+                    .system(.largeTitle, design: .serif, weight: .medium))
+                Text(
+                    viewModel.declined
+                        ? "Your first achievement is saved. Unlock Cuentiva whenever you’re ready to keep learning."
+                        : "Small stories. Real progress. Build a collection you can be proud of."
+                ).foregroundStyle(theme.theme.muted)
+                ForEach(
+                    [
+                        "Explore every story in the library", "Listen, speak, and write in Spanish",
+                        "Collect completed books", "Keep your learning on this device",
+                    ], id: \.self
+                ) { item in Label(item, systemImage: "checkmark").font(.body) }
                 Divider()
                 Text(viewModel.price).font(.headline)
-                Text("Pay once. Keep learning. No subscription or recurring charges.").font(.footnote).foregroundStyle(theme.theme.muted)
-                Button(viewModel.button) { Task { await viewModel.purchase() } }.buttonStyle(PrimaryButton()).disabled(viewModel.busy || !viewModel.available)
+                Text("Pay once. Keep learning. No subscription or recurring charges.").font(.footnote).foregroundStyle(
+                    theme.theme.muted)
+                Button(viewModel.button) { Task { await viewModel.purchase() } }.buttonStyle(PrimaryButton()).disabled(
+                    viewModel.busy || !viewModel.available)
                 if viewModel.busy { ProgressView().frame(maxWidth: .infinity) }
-                Button("Restore purchases") { Task { await viewModel.restore() } }.frame(maxWidth: .infinity).disabled(viewModel.busy)
-                if !viewModel.declined { Button("Not now") { viewModel.declined = true }.frame(maxWidth: .infinity).foregroundStyle(theme.theme.muted) }
+                Button("Restore purchases") { Task { await viewModel.restore() } }.frame(maxWidth: .infinity).disabled(
+                    viewModel.busy)
+                if !viewModel.declined {
+                    Button("Not now") { viewModel.declined = true }.frame(maxWidth: .infinity).foregroundStyle(
+                        theme.theme.muted)
+                }
                 InlineError(message: viewModel.error ?? viewModel.storeMessage)
                 if !viewModel.available { Button("Reload purchase options") { Task { await viewModel.reload() } } }
                 #if DEBUG
-                Text("DEMO • The Xcode StoreKit scheme uses a test price. No real payment is taken in local StoreKit testing.").font(.caption2).foregroundStyle(theme.theme.muted)
+                    Text(
+                        "DEMO • The Xcode StoreKit scheme uses a test price. No real payment is taken in local StoreKit testing."
+                    ).font(.caption2).foregroundStyle(theme.theme.muted)
                 #endif
-                HStack { Link("Terms of use", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!); Spacer(); Text("Privacy: audio stays on device") }.font(.caption2)
+                HStack {
+                    if let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/") {
+                        Link("Terms of use", destination: termsURL)
+                    } else {
+                        Text("Terms link unavailable")
+                    }
+                    Spacer()
+                    Text("Privacy: audio stays on device")
+                }.font(.caption2)
             }.padding(28)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).task { await viewModel.reload() }
     }

@@ -32,3 +32,8 @@ Prefer one clear idea at a time over lists of classifications and exceptions.
 Clearly distinguish words being discussed from the surrounding explanation using
 quotation marks and selective bold emphasis. Keep short paragraphs intact when
 rendering formatted teaching copy.
+
+During every cleanup, audit first-party Swift source and tests for forced unwraps,
+implicitly unwrapped optionals, `try!` and `as!`. Remove them using nonoptional APIs
+or explicit safe checks and error handling. Never substitute traps, fabricated
+success or arbitrary defaults. Use `try #require` for required test fixtures.

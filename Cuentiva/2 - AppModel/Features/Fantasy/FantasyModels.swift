@@ -91,8 +91,8 @@ extension FantasyStory {
         let bookID = "personal-\(id.uuidString.lowercased())"
         let words = sentences.flatMap { WordComparison.words($0.spanish) }.map(WordComparison.normalized)
         let counts = Dictionary(grouping: words, by: { $0 })
-        let vocabulary = counts.keys.sorted().map {
-            VocabularyEntry(word: $0, lemma: $0, occurrences: counts[$0]!.count)
+        let vocabulary = counts.sorted { $0.key < $1.key }.map { word, occurrences in
+            VocabularyEntry(word: word, lemma: word, occurrences: occurrences.count)
         }
         return Book(id: bookID, title: title, englishTitle: englishTitle, author: author.name,
                     level: "A2", symbol: "sparkles", palette: 0,

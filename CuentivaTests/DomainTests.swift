@@ -89,16 +89,16 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         #expect(progress.snapshot.completed.count == 1)
     }
     @Test func streakUsesCalendarDaysAndPreservesBooks() async throws {
-        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
         var now = Date(timeIntervalSince1970: 1_800_000_000)
         let progress = ProgressManager(repository: MemoryProgress(), now: { now }, calendar: calendar)
         let book = sample(); try await progress.load()
         try await progress.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
         #expect(progress.streak == 1)
-        now = calendar.date(byAdding: .day, value: 1, to: now)!
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
         #expect(progress.streak == 1)
         try await progress.recordEncounter(book: book, sentence: book.sentences[0]); #expect(progress.streak == 2)
-        now = calendar.date(byAdding: .day, value: 2, to: now)!
+        now = try #require(calendar.date(byAdding: .day, value: 2, to: now))
         #expect(progress.streak == 0); #expect(progress.snapshot.completed.count == 1)
     }
     @Test func exposureDoesNotBecomeKnownAutomatically() async throws {
@@ -300,7 +300,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
         let url = root.appending(path: "Cuentiva/3 - App Resources/Books.json")
         #else
-        let url = Bundle.main.url(forResource: "Books", withExtension: "json")!
+        let url = try #require(Bundle.main.url(forResource: "Books", withExtension: "json"))
         #endif
         let books = try await BundledBookRepository(url: url).books()
         #expect(books.count == 52); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
@@ -562,7 +562,7 @@ actor TestCatalogueTransport: CatalogueTransport {
         guard let pack else { return try JSONEncoder().encode(manifest) }
         partReads += 1
         if broken || failID == pack.id { throw AppFailure.unavailable("Offline") }
-        return payloads[pack.id]!
+        return try #require(payloads[pack.id])
     }
 }
 @Suite struct CatalogueSyncTests {
@@ -746,7 +746,7 @@ actor TestCatalogueTransport: CatalogueTransport {
             #expect(library.discover(level: "A1", format: nil).map(\.id) == initial.map(\.id))
         }
         #expect(library.recommendationBuildCount == 1)
-        clock.date = Calendar.current.date(byAdding: .day, value: 1, to: clock.date)!
+        clock.date = try #require(Calendar.current.date(byAdding: .day, value: 1, to: clock.date))
         _ = library.dailyReads
         #expect(library.recommendationBuildCount == 2)
         let book = initial[0]
@@ -775,14 +775,14 @@ actor TestCatalogueTransport: CatalogueTransport {
         let reloaded = LibraryManager(repository: source, purchases: purchases, progress: reloadedProgress, now: { clock.date })
         try await reloaded.load(); try await reloaded.prepareDailyReads()
         #expect(reloaded.dailyReads.map(\.id) == original.map(\.id))
-        clock.date = Calendar.current.date(byAdding: .day, value: 1, to: clock.date)!
+        clock.date = try #require(Calendar.current.date(byAdding: .day, value: 1, to: clock.date))
         try await reloaded.prepareDailyReads()
         #expect(Set(reloaded.dailyReads.map(\.id)).isDisjoint(with: Set(original.map(\.id))))
         #expect(reloadedProgress.snapshot.completed.count == 3)
     }
     @Test func newArrivalsLeadAndOldAttemptsRestWithoutLosingProgress() async throws {
         let clock = Clock(), store = MemoryProgress(), purchases = TestPurchases(); purchases.hasAccess = true
-        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
         let progress = ProgressManager(repository: store, now: { clock.date }, calendar: calendar)
         let old = sample("old"), ongoing = sample("ongoing"), fresh = sample("fresh")
         let first = LibraryManager(repository: MemoryBooks(values: [old, ongoing]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
@@ -790,7 +790,7 @@ actor TestCatalogueTransport: CatalogueTransport {
         try await first.prepareDailyReads()
         try await progress.recordEncounter(book: old, sentence: old.sentences[0])
         let arrival = progress.snapshot.bookArrivals?[old.id]
-        clock.date = calendar.date(byAdding: .day, value: 40, to: clock.date)!
+        clock.date = try #require(calendar.date(byAdding: .day, value: 40, to: clock.date))
         try await progress.recordEncounter(book: ongoing, sentence: ongoing.sentences[0])
         let updated = LibraryManager(repository: MemoryBooks(values: [old, ongoing, fresh]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
         try await updated.load()
@@ -800,9 +800,9 @@ actor TestCatalogueTransport: CatalogueTransport {
         #expect(!updated.dailyReads.map(\.id).contains(old.id))
         #expect(updated.search("", level: nil, completedOnly: false).count == 3)
         #expect(progress.snapshot.bookArrivals?[old.id] == arrival)
-        clock.date = calendar.date(byAdding: .day, value: 3, to: clock.date)!
+        clock.date = try #require(calendar.date(byAdding: .day, value: 3, to: clock.date))
         #expect(updated.dailyReads.map(\.id).contains(ongoing.id))
-        clock.date = calendar.date(byAdding: .day, value: 1, to: clock.date)!
+        clock.date = try #require(calendar.date(byAdding: .day, value: 1, to: clock.date))
         #expect(!updated.dailyReads.map(\.id).contains(ongoing.id))
         #expect(!progress.snapshot.attempts[old.id, default: []].isEmpty)
         let reloaded = ProgressManager(repository: store); try await reloaded.load()
@@ -811,16 +811,16 @@ actor TestCatalogueTransport: CatalogueTransport {
     }
     @Test func dailyThreeAreStableThenRotateWithoutNewDownloads() async throws {
         let clock = Clock(), purchases = TestPurchases(); purchases.hasAccess = true
-        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
         let progress = ProgressManager(repository: MemoryProgress(), now: { clock.date }, calendar: calendar)
         let books = (0..<6).map { sample("book-\($0)") }
         let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
         try await library.load()
-        clock.date = calendar.date(byAdding: .year, value: 1, to: clock.date)!
+        clock.date = try #require(calendar.date(byAdding: .year, value: 1, to: clock.date))
         let today = Set(library.dailyReads.map(\.id))
         #expect(today.count == 3)
         #expect(today == Set(library.dailyReads.map(\.id)))
-        clock.date = calendar.date(byAdding: .day, value: 1, to: clock.date)!
+        clock.date = try #require(calendar.date(byAdding: .day, value: 1, to: clock.date))
         #expect(today.isDisjoint(with: Set(library.dailyReads.map(\.id))))
         #expect(!library.revisiting)
     }
@@ -997,7 +997,7 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
     }
     private func prepared(_ repository: FantasyTestRepository, now: @escaping () -> Date = Date.init) async throws -> FantasyManager {
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
         let manager = FantasyManager(repository: repository, generator: FantasyTestGenerator(), draw: { .fox }, now: now, calendar: calendar)
         try await manager.load()
         _ = try await manager.drawCreature()
@@ -1174,5 +1174,37 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         var updated = loaded; updated.introductionSeen = false
         try await repository.save(updated)
         #expect(try await LocalFantasyRepository(url: url).load().introductionSeen == false)
+    }
+}
+
+@Suite struct RecommendationPriorityTests {
+    @Test func personalThenNewThenRecentAndRecyclingUsesOnlyRotation() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        let today = calendar.startOfDay(for: Date(timeIntervalSince1970: 1_800_014_400))
+        var personal = sample("personal")
+        personal.personalAuthor = Author.demoProfiles[0]
+        let fresh = sample("fresh"), recent = sample("recent"), old = sample("old")
+        let books = [old, recent, fresh, personal]
+        let arrivals = [fresh.id: today, old.id: today.addingTimeInterval(-31 * 86400)]
+        let lastRead = [recent.id: today]
+        var order = LibraryRecommendationOrder()
+        let ranked = order.order(books, recycling: false, today: today, calendar: calendar,
+            arrivals: arrivals, lastRead: lastRead, level: nil)
+        #expect(ranked.map(\.id) == ["personal", "fresh", "recent", "old"])
+        let recycled = order.order(books, recycling: true, today: today, calendar: calendar,
+            arrivals: arrivals, lastRead: lastRead, level: .a1)
+        var baseline = LibraryRecommendationOrder()
+        let rotation = baseline.order(books.reversed(), recycling: true, today: today, calendar: calendar,
+            arrivals: [:], lastRead: [:], level: nil)
+        #expect(recycled.map(\.id) == rotation.map(\.id))
+        #expect(Set(recycled.map(\.id)) == Set(books.map(\.id)))
+    }
+}
+
+@Suite struct CatalogueAddressTests {
+    @Test func missingDownloadAddressFailsWithoutStartingARequest() async {
+        let transport = GitHubCatalogueTransport(endpoint: nil)
+        await #expect(throws: AppFailure.self) { try await transport.fetch(pack: nil) }
     }
 }

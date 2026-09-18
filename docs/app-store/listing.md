@@ -6,6 +6,12 @@ Cuentiva
 ## Subtitle
 Spanish through stories
 
+## Keywords
+reading,listening,speaking,vocabulary,grammar,practice,bilingual,beginner,fantasy,offline
+
+## Suggested categories
+Primary: Education. Secondary: Books. Confirm these choices in App Store Connect.
+
 ## Promotional text
 Meet a cast of curious storytellers. Read a little Spanish, listen, practise and make your own memories part of the tale.
 

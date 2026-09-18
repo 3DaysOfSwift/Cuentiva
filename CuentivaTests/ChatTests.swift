@@ -1,9 +1,10 @@
 import Foundation
 import Testing
+
 #if canImport(CuentivaCore)
-@testable import CuentivaCore
+    @testable import CuentivaCore
 #else
-@testable import Cuentiva
+    @testable import Cuentiva
 #endif
 
 private actor ChatTestRepository: ChatRepository {
@@ -13,10 +14,14 @@ private actor ChatTestRepository: ChatRepository {
     var loadFailure = false
     var loadContinuation: CheckedContinuation<Void, Never>?
     func configureLoad(paused: Bool = false, fail: Bool = false) {
-        pauseLoad = paused; loadFailure = fail
+        pauseLoad = paused
+        loadFailure = fail
     }
     func waitingToLoad() -> Bool { loadContinuation != nil }
-    func resumeLoad() { loadContinuation?.resume(); loadContinuation = nil }
+    func resumeLoad() {
+        loadContinuation?.resume()
+        loadContinuation = nil
+    }
     func load() async throws -> [String: ChatConversation] {
         if pauseLoad { await withCheckedContinuation { loadContinuation = $0 } }
         if loadFailure { throw AppFailure.unavailable("Unreadable history") }
@@ -31,25 +36,34 @@ private actor ChatTestRepository: ChatRepository {
 private actor ChatTestGenerator: ChatGenerator {
     var requests: [ChatRequest] = []
     var unavailable: String?
+    var suppliedReply: ChatReply?
+    func setReply(_ reply: ChatReply) { suppliedReply = reply }
     var paused = false
     var pending: CheckedContinuation<Void, Never>?
     func availabilityMessage() -> String? { unavailable }
     func configure(unavailable: String? = nil, paused: Bool = false) {
-        self.unavailable = unavailable; self.paused = paused
+        self.unavailable = unavailable
+        self.paused = paused
     }
-    func resume() { pending?.resume(); pending = nil }
+    func resume() {
+        pending?.resume()
+        pending = nil
+    }
     func isWaiting() -> Bool { pending != nil }
     func reply(to request: ChatRequest) async -> ChatReply {
         requests.append(request)
         if paused { await withCheckedContinuation { pending = $0 } }
-        return .init(spanish: "¡Hola! ¿Dónde vive el dragón?", english: "Hello! Where does the dragon live?",
-                     correction: "", suggestion: "Vive en el bosque.", memory: "Discussing a dragon in a forest.")
+        if let suppliedReply { return suppliedReply }
+        return .init(
+            spanish: "¡Hola! ¿Dónde vive el dragón?", english: "Hello! Where does the dragon live?",
+            correction: "", suggestion: "Vive en el bosque.", memory: "Discussing a dragon in a forest.")
     }
 }
 @Suite @MainActor struct ChatTests {
     private let author = Author.demoProfiles[0]
     @Test func concurrentPreparationWaitsForSameLoad() async throws {
-        let purchases = TestPurchases(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let repository = ChatTestRepository()
         await repository.configureLoad(paused: true)
         let chat = ChatManager(purchases: purchases, generator: ChatTestGenerator(), repository: repository)
         let first = Task { try await chat.prepare() }
@@ -72,14 +86,16 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(purchases.refreshCalls == 1)
     }
     @Test func featureRejectsPurchaseOnUnsupportedDevice() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
         await generator.configure(unavailable: "Unsupported device")
         let chat = ChatManager(purchases: purchases, generator: generator, repository: ChatTestRepository())
         await #expect(throws: AppFailure.self) { try await chat.purchase() }
         #expect(!purchases.hasAccess)
     }
     @Test func modelBecomingUnavailablePreventsPurchaseAfterPreparation() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
         let chat = ChatManager(purchases: purchases, generator: generator, repository: ChatTestRepository())
         try await chat.prepare()
         await generator.configure(unavailable: "Model no longer available")
@@ -87,7 +103,8 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(!purchases.hasAccess)
     }
     @Test func restoreWorksDespiteLocalHistoryFailure() async throws {
-        let purchases = TestPurchases(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let repository = ChatTestRepository()
         purchases.restoresAccess = true
         await repository.configureLoad(fail: true)
         let chat = ChatManager(purchases: purchases, generator: ChatTestGenerator(), repository: repository)
@@ -107,7 +124,9 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(chat.ready)
     }
     @Test func noGenerationBeforeSeparatePurchase() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
+        let repository = ChatTestRepository()
         let chat = ChatManager(purchases: purchases, generator: generator, repository: repository)
         try await chat.prepare()
         await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A2") }
@@ -115,7 +134,8 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(await repository.values.isEmpty)
     }
     @Test func unsupportedDeviceDoesNotGenerateEvenIfPurchased() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
         purchases.hasAccess = true
         await generator.configure(unavailable: "Model not ready")
         let chat = ChatManager(purchases: purchases, generator: generator, repository: ChatTestRepository())
@@ -125,7 +145,9 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(await generator.requests.isEmpty)
     }
     @Test func conversationPersistsAndContextRemainsBounded() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
+        let repository = ChatTestRepository()
         purchases.hasAccess = true
         let chat = ChatManager(purchases: purchases, generator: generator, repository: repository)
         try await chat.prepare()
@@ -141,7 +163,8 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(restored.conversation(for: author).turns.isEmpty)
     }
     @Test func failedSaveDoesNotAppendConversation() async throws {
-        let purchases = TestPurchases(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let repository = ChatTestRepository()
         purchases.hasAccess = true
         let chat = ChatManager(purchases: purchases, generator: ChatTestGenerator(), repository: repository)
         try await chat.prepare()
@@ -151,7 +174,9 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(!chat.busy)
     }
     @Test func revocationWhileGeneratingDiscardsReplyAndRejectsOverlap() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
+        let repository = ChatTestRepository()
         purchases.hasAccess = true
         await generator.configure(paused: true)
         let chat = ChatManager(purchases: purchases, generator: generator, repository: repository)
@@ -166,7 +191,9 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(!chat.busy)
     }
     @Test func cancelledGenerationDoesNotSave() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
+        let repository = ChatTestRepository()
         purchases.hasAccess = true
         await generator.configure(paused: true)
         let chat = ChatManager(purchases: purchases, generator: generator, repository: repository)
@@ -180,7 +207,8 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(!chat.busy)
     }
     @Test func clearingOneStorytellerPreservesAnother() async throws {
-        let purchases = TestPurchases(), repository = ChatTestRepository()
+        let purchases = TestPurchases()
+        let repository = ChatTestRepository()
         purchases.hasAccess = true
         let chat = ChatManager(purchases: purchases, generator: ChatTestGenerator(), repository: repository)
         try await chat.prepare()
@@ -193,11 +221,71 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(await repository.values[author.id] == nil)
     }
     @Test func rejectsOversizedMessagesBeforeInference() async throws {
-        let purchases = TestPurchases(), generator = ChatTestGenerator()
+        let purchases = TestPurchases()
+        let generator = ChatTestGenerator()
         purchases.hasAccess = true
         let chat = ChatManager(purchases: purchases, generator: generator, repository: ChatTestRepository())
         try await chat.prepare()
-        await #expect(throws: AppFailure.self) { try await chat.send(String(repeating: "a", count: 501), to: author, level: "A2") }
+        await #expect(throws: AppFailure.self) {
+            try await chat.send(String(repeating: "a", count: 501), to: author, level: "A2")
+        }
         #expect(await generator.requests.isEmpty)
+    }
+}
+
+@Suite @MainActor struct ChatReplyValidationTests {
+    @Test(arguments: [
+        "spanish-empty", "english-empty", "spanish-long", "english-long", "correction", "suggestion", "memory",
+    ])
+    func invalidReplyPreservesExistingConversation(field: String) async throws {
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let generator = ChatTestGenerator()
+        let repository = ChatTestRepository()
+        let author = Author.demoProfiles[0]
+        let chat = ChatManager(purchases: purchases, generator: generator, repository: repository)
+        try await chat.prepare()
+        try await chat.send("Hola", to: author, level: "A2")
+        let original = chat.conversation(for: author)
+        var reply = ChatReply(spanish: "Hola", english: "Hello", correction: "", suggestion: "", memory: "New topic")
+        switch field {
+        case "spanish-empty": reply.spanish = " \n "
+        case "english-empty": reply.english = " \t "
+        case "spanish-long": reply.spanish = String(repeating: "a", count: 901)
+        case "english-long": reply.english = String(repeating: "a", count: 901)
+        case "correction": reply.correction = String(repeating: "a", count: 501)
+        case "suggestion": reply.suggestion = String(repeating: "a", count: 251)
+        default: reply.memory = String(repeating: "a", count: 701)
+        }
+        await generator.setReply(reply)
+        await #expect(throws: AppFailure.self) { try await chat.send("Otra pregunta", to: author, level: "A2") }
+        let saved = await repository.values[author.id]
+        #expect(saved?.turns.map(\.id) == original.turns.map(\.id))
+        #expect(saved?.memory == original.memory)
+        #expect(chat.conversation(for: author).turns.map(\.id) == original.turns.map(\.id))
+        #expect(!chat.busy)
+    }
+
+    @Test func maximumReplyIsSavedWithBoundedMemoryAndFallbackLevel() async throws {
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let generator = ChatTestGenerator()
+        let repository = ChatTestRepository()
+        let author = Author.demoProfiles[0]
+        let reply = ChatReply(
+            spanish: String(repeating: "a", count: 900), english: String(repeating: "b", count: 900),
+            correction: String(repeating: "c", count: 500), suggestion: String(repeating: "d", count: 250),
+            memory: String(repeating: "m", count: 700))
+        await generator.setReply(reply)
+        let chat = ChatManager(purchases: purchases, generator: generator, repository: repository)
+        try await chat.prepare()
+        try await chat.send("  Hola  ", to: author, level: "unknown")
+        let request = try #require(await generator.requests.first)
+        #expect(request.message == "Hola")
+        #expect(request.level == "A2")
+        let saved = try #require(await repository.values[author.id])
+        #expect(saved.turns.count == 1)
+        #expect(saved.turns.first?.spanish == reply.spanish)
+        #expect(saved.memory.count == 500)
     }
 }
