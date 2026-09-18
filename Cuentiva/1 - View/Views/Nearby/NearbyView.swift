@@ -8,7 +8,7 @@ struct NearbyView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 Text("Every place\nhas a story.").font(.system(.largeTitle, design: .serif))
-                Text("Read the moments people left here. Leave one for the next traveller.").foregroundStyle(theme.theme.muted)
+                Text("Discover stories from the collection connected to places around you.").foregroundStyle(theme.theme.muted)
                 Button { Task { await viewModel.refresh() } } label: {
                     Label(viewModel.busy ? "Finding your place…" : "Find stories near me", systemImage: "location")
                 }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)
@@ -23,8 +23,8 @@ struct NearbyView: View {
                     Label(place.placeName, systemImage: "mappin.and.ellipse").font(.headline)
                     Text("Approximate distances. Location accuracy: about \(Int(place.accuracy)) metres.").font(.caption).foregroundStyle(theme.theme.muted)
                     if viewModel.books.isEmpty {
-                        Text("A place waiting for a voice.").font(.system(.title2, design: .serif))
-                        Text("There are no published stories nearby in this local demo. Tell the next traveller what you discovered.").foregroundStyle(theme.theme.muted)
+                        Text("A little further afield.").font(.system(.title2, design: .serif))
+                        Text("No stories from your collection are nearby yet. Try a wider distance.").foregroundStyle(theme.theme.muted)
                     }
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 260), spacing: 24)], alignment: .leading, spacing: 28) {
                     ForEach(viewModel.books) { book in
@@ -42,8 +42,7 @@ struct NearbyView: View {
                     }
                     }
                 }
-                NavigationLink { ContributionView(nearby: true) } label: { Label("Leave a story here", systemImage: "square.and.pencil") }
-                Text("Finish a nearby story to keep it in Completed wherever you travel. Three fictional Thailand stories have example locations for exploring Nearby. Community publishing is not connected yet.")
+                Text("Finish a nearby story to keep it in Completed wherever you travel. Three fictional Thailand stories have example locations for exploring Nearby.")
                     .font(.caption).foregroundStyle(theme.theme.muted)
             }.padding(25)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)

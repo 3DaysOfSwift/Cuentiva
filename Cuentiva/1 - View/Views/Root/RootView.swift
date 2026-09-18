@@ -10,7 +10,7 @@ struct RootView: View {
             if viewModel.ready {
                 if viewModel.hasAccess || viewModel.checkingAccess {
                     TabView(selection: $selectedTab) {
-                        Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) { NavigationStack { HomeView(onContribute: { selectedTab = .contribute }) } }
+                        Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) { NavigationStack { HomeView(onWrite: { selectedTab = .contribute }) } }
                         Tab("Nearby", systemImage: "location", value: LibraryTab.nearby) { NavigationStack { NearbyView() } }
                         Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) { NavigationStack { CompletedView() } }
                         Tab("Write", systemImage: "square.and.pencil", value: LibraryTab.contribute) { NavigationStack { FantasyWritingView(feature: AppModel.shared.fantasy) } }

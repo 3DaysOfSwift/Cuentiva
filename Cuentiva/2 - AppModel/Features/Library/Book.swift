@@ -13,6 +13,7 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     let vocabulary: [VocabularyEntry]
     let license: String
     var authorID: String? = nil
+    var personalAuthor: Author? = nil
     var matchGlossary: [String: String]? = nil
     var isDemoLocation: Bool? = nil
     var submissionLocation: StoryLocation? = nil
@@ -21,11 +22,11 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     var continuation: [Sentence]? = nil
     var verbFocus: VerbFocus? = nil
     var storytellerName: String {
-        Author.demoProfiles.first(where: { $0.id == authorID })?.name
+        personalAuthor?.name ?? Author.demoProfiles.first(where: { $0.id == authorID })?.name
             ?? author.split(whereSeparator: { $0.isWhitespace }).first.map(String.init) ?? author
     }
     var storyteller: Author {
-        Author.demoProfiles.first(where: { $0.id == authorID })
+        personalAuthor ?? Author.demoProfiles.first(where: { $0.id == authorID })
             ?? Author(id: authorID ?? author, name: storytellerName, portrait: "",
                       introduction: "A storyteller from our shared library.",
                       note: "Explore this storyteller’s books below.")

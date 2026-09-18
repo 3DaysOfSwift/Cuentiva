@@ -4,6 +4,7 @@ struct FantasyArchive: Codable, Sendable {
     var introductionSeen: Bool? = nil
     var profile: FantasyProfile?
     var stories: [FantasyStory] = []
+    var publications: [FantasyPublication]? = nil
 }
 
 protocol FantasyRepository: Sendable {

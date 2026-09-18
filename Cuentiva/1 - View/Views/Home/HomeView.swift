@@ -1,6 +1,6 @@
 import SwiftUI
 struct HomeView: View {
-    let onContribute: () -> Void
+    let onWrite: () -> Void
     @State private var viewModel = HomeViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -96,7 +96,7 @@ struct HomeView: View {
                 }
                 Divider()
                 Text("Bring Spanish to life through stories").font(.system(.title2, design: .serif, weight: .medium))
-                CommunityAuthors(authors: viewModel.authors, onContribute: onContribute, horizontalInset: 23)
+                CommunityAuthors(authors: viewModel.authors, onWrite: onWrite, horizontalInset: 23)
                 Picker("Difficulty", selection: $viewModel.level) { ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) } }.pickerStyle(.segmented)
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
                 Toggle(viewModel.revisiting && viewModel.query.isEmpty && viewModel.sort == .library ? "Daily selection · revisiting favourites" : "Hide completed books", isOn: $viewModel.hideCompleted)

@@ -20,7 +20,13 @@ import CryptoKit
     func books(by author: Author) -> [Book]
 }
 @MainActor @Observable final class LibraryManager: LibraryFeature {
-    private(set) var books: [Book] = []
+    private var catalogueBooks: [Book] = []
+    private let personalLibrary: (any PersonalLibraryFeature)?
+    var books: [Book] {
+        let personal = personalLibrary?.publishedBooks ?? []
+        let ids = Set(personal.map(\.id))
+        return personal + catalogueBooks.filter { !ids.contains($0.id) }
+    }
     private var authorProfiles: [Author] = Author.demoProfiles
     private(set) var syncing = false
     private(set) var syncMessage: String?
@@ -29,16 +35,17 @@ import CryptoKit
     private let progress: any ProgressFeature
     private let now: () -> Date
     private let calendar: Calendar
-    init(repository: any BookRepository, purchases: any PurchaseFeature, progress: any ProgressFeature, now: @escaping () -> Date = Date.init, calendar: Calendar = .current) {
+    init(repository: any BookRepository, purchases: any PurchaseFeature, progress: any ProgressFeature, personalLibrary: (any PersonalLibraryFeature)? = nil, now: @escaping () -> Date = Date.init, calendar: Calendar = .current) {
+        self.personalLibrary = personalLibrary
         self.repository = repository; self.purchases = purchases; self.progress = progress; self.now = now; self.calendar = calendar
     }
     var introduction: Book? { books.first { $0.id == "cafe" } }
     func load() async throws {
-        if books.isEmpty {
+        if catalogueBooks.isEmpty {
             try await progress.load()
             let loaded = try await repository.books()
             try await progress.registerLibrary(loaded)
-            books = loaded; authorProfiles = await repository.authors().map(\.storyteller)
+            catalogueBooks = loaded; authorProfiles = await repository.authors().map(\.storyteller)
         }
     }
     func sync() async {
@@ -47,7 +54,7 @@ import CryptoKit
         do {
             let updated = try await repository.sync()
             try await progress.registerLibrary(updated)
-            books = updated
+            catalogueBooks = updated
             authorProfiles = await repository.authors().map(\.storyteller)
             syncMessage = "Your community library is up to date."
         } catch {
@@ -109,6 +116,9 @@ import CryptoKit
             return calendar.startOfDay(for: date)
         }
         return rotated.sorted { a, b in
+            if !recycling, (a.personalAuthor != nil) != (b.personalAuthor != nil) {
+                return a.personalAuthor != nil
+            }
             let first = arrival(a), second = arrival(b)
             if first != second { return first > second }
             if !recycling && recent(a) != recent(b) { return recent(a) }
@@ -131,10 +141,15 @@ import CryptoKit
     }
     func prepareDailyReads() async throws {
         guard purchases.hasAccess, !books.isEmpty else { return }
+        try await progress.registerLibrary(books)
         try await progress.saveDailyReading(dailyReads.map(\.id), date: calendar.startOfDay(for: now()))
     }
     var nextRead: Book? { dailyReads.first { !progress.snapshot.completed.contains($0.id) } ?? dailyReads.first }
-    var authors: [Author] { Author.weeklyOrder(authorProfiles.filter { !books(by: $0).isEmpty }, on: now()) }
+    var authors: [Author] {
+        let personal = personalLibrary?.publishedBooks.first?.personalAuthor
+        let profiles = (personal.map { [$0] } ?? []) + authorProfiles.filter { $0.id != personal?.id }
+        return Author.weeklyOrder(profiles.filter { !books(by: $0).isEmpty }, on: now())
+    }
     func books(by author: Author) -> [Book] {
         search("", level: nil, completedOnly: false, format: nil, sort: .library).filter { $0.authorID == author.id }
     }

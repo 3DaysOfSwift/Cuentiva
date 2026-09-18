@@ -8,7 +8,7 @@ struct PaywallView: View {
                 Label("YOUR FIRST BOOK, COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.weight(.bold)).tracking(1)
                 Text(viewModel.declined ? "Your stories will\nbe here." : viewModel.title).font(.system(.largeTitle, design: .serif, weight: .medium))
                 Text(viewModel.declined ? "Your first achievement is saved. Unlock Cuentiva whenever you’re ready to keep learning." : "Small stories. Real progress. Build a collection you can be proud of.").foregroundStyle(theme.theme.muted)
-                ForEach(["Explore every story in the library", "Listen, speak, and write in Spanish", "Collect completed books", "Share a story of your own"], id: \.self) { item in Label(item, systemImage: "checkmark").font(.body) }
+                ForEach(["Explore every story in the library", "Listen, speak, and write in Spanish", "Collect completed books", "Keep your learning on this device"], id: \.self) { item in Label(item, systemImage: "checkmark").font(.body) }
                 Divider()
                 Text(viewModel.price).font(.headline)
                 Text("Pay once. Keep learning. No subscription or recurring charges.").font(.footnote).foregroundStyle(theme.theme.muted)

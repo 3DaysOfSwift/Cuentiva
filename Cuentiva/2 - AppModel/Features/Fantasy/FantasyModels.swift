@@ -3,6 +3,10 @@ import Foundation
 /// The draw identifies a bundled creature, independently of AI availability.
 enum FantasyCreature: Int, Codable, CaseIterable, Sendable, Identifiable {
     case turtle = 1, unicorn, fox
+    static func weightedDraw(ticket: Int) -> FantasyCreature {
+        precondition((1...10).contains(ticket))
+        return switch ticket { case 1...8: .fox; case 9: .turtle; default: .unicorn }
+    }
     var id: Int { rawValue }
     var title: String {
         switch self { case .turtle: "Turtle"; case .unicorn: "Winged unicorn"; case .fox: "Fox" }
@@ -69,4 +73,33 @@ enum FantasyValidation {
 
 extension FantasyGenerator {
     func availabilityMessage() async -> String? { nil }
+}
+
+/// Personal publications never pass through the shared catalogue transport.
+struct FantasyPublication: Codable, Sendable {
+    let storyID: UUID
+    let publishedAt: Date
+    let book: Book
+}
+
+@MainActor protocol PersonalLibraryFeature: AnyObject, Sendable {
+    var publishedBooks: [Book] { get }
+}
+
+extension FantasyStory {
+    func personalBook(author: Author) -> Book {
+        let bookID = "personal-\(id.uuidString.lowercased())"
+        let words = sentences.flatMap { WordComparison.words($0.spanish) }.map(WordComparison.normalized)
+        let counts = Dictionary(grouping: words, by: { $0 })
+        let vocabulary = counts.keys.sorted().map {
+            VocabularyEntry(word: $0, lemma: $0, occurrences: counts[$0]!.count)
+        }
+        return Book(id: bookID, title: title, englishTitle: englishTitle, author: author.name,
+                    level: "A2", symbol: "sparkles", palette: 0,
+                    summary: "A personal tale from your own storyteller.",
+                    sentences: sentences.enumerated().map {
+                        Sentence(id: "\(bookID)-\($0.offset)", spanish: $0.element.spanish, english: $0.element.english)
+                    }, vocabulary: vocabulary, license: "Private personal story",
+                    authorID: author.id, personalAuthor: author)
+    }
 }

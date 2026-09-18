@@ -6,7 +6,7 @@
 
 Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Read at your own pace, listen to Spanish, practise speaking or writing, and collect the books you complete.
 
-The vision is a community library where learners share stories and learn by teaching. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with local contribution drafts and example Nearby Stories. Community publishing is not live; the bundled stories are not verified memoirs.
+Cuentiva combines a shared reading collection with private, personalised fantasy stories created on the device. Public story submission has been retired. Readers can publish one saved AI tale to their own Discover library every seven days, credited to their personal storyteller; nothing is uploaded. New avatars have an 80% chance of being the fox, with existing avatars preserved. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with local contribution drafts and example Nearby Stories. The bundled stories are fictional, and personal tales stay on the device.
 
 ## Cooperative Feature Architecture (CFA)
 
@@ -49,7 +49,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 - Immediate manual advancement with no mandatory checks, persistent reading progress, and completion celebration. Writing drafts survive tab switches and revisiting sentences during the lesson.
 - Completed cover ticks, a separate collection screen, and a counter that counts each book once.
 - Weekly streak strip inspired by the requested Trend pattern. A Trend source component was not found, so this is an adaptation, not copied source.
-- Contribution drafts, preview, local coaching prompts, and local pending-review submissions. No uploads or live AI are claimed.
+- Private AI tales with Apple Intelligence on supported devices, plus a read-only archive of earlier drafts. No public submission flow.
 - Vocabulary states and a settings screen for editing them; exposure marks words learning, never automatically known.
 - Settings → Appearance → Colour theme switches between Library and Midnight immediately and remembers the selection across launches. One app-owned ThemeManager supplies the current palette to every screen and sheet.
 
@@ -81,12 +81,12 @@ Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replace
 - Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
 - A verified non-consumable purchase unlocks access without an expiry date. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
-- Demo contribution unlock: active membership plus one completed book. This is explicitly not a CEFR assessment. Real proficiency-based eligibility remains a product decision.
-- Only published contributions count toward the goal of five. The local demo never invents publication approval.
+- Public submission, publishing goals and contribution eligibility are retired from the app experience.
+- Existing local drafts are preserved; new personal tales are saved privately on the device.
 
 ## Wix later
 
-`BookRepository` is the library boundary. `ContributionRepository` currently saves drafts and their local review status. A remote implementation will require an agreed authenticated API and server-authoritative review status, not just filling in a URL. Add a dedicated submission command/response when the server contract exists. Keep administrative credentials and moderation permissions on the server. The UI does not need to know Wix paths or CMS record formats.
+`BookRepository` is the library boundary. `ContributionRepository` currently saves drafts and their local review status. These are legacy records retained for the private draft archive. No remote submission implementation is planned; library delivery remains separate from personal writing.
 
 ## Privacy and accessibility
 
@@ -130,11 +130,11 @@ Verbs is a third content type in the shared Discover/Completed type picker. The 
 
 ## Contribution requests
 
-Contributors can write freely or pick a topic request with a teaching brief, coverage target, form counts, and self-review checklist. Picking a request creates/resumes a local draft and switching paths preserves current work. Haber leads six editorially seeded requests. Counts distinguish reviewed coverage from drafts and demo examples. Submitting locally never completes a topic or publishes a book. See [topic requests](Documentation/TOPIC-REQUESTS.md) for review boundaries and backend integration.
+The topic-request and review workflow is retired. Its models and historical documentation remain for compatibility with earlier local drafts; no submission controls are exposed. Write now creates private personal tales on the device.
 
 ## Nearby Stories
 
-Nearby discovers geotagged books within 5, 25 or 100 km, or 1,000 miles (default). Contributions can capture and confirm a fixed submission location; completed stories remain readable after travel. This demo keeps submissions local and includes three clearly labelled fictional Thailand stories with example locations. See [Nearby Stories](Documentation/NEARBY-STORIES.md) for behavior, privacy and server integration.
+Nearby discovers geotagged books within 5, 25 or 100 km, or 1,000 miles (default). Completed stories remain readable after travel. Leaving new public stories at locations is retired. The collection includes three clearly labelled fictional Thailand stories with example locations. See [Nearby Stories](Documentation/NEARBY-STORIES.md) for behavior, privacy and server integration.
 
 ## Your turn and Match Pairs
 

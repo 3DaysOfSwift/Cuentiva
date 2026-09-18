@@ -1,11 +1,11 @@
 import SwiftUI
 
 struct AuthorView: View {
-    let onContribute: (() -> Void)?
+    let onWrite: (() -> Void)?
     @State private var model: AuthorViewModel
     @Environment(ThemeManager.self) private var theme
-    init(author: Author, onContribute: (() -> Void)? = nil) {
-        self.onContribute = onContribute
+    init(author: Author, onWrite: (() -> Void)? = nil) {
+        self.onWrite = onWrite
         _model = State(initialValue: AuthorViewModel(author: author))
     }
     var body: some View {
@@ -32,8 +32,8 @@ struct AuthorView: View {
                         }
                     }.buttonStyle(.plain)
                 }
-                if let onContribute {
-                    Button(action: onContribute) { Label("Share a story of your own", systemImage: "square.and.pencil") }
+                if let onWrite {
+                    Button(action: onWrite) { Label("Create a tale of your own", systemImage: "square.and.pencil") }
                 }
             }.padding(23)
         }

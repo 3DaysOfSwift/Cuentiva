@@ -29,10 +29,10 @@ import Foundation
         let repository = SyncedBookRepository(bundled: BundledBookRepository(),
             transport: GitHubCatalogueTransport(endpoint: URL(string: "https://github.com/3DaysOfSwift/GlobalEnglish-SpanishLearningBooksCollection")!),
             cacheURL: directory.appending(path: "catalogue.json"))
-        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
+        let fantasy = FantasyManager(repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json")), generator: AppleFantasyGenerator())
+        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress, personalLibrary: fantasy)
         let learning = LearningManager(purchases: purchases, progress: progress)
         let contributions = ContributionManager(repository: LocalContributionRepository(url: directory.appending(path: "drafts.json")), purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
-        let fantasy = FantasyManager(repository: LocalFantasyRepository(url: directory.appending(path: "fantasy.json")), generator: AppleFantasyGenerator())
         let chat = ChatManager(purchases: PurchaseManager(productID: PurchaseManager.storytellerChatProductID),
             generator: AppleChatGenerator(), repository: LocalChatRepository(url: directory.appending(path: "chat.json")))
         return .init(library: library, progress: progress, purchases: purchases, learning: learning, contributions: contributions, fantasy: fantasy, chat: chat, makeAudio: { AppleLessonAudio() })

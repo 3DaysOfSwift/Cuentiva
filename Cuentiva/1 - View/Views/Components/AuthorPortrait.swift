@@ -8,8 +8,8 @@ struct AuthorPortrait: View {
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         Group {
-            if author.storyteller.portrait.hasPrefix("Storyteller"),
-               Author.supportedPortraits.contains(author.storyteller.portrait) {
+            if Author.supportedPortraits.contains(author.storyteller.portrait) ||
+                FantasyCreature.allCases.contains(where: { $0.portrait == author.storyteller.portrait }) {
                 Image(author.storyteller.portrait).resizable().scaledToFill()
             } else {
                 Image(systemName: "sparkles")

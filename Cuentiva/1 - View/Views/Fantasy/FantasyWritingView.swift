@@ -50,8 +50,25 @@ struct FantasyWritingView: View {
                         }
                     }
                     Text("Saved privately on this device.").font(.caption).foregroundStyle(theme.theme.muted)
+                    if model.storyIsPublished {
+                        Label("In your Discover library", systemImage: "checkmark.seal.fill")
+                            .foregroundStyle(theme.theme.accent)
+                    } else {
+                        Button("Publish to my library") { Task { await model.publish() } }
+                            .buttonStyle(PrimaryButton())
+                            .disabled(model.busy || model.nextPublicationDate != nil)
+                        Text("One personal book every seven days. Only you can see it on this device.")
+                            .font(.footnote).foregroundStyle(theme.theme.muted)
+                        if let date = model.nextPublicationDate {
+                            Text("Your next book can be published on \(date.formatted(date: .abbreviated, time: .shortened)).")
+                                .font(.footnote).foregroundStyle(theme.theme.muted)
+                        }
+                    }
+                    if let notice = model.publicationNotice {
+                        Text(notice).font(.footnote).foregroundStyle(theme.theme.accent)
+                    }
                 }
-                NavigationLink("Earlier drafts and review submissions") { ContributionView() }
+                NavigationLink("My earlier drafts") { ContributionView() }
                     .font(.footnote)
                 if !model.stories.isEmpty {
                     DisclosureGroup("My saved tales") {
