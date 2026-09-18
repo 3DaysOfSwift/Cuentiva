@@ -7,6 +7,15 @@ enum ProgressRecords {
         throws -> [String: Data]
     {
         var rows = existing
+        if previous == nil || previous?.earnedStreakTheme != value.earnedStreakTheme {
+            rows["earnedStreakTheme"] = try RecordCoding.encode(value.earnedStreakTheme)
+        }
+        if previous == nil || previous?.celebratedStreakTheme != value.celebratedStreakTheme {
+            rows["celebratedStreakTheme"] = try RecordCoding.encode(value.celebratedStreakTheme)
+        }
+        if previous == nil || previous?.installedThemePacks != value.installedThemePacks {
+            rows["installedThemePacks"] = try RecordCoding.encode(value.installedThemePacks)
+        }
         if previous == nil || previous?.schemaVersion != value.schemaVersion {
             rows["schemaVersion"] = try RecordCoding.encode(value.schemaVersion)
         }
@@ -93,6 +102,11 @@ enum ProgressRecords {
             throw AppFailure.unavailable("Your progress records are incomplete.")
         }
         var value = LearnerProgress()
+        if let data = rows["earnedStreakTheme"] { value.earnedStreakTheme = try RecordCoding.decode(Bool?.self, data) }
+        if let data = rows["celebratedStreakTheme"] { value.celebratedStreakTheme = try RecordCoding.decode(Bool?.self, data) }
+        if let data = rows["installedThemePacks"] {
+            value.installedThemePacks = try RecordCoding.decode(Set<String>?.self, data)
+        }
         if let data = rows["schemaVersion"] {
             value.schemaVersion = try RecordCoding.decode(type(of: value.schemaVersion), data)
         }

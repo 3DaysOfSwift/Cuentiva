@@ -33,11 +33,11 @@ struct MemoryBooks: BookRepository {
 @MainActor final class TestPurchases: PurchaseFeature {
     var hasAccess = false
     var checking = false
-    var offer: Product? { nil }
+    var offers: [Product] { [] }
     var message: String?
     var refreshCalls = 0
     func refresh() async { refreshCalls += 1 }
-    func purchase() async throws { hasAccess = true }
+    func purchase(plan: LibraryPlan) async throws { hasAccess = true }
     var restoresAccess = false
     var restoreFailure: AppFailure?
     func restore() async throws {
@@ -464,7 +464,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let receipt = try await manager.complete(book: book)
         #expect(receipt.streakCelebration == 1)
         #expect(try await manager.complete(book: book).streakCelebration == nil)
-        #expect(try await manager.rewardPractice(book: book, matches: 1))
+        #expect(try await manager.rewardPractice(book: book, matches: 1) == false)
         let restored = ProgressManager(repository: repo); try await restored.load()
         #expect(try await restored.rewardPractice(book: book, matches: 1) == false)
         #expect(restored.snapshot.doubloons == 1)
@@ -478,8 +478,8 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         try await manager.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await manager.complete(book: book)
         await repo.setFailure(true)
         await #expect(throws: (any Error).self) { try await manager.rewardPractice(book: book, matches: 1) }
-        #expect(manager.snapshot.doubloons == nil)
-        #expect(manager.snapshot.rewardedBooks == nil)
+        #expect(manager.snapshot.doubloons == 1)
+        #expect(manager.snapshot.rewardedBooks == [book.id])
     }
     @Test func legacyProgressDoesNotInventBaseline() async throws {
         let repo = MemoryProgress()
@@ -970,17 +970,34 @@ private struct UnavailableFantasyGenerator: FantasyGenerator {
     }
 }
 
-@Suite @MainActor struct ChatProductConfigurationTests {
-    @Test func chatIsOneTimeUKPurchaseWithoutChangingLibraryConfiguration() throws {
+@Suite @MainActor struct ProductConfigurationTests {
+    @Test func twoSubscriptionsShareOneGroup() throws {
         let directory = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
             .appending(path: "Cuentiva/3 - App Resources")
-        let chat = try #require(try JSONSerialization.jsonObject(with: Data(contentsOf: directory.appending(path: "StorytellerChat.storekit"))) as? [String: Any])
-        let settings = try #require(chat["settings"] as? [String: Any])
-        #expect(settings["_storefront"] as? String == "GBR")
-        let products = try #require(chat["products"] as? [[String: Any]])
-        let product = try #require(products.first { $0["productID"] as? String == PurchaseManager.storytellerChatProductID })
-        #expect(product["type"] as? String == "NonConsumable")
-        #expect(product["displayPrice"] as? String == "24.99")
+        let configuration = try #require(try JSONSerialization.jsonObject(with: Data(contentsOf: directory.appending(path: "Cuentiva.storekit"))) as? [String: Any])
+        let products = try #require(configuration["products"] as? [[String: Any]])
+        #expect(products.isEmpty)
+        let groups = try #require(configuration["subscriptionGroups"] as? [[String: Any]])
+        #expect(groups.count == 1)
+        let group = try #require(groups.first)
+        let subscriptions = try #require(group["subscriptions"] as? [[String: Any]])
+        #expect(subscriptions.count == 2)
+        for plan in LibraryPlan.allCases {
+            let product = try #require(subscriptions.first { $0["productID"] as? String == plan.productID })
+            #expect(product["type"] as? String == "RecurringSubscription")
+            #expect(product["displayPrice"] as? String == (plan == .annual ? "39.99" : "9.99"))
+            #expect(product["recurringSubscriptionPeriod"] as? String == (plan == .annual ? "P1Y" : "P1M"))
+        }
+    }
+    @Test func expiryRevocationAndUpgradeNeverGrantAccess() {
+        let now = Date()
+        #expect(LibraryAccess.isActive(expiration: now.addingTimeInterval(100), revoked: false, upgraded: false, lifetime: false, now: now))
+        #expect(!LibraryAccess.isActive(expiration: now, revoked: false, upgraded: false, lifetime: false, now: now))
+        #expect(!LibraryAccess.isActive(expiration: nil, revoked: false, upgraded: false, lifetime: false, now: now))
+        #expect(!LibraryAccess.isActive(expiration: now.addingTimeInterval(100), revoked: true, upgraded: false, lifetime: false, now: now))
+        #expect(!LibraryAccess.isActive(expiration: now.addingTimeInterval(100), revoked: false, upgraded: true, lifetime: false, now: now))
+        #expect(LibraryAccess.isActive(expiration: nil, revoked: false, upgraded: false, lifetime: true, now: now))
+        #expect(!LibraryAccess.isActive(expiration: nil, revoked: true, upgraded: false, lifetime: true, now: now))
     }
 }
 
@@ -1206,5 +1223,267 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
     @Test func missingDownloadAddressFailsWithoutStartingARequest() async {
         let transport = GitHubCatalogueTransport(endpoint: nil)
         await #expect(throws: AppFailure.self) { try await transport.fetch(pack: nil) }
+    }
+}
+
+@Suite @MainActor struct ReadingMilestoneTests {
+    @Test func distinctCompletionsUnlockWritingAndSurviveStorage() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        for number in 1...15 {
+            let book = sample("milestone-\(number)")
+            let sentence = try #require(book.sentences.first)
+            try await progress.recordEncounter(book: book, sentence: sentence)
+            // Exercise both completion paths.
+            let receipt = number.isMultiple(of: 2)
+                ? try await progress.complete(book: book)
+                : try await progress.completeReading(book: book)
+            #expect(progress.snapshot.writingUnlocked == (number >= 5))
+            #expect(receipt.unlocksWriting == (number == 5))
+            #expect(receipt.requestsReview == (number == 15))
+            let repeated = try await progress.completeReading(book: book)
+            #expect(!repeated.unlocksWriting)
+            #expect(!repeated.requestsReview)
+            #expect(repeated.total == number)
+        }
+        let restored = ProgressManager(repository: repository)
+        try await restored.load()
+        #expect(restored.snapshot.writingUnlocked)
+        let rows = try ProgressRecords.encode(restored.snapshot)
+        #expect(try ProgressRecords.decode(rows).writingUnlocked)
+        try await restored.reset()
+        #expect(!restored.snapshot.writingUnlocked)
+    }
+    @Test func failedFifthCompletionCannotUnlockWriting() async throws {
+        let repository = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.completed = ["one", "two", "three", "four"]
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let book = sample("five")
+        try await progress.recordEncounter(book: book, sentence: try #require(book.sentences.first))
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.completeReading(book: book) }
+        #expect(!progress.snapshot.writingUnlocked)
+        await repository.setFailure(false)
+        let receipt = try await progress.completeReading(book: book)
+        #expect(receipt.unlocksWriting)
+        #expect(progress.snapshot.writingUnlocked)
+    }
+    @Test func settingsReviewLinkUsesTheAppStoreRecord() throws {
+        let url = try #require(ReadingMilestones.reviewURL)
+        #expect(url.host == "apps.apple.com")
+        #expect(url.path == "/app/id6813381807")
+        #expect(url.query == "action=write-review")
+    }
+}
+
+@Suite @MainActor struct HundredBookMilestoneTests {
+    @Test func honoursRequireSavedHundredthBookAndSurviveReload() async throws {
+        let repository = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.completed = Set((1...99).map { "book-\($0)" })
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        #expect(progress.snapshot.readerBadges.isEmpty)
+        #expect(progress.snapshot.nextCompletionNumber(for: "hundred") == 100)
+        #expect(progress.snapshot.nextCompletionNumber(for: "book-1") == nil)
+        let book = sample("hundred")
+        try await progress.recordEncounter(book: book, sentence: try #require(book.sentences.first))
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.completeReading(book: book) }
+        #expect(progress.snapshot.readerBadges.isEmpty)
+        await repository.setFailure(false)
+        let receipt = try await progress.completeReading(book: book)
+        #expect(receipt.celebratesHundredBooks)
+        #expect(progress.snapshot.readerBadges == [.vip, .persistence, .onePercent])
+        let repeated = try await progress.complete(book: book)
+        #expect(!repeated.celebratesHundredBooks)
+        let restored = ProgressManager(repository: repository)
+        try await restored.load()
+        #expect(restored.snapshot.readerBadges == progress.snapshot.readerBadges)
+        let records = try ProgressRecords.encode(restored.snapshot)
+        #expect(try ProgressRecords.decode(records).readerBadges == [.vip, .persistence, .onePercent])
+        #expect(restored.snapshot.nextCompletionNumber(for: "next") == 101)
+    }
+}
+
+@Suite struct VIPMembershipTests {
+    @Test(arguments: [0, 99, 100, 101, 1000])
+    func membershipAndBadgesShareTheSavedCompletionThreshold(count: Int) throws {
+        var progress = LearnerProgress()
+        progress.completed = Set((0..<count).map { "book-\($0)" })
+        #expect(progress.isVIP == (count >= 100))
+        #expect(progress.readerBadges.contains(.vip) == progress.isVIP)
+        let restored = try ProgressRecords.decode(ProgressRecords.encode(progress))
+        #expect(restored.isVIP == progress.isVIP)
+    }
+}
+
+@Suite @MainActor struct MoreDailyBooksTests {
+    @Test(arguments: [3, 4, 6])
+    func replacesCompletedSetAtomicallyWithoutChangingProgress(bookCount: Int) async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let books = (0..<bookCount).map { sample("extra-\($0)") }
+        let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress)
+        try await library.load()
+        try await library.prepareDailyReads()
+        let original = library.dailyReads
+        let originalIDs = original.map(\.id)
+        #expect(!library.dailyReadsCompleted)
+        try await library.loadMoreDailyReads()
+        #expect(library.dailyReads.map(\.id) == originalIDs)
+        for book in original {
+            try await progress.recordEncounter(book: book, sentence: try #require(book.sentences.first))
+            _ = try await progress.completeReading(book: book)
+        }
+        #expect(library.dailyReadsCompleted)
+        let before = progress.snapshot
+        if bookCount == 3 {
+            await #expect(throws: AppFailure.self) { try await library.loadMoreDailyReads() }
+            #expect(progress.snapshot == before)
+            return
+        }
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await library.loadMoreDailyReads() }
+        #expect(progress.snapshot == before)
+        #expect(library.dailyReads.map(\.id) == originalIDs)
+        await repository.setFailure(false)
+        try await library.loadMoreDailyReads()
+        let nextIDs = library.dailyReads.map(\.id)
+        #expect(nextIDs.count == min(3, bookCount - 3))
+        #expect(Set(nextIDs).isDisjoint(with: originalIDs))
+        #expect(!library.dailyReadsCompleted)
+        #expect(progress.snapshot.completed == before.completed)
+        #expect(progress.snapshot.positions == before.positions)
+        #expect(progress.snapshot.vocabulary == before.vocabulary)
+        let restoredProgress = ProgressManager(repository: repository)
+        let restoredLibrary = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: restoredProgress)
+        try await restoredLibrary.load()
+        #expect(restoredLibrary.dailyReads.map(\.id) == nextIDs)
+        purchases.hasAccess = false
+        await #expect(throws: AppFailure.self) { try await library.loadMoreDailyReads() }
+    }
+    @Test func emptyLibraryIsNotComplete() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let library = LibraryManager(repository: MemoryBooks(values: []), purchases: purchases,
+            progress: ProgressManager(repository: MemoryProgress()))
+        try await library.load()
+        #expect(!library.dailyReadsCompleted)
+    }
+}
+
+@Suite @MainActor struct ThemePackTests {
+    @Test(arguments: [0, 9, 10, 24, 25, 49, 50, 100])
+    func rewardsAreEarnedButNotAutomaticallyInstalled(count: Int) {
+        var progress = LearnerProgress()
+        progress.completed = Set((0..<count).map { "book-\($0)" })
+        #expect(progress.availableThemes == [.library, .midnight])
+        #expect(progress.earnedThemePacks == ThemePack.allCases.filter { $0.requiredBooks.map { count >= $0 } ?? false })
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: count)
+        #expect(receipt.themePackGift == ThemePack.allCases.first { $0.requiredBooks == count })
+        #expect(!receipt.requestsReview)
+        #expect(CompletionReceipt(book: sample(), isNew: false, total: count).themePackGift == nil)
+    }
+    @Test func installsAtomicallyAndPersistsWithoutDuplicateGrants() async throws {
+        let repository = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.completed = Set((0..<50).map { "book-\($0)" })
+        try await repository.save(saved)
+        let manager = ProgressManager(repository: repository)
+        try await manager.load()
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await manager.installThemePack(.storybook) }
+        #expect(manager.snapshot.availableThemes.count == 2)
+        await repository.setFailure(false)
+        for pack in ThemePack.allCases where pack.requiredBooks != nil { try await manager.installThemePack(pack) }
+        #expect(manager.snapshot.availableThemes.count == 17)
+        #expect(Set(manager.snapshot.availableThemes).count == 17)
+        let writes = await repository.saveAttempts
+        try await manager.installThemePack(.storybook)
+        #expect(await repository.saveAttempts == writes)
+        let restored = ProgressManager(repository: repository)
+        try await restored.load()
+        #expect(restored.snapshot.availableThemes == manager.snapshot.availableThemes)
+        let rows = try ProgressRecords.encode(restored.snapshot)
+        #expect(try ProgressRecords.decode(rows).availableThemes.count == 17)
+        try await restored.reset()
+        #expect(restored.snapshot.completed.isEmpty)
+        #expect(restored.snapshot.availableThemes.count == 17)
+    }
+    @Test func cannotInstallUnearnedPackAndLegacyProgressStartsWithTwoThemes() async throws {
+        let repository = MemoryProgress()
+        let manager = ProgressManager(repository: repository)
+        try await manager.load()
+        await #expect(throws: AppFailure.self) { try await manager.installThemePack(.storybook) }
+        #expect(manager.snapshot.installedThemePacks == nil)
+        #expect(await repository.saveAttempts == 0)
+        let legacy = try ProgressRecords.decode(ProgressRecords.encode(LearnerProgress()))
+        #expect(legacy.availableThemes == [.library, .midnight])
+        #expect(ThemePack.allCases.filter { $0.requiredBooks != nil }.allSatisfy { $0.themes.count == 5 })
+    }
+}
+
+@Suite @MainActor struct StreakThemeGiftTests {
+    @Test func firstTenDayStreakEarnsOnePermanentGiftWithoutVIPMembership() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository, now: { now }, calendar: calendar)
+        try await progress.load()
+        let book = sample()
+        let sentence = try #require(book.sentences.first)
+        for day in 1...9 {
+            try await progress.recordEncounter(book: book, sentence: sentence)
+            #expect(progress.streak == day)
+            #expect(!progress.snapshot.earnedThemePacks.contains(.vip))
+            now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        }
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.recordEncounter(book: book, sentence: sentence) }
+        #expect(progress.snapshot.earnedStreakTheme != true)
+        await repository.setFailure(false)
+        try await progress.recordEncounter(book: book, sentence: sentence)
+        #expect(progress.streak == 10)
+        #expect(progress.snapshot.earnedThemePacks.contains(.vip))
+        #expect(!progress.snapshot.isVIP)
+        #expect(!progress.snapshot.availableThemes.contains(.vip))
+        let earned = try ProgressRecords.decode(ProgressRecords.encode(progress.snapshot))
+        #expect(earned.earnedThemePacks.contains(.vip))
+        let receipt = try await progress.completeReading(book: book)
+        #expect(receipt.streakThemeGift == .vip)
+        let duplicate = try await progress.complete(book: book)
+        #expect(duplicate.streakThemeGift == nil)
+        now = try #require(calendar.date(byAdding: .day, value: 20, to: now))
+        let restored = ProgressManager(repository: repository, now: { now }, calendar: calendar)
+        try await restored.load()
+        #expect(restored.streak == 0)
+        try await restored.installThemePack(.vip)
+        #expect(restored.snapshot.availableThemes == [.library, .midnight, .vip])
+        #expect(!restored.snapshot.isVIP)
+        try await restored.reset()
+        for _ in 1...10 {
+            try await restored.recordEncounter(book: book, sentence: sentence)
+            now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        }
+        let later = try await restored.completeReading(book: book)
+        #expect(later.streakThemeGift == nil)
+        #expect(restored.snapshot.hasInstalled(.vip))
+    }
+}
+
+@Suite struct CompletionChatOfferTests {
+    @Test(arguments: [0, 5, 10, 11, 12, 100])
+    func offerStartsAtElevenCompletedBooks(total: Int) {
+        for isNew in [true, false] {
+            let receipt = CompletionReceipt(book: sample(), isNew: isNew, total: total)
+            #expect(receipt.offersChat == (total >= 11))
+        }
     }
 }

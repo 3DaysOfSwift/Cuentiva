@@ -32,9 +32,9 @@ Explore the [open-source CFA skills and toolkit](https://github.com/3DaysOfSwift
 2. Select the **Cuentiva** scheme and an iOS 26 simulator or device.
 3. The shared scheme selects `Cuentiva/3 - App Resources/Cuentiva.storekit`. Confirm it under Edit Scheme → Run → Options → StoreKit Configuration.
 4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then Read the full story. Enjoy the extended bilingual reader and use Mark as read at its end. Speak, Write, and Check my words are optional.
-5. Continue from the celebration to the one-time purchase offer. Purchase full access in the local StoreKit purchase sheet to unlock the full library.
+5. Continue from the celebration to the subscription offer. Purchase full access in the local StoreKit purchase sheet to unlock the full library.
 
-The StoreKit file configures a **$14.99 one-time non-consumable purchase**, with no trial or renewal. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
+The StoreKit file configures **$9.99/month and $39.99/year auto-renewable subscriptions** in one group, with no trial. The annual charge is paid yearly. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
 
 For a physical device, select your signing team. The bundle ID is `com.3DaysOfSwiftConcurrency.Cuentiva`; test targets append their target name. All package dependencies are Apple frameworks—there are no third-party dependencies.
 
@@ -64,12 +64,12 @@ Each screen owns its adjacent `@MainActor @Observable` ViewModel. Presentation c
 | LibraryManager | Book loading, search, level filtering, vocabulary coverage |
 | LearningManager | Access checks, answer comparison, reading progression, optional practice, completion workflow |
 | ProgressManager | Committed learner state, streaks, vocabulary evidence, completion counting |
-| PurchaseManager | Verified StoreKit ownership, purchase/restore, lifetime-transaction recovery, transaction updates |
+| PurchaseManager | Verified StoreKit ownership, purchase/restore, expiry handling and legacy lifetime recovery, transaction updates |
 | PracticeManager | Completed-book practice eligibility, vocabulary statistics, matching glossaries and rewards |
 | NearbyManager | Location-based discovery within the selected radius |
 | LanguageTermsManager | Searchable bilingual language-term explanations |
 | FantasyManager | Private storyteller identity, generated drafts and weekly personal publication |
-| ChatManager | Paid on-device conversation, bounded model context and saved transcripts |
+| ChatManager | Earned-doubloon topic sessions with on-device AI and bounded model context |
 | ContributionManager | Legacy draft compatibility; no public submission UI |
 
 Repositories isolate bundled/remote JSON from local SwiftData persistence. Database transactions are atomic and state publishes only after successful persistence. Concurrent progress mutations return a recoverable busy error instead of overwriting one another. Tracked lesson tasks belong to the LessonViewModel; stale audio callbacks are invalidated when a lesson changes. Main-actor managers publish observable state, while decoding and database work happen outside MainActor in repository/model actors.
@@ -82,7 +82,7 @@ Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replace
 - Next sentence records an encounter and advances after its progress transaction succeeds. The final guided sentence opens the full reader without awarding completion. Mark as read records the continuation and book completion in one atomic save. There is no Skip button or compulsory assessment.
 - Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
-- A verified non-consumable purchase unlocks access without an expiry date. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
+- A verified active subscription unlocks access until its expiry. Existing lifetime purchases remain valid. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
 - Public submission, publishing goals and contribution eligibility are retired from the app experience.
 - Existing local drafts are preserved; new personal tales are saved privately on the device.
 
@@ -140,7 +140,7 @@ Nearby discovers geotagged books within 5, 25 or 100 km, or 1,000 miles (default
 
 ## Your turn and Match Pairs
 
-Completed books offer Spanish-only guided rereading, vocabulary statistics and optional matching practice. Match Pairs currently has full glossaries for Ana’s little café and My father’s garden. First qualifying rounds award one persistent doubloon per book; no spending feature yet. See [Your turn](Documentation/YOUR-TURN.md).
+Completed books offer Spanish-only guided rereading, vocabulary statistics and optional matching practice. Match Pairs currently has full glossaries for Ana’s little café and My father’s garden. Each newly completed book awards one persistent doubloon. One doubloon starts a continuous Storyteller Chat session; leaving the chat screen ends it. Matching practice does not award extra coins. See [Your turn](Documentation/YOUR-TURN.md).
 
 ## Language help
 
@@ -186,6 +186,6 @@ book. Swiping or tapping a page indicator selects another book and updates its
 details and reading action. The next day's selection uses the existing freshness
 rules; permanent completion records are retained.
 
-Local storage uses SwiftData for the catalogue, reading progress, storyteller profile, private stories, drafts and chat. Existing JSON data is imported once, then obsolete files are deleted after the database has been verified readable. Bundled seed books and GitHub downloads still use JSON. Downloaded catalogues become active on the next launch. See [startup and storage behavior](docs/startup.md).
+Local storage uses SwiftData for the catalogue, reading progress, storyteller profile, private stories and drafts. Topic chats live in memory until their screen closes. Existing JSON data is imported once, then obsolete files are deleted after the database has been verified readable. Bundled seed books and GitHub downloads still use JSON. Downloaded catalogues become active on the next launch. See [startup and storage behavior](docs/startup.md).
 
 For contributors, start with [the architecture guide](docs/architecture.md) and [contribution guidelines](CONTRIBUTING.md). Release preparation is tracked in [App Store submission](docs/app-store/README.md).

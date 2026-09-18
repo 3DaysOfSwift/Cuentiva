@@ -10,10 +10,10 @@ import Observation
     private(set) var preparationError: String?
     var error: String?
     var notice: String?
-    var purchasing = false
     var sending = false
     var confirmingClear = false
     var translations: Set<UUID> = []
+    private var sessionID = UUID()
     private var replyTask: Task<Void, Never>?
     init(author: Author, feature: any ChatFeature, audio: any LessonAudio, level: String = "A2") {
         self.author = author
@@ -22,40 +22,23 @@ import Observation
         self.level = LearningLevel(rawValue: level) ?? .a2
     }
     var unlocked: Bool { feature.hasAccess }
-    var turns: [ChatTurn] { feature.conversation(for: author).turns }
-    var price: String? { feature.displayPrice }
-    var canBuy: Bool {
-        feature.ready && !feature.preparing && feature.unavailable == nil && price != nil && !purchasing && !unlocked
+    var sessionMessage: String {
+        if feature.sessionPaid { return "This topic is paid for. Keep chatting while this screen stays open." }
+        return "1 doubloon starts one topic. Closing this screen ends the session. You have \(feature.coins) doubloons."
     }
+    var turns: [ChatTurn] { feature.conversation(for: author).turns }
     var canSend: Bool {
         unlocked && feature.ready && feature.unavailable == nil && !feature.busy && !sending
             && ChatLimits.acceptsMessage(draft)
     }
     func prepare() async {
+        let preparingSessionID = sessionID
         preparationError = nil
-        do { try await feature.prepare() } catch { preparationError = error.localizedDescription }
-    }
-    func purchase() async {
-        guard canBuy else { return }
-        purchasing = true
-        error = nil
-        notice = nil
-        defer { purchasing = false }
         do {
-            try await feature.purchase()
-            if unlocked { notice = "Storyteller Chat is unlocked." }
-        } catch { self.error = error.localizedDescription }
-    }
-    func restore() async {
-        guard !purchasing else { return }
-        purchasing = true
-        error = nil
-        notice = nil
-        defer { purchasing = false }
-        do {
-            try await feature.restore()
-            notice = unlocked ? "Your Storyteller Chat purchase is active." : "No Storyteller Chat purchase was found."
-        } catch { self.error = error.localizedDescription }
+            try await feature.prepare()
+            guard !Task.isCancelled, sessionID == preparingSessionID else { return }
+            feature.beginSession(id: preparingSessionID, author: author)
+        } catch { preparationError = error.localizedDescription }
     }
     func toggleTranslation(for turn: ChatTurn) {
         if !translations.insert(turn.id).inserted { translations.remove(turn.id) }
@@ -80,6 +63,12 @@ import Observation
     func cancel() {
         replyTask?.cancel()
         audio.stop()
+    }
+    func endSession() {
+        cancel()
+        feature.endSession(id: sessionID)
+        sessionID = UUID()
+        translations = []
     }
     func listen(_ turn: ChatTurn) { if unlocked { audio.speak(turn.spanish, slow: false) } }
     var audioError: String? { audio.error }

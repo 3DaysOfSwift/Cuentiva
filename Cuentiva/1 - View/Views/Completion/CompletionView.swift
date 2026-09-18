@@ -1,10 +1,12 @@
 import SwiftUI
+import StoreKit
 struct CompletionView: View {
     let receipt: CompletionReceipt
     @State private var viewModel: CompletionViewModel
     @State private var showPractice = false
     @State private var contentVisible = false
     @State private var confettiStart: Date?
+    @Environment(\.requestReview) private var requestReview
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(ThemeManager.self) private var theme
@@ -21,15 +23,66 @@ struct CompletionView: View {
                     Text("BOOKS LEARNED").font(.caption.bold()).tracking(3)
                     Text(receipt.isNew ? "+1 to your collection" : "A familiar story, practiced again").font(.subheadline).foregroundStyle(theme.theme.accent)
                 }
-                Label(receipt.book.kind == .movieScript ? "SCRIPT COMPLETED" : "BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
-                Text("One more story.\nA little more you.").font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
-                BookCover(book: receipt.book, completed: true, compact: true).frame(width: 155)
-                Text(receipt.book.englishTitle).font(.title3.weight(.semibold))
-                Text("\(receipt.book.fullText.count) \(receipt.book.unitName) · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
-                Button("Continue  →") { if receipt.streakCelebration != nil && AppModel.shared.practice.allowed(receipt.book) { showPractice = true } else { dismiss() } }.buttonStyle(PrimaryButton())
-                if AppModel.shared.practice.allowed(receipt.book) {
-                    Button("Your turn · read it in Spanish") { showPractice = true }
-                    Button("Finish for today") { dismiss() }
+                if receipt.isNew {
+                    Label("+1 doubloon", systemImage: "circle.circle.fill")
+                        .font(.subheadline).foregroundStyle(theme.theme.rewardGold)
+                }
+                if receipt.offersChat {
+                    Button {
+                        viewModel.showingChat = true
+                    } label: {
+                        Label("Chat with \(receipt.book.storyteller.name) · 1 doubloon",
+                              systemImage: "bubble.left.and.bubble.right")
+                    }.buttonStyle(.bordered).tint(theme.theme.accent)
+                    Text("Keep practising Spanish together. One doubloon covers this chat until you leave its screen.")
+                        .font(.subheadline).foregroundStyle(theme.theme.muted)
+                        .multilineTextAlignment(.center)
+                }
+                if let gift = receipt.streakThemeGift {
+                    Label("Your first 10-day streak!", systemImage: "flame.fill")
+                        .font(.title2).foregroundStyle(theme.theme.accent)
+                    Text("You’ve earned an exclusive VIP colour theme. A little gift for your persistence.")
+                        .multilineTextAlignment(.center)
+                    Button("Open my streak gift  →") { viewModel.showingThemePack = gift }
+                        .buttonStyle(PrimaryButton())
+                }
+                if receipt.unlocksWriting {
+                    Text("Five books.\nLook how far you’ve come.")
+                        .font(.system(.largeTitle, design: .serif))
+                        .multilineTextAlignment(.center)
+                    Text("Five little adventures in Spanish. Every story is another step on your journey.")
+                        .multilineTextAlignment(.center)
+                    Button("Continue  →") { viewModel.presentWritingMilestone(receipt) }
+                        .buttonStyle(PrimaryButton())
+                } else if let pack = receipt.themePackGift {
+                    Text("\(receipt.total) books.\nA new gift awaits.")
+                        .font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
+                    Text("You’ve earned a pack of five colour themes. Make your next chapter feel a little more yours.")
+                        .multilineTextAlignment(.center)
+                    Button("See my gift  →") { viewModel.showingThemePack = pack }
+                        .buttonStyle(PrimaryButton())
+                } else if receipt.celebratesHundredBooks {
+                    Text("One hundred books.\nThat’s something to celebrate.")
+                        .font(.system(.largeTitle, design: .serif))
+                        .multilineTextAlignment(.center)
+                    Text("You’ve made time to grow, discover new words and build new skills. Your curiosity and persistence deserve to be celebrated.")
+                        .multilineTextAlignment(.center)
+                    ReaderBadgesView(badges: ReaderBadge.allCases)
+                    Text("Your badges are waiting in your reading stats. Here’s to your next chapter.")
+                        .font(.subheadline).foregroundStyle(theme.theme.muted)
+                        .multilineTextAlignment(.center)
+                    Button("Keep growing  →") { dismiss() }.buttonStyle(PrimaryButton())
+                } else {
+                    Label(receipt.book.kind == .movieScript ? "SCRIPT COMPLETED" : "BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
+                    Text("One more story.\nA little more you.").font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
+                    BookCover(book: receipt.book, completed: true, compact: true).frame(width: 155)
+                    Text(receipt.book.englishTitle).font(.title3.weight(.semibold))
+                    Text("\(receipt.book.fullText.count) \(receipt.book.unitName) · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
+                    Button("Continue  →") { if receipt.streakCelebration != nil && AppModel.shared.practice.allowed(receipt.book) { showPractice = true } else { dismiss() } }.buttonStyle(PrimaryButton())
+                    if AppModel.shared.practice.allowed(receipt.book) {
+                        Button("Your turn · read it in Spanish") { showPractice = true }
+                        Button("Finish for today") { dismiss() }
+                    }
                 }
             }.padding(28).frame(maxWidth: .infinity)
         }
@@ -78,6 +131,21 @@ struct CompletionView: View {
                     confettiStart = nil
                     viewModel.celebrate(receipt)
                 }
+            }
+            .task(id: viewModel.hasCelebrated) {
+                guard viewModel.hasCelebrated else { return }
+                do { try await Task.sleep(for: .seconds(2)) } catch { return }
+                guard !Task.isCancelled, !showPractice, !viewModel.showingChat else { return }
+                if viewModel.takeReviewRequest(receipt) { requestReview() }
+            }
+            .fullScreenCover(isPresented: $viewModel.showingWritingMilestone, onDismiss: { dismiss() }) {
+                WritingUnlockedView { viewModel.showingWritingMilestone = false }
+            }
+            .fullScreenCover(item: $viewModel.showingThemePack, onDismiss: { dismiss() }) { pack in
+                ThemePackGiftView(pack: pack) { viewModel.showingThemePack = nil }
+            }
+            .navigationDestination(isPresented: $viewModel.showingChat) {
+                ChatView(author: receipt.book.storyteller)
             }
             .onDisappear { confettiStart = nil }
             .fullScreenCover(isPresented: $showPractice, onDismiss: { dismiss() }) {

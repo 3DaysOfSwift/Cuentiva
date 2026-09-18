@@ -8,6 +8,7 @@ import Observation
         self.progress = progress
     }
 
+    var readerBadges: [ReaderBadge] { progress.snapshot.readerBadges }
     var streak: Int { progress.streak }
     var week: [WeekDay] { progress.week }
     var booksRead: Int { progress.snapshot.completed.count }

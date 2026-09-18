@@ -15,6 +15,8 @@ import Observation
     var nextRead: Book? { get }
     var dailyReads: [Book] { get }
     func prepareDailyReads() async throws
+    var dailyReadsCompleted: Bool { get }
+    func loadMoreDailyReads() async throws
     var revisiting: Bool { get }
     func discover(level: String?, format: BookFormat?) -> [Book]
     var authors: [Author] { get }
@@ -143,7 +145,7 @@ import Observation
         // Retain completed cards in today's set; only replace books no longer available.
         let lookup = Dictionary(uniqueKeysWithValues: available.map { ($0.id, $0) })
         let retained = ids.compactMap { lookup[$0] }
-        if retained.count >= 3 { return Array(retained.prefix(3)) }
+        if retained.count == ids.count { return Array(retained.prefix(3)) }
         let candidates = discover(level: nil, format: nil)
         let retainedIDs = Set(retained.map(\.id))
         return Array((retained + candidates.filter { !retainedIDs.contains($0.id) }).prefix(3))
@@ -154,6 +156,27 @@ import Observation
         defer { preparingDaily = false }
         try await progress.registerLibrary(books)
         try await progress.saveDailyReading(dailyReads.map(\.id), date: calendar.startOfDay(for: now()))
+    }
+    var dailyReadsCompleted: Bool {
+        let selection = dailyReads
+        return !selection.isEmpty && selection.allSatisfy { progress.snapshot.completed.contains($0.id) }
+    }
+    /// Replace only a finished selection, preserving every completion and reading position.
+    func loadMoreDailyReads() async throws {
+        guard purchases.hasAccess else { throw AppFailure.unavailable("Unlock the library to choose more books.") }
+        guard !preparingDaily else { throw AppFailure.busy }
+        guard dailyReadsCompleted else { return }
+        preparingDaily = true
+        defer { preparingDaily = false }
+        let currentIDs = Set(dailyReads.map(\.id))
+        let unread = available.filter {
+            !currentIDs.contains($0.id) && !progress.snapshot.completed.contains($0.id)
+        }
+        let next = Array(dailyOrder(unread, recycling: false).prefix(3))
+        guard !next.isEmpty else {
+            throw AppFailure.unavailable("You’ve read every available book. Revisit a favourite below, or check back for new stories.")
+        }
+        try await progress.saveDailyReading(next.map(\.id), date: calendar.startOfDay(for: now()))
     }
     var nextRead: Book? { dailyReads.first { !progress.snapshot.completed.contains($0.id) } ?? dailyReads.first }
     var authors: [Author] {

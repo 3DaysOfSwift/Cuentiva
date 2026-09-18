@@ -30,10 +30,13 @@ struct StatsView: View {
                     Text("This week").font(.headline)
                     StreakBar(days: viewModel.week)
                 }
+                if !viewModel.readerBadges.isEmpty {
+                    ReaderBadgesView(badges: viewModel.readerBadges)
+                }
                 Divider()
                 VStack(spacing: 22) {
                     stat("Books read", value: "\(viewModel.booksRead)", symbol: "books.vertical")
-                    stat("Doubloons earned", value: "\(viewModel.doubloons)", symbol: "star.circle")
+                    stat("Doubloons available", value: "\(viewModel.doubloons)", symbol: "star.circle")
                     stat("Days practised", value: "\(viewModel.practiceDays)", symbol: "calendar")
                     VStack(alignment: .leading, spacing: 8) {
                         Label("First recorded practice", systemImage: "sunrise").font(.headline)

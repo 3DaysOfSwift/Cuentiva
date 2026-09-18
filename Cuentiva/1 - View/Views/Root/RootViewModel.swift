@@ -3,6 +3,8 @@ import OSLog
 import Observation
 
 @MainActor @Observable final class RootViewModel {
+    private let progress: any ProgressFeature
+    var writingUnlocked: Bool { progress.snapshot.writingUnlocked }
     private let purchases: any PurchaseFeature
     private let library: any LibraryFeature
     private var loading = false
@@ -18,8 +20,10 @@ import Observation
     var hasAccess: Bool { purchases.hasAccess }
     init(
         purchases: any PurchaseFeature = AppModel.shared.purchases,
-        library: any LibraryFeature = AppModel.shared.library, fantasy: any FantasyFeature = AppModel.shared.fantasy
+        library: any LibraryFeature = AppModel.shared.library,
+        progress: any ProgressFeature = AppModel.shared.progress, fantasy: any FantasyFeature = AppModel.shared.fantasy
     ) {
+        self.progress = progress
         self.fantasy = fantasy
         self.purchases = purchases
         self.library = library
@@ -76,7 +80,7 @@ import Observation
             if !checkedIntroduction {
                 do {
                     try await fantasy.load()
-                    showingStoryteller = !fantasy.introductionSeen
+                    showingStoryteller = writingUnlocked && !fantasy.introductionSeen
                     checkedIntroduction = true
                 } catch { /* Profile storage must never block library access. Write offers a retry. */  }
             }

@@ -3,6 +3,28 @@ import Foundation
 enum VocabularyState: String, Codable, CaseIterable, Sendable { case unknown, learning, known }
 enum LearningLevel: String, Codable, CaseIterable, Sendable { case a1 = "A1", a2 = "A2", b1 = "B1", b2 = "B2", c1 = "C1", c2 = "C2" }
 struct LearnerProgress: Codable, Sendable, Equatable {
+    /// Shared across all targets; only distinct, saved completions unlock writing.
+    var writingUnlocked: Bool { completed.count >= ReadingMilestones.writingBookCount }
+    var isVIP: Bool { completed.count >= ReadingMilestones.honouredReaderBookCount }
+    var readerBadges: [ReaderBadge] {
+        isVIP ? ReaderBadge.allCases : []
+    }
+    func nextCompletionNumber(for bookID: String) -> Int? {
+        completed.contains(bookID) ? nil : completed.count + 1
+    }
+    var earnedStreakTheme: Bool? = nil
+    var celebratedStreakTheme: Bool? = nil
+    var installedThemePacks: Set<String>? = nil
+    var earnedThemePacks: [ThemePack] {
+        ThemePack.allCases.filter { pack in
+            if let threshold = pack.requiredBooks { return completed.count >= threshold }
+            return earnedStreakTheme == true
+        }
+    }
+    func hasInstalled(_ pack: ThemePack) -> Bool { installedThemePacks?.contains(pack.rawValue) == true }
+    var availableThemes: [ColourThemeID] {
+        [.library, .midnight] + ThemePack.allCases.filter(hasInstalled).flatMap(\.themes)
+    }
     var schemaVersion = 1
     var selectedLearningLevel: LearningLevel? = nil
     var completed: Set<String> = []
@@ -31,5 +53,13 @@ struct CompletionReceipt: Identifiable, Sendable {
     let isNew: Bool
     let total: Int
     var streakCelebration: Int? = nil
+    var streakThemeGift: ThemePack? = nil
+    var offersChat: Bool { total >= ReadingMilestones.chatOfferBookCount }
+    var unlocksWriting: Bool { isNew && total == ReadingMilestones.writingBookCount }
+    var celebratesHundredBooks: Bool { isNew && total == ReadingMilestones.honouredReaderBookCount }
+    var themePackGift: ThemePack? {
+        isNew ? ThemePack.allCases.first { $0.requiredBooks == total } : nil
+    }
+    var requestsReview: Bool { isNew && total == ReadingMilestones.reviewBookCount && streakThemeGift == nil }
 }
 struct WeekDay: Identifiable { let id: String; let label: String; let practiced: Bool; let today: Bool }

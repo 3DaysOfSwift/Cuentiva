@@ -12,7 +12,7 @@ struct HiddenProgressView: View {
                 .foregroundStyle(theme.theme.accent)
             Text("\(viewModel.streak) day streak")
                 .font(.system(.title2, design: .serif, weight: .medium))
-            Text("\(viewModel.booksRead) books read · \(viewModel.doubloons) doubloons earned")
+            Text("\(viewModel.booksRead) books read · \(viewModel.doubloons) doubloons available")
                 .font(.subheadline)
             Text("\(viewModel.practiceDays) days practised")
                 .font(.subheadline)

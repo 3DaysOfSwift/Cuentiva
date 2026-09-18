@@ -3,22 +3,40 @@ import OSLog
 import Observation
 import StoreKit
 
+enum LibraryPlan: String, CaseIterable, Identifiable, Sendable {
+    case monthly, annual
+    var id: Self { self }
+    var productID: String { "com.3DaysOfSwiftConcurrency.Cuentiva.\(rawValue)" }
+    var title: String { self == .monthly ? "Monthly" : "Annual" }
+    var billingPeriod: String { self == .monthly ? "month" : "year" }
+}
+
+/// Only verified transactions reach this policy; renewal cancellation alone is not expiry.
+enum LibraryAccess {
+    static func isActive(expiration: Date?, revoked: Bool, upgraded: Bool, lifetime: Bool, now: Date = .now) -> Bool {
+        guard !revoked, !upgraded else { return false }
+        if lifetime { return true }
+        guard let expiration else { return false }
+        return expiration > now
+    }
+}
+
 @MainActor protocol PurchaseFeature: AnyObject, Sendable {
     var hasAccess: Bool { get }
     var checking: Bool { get }
-    var offer: Product? { get }
+    var offers: [Product] { get }
     var message: String? { get }
     func refresh() async
-    func purchase() async throws
+    func purchase(plan: LibraryPlan) async throws
     func restore() async throws
 }
 @MainActor @Observable final class PurchaseManager: PurchaseFeature {
     static let productID = "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime"
-    static let storytellerChatProductID = "com.3DaysOfSwiftConcurrency.Cuentiva.storytellerChat"
-    private let entitlementProductID: String
+    private let entitlementProductIDs = Set(LibraryPlan.allCases.map(\.productID) + [PurchaseManager.productID])
+    private var expirationTask: Task<Void, Never>?
     private(set) var hasAccess = false
     private(set) var checking = true
-    private(set) var offer: Product?
+    private(set) var offers: [Product] = []
     private(set) var message: String?
     private var listener: Task<Void, Never>?
     private var verificationFailure: String?
@@ -28,14 +46,12 @@ import StoreKit
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Purchases")
     private let readEntitlements: @MainActor () async -> [VerificationResult<Transaction>]
     init(
-        productID: String = PurchaseManager.productID,
         readEntitlements: @escaping @MainActor () async -> [VerificationResult<Transaction>] = {
             var results: [VerificationResult<Transaction>] = []
             for await result in Transaction.currentEntitlements { results.append(result) }
             return results
         }
     ) {
-        self.entitlementProductID = productID
         self.readEntitlements = readEntitlements
     }
     func refresh() async {
@@ -48,9 +64,11 @@ import StoreKit
                     guard let self else { return }
                     switch update {
                     case .verified(let transaction):
-                        if self.apply(transaction) { await transaction.finish() }
+                        guard self.entitlementProductIDs.contains(transaction.productID) else { continue }
+                        await self.updateEntitlements(confirmed: transaction)
+                        await transaction.finish()
                     case .unverified(let transaction, let error):
-                        guard transaction.productID == entitlementProductID else { continue }
+                        guard entitlementProductIDs.contains(transaction.productID) else { continue }
                         self.recordVerificationFailure(error)
                     }
                 }
@@ -63,52 +81,48 @@ import StoreKit
         checking = false
         // Owners need verified access, not a network lookup for a price.
         // Keep an already loaded offer when returning to the foreground.
-        guard !hasAccess, offer == nil else { return }
+        guard !hasAccess, offers.count < LibraryPlan.allCases.count else { return }
         do {
-            offer = try await Product.products(for: [entitlementProductID]).first
-            if offer?.type != .nonConsumable { offer = nil }
-            message = offer == nil ? "Purchase options are temporarily unavailable. Please try again later." : nil
+            offers = try await Product.products(for: LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
+            message = offers.isEmpty ? "Purchase options are temporarily unavailable. Please try again later." : nil
         } catch { message = error.localizedDescription }
     }
-    private func updateEntitlements() async {
+    private func updateEntitlements(confirmed: Transaction? = nil) async {
         entitlementRevision += 1
         let revision = entitlementRevision
         var active = false
+        var expiry: Date?
         var failedVerification: String?
-        for result in await readEntitlements() {
+        var results = await readEntitlements()
+        // The latest verified transaction also recovers an incomplete entitlement index.
+        for id in entitlementProductIDs {
+            if let latest = await Transaction.latest(for: id) { results.append(latest) }
+        }
+        if let confirmed { results.append(.verified(confirmed)) }
+        var verified: [String: Transaction] = [:]
+        for result in results {
             switch result {
             case .verified(let transaction):
-                if transaction.productID == entitlementProductID,
-                    transaction.revocationDate == nil, transaction.productType == .nonConsumable
-                {
-                    active = true
-                }
+                verified[transaction.productID] = transaction
             case .unverified(let transaction, let error):
-                guard transaction.productID == entitlementProductID else { continue }
+                guard entitlementProductIDs.contains(transaction.productID) else { continue }
                 failedVerification = verificationMessage(error)
-                logger.error(
-                    "Entitlement exists but failed verification: \(String(reflecting: error), privacy: .public)")
             }
         }
-        // A lifetime purchase can also be recovered from its latest verified
-        // transaction when the current-entitlement index has not returned it.
-        if !active, let latest = await Transaction.latest(for: entitlementProductID) {
-            switch latest {
-            case .verified(let transaction):
-                active =
-                    transaction.productID == entitlementProductID
-                    && transaction.productType == .nonConsumable
-                    && transaction.revocationDate == nil && !transaction.isUpgraded
-                logger.info("Latest product transaction found; active: \(active)")
-            case .unverified(_, let error):
-                failedVerification = verificationMessage(error)
-                logger.error(
-                    "Latest product transaction failed verification: \(String(reflecting: error), privacy: .public)")
-            }
+        for transaction in verified.values where isActive(transaction) {
+            active = true
+            if let date = transaction.expirationDate { expiry = min(expiry ?? date, date) }
         }
         // A purchase, revocation, or newer scan supersedes an in-flight snapshot.
         guard revision == entitlementRevision else { return }
         hasAccess = active
+        expirationTask?.cancel()
+        if let expiry {
+            expirationTask = Task { [weak self] in
+                do { try await Task.sleep(for: .seconds(max(0, expiry.timeIntervalSinceNow))) } catch { return }
+                await self?.updateEntitlements()
+            }
+        }
         verificationFailure = active ? nil : failedVerification
         logger.info("Entitlement check finished; access: \(active), verification failure: \(failedVerification != nil)")
     }
@@ -120,26 +134,20 @@ import StoreKit
         message = verificationFailure
         logger.error("Transaction verification failed: \(String(reflecting: error), privacy: .public)")
     }
-    @discardableResult private func apply(_ transaction: Transaction) -> Bool {
-        guard transaction.productID == entitlementProductID, transaction.productType == .nonConsumable else {
-            return false
-        }
-        entitlementRevision += 1
-        hasAccess = transaction.revocationDate == nil && !transaction.isUpgraded
-        if hasAccess {
-            message = nil
-            verificationFailure = nil
-        }
-        logger.info("Verified product transaction received; access: \(self.hasAccess)")
-        return true
+    private func isActive(_ transaction: Transaction) -> Bool {
+        guard entitlementProductIDs.contains(transaction.productID) else { return false }
+        let lifetime = transaction.productID == Self.productID && transaction.productType == .nonConsumable
+        guard lifetime || transaction.productType == .autoRenewable else { return false }
+        return LibraryAccess.isActive(expiration: transaction.expirationDate,
+            revoked: transaction.revocationDate != nil, upgraded: transaction.isUpgraded, lifetime: lifetime)
     }
-    func purchase() async throws {
+    func purchase(plan: LibraryPlan = .annual) async throws {
         guard !operationInProgress else { return }
         operationInProgress = true
         defer { operationInProgress = false }
         await updateEntitlements()
         guard !hasAccess else { return }
-        guard let offer else { throw AppFailure.unavailable("Purchase options have not loaded. Please retry.") }
+        guard let offer = offers.first(where: { $0.id == plan.productID }) else { throw AppFailure.unavailable("Purchase options have not loaded. Please retry.") }
         let result: Product.PurchaseResult
         do { result = try await offer.purchase() } catch {
             // StoreKit may report an error after an existing purchase has become available.
@@ -159,9 +167,10 @@ import StoreKit
                     verificationFailure ?? "The purchase could not be verified. Please try Restore purchases.")
             }
             // Deliver access from the verified result before finishing the transaction.
-            guard apply(transaction), hasAccess else {
+            guard isActive(transaction) else {
                 throw AppFailure.unavailable("This transaction does not provide active access to this feature.")
             }
+            await updateEntitlements(confirmed: transaction)
             await transaction.finish()
         case .pending:
             throw AppFailure.unavailable("Your purchase is awaiting approval. Access will update when it is approved.")
@@ -188,5 +197,5 @@ import StoreKit
         }
         message = nil
     }
-    isolated deinit { listener?.cancel() }
+    isolated deinit { listener?.cancel(); expirationTask?.cancel() }
 }

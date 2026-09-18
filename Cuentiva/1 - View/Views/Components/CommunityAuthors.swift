@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CommunityAuthors: View {
     let authors: [Author]
-    let onWrite: () -> Void
+    let onWrite: (() -> Void)?
     var horizontalInset: CGFloat = 0
     @Environment(ThemeManager.self) private var theme
     var body: some View {
@@ -30,9 +30,11 @@ struct CommunityAuthors: View {
             .padding(.horizontal, -horizontalInset)
             Text("Our storytellers guide you through the shared collection, one little adventure at a time.")
                 .font(.caption).foregroundStyle(theme.theme.muted)
-            Button(action: onWrite) {
-                Label("Create your own tale", systemImage: "square.and.pencil").font(.subheadline.weight(.semibold))
-            }.tint(theme.theme.accent)
+            if let onWrite {
+                Button(action: onWrite) {
+                    Label("Create your own tale", systemImage: "square.and.pencil").font(.subheadline.weight(.semibold))
+                }.tint(theme.theme.accent)
+            }
         }
     }
 }

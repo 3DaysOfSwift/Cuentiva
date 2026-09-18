@@ -12,7 +12,7 @@ struct RootView: View {
                 if viewModel.hasAccess {
                     TabView(selection: $selectedTab) {
                         Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) {
-                            NavigationStack { HomeView(onWrite: { selectedTab = .write }) }
+                            NavigationStack { HomeView(onWrite: viewModel.writingUnlocked ? { selectedTab = .write } : nil) }
                         }
                         Tab("Nearby", systemImage: "location", value: LibraryTab.nearby) {
                             NavigationStack { NearbyView() }
@@ -20,8 +20,10 @@ struct RootView: View {
                         Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) {
                             NavigationStack { CompletedView() }
                         }
-                        Tab("Write", systemImage: "square.and.pencil", value: LibraryTab.write) {
-                            NavigationStack { FantasyWritingView(feature: AppModel.shared.fantasy) }
+                        if viewModel.writingUnlocked {
+                            Tab("Write", systemImage: "square.and.pencil", value: LibraryTab.write) {
+                                NavigationStack { FantasyWritingView(feature: AppModel.shared.fantasy) }
+                            }
                         }
                     }
                 } else {
@@ -45,6 +47,9 @@ struct RootView: View {
                 StorytellerRevealView(feature: AppModel.shared.fantasy) { viewModel.showingStoryteller = false }
             }
             .task { await viewModel.start() }
+            .onChange(of: viewModel.writingUnlocked) { _, unlocked in
+                if !unlocked && selectedTab == .write { selectedTab = .discover }
+            }
             .onChange(of: scenePhase) { _, phase in
                 switch phase {
                 case .background: viewModel.enteredBackground()

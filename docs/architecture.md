@@ -51,4 +51,4 @@ Progress changes are confirmed after a transaction succeeds. Overlapping progres
 
 ## Storyteller Chat
 
-ChatManager owns preparation, purchase access, generation and persistence. Its send workflow checks access, builds a bounded request, validates the generated reply, and saves the complete exchange before exposing it. ChatLimits names both input and output limits; the accepted generated summary can be longer than the summary retained for the next request. ChatViewModel owns the composer and its cancellable task. Restore remains independent of loading local chat history or AI availability.
+ChatManager owns preparation, purchase access, generation and persistence. Its send workflow checks access, builds a bounded request, validates the generated reply, and saves the complete exchange before exposing it. ChatLimits names both input and output limits; the accepted generated summary can be longer than the summary retained for the next request. ChatViewModel owns the composer and its cancellable task. Topic transcripts are kept only in memory; chat has no purchase or restore flow.

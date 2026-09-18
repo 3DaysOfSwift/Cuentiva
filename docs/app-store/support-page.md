@@ -6,7 +6,7 @@ Cuentiva brings Spanish to life through stories. For help, contact **[YOUR SUPPO
 
 ## Purchases
 
-The library and Storyteller Chat are separate one-time purchases. To recover a purchase, use Restore purchases in Settings while signed in to the Apple Account used to buy it. Apple manages billing and refund requests.
+The library offers monthly and annual auto-renewable subscriptions. Manage or cancel through your App Store account settings. Storyteller Chat uses earned doubloons, not a separate purchase. To recover a purchase, use Restore purchases in Settings while signed in to the Apple Account used to buy it. Apple manages billing and refund requests.
 
 ## Apple Intelligence
 

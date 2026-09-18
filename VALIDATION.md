@@ -1,3 +1,70 @@
+## Monthly and annual subscriptions — 18 September 2026
+
+- Replaced the lifetime sales offer with auto-renewable monthly (USD 9.99) and annual (USD 39.99, paid yearly) plans in one StoreKit group at the same service level. Existing verified lifetime ownership remains supported but is not offered for sale.
+- Paywall shows localized full charges and billing periods, selects annual initially, and displays “Ahorra con el plan anual” only when annual costs less than twelve monthly payments. Added auto-renewal terms, privacy link and Settings subscription management link.
+- Entitlement aggregation checks verification, expiration, revocation and upgrades across plans. Transaction updates and an expiration task re-evaluate access; restore/latest-transaction recovery remain supported. Billing Grace Period must remain disabled for this initial configuration; grace extensions are not implemented.
+- 91 core tests passed, including pricing/group configuration and expiry/revocation/upgrade policy. One earlier run ended with the previously observed test-runner signal 11; rerun passed. All app sources passed iOS SDK type-checking. Project/plist/whitespace checks passed.
+- StoreKit simulator tests were updated for both plans, but could not run because Xcode exposed no available simulator destination. Real checkout, renewal, refunds, plan changes and restoration require sandbox/TestFlight testing before release. App Store Connect products and live Wix pages were not changed; setup instructions are in docs/app-store/connect-setup.md.
+
+## Removed obsolete chat IAP — 18 September 2026
+
+- Deleted the separate chat StoreKit configuration, dedicated UK test scheme, Xcode file reference and unused product identifier. Removed obsolete purchase tests and updated App Store setup instructions. Chat documentation is now `docs/storyteller-chat.md`.
+- The only configured product is the one-time library unlock at the local test price of 14.99. A configuration test verifies that single product. No App Store Connect records were changed.
+- 90 core tests passed. Project/plist validation, remaining scheme XML validation and whitespace checks passed. Earlier entries below describe historical configurations.
+
+## Completion chat invitation — 18 September 2026
+
+- Completion screens offer “Chat with [storyteller] · 1 doubloon” from 11 completed books onward, linking to that book’s storyteller inside the reader navigation stack. Earlier completions display only the earned coin, without a chat invitation. Existing Settings and bio entry points remain available.
+- Eligibility lives in the completion model. Opening chat does not spend a coin; the existing first-successful-reply rule still applies. Review prompting is skipped while navigating into chat.
+- 90 core tests passed, including the 10/11 boundary and later/reread completions. All app sources passed iOS SDK type-checking. Visual navigation verification remains pending.
+
+## Earned-doubloon chat sessions — 18 September 2026
+
+- A newly completed distinct book or script earns one doubloon in the same atomic progress save. Repeated completions and matching practice do not grant additional coins. Existing balances are preserved without backfilling historical reads.
+- Storyteller Chat is coin-only. Removed its purchase/restore UI and StoreKit dependency from the runtime feature. No coin packs are sold. One validated first reply costs one coin, and subsequent messages remain free for that session.
+- Leaving the chat screen, backgrounding the app, or explicitly starting a new topic ends the session. Transcripts are ephemeral; stale requests cannot populate another session. Failed AI responses and failed wallet saves do not spend coins. Existing chat database records are retained but no longer used by the feature.
+- 89 core tests passed after replacing superseded chat-purchase tests with coin-session tests. Coverage includes completion idempotency, persisted balances, no-coin access, continuous messages, closed/new sessions, cancellations, invalid replies, failed debits and bounded model context. All app sources passed iOS SDK type-checking; project/plist and whitespace checks passed.
+- Live AI, visual behavior and iOS UI tests remain unverified on hardware; no screen control was used. Old chat StoreKit fixtures are historical and must not be submitted as a separate product for this version.
+
+## First ten-day streak gift — 18 September 2026
+
+- The first saved ten-day practice streak earns a single emerald-and-gold VIP theme. An optional, backward-compatible progress flag keeps the earned gift through streak breaks and learning resets. A separate persisted flag prevents repeated completion announcements.
+- The gift is shown at the next book completion and remains available in Settings for installation. The existing theme-gift view now supports both single-theme and five-theme rewards. VIP membership still requires 100 distinct books.
+- Gift eligibility saves atomically with practice; failed saves grant nothing. Once earned, future progress writes skip the streak reward calculation.
+- 96 core tests passed, covering day nine/day ten, failed saves, installation after a broken streak, reload, reset, repeat streaks and no accidental VIP membership. App sources passed iOS SDK type-checking. Visual verification remains pending.
+
+## Installable theme gifts — 18 September 2026
+
+- Library and Midnight are the two initial themes. Storybook (10 books) adds Parchment, Rose, Lavender, Ocean and Forest; Wanderlust (25) adds Terracotta, Honey, Sage, Lagoon and Twilight; Enchanted (50) adds Cherry, Glacier, Pearl, Cocoa and Starlight.
+- Shared model catalogue owns milestones, theme identifiers and eligibility. Completion offers a gift; Settings retains earned packs for later. Install persists atomically in SwiftData before themes become selectable, preserves the currently displayed palette, and is idempotent. No downloads, payments or review actions participate.
+- Installed packs survive progress reset; earned but uninstalled packs depend on the saved completion count. Existing uninstalled palette preferences fall back to Library until their pack is installed. Additional packs extend the catalogue and palette mapping.
+- Native review milestone moved to book 15, separate from the new gift at 10.
+- 95 core tests passed, covering milestone boundaries, repeat completions, eligibility, failed installation, idempotence, reload, record round-trip and reset. App sources passed iOS SDK type-checking. All ten new palettes meet 4.5:1 text contrast on paper/surface and primary buttons. Visual simulator verification remains pending.
+
+## Completed Today selection and more books — 18 September 2026
+
+- Completed selections show a tick before Today’s books. Completed focused books also show a title tick and a tick over the storyteller portrait.
+- Once the entire selection is complete, the main action becomes a theme-accent outline button labelled “Load 3 more books”. Model-owned selection chooses unread books, saves the new set atomically and keeps completion, vocabulary and reading positions intact.
+- Partial remaining sets stay partial across relaunch; exhausted libraries explain that there are no unread books rather than resetting progress. Failed saves retain the completed selection and allow retry. Incomplete selections cannot be replaced by this action.
+- 92 core tests passed, including full/partial/exhausted selections, persistence failure, relaunch, empty libraries and purchase access. All app sources passed iOS SDK type-checking. Visual verification remains pending.
+
+## Welcome, lifetime reading numbers and 100-book honours — 18 September 2026
+
+- Updated the welcome heading to the requested Cuentiva introduction.
+- Discover numbers new reads from the saved lifetime count of distinct completions; completed selections say “Read again”. No daily numbering reset or duplicate credit.
+- Five-book celebration and free-gift announcement are separate tap-driven screens, followed by the wrapped gift, invitation and character setup.
+- At 100 distinct saved completions, the completion screen celebrates VIP, Persistence and 1% honours. Stats retains the badges using existing saved progress, including for readers already over 100. The 1% name is explicitly motivational, not a global ranking; no unsupported statistic or book quotation is displayed. Resetting learning progress also resets these honours.
+- 89 core tests passed. Tests cover the 99/100 boundary, failed-save rollback, duplicate completion, reload, record round-trip and lifetime numbering. All app Swift sources passed iOS SDK type-checking. Visual simulator validation remains pending.
+
+## Five-book Write milestone and reviews — 18 September 2026
+
+- Write and its library/author links remain hidden until five distinct saved book/script completions. Existing readers with five or more completions already qualify. Reset learning progress also resets this milestone; private story data is not deleted by that reset.
+- The fifth completion announces a free gift and waits for a tap. The wrapped-gift screen waits for another tap before revealing the Write invitation, which leads directly into the existing character setup. No gift step advances on a timer. The user receives Write independently of any review. Profile onboarding is deferred until writing is unlocked; generation still requires compatible, available Apple Intelligence.
+- A separate native StoreKit review request is eligible at the tenth distinct completion. Repeated books do not trigger either milestone. Apple may suppress the prompt; the app never claims a review was submitted.
+- Settings links directly to the review page for Apple ID 6813381807. No review pre-prompt or incentive is used. See https://developer.apple.com/app-store/review/guidelines/ (5.6.1).
+- 88 core tests passed, including milestone boundaries, both completion paths, duplicate completion, reload/record encoding, failed-save rollback and the review URL. The initial run hit the previously observed intermittent test-process signal 11; the full retry passed.
+- All app Swift sources passed iOS Simulator SDK type-checking. Xcode build-for-testing was blocked by unavailable CoreSimulator runtimes during asset compilation. Visual UI and native review presentation still need simulator/device verification.
+
 ## Optional safety audit — 18 September 2026
 
 - Removed forced unwraps from calendar/streak/week calculations, nearby distances, fantasy vocabulary grouping, catalogue URL configuration and the terms link. Invalid download configuration throws an actionable error; calendar failures stop traversal/omit unavailable dates without inventing saved progress.

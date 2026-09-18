@@ -1,16 +1,24 @@
 import SwiftUI
 
-/// One instance is owned by the App and supplied to every scene and sheet.
-/// Theme is presentation state, so its owner remains in the View layer.
+/// One app-owned palette. Pack eligibility and installation belong to learner progress.
 @MainActor @Observable final class ThemeManager {
     private static let preferenceKey = "appearance.colourTheme"
     @ObservationIgnored private let preferences: UserDefaults
+    private let progress: any ProgressFeature
+    private var preferredTheme: ColourThemeID
+    var availableThemes: [ColourThemeID] { progress.snapshot.availableThemes }
     var selectedTheme: ColourThemeID {
-        didSet { preferences.set(selectedTheme.rawValue, forKey: Self.preferenceKey) }
+        get { availableThemes.contains(preferredTheme) ? preferredTheme : .library }
+        set {
+            guard availableThemes.contains(newValue) else { return }
+            preferredTheme = newValue
+            preferences.set(newValue.rawValue, forKey: Self.preferenceKey)
+        }
     }
     var theme: AppColourTheme { selectedTheme.palette }
-    init(preferences: UserDefaults = .standard) {
+    init(preferences: UserDefaults = .standard, progress: any ProgressFeature = AppModel.shared.progress) {
         self.preferences = preferences
-        selectedTheme = preferences.string(forKey: Self.preferenceKey).flatMap(ColourThemeID.init(rawValue:)) ?? .library
+        self.progress = progress
+        preferredTheme = preferences.string(forKey: Self.preferenceKey).flatMap(ColourThemeID.init(rawValue:)) ?? .library
     }
 }

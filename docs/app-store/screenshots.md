@@ -13,7 +13,7 @@ The first three images sell the core reading experience. Characters add personal
 | 03 | A little practice. Real progress. | Completion or stats | Genuine test progress; count and streak consistent |
 | 04 | Meet your storytellers | Storyteller biography | Existing portrait, name and bio; no public-community claims |
 | 05 | Your memory. A little magic. | Write or private generated story | Show actual successful generation; caption: Requires Apple Intelligence on a supported device |
-| 06 | Keep the conversation going | Storyteller Chat | Actual Spanish exchange; caption: Separate one-time purchase. Requires Apple Intelligence |
+| 06 | Keep the conversation going | Storyteller Chat | Actual Spanish exchange; caption: One earned doubloon per session. Requires Apple Intelligence |
 
 Use the fox prominently on the first composition, as a small supporting illustration outside the capture. Keep the capture's controls unobscured. Reuse existing art; new generated artwork is unnecessary for this set. Start with static screenshots; defer video until the interaction and copy are stable.
 

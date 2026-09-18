@@ -7,7 +7,10 @@ import Observation
     var selectedBook: Book?
     var focusedBookID: String?
     var dailyReadingError: String?
-    private var preparingDailyReads = false
+    private(set) var preparingDailyReads = false
+    var dailyReadsCompleted: Bool { library.dailyReadsCompleted }
+    var showTomorrowFooter: Bool { dailyReads.count == 3 && dailyReadsCompleted }
+    private(set) var dailyReadingNotice: String?
     var query = ""
     var format: BookFormat?
     var sort: BookSort = .library
@@ -19,10 +22,36 @@ import Observation
     var nextRead: Book? { library.nextRead }
     var focusedRead: Book? { dailyReads.first { $0.id == focusedBookID } ?? nextRead }
     var readButtonTitle: String {
-        guard let book = focusedRead, let index = dailyReads.firstIndex(where: { $0.id == book.id }) else {
-            return "Read book"
-        }
-        return "Read book \(index + 1)"
+        if preparingDailyReads { return "Loading books…" }
+        if dailyReadsCompleted { return "Load 3 more books" }
+        guard let book = focusedRead else { return "Read book" }
+        guard let number = progress.snapshot.nextCompletionNumber(for: book.id) else { return "Read again" }
+        return "Read book \(number)"
+    }
+
+    func performReadingAction() async {
+        if dailyReadsCompleted { await loadMoreBooks() }
+        else { selectedBook = focusedRead }
+    }
+    func retryDailyReads() async {
+        if dailyReadsCompleted { await loadMoreBooks() }
+        else { await prepareDailyReads() }
+    }
+    private func loadMoreBooks() async {
+        guard !preparingDailyReads else { return }
+        preparingDailyReads = true
+        dailyReadingError = nil
+        dailyReadingNotice = nil
+        defer { preparingDailyReads = false }
+        do {
+            try await library.loadMoreDailyReads()
+            focusNextRead()
+            if dailyReads.count < 3 {
+                dailyReadingNotice = dailyReads.count == 1
+                    ? "One unread book remains. Enjoy your next story."
+                    : "Two unread books remain. Enjoy your next stories."
+            }
+        } catch { dailyReadingError = error.localizedDescription }
     }
     func focusNextRead() { focusedBookID = nextRead?.id }
     func prepareDailyReads() async {

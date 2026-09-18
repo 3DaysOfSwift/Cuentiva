@@ -26,7 +26,7 @@ actor LaunchBooks: SyncingBookRepository {
         let progress = ProgressManager(repository: MemoryProgress())
         let repository = LaunchBooks()
         let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library,
+        let root = RootViewModel(purchases: purchases, library: library, progress: progress,
             fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await root.load()
         #expect(root.ready)
@@ -44,9 +44,10 @@ actor LaunchBooks: SyncingBookRepository {
 
     @Test func initialSceneActivationDoesNotRepeatStartupPurchaseCheck() async throws {
         let purchases = TestPurchases()
+        let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases,
-            progress: ProgressManager(repository: MemoryProgress()))
-        let root = RootViewModel(purchases: purchases, library: library,
+            progress: progress)
+        let root = RootViewModel(purchases: purchases, library: library, progress: progress,
             fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await root.becameActive()
         #expect(purchases.refreshCalls == 0)
@@ -137,7 +138,7 @@ actor LaunchBooks: SyncingBookRepository {
         #expect(home.focusedRead?.id != first.id)
         #expect(home.dailyReads.contains { $0.id == first.id })
         home.focusedBookID = first.id
-        #expect(home.readButtonTitle == "Read book 1")
+        #expect(home.readButtonTitle == "Read again")
         #expect(home.focusedRead?.id == first.id)
         #expect(home.completed(first))
     }
@@ -444,10 +445,10 @@ actor ReaderPauseProbe {
         let model = PracticeViewModel(book: playable, feature: feature)
         model.timed = false; model.startGame()
         model.suspend()
-        #expect(model.stage == .ready); #expect(feature.coins == 0)
+        #expect(model.stage == .ready); #expect(feature.coins == 1)
         model.startGame(); model.stage = .playing
         await model.chooseSpanish("está"); await model.chooseEnglish("está")
-        #expect(model.stage == .result); #expect(model.matches == 1); #expect(model.awarded)
+        #expect(model.stage == .result); #expect(model.matches == 1); #expect(!model.awarded)
         model.startGame(); model.stage = .playing
         await model.chooseEnglish("está"); await model.chooseSpanish("está")
         #expect(!model.awarded); #expect(feature.coins == 1)
@@ -470,7 +471,7 @@ actor ReaderPauseProbe {
         #expect(model.stage == .playing); #expect(model.seconds == 30)
         instant = instant.advanced(by: .seconds(31))
         await model.chooseSpanish("está"); await model.chooseEnglish("está")
-        #expect(model.stage == .result); #expect(model.matches == 0); #expect(feature.coins == 0)
+        #expect(model.stage == .result); #expect(model.matches == 0); #expect(feature.coins == 1)
     }
 }
 
@@ -478,29 +479,7 @@ actor ReaderPauseProbe {
 import StoreKitTest
 
 @Suite(.serialized) @MainActor struct StorePurchaseTests {
-    @Test func chatPurchaseIsSeparateAndRestores() async throws {
-        let configuration = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent().deletingLastPathComponent()
-            .appending(path: "Cuentiva/3 - App Resources/StorytellerChat.storekit")
-        let session = try SKTestSession(contentsOf: configuration)
-        session.disableDialogs = true; session.clearTransactions()
-        defer { session.clearTransactions() }
-        let chat = PurchaseManager(productID: PurchaseManager.storytellerChatProductID)
-        let library = PurchaseManager()
-        await chat.refresh(); await library.refresh()
-        #expect(!chat.hasAccess); #expect(!library.hasAccess)
-        #expect(chat.offer?.price == Decimal(string: "24.99"))
-        #expect(chat.offer?.type == .nonConsumable)
-        try await chat.purchase()
-        await library.refresh()
-        #expect(chat.hasAccess); #expect(!library.hasAccess)
-        let restored = PurchaseManager(productID: PurchaseManager.storytellerChatProductID)
-        try await restored.restore()
-        #expect(restored.hasAccess)
-        #expect(session.allTransactions().count == 1)
-    }
-
-    @Test func lifetimePurchaseSurvivesNewManagerAndRestoresWithoutRepurchase() async throws {
+    @Test(arguments: LibraryPlan.allCases) func subscriptionSurvivesNewManagerAndRestoresWithoutRepurchase(plan: LibraryPlan) async throws {
         let configuration = URL(fileURLWithPath: #filePath)
             .deletingLastPathComponent().deletingLastPathComponent()
             .appending(path: "Cuentiva/3 - App Resources/Cuentiva.storekit")
@@ -511,13 +490,13 @@ import StoreKitTest
         let purchases = PurchaseManager()
         await purchases.refresh()
         #expect(!purchases.hasAccess)
-        #expect(purchases.offer != nil)
+        #expect(purchases.offers.count == 2)
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
+        let root = RootViewModel(purchases: purchases, library: library, progress: progress, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await root.load()
         #expect(!root.hasAccess)
-        try await purchases.purchase()
+        try await purchases.purchase(plan: plan)
         #expect(purchases.hasAccess)
         #expect(root.hasAccess)
 
@@ -526,12 +505,12 @@ import StoreKitTest
         await relaunched.refresh()
         #expect(relaunched.hasAccess)
         try await relaunched.restore()
-        try await relaunched.purchase()
+        try await relaunched.purchase(plan: plan)
         #expect(relaunched.hasAccess)
         #expect(session.allTransactions().count == 1)
 
         // Reproduce the device failure: the entitlement index returns nothing,
-        // but StoreKit still has a verified lifetime transaction.
+        // but StoreKit still has a verified subscription transaction.
         let emptyIndex = PurchaseManager(readEntitlements: { [] })
         await emptyIndex.refresh()
         #expect(emptyIndex.hasAccess)
@@ -554,42 +533,21 @@ import StoreKitTest
 }
 #endif
 
-@MainActor private final class ChatPresentationFeature: ChatFeature {
-    var hasAccess = false
-    var displayPrice: String? = "£24.99"
-    var preparing = false
-    var unavailable: String?
-    var ready = true
-    var busy = false
-    var purchaseFailure: AppFailure?
-    func prepare() async throws { ready = true }
-    func purchase() async throws {
-        if let purchaseFailure { throw purchaseFailure }
-        // A cancelled store sheet completes without granting an entitlement.
-    }
-    func restore() async throws { }
-    func conversation(for author: Author) -> ChatConversation { .init() }
-    func send(_ message: String, to author: Author, level: String) async throws { }
-    func clear(author: Author) async throws { }
-}
-@Suite @MainActor struct ChatPresentationTests {
-    @Test func cancelledPurchaseNeverShowsUnlockedNotice() async {
-        let feature = ChatPresentationFeature()
-        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
-        await model.purchase()
-        #expect(!model.unlocked)
-        #expect(model.notice == nil)
-        #expect(!model.purchasing)
-    }
-    @Test func foregroundRefreshPreservesPurchaseFailure() async {
-        let feature = ChatPresentationFeature()
-        feature.purchaseFailure = .unavailable("Purchase awaiting approval")
-        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
-        await model.purchase()
-        let failure = model.error
-        #expect(failure != nil)
-        await model.prepare()
-        #expect(model.error == failure)
-        #expect(model.preparationError == nil)
+@Suite @MainActor struct CompletionMilestoneViewModelTests {
+    @Test func reviewRequestIsConsumedOnceAndIndependentOfWriting() {
+        let fifth = CompletionReceipt(book: sample(), isNew: true, total: 5)
+        let model = CompletionViewModel(receipt: fifth)
+        model.presentWritingMilestone(fifth)
+        #expect(model.showingWritingMilestone)
+        #expect(!model.takeReviewRequest(fifth))
+        model.showingWritingMilestone = false
+        model.presentWritingMilestone(fifth)
+        #expect(!model.showingWritingMilestone)
+        let fifteenth = CompletionReceipt(book: sample(), isNew: true, total: 15)
+        model.prepare(fifteenth)
+        #expect(!model.showingWritingMilestone)
+        #expect(model.takeReviewRequest(fifteenth))
+        model.prepare(fifteenth)
+        #expect(!model.takeReviewRequest(fifteenth))
     }
 }

@@ -12,24 +12,22 @@ Copyright must name the actual rights holder, with the year. Keep marketing focu
 
 ## 2. Pricing and purchases
 
-Recommended app download price: Free, with the existing introductory book and two separate non-consumable unlocks. Confirm storefront availability intentionally. Complete the Paid Apps Agreement, tax and banking setup before paid-product testing.
+App download: Free, including the introductory book. Create one auto-renewable subscription group named **Cuentiva Library**, with these two products at the same service level:
 
-| Field | Library | Chat |
+| Field | Monthly | Annual |
 |---|---|---|
-| Reference name | Cuentiva Library Unlock | Cuentiva Storyteller Chat |
-| Type | Non-Consumable | Non-Consumable |
-| Product ID | `com.3DaysOfSwiftConcurrency.Cuentiva.lifetime` | `com.3DaysOfSwiftConcurrency.Cuentiva.storytellerChat` |
-| Display name | Cuentiva Library | Storyteller Chat |
-| Description | Unlock the story library with one purchase. | Practise Spanish with storytellers. Requires Apple Intelligence. |
-| Intended base price | US storefront: USD 14.99 | UK storefront: GBP 24.99 |
+| Product ID | `com.3DaysOfSwiftConcurrency.Cuentiva.monthly` | `com.3DaysOfSwiftConcurrency.Cuentiva.annual` |
+| Duration | 1 month | 1 year |
+| US price | USD 9.99 | USD 39.99 |
+| Billing | Each month | Full amount each year |
 
-Select the intended base country/currency and inspect Apple's resulting other-storefront prices. Do not set every region to the same numeric price. These prices come from the product decisions; they have not been verified live. Use exact product IDs above; local StoreKit files do not create products.
+These are new subscription products; do not reuse the old non-consumable product ID. Stop offering the lifetime product for sale. Existing verified lifetime ownership is still honoured by the app. Configure localization, availability and review screenshots for both subscriptions. Local StoreKit files do not create live products.
 
-Library review note: Unlocks the wider reading collection after the introductory book. Restore is available in Settings and the library paywall. No subscription.
+Both subscriptions provide identical library access while active. The annual plan is selected by default, with its full yearly price shown and “Ahorra con el plan anual” when cheaper than twelve monthly payments. StoreKit supplies localized prices. Restore purchases and Manage subscription are available. Cancellation keeps access until expiry; revoked, expired or upgraded transactions do not grant access.
 
-Chat review note: Separate unlock for on-device Spanish conversations. Requires Apple Intelligence availability on a supported device. Reach it through a storyteller biography or Settings. It does not purchase the library unlock. Confirm the navigation and availability gating in the submitted build.
+For this initial configuration leave Billing Grace Period disabled: this implementation uses verified transaction expiry and does not extend access for a grace period. Verify renewal, expiry, cancellation, refund, plan changes, restoration and offline access in sandbox/TestFlight before release. Ensure ongoing content/service value for subscribers, and update the published support/privacy/terms pages to match recurring billing.
 
-Capture each actual purchase screen for its own review screenshot. These are separate from marketing screenshots. Submit the initial products with the app version and verify neither is left at Missing Metadata.
+Chat continues to use earned doubloons and requires supported on-device Apple Intelligence. Neither chat nor doubloons are sold separately.
 
 ## 3. Public pages and declarations
 
@@ -43,7 +41,7 @@ Copy [listing.md](listing.md) into the matching fields. Use [screenshots.md](scr
 
 ## 5. Review and release
 
-Enter a real review contact privately in App Store Connect. No app sign-in account is required. Copy and verify the review notes from listing.md against the exact uploaded build. Select manual release so approval does not publish immediately. Run [release-checks.md](release-checks.md), upload a validated archive, test it with TestFlight, then attach the build and both initial IAPs before submission.
+Enter a real review contact privately in App Store Connect. No app sign-in account is required. Copy and verify the review notes from listing.md against the exact uploaded build. Select manual release so approval does not publish immediately. Run [release-checks.md](release-checks.md), upload a validated archive, test it with TestFlight, then attach the build and both subscription products before submission.
 
 ## References
 

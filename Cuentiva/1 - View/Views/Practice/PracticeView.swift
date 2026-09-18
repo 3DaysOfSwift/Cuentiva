@@ -128,7 +128,7 @@ struct PracticeView: View {
                 Text("Tap a Spanish word and its English meaning. Five pairs at a time, with every distinct word in this book waiting in the deck.")
                 Toggle("30-second challenge", isOn: $model.timed)
                 Text(model.timed ? "The timer starts after a three-second countdown." : "Untimed practice: work through the whole deck.")
-                Text("Earn one doubloon for your first finished round with at least one match. Replays improve your score. Coins have no spending feature yet.").font(.caption)
+                Text("Earn one doubloon when you complete a new story. Spend it on a topic chat. This practice helps improve your score.").font(.caption)
                 Button("Ready") { model.startGame() }.buttonStyle(PrimaryButton())
                 Text(model.feedback).font(.caption)
             } else {
@@ -170,8 +170,8 @@ struct PracticeView: View {
                 Text("Words to revisit").font(.headline)
                 ForEach(model.missed.sorted(), id: \.self) { word in Text("\(word) — \(model.glossary?[word] ?? "")") }
             }
-            Label(model.awarded ? "+1 gold doubloon" : "\(model.coins) doubloons collected", systemImage: "circle.circle.fill").font(.title2).foregroundStyle(theme.theme.rewardGold)
-            if model.matches == 0 { Text("Make at least one match in a finished round to earn this book’s doubloon.") }
+            Label("\(model.coins) doubloons available", systemImage: "circle.circle.fill").font(.title2).foregroundStyle(theme.theme.rewardGold)
+            if model.matches == 0 { Text("Try another round to practise these words. Your story-completion doubloon is already earned.") }
             if model.saving { ProgressView("Saving your round…") }
             if model.error != nil { Button("Retry saving reward") { Task { await model.saveReward() } } }
             Button("Play again") { model.prepareGame() }.buttonStyle(PrimaryButton()).disabled(model.saving || model.error != nil)

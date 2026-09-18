@@ -17,6 +17,8 @@ import Observation
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
     func setLearningLevel(_ level: LearningLevel?) async throws
     func rewardPractice(book: Book, matches: Int) async throws -> Bool
+    func installThemePack(_ pack: ThemePack) async throws
+    func spendChatCoin() async throws
     func reset() async throws
 }
 @MainActor @Observable final class ProgressManager: ProgressFeature {
@@ -37,14 +39,15 @@ import Observation
             calendar.component(.year, from: date), calendar.component(.month, from: date),
             calendar.component(.day, from: date))
     }
-    var streak: Int {
+    var streak: Int { streak(in: snapshot) }
+    private func streak(in value: LearnerProgress) -> Int {
         var day = calendar.startOfDay(for: now())
         var count = 0
-        if !snapshot.practiceDays.contains(dayKey(day)) {
+        if !value.practiceDays.contains(dayKey(day)) {
             guard let previous = calendar.date(byAdding: .day, value: -1, to: day) else { return 0 }
             day = previous
         }
-        while snapshot.practiceDays.contains(dayKey(day)) {
+        while value.practiceDays.contains(dayKey(day)) {
             count += 1
             guard let previous = calendar.date(byAdding: .day, value: -1, to: day), previous < day else { break }
             day = previous
@@ -77,6 +80,7 @@ import Observation
         defer { saving = false }
         var next = snapshot
         update(&next)
+        if next.earnedStreakTheme != true && streak(in: next) >= 10 { next.earnedStreakTheme = true }
         try await repository.save(next)
         snapshot = next
     }
@@ -147,33 +151,47 @@ import Observation
         guard Set(book.fullText.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else {
             throw AppFailure.incomplete
         }
+        let streakGift = snapshot.earnedStreakTheme == true && snapshot.celebratedStreakTheme != true
         let isNew = !snapshot.completed.contains(book.id)
         let celebrate = !(snapshot.celebratedCompletionDays ?? []).contains(dayKey(now()))
         try await commit {
+            if streakGift { $0.celebratedStreakTheme = true }
+            if isNew {
+                $0.doubloons = ($0.doubloons ?? 0) + 1
+                if $0.rewardedBooks == nil { $0.rewardedBooks = [] }
+                $0.rewardedBooks?.insert(book.id)
+            }
             $0.completed.insert(book.id)
             $0.positions[book.id] = 0
             if $0.celebratedCompletionDays == nil { $0.celebratedCompletionDays = [] }
             $0.celebratedCompletionDays?.insert(dayKey(now()))
         }
         return .init(
-            book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil)
+            book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil, streakThemeGift: streakGift ? .vip : nil)
     }
     /// The final reader action records the continuation and completion in one save.
     func completeReading(book: Book) async throws -> CompletionReceipt {
         guard Set(book.sentences.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else {
             throw AppFailure.incomplete
         }
+        let streakGift = snapshot.earnedStreakTheme == true && snapshot.celebratedStreakTheme != true
         let isNew = !snapshot.completed.contains(book.id)
         let celebrate = !(snapshot.celebratedCompletionDays ?? []).contains(dayKey(now()))
         try await commit { next in
             for sentence in book.continuation ?? [] { addEncounter(book: book, sentence: sentence, to: &next) }
             if next.celebratedCompletionDays == nil { next.celebratedCompletionDays = [] }
             next.celebratedCompletionDays?.insert(dayKey(now()))
+            if streakGift { next.celebratedStreakTheme = true }
+            if isNew {
+                next.doubloons = (next.doubloons ?? 0) + 1
+                if next.rewardedBooks == nil { next.rewardedBooks = [] }
+                next.rewardedBooks?.insert(book.id)
+            }
             next.completed.insert(book.id)
             next.positions[book.id] = 0
         }
         return .init(
-            book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil)
+            book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil, streakThemeGift: streakGift ? .vip : nil)
     }
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws {
         try await commit { $0.vocabulary[lemma] = state }
@@ -181,21 +199,41 @@ import Observation
     func rewardPractice(book: Book, matches: Int) async throws -> Bool {
         guard snapshot.completed.contains(book.id), matches > 0, matches <= Set(book.vocabulary.map(\.word)).count
         else { throw AppFailure.incomplete }
-        let awarded = !(snapshot.rewardedBooks ?? []).contains(book.id)
         try await commit { next in
             if next.bestMatches == nil { next.bestMatches = [:] }
             let best = max(next.bestMatches?[book.id] ?? 0, matches)
             next.bestMatches?[book.id] = best
-            if awarded {
-                if next.rewardedBooks == nil { next.rewardedBooks = [] }
-                next.rewardedBooks?.insert(book.id)
-                next.doubloons = (next.doubloons ?? 0) + 1
-            }
         }
-        return awarded
+        return false
     }
     func setLearningLevel(_ level: LearningLevel?) async throws {
         try await commit { $0.selectedLearningLevel = level }
     }
-    func reset() async throws { try await commit { $0 = .init() } }
+    func spendChatCoin() async throws {
+        guard (snapshot.doubloons ?? 0) > 0 else {
+            throw AppFailure.unavailable("Complete another story to earn a doubloon for a new chat.")
+        }
+        try await commit { $0.doubloons = ($0.doubloons ?? 0) - 1 }
+    }
+    func installThemePack(_ pack: ThemePack) async throws {
+        if snapshot.hasInstalled(pack) { return }
+        guard snapshot.earnedThemePacks.contains(pack) else {
+            throw AppFailure.unavailable("This theme gift hasn’t been earned yet.")
+        }
+        try await commit {
+            if $0.installedThemePacks == nil { $0.installedThemePacks = [] }
+            $0.installedThemePacks?.insert(pack.rawValue)
+        }
+    }
+    func reset() async throws {
+        try await commit {
+            let earnedStreak = $0.earnedStreakTheme
+            let celebratedStreak = $0.celebratedStreakTheme
+            let installed = $0.installedThemePacks
+            $0 = .init()
+            $0.installedThemePacks = installed
+            $0.earnedStreakTheme = earnedStreak
+            $0.celebratedStreakTheme = celebratedStreak
+        }
+    }
 }

@@ -21,11 +21,12 @@ struct ChatView: View {
                             Text("A little Spanish. A conversation of your own.").font(.subheadline).foregroundStyle(theme.theme.muted)
                         }
                     }
+                    Text(model.sessionMessage).font(.subheadline).foregroundStyle(theme.theme.accent)
                     if !model.feature.ready {
                         if model.feature.preparing || model.preparationError == nil {
                             ProgressView("Preparing chat…")
                         } else {
-                            Text("Chat couldn’t load. Your saved conversation hasn’t been changed.")
+                            Text("Chat couldn’t load. Please try again.")
                             Button("Try again") { Task { await model.prepare() } }
                         }
                     } else if model.unlocked {
@@ -53,20 +54,15 @@ struct ChatView: View {
                                 }
                             }.disabled(model.sending)
                         }
-                        Text("AI can make mistakes. Conversations stay on this device. Your storyteller remembers a short summary and recent messages.")
+                        Text("AI can make mistakes. This topic stays on your device while the screen is open. Your storyteller remembers a short summary and recent messages.")
                             .font(.caption).foregroundStyle(theme.theme.muted)
                     } else {
-                        ChatPaywallView(model: model)
-                    }
-                    if !model.unlocked {
-                        Button(model.purchasing ? "Checking purchase…" : "Restore chat purchase") {
-                            Task { await model.restore() }
-                        }.disabled(model.purchasing)
+                        ChatPaywallView()
                     }
                     if let unavailable = model.feature.unavailable {
                         Text(unavailable).foregroundStyle(theme.theme.muted)
                         Button("Check again") { Task { await model.prepare() } }
-                            .disabled(model.feature.preparing || model.purchasing)
+                            .disabled(model.feature.preparing)
                     }
                     if let notice = model.notice { Text(notice).foregroundStyle(theme.theme.accent) }
                     InlineError(message: model.preparationError)
@@ -101,13 +97,14 @@ struct ChatView: View {
                 }
             }
         }
-        .confirmationDialog("Delete this conversation and start again?", isPresented: $model.confirmingClear, titleVisibility: .visible) {
-            Button("Delete conversation", role: .destructive) { Task { await model.clear() } }
+        .confirmationDialog("Start a new topic? This ends the current session. The next topic costs 1 doubloon.", isPresented: $model.confirmingClear, titleVisibility: .visible) {
+            Button("Start new topic", role: .destructive) { Task { await model.clear() } }
         }
-        .onDisappear { model.cancel() }
+        .onDisappear { model.endSession() }
         .onChange(of: model.unlocked) { _, access in if !access { model.cancel() } }
         .onChange(of: scenePhase) { _, phase in
-            if phase != .active { model.cancel() }
+            if phase == .background { model.endSession() }
+            else if phase != .active { model.cancel() }
             else { Task { await model.prepare() } }
         }
     }

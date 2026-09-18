@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    let onWrite: () -> Void
+    let onWrite: (() -> Void)?
     @State private var viewModel = HomeViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -12,8 +12,14 @@ struct HomeView: View {
                 StreakBar(days: viewModel.week)
                 Divider()
                 if !viewModel.dailyReads.isEmpty {
-                    Text("Today’s books")
-                        .font(.system(.title2, design: .serif, weight: .medium))
+                    HStack {
+                        if viewModel.dailyReadsCompleted {
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.theme.accent)
+                        }
+                        Text("Today’s books")
+                    }.font(.system(.title2, design: .serif, weight: .medium))
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(viewModel.dailyReadsCompleted ? "Today’s books, completed" : "Today’s books")
                     ScrollView(.horizontal) {
                         HStack(spacing: 16) {
                             HStack(spacing: 16) {
@@ -51,7 +57,9 @@ struct HomeView: View {
                                 }
                             }.scrollTargetLayout()
                             // Outside the book targets: scrolling here never selects a fourth book.
-                            TomorrowFooter()
+                            if viewModel.showTomorrowFooter {
+                                TomorrowFooter()
+                            }
                         }
                     }
                     .contentMargins(.horizontal, 23, for: .scrollContent)
@@ -68,12 +76,29 @@ struct HomeView: View {
                                 AuthorView(author: book.storyteller)
                             } label: {
                                 AuthorPortrait(author: book.storyteller, size: 76)
+                                    .overlay(alignment: .bottomTrailing) {
+                                        if viewModel.completed(book) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .symbolRenderingMode(.palette)
+                                                .foregroundStyle(theme.theme.onAccent, theme.theme.accent)
+                                                .font(.system(size: 28))
+                                                .background(theme.theme.paper, in: Circle())
+                                                .accessibilityHidden(true)
+                                        }
+                                    }
                             }
                             .buttonStyle(.plain)
                             .accessibilityLabel("About \(book.storytellerName)")
                             VStack(alignment: .leading, spacing: 6) {
-                                Text(book.title).font(.title2.weight(.semibold))
-                                    .fixedSize(horizontal: false, vertical: true)
+                                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                    if viewModel.completed(book) {
+                                        Image(systemName: "checkmark").foregroundStyle(theme.theme.accent)
+                                            .accessibilityHidden(true)
+                                    }
+                                    Text(book.title).fixedSize(horizontal: false, vertical: true)
+                                }.font(.title2.weight(.semibold))
+                                    .accessibilityElement(children: .ignore)
+                                    .accessibilityLabel(book.title + (viewModel.completed(book) ? ", completed" : ""))
                                 Text(book.englishTitle).font(.subheadline)
                                     .foregroundStyle(theme.theme.muted)
                                     .fixedSize(horizontal: false, vertical: true)
@@ -85,24 +110,31 @@ struct HomeView: View {
                             .font(.caption).foregroundStyle(theme.theme.muted)
                         Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
                         Button {
-                            viewModel.selectedBook = book
+                            Task { await viewModel.performReadingAction() }
                         } label: {
                             HStack {
                                 Text(viewModel.readButtonTitle)
                                 Image(systemName: "arrow.right")
                             }
                             .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
-                            .foregroundStyle(theme.theme.onAccent)
-                            .background(theme.theme.accent, in: RoundedRectangle(cornerRadius: 18))
-                        }.buttonStyle(.plain)
+                            .foregroundStyle(viewModel.dailyReadsCompleted ? theme.theme.accent : theme.theme.onAccent)
+                            .background(viewModel.dailyReadsCompleted ? Color.clear : theme.theme.accent, in: RoundedRectangle(cornerRadius: 18))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 18)
+                                    .strokeBorder(theme.theme.accent, lineWidth: viewModel.dailyReadsCompleted ? 1.5 : 0)
+                            }
+                        }.buttonStyle(.plain).disabled(viewModel.preparingDailyReads)
                     }
                 } else {
                     Text("New stories will appear here as the library grows.")
                         .foregroundStyle(theme.theme.muted)
                 }
+                if let notice = viewModel.dailyReadingNotice {
+                    Text(notice).font(.caption).foregroundStyle(theme.theme.muted)
+                }
                 if let error = viewModel.dailyReadingError {
                     Text(error).font(.caption).foregroundStyle(theme.theme.muted)
-                    Button("Retry") { Task { await viewModel.prepareDailyReads() } }
+                    Button("Retry") { Task { await viewModel.retryDailyReads() } }.disabled(viewModel.preparingDailyReads)
                 }
                 if viewModel.revisiting {
                     Text("A fresh look at your collection. Your reading progress is safely kept.")
