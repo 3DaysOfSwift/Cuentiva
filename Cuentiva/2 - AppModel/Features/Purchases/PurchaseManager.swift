@@ -13,6 +13,10 @@ enum LibraryPlan: String, CaseIterable, Identifiable, Sendable {
 
 /// Only verified transactions reach this policy; renewal cancellation alone is not expiry.
 enum LibraryAccess {
+    static func shouldPromoteAnnual(total: Int, isNew: Bool, monthlyOnly: Bool, checking: Bool, saves: Bool) -> Bool {
+        isNew && total > 0 && total.isMultiple(of: 10) && monthlyOnly && !checking && saves
+    }
+
     static func isActive(expiration: Date?, revoked: Bool, upgraded: Bool, lifetime: Bool, now: Date = .now) -> Bool {
         guard !revoked, !upgraded else { return false }
         if lifetime { return true }
@@ -25,6 +29,7 @@ enum LibraryAccess {
     var hasAccess: Bool { get }
     var checking: Bool { get }
     var offers: [Product] { get }
+    var isMonthlySubscriber: Bool { get }
     var message: String? { get }
     func hasOneWeekTrial(for plan: LibraryPlan) -> Bool
     func refresh() async
@@ -32,6 +37,11 @@ enum LibraryAccess {
     func restore() async throws
 }
 extension PurchaseFeature {
+    var isMonthlySubscriber: Bool { false }
+    func shouldPromoteAnnual(_ receipt: CompletionReceipt) -> Bool {
+        LibraryAccess.shouldPromoteAnnual(total: receipt.total, isNew: receipt.isNew,
+            monthlyOnly: hasAccess && isMonthlySubscriber, checking: checking, saves: annualPlanSaves)
+    }
     func hasOneWeekTrial(for plan: LibraryPlan) -> Bool { false }
 
     func offer(for plan: LibraryPlan) -> Product? {
@@ -40,7 +50,8 @@ extension PurchaseFeature {
 
     var annualPlanSaves: Bool {
         guard let monthly = offer(for: .monthly), let annual = offer(for: .annual) else { return false }
-        return annual.price < monthly.price * 12
+        return annual.priceFormatStyle.currencyCode == monthly.priceFormatStyle.currencyCode
+            && annual.price < monthly.price * 12
     }
 }
 
@@ -48,6 +59,7 @@ extension PurchaseFeature {
     static let legacyLifetimeProductID = "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime"
     private let entitlementProductIDs = Set(LibraryPlan.allCases.map(\.productID) + [PurchaseManager.legacyLifetimeProductID])
     private var expirationTask: Task<Void, Never>?
+    private(set) var isMonthlySubscriber = false
     private(set) var hasAccess = false
     private(set) var checking = true
     private(set) var offers: [Product] = []
@@ -172,6 +184,8 @@ extension PurchaseFeature {
         // A purchase, revocation, or newer scan supersedes an in-flight snapshot.
         guard revision == entitlementRevision else { return }
         hasAccess = active
+        let activeIDs = Set(verified.values.filter { isActive($0) }.map(\.productID))
+        isMonthlySubscriber = activeIDs == [LibraryPlan.monthly.productID]
         scheduleExpirationCheck(at: expiry)
         verificationFailure = active ? nil : failedVerification
         logger.info("Entitlement check finished; access: \(active), verification failure: \(failedVerification != nil)")

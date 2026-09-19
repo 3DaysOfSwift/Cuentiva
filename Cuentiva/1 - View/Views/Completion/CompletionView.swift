@@ -12,7 +12,7 @@ struct CompletionView: View {
     init(receipt: CompletionReceipt) {
         self.receipt = receipt
         // Seed the previous total before the first rendered frame, not in onAppear.
-        _viewModel = State(initialValue: CompletionViewModel(receipt: receipt))
+        _viewModel = State(initialValue: CompletionViewModel(receipt: receipt, purchases: AppModel.shared.purchases))
     }
     var body: some View {
         ScrollView {
@@ -75,6 +75,24 @@ struct CompletionView: View {
                         Button("Your turn · read it in Spanish") { viewModel.showingPractice = true }
                         Button("Finish for today") { dismiss() }
                     }
+                }
+                if viewModel.showsAnnualOffer(receipt) {
+                    VStack(spacing: 14) {
+                        Text("Keep your story going. Spend less.")
+                            .font(.system(.title2, design: .serif, weight: .medium))
+                        Text("You’ve read \(receipt.total) books! Save on a year of reading with the annual plan.")
+                        Text("\(viewModel.annualPrice) per year, billed yearly, instead of \(viewModel.monthlyPrice) per month.")
+                            .font(.headline)
+                        Text("Ahorra con el plan anual")
+                            .font(.subheadline).foregroundStyle(theme.theme.accent)
+                        if let url = URL(string: "https://apps.apple.com/account/subscriptions") {
+                            Link("Switch to annual and save", destination: url).buttonStyle(PrimaryButton())
+                        }
+                        Text("Choose Cuentiva’s annual plan in Apple’s subscription settings. Apple shows the price and when the change takes effect before you confirm.")
+                            .font(.caption).foregroundStyle(theme.theme.muted)
+                        Button("Keep monthly for now") { viewModel.annualOfferDismissed = true }
+                    }.multilineTextAlignment(.center).padding(20)
+                        .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
                 }
                 BookDetailsView(book: receipt.book, completed: true)
             }.padding(28).frame(maxWidth: .infinity)

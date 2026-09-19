@@ -2,6 +2,13 @@ import Foundation
 import Observation
 
 @MainActor @Observable final class CompletionViewModel {
+    private let purchases: (any PurchaseFeature)?
+    var annualOfferDismissed = false
+    func showsAnnualOffer(_ receipt: CompletionReceipt) -> Bool {
+        !annualOfferDismissed && purchases?.shouldPromoteAnnual(receipt) == true
+    }
+    var annualPrice: String { purchases?.offer(for: .annual)?.displayPrice ?? "" }
+    var monthlyPrice: String { purchases?.offer(for: .monthly)?.displayPrice ?? "" }
     private(set) var displayedTotal = 0
     private(set) var hasCelebrated = false
     var showingChat = false
@@ -31,12 +38,14 @@ import Observation
     }
     private var preparedReceiptID: UUID?
 
-    init(receipt: CompletionReceipt? = nil) {
+    init(receipt: CompletionReceipt? = nil, purchases: (any PurchaseFeature)? = nil) {
+        self.purchases = purchases
         if let receipt { prepare(receipt) }
     }
     func prepare(_ receipt: CompletionReceipt) {
         guard preparedReceiptID != receipt.id else { return }
         preparedReceiptID = receipt.id
+        annualOfferDismissed = false
         hasCelebrated = false
         reviewRequested = false
         writingMilestonePresented = false

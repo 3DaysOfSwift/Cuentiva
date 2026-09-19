@@ -72,3 +72,9 @@ Validation: 124 model tests and three content-pack tests passed. The bundled-con
 Author queries now include the already-loaded free introduction when paid access is unavailable. The author and other query filters still apply; general library searches and daily recommendations remain locked. Loading the introduction invalidates previously empty profile results. No paid catalogue loading is triggered.
 
 Validation: 125 model tests passed, including querying Pipa before/after introduction loading, excluding another author, and retaining paid-library gates.
+
+## Annual savings at reading milestones — 19 September 2026
+
+New completions at totals 10, 20, 30 and every further multiple of ten show an annual-plan card to verified monthly-only subscribers. Annual/lifetime access, entitlement checking, rereads, unavailable prices, mismatched currencies and no savings suppress the offer. The card uses StoreKit-localized monthly and yearly prices, says the annual price is billed yearly, and opens Apple’s subscription management for confirmation. It never purchases automatically or claims a new trial. Keep monthly for now dismisses the card for that completion. Existing gifts and completion navigation are preserved.
+
+126 model tests passed, including milestone boundaries and exclusion rules. StoreKit integration coverage now checks monthly/annual identification, dismissal and the next milestone; those iOS runtime tests still need execution in a working simulator. Same-group, same-level monthly and annual products must be configured in App Store Connect.

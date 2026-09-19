@@ -7,6 +7,16 @@ import Testing
 #endif
 
 @Suite @MainActor struct ProductConfigurationTests {
+    @Test(arguments: [0, 1, 9, 10, 11, 20, 30, 40, 50, 100, 110])
+    func annualOfferOnlyAtNewTenBookMilestones(total: Int) {
+        let eligible = LibraryAccess.shouldPromoteAnnual(total: total, isNew: true, monthlyOnly: true, checking: false, saves: true)
+        #expect(eligible == (total > 0 && total.isMultiple(of: 10)))
+        #expect(!LibraryAccess.shouldPromoteAnnual(total: total, isNew: false, monthlyOnly: true, checking: false, saves: true))
+        #expect(!LibraryAccess.shouldPromoteAnnual(total: total, isNew: true, monthlyOnly: false, checking: false, saves: true))
+        #expect(!LibraryAccess.shouldPromoteAnnual(total: total, isNew: true, monthlyOnly: true, checking: true, saves: true))
+        #expect(!LibraryAccess.shouldPromoteAnnual(total: total, isNew: true, monthlyOnly: true, checking: false, saves: false))
+    }
+
     @Test func twoSubscriptionsShareOneGroup() throws {
         let directory = TestResources.repositoryRoot
             .appending(path: "Cuentiva/3 - App Resources")
