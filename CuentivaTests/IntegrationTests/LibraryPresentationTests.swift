@@ -4,7 +4,9 @@ import Testing
 
 @Suite @MainActor struct LibraryPresentationTests {
     @Test func homeAndCollectionReflectCommittedCompletion() async throws {
-        let (p,s,l,_,_) = try await makeViewModelTestGraph(); p.hasAccess = true
+        let (p,s,l,_,_) = try await makeViewModelTestGraph()
+        p.hasAccess = true
+        try await l.load()
         let home = HomeViewModel(library: l, progress: s), collection = CompletedViewModel(library: l)
         await home.refresh(); await collection.refresh()
         #expect(home.books.count == 1); #expect(collection.books.isEmpty)

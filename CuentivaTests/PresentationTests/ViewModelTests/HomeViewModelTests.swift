@@ -7,6 +7,7 @@ import Testing
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: (0..<3).map { sample("carousel-\($0)") }), purchases: purchases, progress: progress)
+        try await progress.load()
         try await library.load()
         let home = HomeViewModel(library: library, progress: progress)
         await home.prepareDailyReads()

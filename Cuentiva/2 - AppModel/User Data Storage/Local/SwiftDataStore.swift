@@ -61,6 +61,16 @@ enum RecordCoding {
         guard records.contains(where: { $0.key == "__ready" }) else { return nil }
         return Dictionary(uniqueKeysWithValues: records.filter { $0.key != "__ready" }.map { ($0.key, $0.payload) })
     }
+    func removeCollection(_ collection: String) throws {
+        modelContext.autosaveEnabled = false
+        do {
+            for record in try fetch(collection) { modelContext.delete(record) }
+            if modelContext.hasChanges { try commit() }
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
+    }
     @discardableResult func replace(_ collection: String, values: [String: Data], onlyIfAbsent: Bool = false) throws
         -> [String: Data]
     {
@@ -133,11 +143,17 @@ private actor StoreOpener {
     func open(at url: URL) throws -> DatabaseWorker {
         try FileManager.default.createDirectory(
             at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let started = ContinuousClock.now
         let schema = Schema(versionedSchema: CuentivaStoreSchema.self)
         let configuration = ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
+        let schemaFinished = ContinuousClock.now
         let container = try ModelContainer(
             for: schema, migrationPlan: CuentivaStoreMigrationPlan.self, configurations: [configuration])
-        return DatabaseWorker(modelContainer: container)
+        let containerFinished = ContinuousClock.now
+        let worker = DatabaseWorker(modelContainer: container)
+        Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
+            .info("SwiftData opening: schema/configuration \(String(describing: started.duration(to: schemaFinished)), privacy: .public); container \(String(describing: schemaFinished.duration(to: containerFinished)), privacy: .public); worker \(String(describing: containerFinished.duration(to: .now)), privacy: .public)")
+        return worker
     }
 }
 
@@ -159,7 +175,25 @@ actor SwiftDataStore {
     #if DEBUG
         func failNextCommitForTesting() async throws { try await worker().failNextCommitForTesting() }
     #endif
-    func read(_ collection: String) async throws -> [String: Data]? { try await worker().read(collection) }
+    /// An absent store means no saved records. A fresh read must not create a DB.
+    /// Once opening has begun, await that shared operation instead of guessing.
+    func readIfPresent(_ collection: String) async throws -> [String: Data]? {
+        guard opening != nil || FileManager.default.fileExists(atPath: url.path) else { return nil }
+        return try await read(collection)
+    }
+    func removeCollection(_ collection: String) async throws {
+        guard opening != nil || FileManager.default.fileExists(atPath: url.path) else { return }
+        try await worker().removeCollection(collection)
+    }
+    func read(_ collection: String) async throws -> [String: Data]? {
+        let started = ContinuousClock.now
+        let database = try await worker()
+        let opened = ContinuousClock.now
+        let rows = try await database.read(collection)
+        Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
+            .info("Storage read \(collection, privacy: .public): opening wait \(String(describing: started.duration(to: opened)), privacy: .public); fetch including actor wait \(String(describing: opened.duration(to: .now)), privacy: .public)")
+        return rows
+    }
     @discardableResult func replace(_ collection: String, values: [String: Data], onlyIfAbsent: Bool = false)
         async throws -> [String: Data]
     {

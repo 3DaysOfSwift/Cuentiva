@@ -28,6 +28,7 @@ import Observation
         didSet { revision = UUID() }
     }
     private(set) var loaded = false
+    @ObservationIgnored private var loadingTask: Task<Void, Error>?
     @ObservationIgnored private var saving = false
     @ObservationIgnored private var waitingSaves: [CheckedContinuation<Void, Never>] = []
 
@@ -82,13 +83,19 @@ import Observation
                 today: calendar.isDate(date, inSameDayAs: today))
         }
     }
+    /// Launch and member activation share one read. Cancelling a caller does
+    /// not cancel the feature's read or leave another caller without progress.
     func load() async throws {
         if loaded { return }
-        let value = try await repository.load()
-        if !loaded {
+        if let loadingTask { return try await loadingTask.value }
+        let task = Task {
+            defer { loadingTask = nil }
+            let value = try await repository.load()
             snapshot = value
             loaded = true
         }
+        loadingTask = task
+        try await task.value
     }
     @discardableResult
     private func commit<Value>(_ update: (inout LearnerProgress) throws -> Value) async throws -> Value {

@@ -13,6 +13,7 @@ import Testing
         await store.setFailure(true)
         let progress = ProgressManager(repository: store)
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
+        try await progress.load()
         try await library.load()
         #expect(await library.dailyReads.count == 1)
         #expect(await library.discover(level: nil, format: nil).count == 1)
@@ -26,6 +27,7 @@ import Testing
         let progress = ProgressManager(repository: MemoryProgress(), now: { clock.date })
         let library = LibraryManager(repository: MemoryBooks(values: (0..<8).map { sample("cache-\($0)") }),
             purchases: purchases, progress: progress, now: { clock.date })
+        try await progress.load()
         try await library.load()
         let initial = await library.discover(level: nil, format: nil)
         for _ in 0..<10 {
@@ -49,6 +51,7 @@ import Testing
         let books = (0..<6).map { sample("daily-\($0)") }
         let source = MemoryBooks(values: books)
         let library = LibraryManager(repository: source, purchases: purchases, progress: progress, now: { clock.date })
+        try await progress.load()
         try await library.load()
         try await library.prepareDailyReads()
         let original = await library.dailyReads
@@ -60,6 +63,7 @@ import Testing
         }
         let reloadedProgress = ProgressManager(repository: store, now: { clock.date })
         let reloaded = LibraryManager(repository: source, purchases: purchases, progress: reloadedProgress, now: { clock.date })
+        try await reloadedProgress.load()
         try await reloaded.load(); try await reloaded.prepareDailyReads()
         #expect(await reloaded.dailyReads.map(\.id) == original.map(\.id))
         clock.date = try #require(Calendar.current.date(byAdding: .day, value: 1, to: clock.date))
@@ -73,6 +77,7 @@ import Testing
         let progress = ProgressManager(repository: store, now: { clock.date }, calendar: calendar)
         let old = sample("old"), ongoing = sample("ongoing"), fresh = sample("fresh")
         let first = LibraryManager(repository: MemoryBooks(values: [old, ongoing]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
+        try await progress.load()
         try await first.load()
         try await first.prepareDailyReads()
         try await progress.recordEncounter(book: old, sentence: old.sentences[0])
@@ -102,6 +107,7 @@ import Testing
         let progress = ProgressManager(repository: MemoryProgress(), now: { clock.date }, calendar: calendar)
         let books = (0..<6).map { sample("book-\($0)") }
         let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
+        try await progress.load()
         try await library.load()
         clock.date = try #require(calendar.date(byAdding: .year, value: 1, to: clock.date))
         let today = Set(await library.dailyReads.map(\.id))
@@ -116,6 +122,7 @@ import Testing
         let store = MemoryProgress(), progress = ProgressManager(repository: store, now: { clock.date })
         let book = sample()
         let library = LibraryManager(repository: MemoryBooks(values: [book]), purchases: purchases, progress: progress, now: { clock.date })
+        try await progress.load()
         try await library.load(); try await progress.recordEncounter(book: book, sentence: book.sentences[0])
         _ = try await progress.complete(book: book)
         try await progress.setVocabulary("café", state: .known)

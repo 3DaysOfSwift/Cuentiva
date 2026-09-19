@@ -60,6 +60,7 @@ import Testing
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: PersonalLibraryCatalogue(), purchases: purchases, progress: progress, personalLibrary: fantasy)
+        try await progress.load()
         try await library.load()
         let book = try await fantasy.publish(story)
         #expect(await library.discover(level: nil, format: nil).first?.id == book.id)

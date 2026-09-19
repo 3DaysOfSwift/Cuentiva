@@ -50,6 +50,41 @@ private actor GatedProgressRepository: ProgressRepository {
         }
     }
 
+    @Test(arguments: [false, true])
+    func progressLoadIsSharedAndFailureCanRetry(failFirst: Bool) async throws {
+        let repository = ProgressReadGate()
+        let progress = ProgressManager(repository: repository)
+        let first = Task { try await progress.load() }
+        defer { repository.finish(); first.cancel() }
+        try await waitUntil { repository.pending != nil }
+        var secondEntered = false
+        let second = Task { secondEntered = true; try await progress.load() }
+        defer { second.cancel() }
+        try await waitUntil { secondEntered }
+        #expect(repository.reads == 1)
+        first.cancel()
+        repository.finish(failing: failFirst)
+        if failFirst {
+            await #expect(throws: AppFailure.self) { try await first.value }
+            await #expect(throws: AppFailure.self) { try await second.value }
+            #expect(!progress.loaded)
+            let retry = Task { try await progress.load() }
+            defer { repository.finish(); retry.cancel() }
+            try await waitUntil { repository.pending != nil }
+            repository.finish()
+            try await retry.value
+            #expect(repository.reads == 2)
+        } else {
+            try await first.value
+            try await second.value
+        }
+        #expect(progress.loaded)
+        #expect(progress.snapshot.completed == ["cafe"])
+        let reads = repository.reads
+        try await progress.load()
+        #expect(repository.reads == reads)
+    }
+
     @Test func purchaseRefreshWaitersShareTheWholeOperationAndRetryAfterFailure() async throws {
         let gate = PurchaseRefreshGate()
         let purchases = PurchaseManager(readEntitlements: {
@@ -91,6 +126,7 @@ private actor GatedProgressRepository: ProgressRepository {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample(), sample("two")]), purchases: purchases, progress: progress)
+        try await progress.load()
         try await library.load()
         let initial = library.revision
         #expect(library.revision == initial)
@@ -117,6 +153,7 @@ private actor GatedProgressRepository: ProgressRepository {
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress,
             personalLibrary: personal)
+        try await progress.load()
         try await library.load()
         let before = library.revision
         _ = library.revision
@@ -336,4 +373,24 @@ private actor ImmediateChatGenerator: ChatGenerator {
     var libraryContent = PersonalLibraryContent()
     var legacyGetterCalls = 0
     var publishedBooks: [Book] { legacyGetterCalls += 1; return libraryContent.preparedBooks() }
+}
+
+@MainActor private final class ProgressReadGate: ProgressRepository {
+    var reads = 0
+    var pending: CheckedContinuation<LearnerProgress, Error>?
+    func load() async throws -> LearnerProgress {
+        reads += 1
+        return try await withCheckedThrowingContinuation { pending = $0 }
+    }
+    func save(_ value: LearnerProgress) async throws {}
+    func finish(failing: Bool = false) {
+        let continuation = pending
+        pending = nil
+        if failing { continuation?.resume(throwing: AppFailure.unavailable("Read failed")) }
+        else {
+            var value = LearnerProgress()
+            value.completed.insert("cafe")
+            continuation?.resume(returning: value)
+        }
+    }
 }

@@ -14,6 +14,7 @@ import Testing
         let purchases = TestPurchases(); purchases.hasAccess = true
         let books = (0..<bookCount).map { sample("extra-\($0)") }
         let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress)
+        try await progress.load()
         try await library.load()
         try await library.prepareDailyReads()
         let original = await library.dailyReads
@@ -47,6 +48,7 @@ import Testing
         #expect(progress.snapshot.vocabulary == before.vocabulary)
         let restoredProgress = ProgressManager(repository: repository)
         let restoredLibrary = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: restoredProgress)
+        try await restoredProgress.load()
         try await restoredLibrary.load()
         #expect(await restoredLibrary.dailyReads.map(\.id) == nextIDs)
         purchases.hasAccess = false

@@ -1,6 +1,8 @@
 import Foundation
+import OSLog
 
 actor BundledBookRepository: BookRepository {
+    private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
     private let url: URL?
     private let introductionURL: URL?
     init(url: URL? = Bundle.main.url(forResource: "Library", withExtension: "dat"),
@@ -10,19 +12,27 @@ actor BundledBookRepository: BookRepository {
     }
     func introduction() async throws -> Book {
         guard let introductionURL else { throw AppFailure.invalidBook }
+        let started = ContinuousClock.now
         let library = try BinaryLibrary(url: introductionURL)
+        let readFinished = ContinuousClock.now
         let book = try library.book(at: 0)
+        logger.info("Introduction DAT: read/header \(String(describing: started.duration(to: readFinished)), privacy: .public); book construction \(String(describing: readFinished.duration(to: .now)), privacy: .public)")
         guard library.count == 1, book.id == "cafe" else { throw AppFailure.invalidBook }
         return book
     }
     func books() throws -> [Book] {
         guard let url else { throw AppFailure.invalidBook }
-        let books = try BinaryLibrary(url: url).books()
+        let started = ContinuousClock.now
+        let library = try BinaryLibrary(url: url)
+        let readFinished = ContinuousClock.now
+        let books = try library.books()
+        let constructionFinished = ContinuousClock.now
         guard Set(books.map(\.id)).count == books.count,
             books.allSatisfy({
                 !$0.sentences.isEmpty && Set($0.fullText.map(\.id)).count == $0.fullText.count
                     && $0.fullText.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty }
             }) else { throw AppFailure.invalidBook }
+        logger.info("Library DAT: read/header \(String(describing: started.duration(to: readFinished)), privacy: .public); book construction \(String(describing: readFinished.duration(to: constructionFinished)), privacy: .public); validation \(String(describing: constructionFinished.duration(to: .now)), privacy: .public)")
         return books
     }
 }
@@ -30,32 +40,50 @@ actor LocalProgressRepository: ProgressRepository {
     private let url: URL
     private let store: SwiftDataStore
     private var savedProgress: LearnerProgress?
+    private var hasStoredProgress = false
     init(url: URL, store: SwiftDataStore) {
         self.url = url
         self.store = store
     }
     func load() async throws -> LearnerProgress {
-        if let rows = try await store.read("progress") { return try remember(rows) }
-        let legacy =
-            FileManager.default.fileExists(atPath: url.path)
-            ? try JSONDecoder().decode(LearnerProgress.self, from: Data(contentsOf: url)) : LearnerProgress()
+        let started = ContinuousClock.now
+        defer {
+            Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
+                .info("Progress load including storage wait: \(String(describing: started.duration(to: .now)), privacy: .public)")
+        }
+        if let rows = try await store.readIfPresent("progress") { return try remember(rows) }
+        guard FileManager.default.fileExists(atPath: url.path) else {
+            let empty = LearnerProgress()
+            savedProgress = empty
+            return empty
+        }
+        let legacy = try JSONDecoder().decode(LearnerProgress.self, from: Data(contentsOf: url))
         guard legacy.schemaVersion == 1 else {
             throw AppFailure.unavailable("This progress file was created by a newer version of Cuentiva.")
         }
+        let seedStarted = ContinuousClock.now
         let rows = try await store.replace("progress", values: ProgressRecords.encode(legacy), onlyIfAbsent: true)
+        Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
+            .info("Initial progress preparation/save: \(String(describing: seedStarted.duration(to: .now)), privacy: .public)")
         return try remember(rows)
     }
     func save(_ progress: LearnerProgress) async throws {
         guard progress.schemaVersion == 1 else { throw AppFailure.unavailable("Unsupported progress version.") }
         if savedProgress == nil { _ = try await load() }
-        let changes = try ProgressRecords.changes(progress, previous: savedProgress)
-        try await store.apply("progress", changes: changes)
+        if hasStoredProgress {
+            let changes = try ProgressRecords.changes(progress, previous: savedProgress)
+            try await store.apply("progress", changes: changes)
+        } else {
+            try await store.replace("progress", values: ProgressRecords.encode(progress))
+            hasStoredProgress = true
+        }
         savedProgress = progress
     }
     private func remember(_ rows: [String: Data]) throws -> LearnerProgress {
         let value = try ProgressRecords.decode(rows)
         LegacyJSONCleanup.remove([url])
         savedProgress = value
+        hasStoredProgress = true
         return value
     }
 }

@@ -7,7 +7,7 @@ import Observation
     var writingUnlocked: Bool { progress.snapshot.writingUnlocked }
     private let purchases: any PurchaseFeature
     private let library: any LibraryFeature
-    private var loading = false
+    @ObservationIgnored private var loadingTask: Task<Void, Never>?
     private var hasEnteredBackground = false
     private var starting = false
     private var lastAutomaticSync: Date?
@@ -38,17 +38,19 @@ import Observation
         guard !starting else { return }
         starting = true
         defer { starting = false }
-        async let access: Void = refreshPurchases()
-        await loadIntroduction()
-        await load()
-        await access
+        async let onboarding: Void = loadIntroduction()
+        await refreshPurchases()
+        if hasAccess && !checkingAccess { await load() }
+        await onboarding
         await syncLibrary()
     }
 
     private func loadIntroduction() async {
         let started = Date()
         do {
-            try await library.loadIntroduction()
+            async let introduction: Void = library.loadIntroduction()
+            try await progress.load()
+            try await introduction
             onboardingReady = true
             logger.info("Onboarding ready in \(Date().timeIntervalSince(started), privacy: .public) seconds")
         } catch { self.error = error.localizedDescription }
@@ -60,15 +62,21 @@ import Observation
         // The first active event belongs to start(), not a second launch check.
         guard hasEnteredBackground else { return }
         hasEnteredBackground = false
-        async let access: Void = refreshPurchases()
-        async let catalogue: Void = syncLibrary()
-        _ = await (access, catalogue)
+        await refreshPurchases()
+        await accessChanged()
     }
 
     var checkingAccess: Bool { purchases.checking }
     func refreshPurchases() async { await purchases.refresh() }
+    /// Also handles a purchase/restore made while onboarding is visible.
+    func accessChanged() async {
+        guard !checkingAccess else { return }
+        guard hasAccess else { ready = false; showingStoryteller = false; return }
+        await load()
+        await syncLibrary()
+    }
     func syncLibrary() async {
-        guard ready, !library.syncing else { return }
+        guard hasAccess, !checkingAccess, ready, !library.syncing else { return }
         // Initial appearance and scene activation can arrive together. Automatic
         // checks are coalesced; Settings still offers an explicit retry.
         let now = Date()
@@ -77,16 +85,31 @@ import Observation
         await library.sync()
     }
     func load() async {
-        guard !loading, !ready else { return }
-        loading = true
-        defer { loading = false }
+        guard hasAccess, !checkingAccess else { return }
+        if let loadingTask { await loadingTask.value; return }
+        guard !ready else { return }
+        // This view model owns the read. SwiftUI may cancel an access-change
+        // task while another caller still needs the same pending result.
+        let task = Task {
+            defer { loadingTask = nil }
+            await loadMemberContent()
+        }
+        loadingTask = task
+        await task.value
+    }
+
+    private func loadMemberContent() async {
         error = nil
         let started = Date()
         logger.info("Local library load started")
         do {
-            // Library.load owns progress loading. No StoreKit or network request
-            // participates in the first local-content render.
-            try await library.load()
+            // Core content is read only after confirmed access. Mutable progress
+            // loads independently; the UI must not present invented zero counts.
+            async let catalogue: Void = library.load()
+            try await progress.load()
+            try await catalogue
+            try Task.checkCancellation()
+            guard hasAccess, !checkingAccess else { return }
             ready = true
             logger.info(
                 "Local library ready in \(Date().timeIntervalSince(started), privacy: .public) seconds; purchase check pending: \(self.purchases.checking, privacy: .public)"
@@ -94,6 +117,7 @@ import Observation
             if !checkedIntroduction {
                 do {
                     try await fantasy.load()
+                    guard hasAccess, !checkingAccess else { return }
                     showingStoryteller = writingUnlocked && !fantasy.introductionSeen
                     checkedIntroduction = true
                 } catch { /* Profile storage must never block library access. Write offers a retry. */  }

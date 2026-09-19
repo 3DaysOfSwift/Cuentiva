@@ -29,9 +29,9 @@ real stories with different IDs; shared text is deduplicated, so this is not a
 size prediction for 500 unique stories. Raw first-sample, median and p95 outputs
 are in `results-52.txt` and `results-500.txt`.
 
-A separate optimized real-repository test measured approximately 9 ms for a new
+Before the core-store refactor, an optimized real-repository test measured about 9 ms for a new
 database open plus DAT loading, 38 ms for the catalogue import and 17 ms for
-reading the stored catalogue. This is one isolated process/sample; see
+reading the stored catalogue. This historical path is no longer used. See
 `results-storage.txt`. It demonstrates work removed from first display, not the
 cause of the historic multi-second launch delay. StoreKit, progress loading,
 UI rendering and the real device still need end-to-end timing.
@@ -49,7 +49,7 @@ python3 diagnostics/library-loading/make_scaling_fixture.py /tmp/cuentiva-scalin
 bash diagnostics/library-loading/benchmark.sh \
   /tmp/cuentiva-scaling/Books.json /tmp/cuentiva-scaling/Library.dat
 
-swift test -c release --filter BinaryLibraryTests/realLibraryPersistsAndReloadsWithSeparatePhaseTimings
+swift test -c release --filter BinaryLibraryTests/realLibraryLoadsWithoutOpeningOrWritingAnyDatabase
 ```
 
 ## Shipping flow
@@ -60,16 +60,17 @@ swift test -c release --filter BinaryLibraryTests/realLibraryPersistsAndReloadsW
   the test bundle for equality checks, not into the installed app.
 - Run `python3 scripts/build_library_dat.py` to refresh the committed binary
   fixtures used by package tests/benchmarks. `scripts/verify.sh` checks freshness.
-- Launch reads the separate introduction and learner progress while StoreKit
-  refreshes. Once purchase state is known, onboarding can appear without waiting
-  for the full catalogue. Member screens still require their catalogue.
-- An existing SwiftData catalogue remains authoritative. With no catalogue, the
-  repository returns validated bundled binary books without importing/rereading
-  them. The later sync first persists the bundle, then attempts network updates;
-  an offline device still receives the local import. Failed import is retryable.
-- The import commits only if the catalogue is absent. A late import cannot
-  replace a newer downloaded catalogue. Ordinary database access stays on the
-  shared store's worker actor. No second production container is introduced.
+- Launch reads the separate introduction and progress alongside StoreKit. No full
+  catalogue read or sync is allowed until purchase access is confirmed.
+- The full core reads directly from installed `core-library.dat` or bundled
+  `Library.dat`; no database is opened for this read. Fresh progress also avoids
+  creating a database until the first real save.
+- Background sync validates downloaded JSON packs, compiles binary book tables,
+  and atomically saves a complete snapshot for the next launch. Old database
+  catalogue records migrate only in this background phase; progress is retained.
+- Installed snapshots wrap the same book bytes with a small binary-plist header
+  (authors, manifest, arrival dates), version and SHA-256 checksum. Unlike the
+  book-table format itself, this metadata does use Codable. See `docs/startup.md`.
 - The current Discover API still materializes all books into `[Book]`. This
   change does not claim a fully lazy reader or zero-allocation SwiftUI text.
 

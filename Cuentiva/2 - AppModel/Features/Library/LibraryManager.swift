@@ -84,6 +84,7 @@ extension LibraryFeature {
     private(set) var syncing = false
     private(set) var syncMessage: String?
     var books: [Book] {
+        guard purchases.hasAccess, !purchases.checking else { return [] }
         let personal = personalLibrary?.publishedBooks ?? []
         let ids = Set(personal.map(\.id))
         return personal + catalogueBooks.filter { !ids.contains($0.id) }
@@ -98,7 +99,7 @@ extension LibraryFeature {
     private var input: LibraryInput {
         LibraryInput(catalogue: catalogueBooks, personal: personalLibrary?.libraryContent ?? .init(),
             authors: authorProfiles, arrivals: catalogueArrivals, progress: progress.snapshot,
-            hasAccess: purchases.hasAccess || purchases.checking,
+            hasAccess: purchases.hasAccess && !purchases.checking,
             day: calendar.startOfDay(for: now()), calendar: calendar)
     }
     init(repository: any BookRepository, purchases: any PurchaseFeature, progress: any ProgressFeature,
@@ -117,23 +118,24 @@ extension LibraryFeature {
     var discoveryBuildCount: Int { get async { await worker.discoveryBuildCount } }
     func loadIntroduction() async throws {
         guard introductoryBook == nil else { return }
-        async let book = repository.introduction()
-        try await progress.load()
-        introductoryBook = try await book
+        introductoryBook = try await repository.introduction()
     }
     func load() async throws {
+        guard purchases.hasAccess, !purchases.checking else { throw AppFailure.locked }
         if catalogueBooks.isEmpty {
-            async let catalogue = repository.books()
-            try await progress.load()
-            let loaded = try await catalogue
-            catalogueArrivals = await repository.arrivals()
+            let loaded = try await repository.books()
+            let arrivals = await repository.arrivals()
+            let authors = await repository.authors().map(\.storyteller)
+            try Task.checkCancellation()
+            guard purchases.hasAccess, !purchases.checking else { throw AppFailure.locked }
+            catalogueArrivals = arrivals
             catalogueBooks = loaded
-            authorProfiles = await repository.authors().map(\.storyteller)
+            authorProfiles = authors
             catalogueRevision = UUID()
         }
     }
     func sync() async {
-        guard !syncing, let repository = repository as? any SyncingBookRepository else { return }
+        guard purchases.hasAccess, !purchases.checking, !syncing, let repository = repository as? any SyncingBookRepository else { return }
         syncing = true
         defer { syncing = false }
         do {

@@ -1,20 +1,78 @@
-# Local-first startup
+# Prepared core library and local progress
 
-Library loading reads learner progress and the local catalogue concurrently through one shared SwiftData store. After initial setup, this path does not save progress, fetch products, or download books. The database contains book and author records plus catalogue order and arrival metadata.
+## Launch
 
-The first launch after this upgrade imports existing JSON data into SwiftData. That one-time setup necessarily writes database records. Existing progress, profiles, private publications, chat turns and draft archives are retained; their JSON source files are deleted after the database records have been saved and decoded successfully. Each collection imports on first access. Already-migrated installations also remove leftover files when that collection loads. Failed imports keep the original data for retry; failed cleanup is logged and retried on a later load. This one-time cleanup is another exception to the normal read-only launch path. The database initialization marker and imported records are saved together, so an interrupted or failed import can retry. Corrupt user data produces an error instead of silently creating an empty archive. Books fall back from old prepared catalogues to old pack caches to bundled seed data only when no database catalogue exists.
+RootViewModel owns startup and presentation. Concurrent member-load callers share one pending task; progress loads are likewise coalesced by the Progress feature. Cancelling one caller does not cancel work another caller needs. The library feature enforces access,
+so another screen or future target cannot bypass the purchase gate.
 
-RootViewModel.start owns concurrent local loading and purchase verification. The initial scene-active event does not start a second entitlement check; returning from the background does. The root shows the loading placeholder until local content is ready and the purchase check finishes, then selects the library or onboarding. No network catalogue request gates that choice. StoreKit verification remains authoritative for lesson access.
+1. Read the separate `Introduction.dat` and saved progress concurrently with
+   StoreKit verification. Never read the full core library while access is
+   unconfirmed or denied. The free introduction remains available afterward.
+2. Once StoreKit confirms access, read the installed `core-library.dat`, or the
+   bundled `Library.dat` if no usable downloaded snapshot exists. This operation
+   does not open SwiftData, import records, save files or contact GitHub.
+3. Show the member library when both core content and progress are ready. Do not
+   briefly show invented zero progress. First-time users have empty progress
+   without creating a database; the first real save creates it atomically.
+4. Prepare core updates after initial content is ready. A purchase or restore
+   during onboarding starts the member load. Scene activation is coalesced with
+   startup; returning from the background refreshes access.
 
-After the library screen mounts, Home owns saving the daily selection. The manager prevents overlapping preparation. Failed saves do not prevent displaying local books. Background catalogue sync never writes learner progress or replaces the session's catalogue.
+Books, filtering and recommendation preparation run on repository/worker actors.
+The current Discover API constructs all core books as Swift values. It is not a
+fully lazy reader: indexed, per-level loading remains a possible measured
+optimization, not an implemented claim. No separate curriculum files or add-on
+pack system are introduced in this change.
 
-Sync downloads and validates changed packs on the repository actor, retains verified pack payloads in SwiftData for interrupted-download retries, and commits book/author records and the catalogue index together. An unchanged manifest reuses the stored version. The next process launch adopts the new catalogue. New personal stories remain immediately visible in their independent local collection. Automatic sync checks are limited to once per hour in a session; Settings can explicitly retry. These are in-process asynchronous tasks, not an iOS BackgroundTasks delivery guarantee.
+## Core updates
 
-Discover caches its recommendation ordering by eligible IDs, day, arrival dates, recent reading, personal stories and learner level. Each book's stable shuffle hash is computed once per manager lifetime. Date calculations are prepared before sorting; level/format filters reuse the same ordering. A saved set of three daily books bypasses recommendation sorting. Author visibility uses a single set of available author IDs.
+GitHub publishes the core catalogue. JSON is a transport/source format, not a
+runtime database. The repository downloads changed packs, checks size, checksum,
+book IDs and author references, and caches verified payloads as files so an
+interrupted download can resume.
 
-Filtering and cache-key comparisons remain linear main-actor work. The current bundled collection is 52 books (about 773 KB); this change does not claim measured launch-time savings or establish the cause of a reported ten-second delay. The existing Launch logs separate local-library time from entitlement-check time. Measure a cold launch outside Xcode on the target phone before attributing remaining delay to either path.
+A complete replacement is compiled off MainActor into one `.dat` snapshot with
+book offset tables, UTF-8 text, storyteller profiles, manifest and arrival dates.
+Small metadata uses a binary property list; book content does not. The snapshot
+has a version and SHA-256 integrity checksum. The exact encoded content is read
+back and compared before an atomic file replacement. Cancellation before that
+replacement leaves the old snapshot intact.
 
+The repository keeps the current session's catalogue in memory. A newly created
+repository on the next process launch adopts the replacement. Stable book IDs
+preserve progress. Personal publications remain independent and can appear in
+the current session. Invalid downloaded snapshots are logged and fall back to
+the bundled core; their files remain until a successful update repairs them.
+This integrity check is not encryption or a substitute for StoreKit verification.
 
-SwiftData uses a versioned schema and a model actor created off MainActor. It is local-only, with CloudKit disabled and explicit saves instead of autosave. Progress fields are stored as separate records for book positions, sentence encounters, vocabulary, evidence and practice days; repositories update only changed records. Compound values use binary property-list payloads. The app does not store an entire progress JSON archive in a single database blob. Stories, publications and chat turns also have individual records. A failed save rolls back the model context, and feature managers keep their last confirmed in-memory state.
+Automatic update checks are limited to once per hour within a session. Settings
+can request a check. These are owned in-process async operations, not a promise
+that iOS will continue downloading after suspending the app.
 
-The Next sentence action still awaits its atomic progress transaction. This migration reduces the amount rewritten and avoids encoding unchanged progress fields; it does not introduce optimistic navigation or promise that all delays are removed. Audio teardown and device timing remain separate matters to measure.
+## Mutable state and compatibility
+
+One shared SwiftData container stores progress, rewards, profiles, personal
+stories and drafts. Its path and schema are unchanged. Contexts remain on model
+actors; saves are explicit, progress mutations are FIFO, and failures roll back.
+The first progress transaction writes the complete baseline and readiness marker;
+later transactions update changed records only.
+
+Existing catalogue records from the previous implementation are converted into
+a core snapshot during background preparation, before the network check. After
+the snapshot is verified, only obsolete catalogue/pack database collections and
+old catalogue JSON files are removed. Progress is never removed. During that
+one transition, the launch uses the bundled core and the migrated core becomes
+available next launch. Failed migration retains its source for retry.
+
+Old mutable JSON archives still migrate on first access where necessary to
+preserve user data. That compatibility path can write; normal launch reads do
+not. Corrupt mutable data reports an error instead of replacing it with defaults.
+
+## Measuring
+
+Use a fresh physical-device install and an existing installation, both inside
+and outside the debugger. Record StoreKit, introduction, progress, database-open
+and core-library phase logs separately. Readiness logs are not first-frame
+measurements. Core `.dat` loading now has no database dependency; existing
+progress can still require a database open, and StoreKit still gates paid access.
+See `diagnostics/library-loading` for reproducible data-only benchmarks.

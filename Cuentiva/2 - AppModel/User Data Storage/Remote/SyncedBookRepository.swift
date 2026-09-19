@@ -1,5 +1,6 @@
 import CryptoKit
 import Foundation
+import OSLog
 
 struct PackDescriptor: Codable, Equatable, Sendable {
     let id: String
@@ -82,13 +83,17 @@ actor SyncedBookRepository: SyncingBookRepository {
     private let transport: any CatalogueTransport
     private let cacheURL: URL
     private let store: SwiftDataStore
+    private let writeSnapshot: @Sendable (Data, URL) throws -> Void
     private var currentBooks: [Book]?
     private var currentAuthors: [Author] = Author.demoProfiles
     private var syncing = false
-    private var needsBundledImport = false
     private var currentArrivals: [String: Date] = [:]
     private var preparedURL: URL { cacheURL.appendingPathExtension("prepared") }
-    init(bundled: any BookRepository, transport: any CatalogueTransport, cacheURL: URL, store: SwiftDataStore) {
+    var snapshotURL: URL { cacheURL.deletingLastPathComponent().appending(path: "core-library.dat") }
+    private var migratedStorage = false
+    init(bundled: any BookRepository, transport: any CatalogueTransport, cacheURL: URL, store: SwiftDataStore,
+         writeSnapshot: @escaping @Sendable (Data, URL) throws -> Void = { try $0.write(to: $1, options: .atomic) }) {
+        self.writeSnapshot = writeSnapshot
         self.store = store
         self.bundled = bundled
         self.transport = transport
@@ -129,13 +134,6 @@ actor SyncedBookRepository: SyncingBookRepository {
         return pack
     }
     private func cachedPack(_ ref: PackDescriptor) async throws -> LibraryPack? {
-        if let data = try await store.value("packs", key: ref.id + "-" + ref.checksum),
-            let pack = try? Self.decode(data, descriptor: ref)
-        {
-            return pack
-        }
-        // Existing file caches are read-only migration sources.
-
         let url = file(ref)
         guard let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize, size == ref.bytes,
             let data = try? Data(contentsOf: url)
@@ -176,7 +174,7 @@ actor SyncedBookRepository: SyncingBookRepository {
         let arrivals: [String: Date]
     }
     private func readCatalogue() async throws -> (CatalogueHeader, [Book], [Author])? {
-        guard let rows = try await store.read("catalogue") else { return nil }
+        guard let rows = try await store.readIfPresent("catalogue") else { return nil }
         guard let data = rows["header"] else { throw AppFailure.invalidBook }
         let header = try RecordCoding.decode(CatalogueHeader.self, data)
         func read<T: Codable>(_ type: T.Type, key: String) throws -> T {
@@ -188,81 +186,97 @@ actor SyncedBookRepository: SyncingBookRepository {
         guard Set(header.books).count == books.count, !books.isEmpty else { throw AppFailure.invalidBook }
         return (header, books, authors)
     }
-    private func saveCatalogue(
-        books: [Book], authors: [Author], arrivals: [String: Date], manifest: CatalogueManifest?,
-        importing: Bool = false
-    ) async throws {
-        let header = CatalogueHeader(
-            manifest: manifest, books: books.map(\.id), authors: authors.map(\.id), arrivals: arrivals)
-        var rows = ["header": try RecordCoding.encode(header)]
-        for book in books { rows["book/" + book.id] = try RecordCoding.encode(book) }
-        for author in authors { rows["author/" + author.id] = try RecordCoding.encode(author) }
-        try await store.replace("catalogue", values: rows, onlyIfAbsent: importing)
-    }
+    /// A launch only reads a prepared file or the bundled library. No database,
+    /// migration, download or write participates in this path.
     func books() async throws -> [Book] {
         if let currentBooks { return currentBooks }
-        if let (header, books, authors) = try await readCatalogue() {
-            currentBooks = books
-            currentAuthors = authors
-            currentArrivals = header.arrivals
-            LegacyJSONCleanup.remove([cacheURL, preparedURL, directory])
-            return books
+        if let prepared = readSnapshot() {
+            currentBooks = prepared.books
+            currentAuthors = prepared.authors
+            currentArrivals = prepared.arrivals
+            return prepared.books
         }
-        // One-time import. Remove obsolete files only after the database is readable.
-        if let prepared = readPreparedCatalogue() {
-            try await saveCatalogue(
-                books: prepared.books, authors: prepared.authors, arrivals: prepared.arrivals,
-                manifest: prepared.manifest, importing: true)
-        } else if let size = try? cacheURL.resourceValues(forKeys: [.fileSizeKey]).fileSize, size <= 409_600,
-            let data = try? Data(contentsOf: cacheURL),
-            let manifest = try? JSONDecoder().decode(CatalogueManifest.self, from: data), manifest.valid
-        {
-            var packs: [LibraryPack] = []
-            for ref in manifest.packs { if let pack = try await cachedPack(ref) { packs.append(pack) } }
-            if packs.count == manifest.packs.count, let (books, authors) = try? assemble(packs) {
-                try await saveCatalogue(
-                    books: books, authors: authors, arrivals: [:], manifest: manifest, importing: true)
-            }
-        }
-        if try await store.read("catalogue") == nil {
-            let books = try await bundled.books()
-            currentBooks = books
-            currentAuthors = await bundled.authors()
-            needsBundledImport = true
-            // Return usable values immediately. The post-launch sync owns import.
-            return books
-        }
-        guard let (header, books, authors) = try await readCatalogue() else { throw AppFailure.invalidBook }
-        currentBooks = books
+        let books = try await bundled.books()
+        let authors = await bundled.authors()
+        // Publish both together after the final suspension point.
+        if let currentBooks { return currentBooks }
         currentAuthors = authors
-        currentArrivals = header.arrivals
-        LegacyJSONCleanup.remove([cacheURL, preparedURL, directory])
+        currentBooks = books
         return books
     }
-    /// The free lesson does not open the catalogue database or decode the full library.
     func introduction() async throws -> Book { try await bundled.introduction() }
 
-    /// Save only if no catalogue has won the race. A downloaded revision must
-    /// never be replaced by a late bundled import. Failed commits remain retryable.
-    func prepareStorage() async throws {
-        _ = try await books()
-        guard needsBundledImport, let books = currentBooks else { return }
-        try await saveCatalogue(books: books, authors: currentAuthors, arrivals: currentArrivals,
-                                manifest: nil, importing: true)
-        needsBundledImport = false
+    private func readSnapshot() -> CoreLibrarySnapshot? {
+        guard FileManager.default.fileExists(atPath: snapshotURL.path) else { return nil }
+        do { return try CoreLibrarySnapshot(url: snapshotURL) }
+        catch {
+            // Downloaded content is replaceable. Keep the damaged file until a
+            // complete update succeeds; use the bundled core in the meantime.
+            Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
+                .error("Installed core snapshot could not be read. Using bundled content until an update repairs it.")
+            return nil
+        }
+    }
+
+    private func saveSnapshot(_ snapshot: CoreLibrarySnapshot) throws {
+        let data = try snapshot.encoded()
+        // Validate the exact bytes before atomic replacement. Interruption or
+        // failed validation leaves the previous version available.
+        let decoded = try CoreLibrarySnapshot(data: data)
+        guard decoded.books == snapshot.books, decoded.authors == snapshot.authors,
+              decoded.arrivals == snapshot.arrivals, decoded.manifest == snapshot.manifest else {
+            throw AppFailure.invalidBook
+        }
+        try Task.checkCancellation()
+        try FileManager.default.createDirectory(at: snapshotURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try writeSnapshot(data, snapshotURL)
+    }
+
+    /// Only the background update workflow calls this compatibility bridge.
+    /// Existing progress remains in the same store and is never removed.
+    private func migrateLegacyCatalogue() async throws {
+        guard !migratedStorage else { return }
+        if !FileManager.default.fileExists(atPath: snapshotURL.path) {
+            if let (header, books, authors) = try await readCatalogue() {
+                try saveSnapshot(.init(manifest: header.manifest, books: books, authors: authors, arrivals: header.arrivals))
+            } else if let prepared = readPreparedCatalogue() {
+                try saveSnapshot(.init(manifest: prepared.manifest, books: prepared.books,
+                                       authors: prepared.authors, arrivals: prepared.arrivals))
+            } else if FileManager.default.fileExists(atPath: cacheURL.path) {
+                let data = try Data(contentsOf: cacheURL)
+                guard data.count <= 409_600 else { throw AppFailure.invalidBook }
+                let manifest = try JSONDecoder().decode(CatalogueManifest.self, from: data)
+                guard manifest.valid else { throw AppFailure.invalidBook }
+                var packs: [LibraryPack] = []
+                for ref in manifest.packs {
+                    if let pack = try await cachedPack(ref) { packs.append(pack) }
+                }
+                if packs.count == manifest.packs.count {
+                    let (books, authors) = try assemble(packs)
+                    try saveSnapshot(.init(manifest: manifest, books: books, authors: authors, arrivals: [:]))
+                }
+            }
+        }
+        if readSnapshot() != nil {
+            try await store.removeCollection("catalogue")
+            try await store.removeCollection("packs")
+            LegacyJSONCleanup.remove([cacheURL, preparedURL])
+        }
+        migratedStorage = true
     }
 
     func sync() async throws -> [Book] {
         guard !syncing else { throw AppFailure.busy }
         syncing = true
         defer { syncing = false }
-        try await prepareStorage()
+        _ = try await books()
+        try await migrateLegacyCatalogue()
         let data = try await transport.fetch(pack: nil)
         guard data.count <= 409_600 else { throw AppFailure.invalidBook }
         let manifest = try JSONDecoder().decode(CatalogueManifest.self, from: data)
         guard manifest.valid else { throw AppFailure.invalidBook }
-        let previous = try await readCatalogue()
-        if let previous, previous.0.manifest == manifest { return previous.1 }
+        let previous = readSnapshot()
+        if let previous, previous.manifest == manifest { return previous.books }
         var packs: [LibraryPack] = []
         for ref in manifest.packs {
             try Task.checkCancellation()
@@ -273,23 +287,75 @@ actor SyncedBookRepository: SyncingBookRepository {
             let payload = try await transport.fetch(pack: ref)
             let pack = try Self.decode(payload, descriptor: ref)
             // Verified individual downloads survive an interrupted sync and are reused on retry.
-            try await store.put("packs", key: ref.id + "-" + ref.checksum, data: payload)
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try payload.write(to: file(ref), options: .atomic)
             packs.append(pack)
         }
         let (books, authors) = try assemble(packs)
         try Task.checkCancellation()
-        // Book records and the catalogue index commit in one database transaction.
-        // Failed preparation preserves the previous usable catalogue.
-        let previousArrivals = previous?.0.arrivals ?? currentArrivals
+        // All core content and metadata activate together on the next launch.
+        let previousArrivals = previous?.arrivals ?? currentArrivals
         let existingIDs = Set((currentBooks ?? []).map(\.id))
         let downloadedAt = Date()
         let arrivals = Dictionary(
             uniqueKeysWithValues: books.map {
                 ($0.id, previousArrivals[$0.id] ?? (existingIDs.contains($0.id) ? Date.distantPast : downloadedAt))
             })
-        try await saveCatalogue(books: books, authors: authors, arrivals: arrivals, manifest: manifest)
+        try saveSnapshot(.init(manifest: manifest, books: books, authors: authors, arrivals: arrivals))
         // Do not replace this session's catalogue. The next repository/launch
         // reads the new catalogue; personal books remain independent.
         return books
+    }
+}
+
+/// One atomic snapshot: small binary-plist metadata, offset-table book bytes,
+/// and a SHA-256 integrity checksum. JSON is only the publishing transport.
+private struct CoreLibrarySnapshot {
+    let manifest: CatalogueManifest?
+    let books: [Book]
+    let authors: [Author]
+    let arrivals: [String: Date]
+    private struct Header: Codable {
+        let manifest: CatalogueManifest?
+        let authors: [Author]
+        let arrivals: [String: Date]
+    }
+    init(manifest: CatalogueManifest?, books: [Book], authors: [Author], arrivals: [String: Date]) {
+        self.manifest = manifest; self.books = books; self.authors = authors; self.arrivals = arrivals
+    }
+    init(url: URL) throws {
+        let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize
+        guard let size, size <= 300_000_000 else { throw AppFailure.invalidBook }
+        try self.init(data: Data(contentsOf: url))
+    }
+    init(data: Data) throws {
+        guard data.count >= 64, data.count <= 300_000_000,
+              data.prefix(8) == Data("CUENCORE".utf8) else { throw AppFailure.invalidBook }
+        let version = data.withUnsafeBytes { UInt32(littleEndian: $0.loadUnaligned(fromByteOffset: 8, as: UInt32.self)) }
+        let length = data.withUnsafeBytes { UInt32(littleEndian: $0.loadUnaligned(fromByteOffset: 12, as: UInt32.self)) }
+        guard version == 1, length <= 10_000_000, Int(length) <= data.count - 48,
+              Data(SHA256.hash(data: data.dropLast(32))) == data.suffix(32) else { throw AppFailure.invalidBook }
+        let boundary = 16 + Int(length)
+        let header = try PropertyListDecoder().decode(Header.self, from: data.subdata(in: 16..<boundary))
+        let books = try BinaryLibrary(data: data.subdata(in: boundary..<(data.count - 32))).books()
+        guard header.manifest?.valid != false,
+              Set(books.map(\.id)).count == books.count, books.contains(where: { $0.id == "cafe" }),
+              Set(header.authors.map(\.id)).count == header.authors.count else { throw AppFailure.invalidBook }
+        self.init(manifest: header.manifest, books: books, authors: header.authors, arrivals: header.arrivals)
+    }
+    func encoded() throws -> Data {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        let header = try encoder.encode(Header(manifest: manifest, authors: authors, arrivals: arrivals))
+        guard header.count <= 10_000_000, let length = UInt32(exactly: header.count) else { throw AppFailure.invalidBook }
+        var data = Data("CUENCORE".utf8)
+        for value in [UInt32(1), length] {
+            var little = value.littleEndian
+            data.append(withUnsafeBytes(of: &little) { Data($0) })
+        }
+        data.append(header)
+        data.append(try BinaryLibrary.encode(books))
+        data.append(Data(SHA256.hash(data: data)))
+        return data
     }
 }

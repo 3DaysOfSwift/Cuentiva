@@ -3,70 +3,78 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct RootViewModelTests {
-    @Test func launchRendersLocalContentBeforePurchaseRefreshOrSync() async throws {
-        let purchases = TestPurchases(); purchases.checking = true
-        let progress = ProgressManager(repository: MemoryProgress())
-        let repository = LaunchBooks()
-        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library, progress: progress,
-            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
-        await root.load()
-        #expect(root.ready)
-        #expect(root.checkingAccess)
-        #expect(!root.hasAccess)
-        #expect(purchases.refreshCalls == 0)
-        #expect(await repository.syncCalls == 0)
-        await root.refreshPurchases()
-        await root.syncLibrary()
-        #expect(purchases.refreshCalls == 1)
-        #expect(await repository.syncCalls == 1)
-        await root.syncLibrary()
-        #expect(await repository.syncCalls == 1) // duplicate scene activation is coalesced
-    }
-
-    @Test func initialSceneActivationDoesNotRepeatStartupPurchaseCheck() async throws {
+    @Test func unpaidLaunchReadsOnlyIntroductionAndDoesNotSync() async throws {
         let purchases = TestPurchases()
         let progress = ProgressManager(repository: MemoryProgress())
-        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases,
-            progress: progress)
-        let root = RootViewModel(purchases: purchases, library: library, progress: progress,
-            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
-        await root.becameActive()
-        #expect(purchases.refreshCalls == 0)
+        let library = GatedLaunchLibrary(gated: false)
+        let root = makeRoot(purchases, library, progress)
         await root.start()
-        #expect(root.ready)
+        #expect(root.onboardingReady)
+        #expect(root.canShowContent)
+        #expect(!root.ready)
+        #expect(library.loads == 0)
+        #expect(library.syncs == 0)
         #expect(purchases.refreshCalls == 1)
         await root.becameActive()
         #expect(purchases.refreshCalls == 1)
         root.enteredBackground()
         await root.becameActive()
         #expect(purchases.refreshCalls == 2)
+        #expect(library.loads == 0)
     }
 
-    @Test func onboardingCanAppearWhileFullCatalogueIsStillLoading() async throws {
+    @Test func purchaseLoadsLibraryAndCoalescesRepeatedActivation() async throws {
         let purchases = TestPurchases()
+        let progress = ProgressManager(repository: MemoryProgress())
         let library = GatedLaunchLibrary()
-        let root = RootViewModel(purchases: purchases, library: library,
-            progress: ProgressManager(repository: MemoryProgress()),
-            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
-        let launch = Task { await root.start() }
-        defer { library.finish(); launch.cancel() }
-        try await waitUntil { library.continuation != nil }
-        #expect(root.onboardingReady)
-        #expect(!root.ready)
-        #expect(root.canShowContent)
-        // A purchase must not expose an unprepared member library.
+        let root = makeRoot(purchases, library, progress)
+        await root.start()
         purchases.hasAccess = true
         #expect(!root.canShowContent)
+        let activation = Task { await root.accessChanged() }
+        defer { library.finish(); activation.cancel() }
+        try await waitUntil { library.continuation != nil }
+        let secondActivation = Task { await root.accessChanged() }
+        activation.cancel() // SwiftUI can cancel the first task as access changes.
+        #expect(library.loads == 1)
+        #expect(!root.ready)
         library.finish()
-        await launch.value
+        await activation.value
+        await secondActivation.value
         #expect(root.ready)
         #expect(root.canShowContent)
+        #expect(library.syncs == 1)
+        await root.accessChanged()
+        #expect(library.syncs == 1)
+        purchases.hasAccess = false
+        await root.accessChanged()
+        #expect(!root.ready)
+        #expect(root.canShowContent) // Returns to the separately loaded introduction.
     }
 
-    @Test func rootLoadsIsolatedGraph() async throws {
-        let (p, s, l, _, _) = try await makeViewModelTestGraph(); let vm = RootViewModel(purchases: p, library: l, progress: s, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
-        await vm.load(); #expect(vm.ready); #expect(!vm.hasAccess)
+    @Test func checkingAccessNeverStartsFullLibraryAndFailureCanRetry() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true; purchases.checking = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = GatedLaunchLibrary(gated: false)
+        let root = makeRoot(purchases, library, progress)
+        await root.load()
+        #expect(library.loads == 0)
+        purchases.checking = false
+        library.failure = .invalidBook
+        await root.load()
+        #expect(!root.ready)
+        #expect(root.error != nil)
+        library.failure = nil
+        await root.load()
+        #expect(root.ready)
+        #expect(root.error == nil)
+        #expect(progress.loaded)
+    }
+
+    private func makeRoot(_ purchases: TestPurchases, _ library: GatedLaunchLibrary,
+                          _ progress: ProgressManager) -> RootViewModel {
+        RootViewModel(purchases: purchases, library: library, progress: progress,
+            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
     }
 }
 
@@ -77,10 +85,19 @@ import Testing
     var syncing = false
     var syncMessage: String?
     var continuation: CheckedContinuation<Void, Never>?
+    var loads = 0
+    var syncs = 0
+    var failure: AppFailure?
+    private var gated: Bool
+    init(gated: Bool = true) { self.gated = gated }
     func loadIntroduction() async throws {}
-    func load() async throws { await withCheckedContinuation { continuation = $0 } }
-    func finish() { let pending = continuation; continuation = nil; pending?.resume() }
-    func sync() async {}
+    func load() async throws {
+        loads += 1
+        if let failure { throw failure }
+        if gated { await withCheckedContinuation { continuation = $0 } }
+    }
+    func finish() { gated = false; let pending = continuation; continuation = nil; pending?.resume() }
+    func sync() async { syncs += 1 }
     func matchingBooks(_ query: LibraryQuery) async -> [Book] { books }
     func presentation(_ query: LibraryQuery) async -> LibraryPresentation { LibraryPresentation(books: books) }
     func prepareDailyReads() async throws {}

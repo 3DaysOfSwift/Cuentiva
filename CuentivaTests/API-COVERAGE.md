@@ -1,6 +1,6 @@
 # API and test coverage audit
 
-Latest binary-library pass: 120 model tests pass, with six new persistence/format tests and an additional iOS-only launch-gating test awaiting runtime validation. The percentages below are unchanged historical measurements.
+Latest immutable-core review: 126 model tests pass, including shared progress-load cancellation/failure/retry. Coverage includes purchase-gated content loading, access loss during loading, database-free core reads, first-progress-save rollback/retry, exact binary round trips, old-catalogue migration, failed snapshot writes and update activation on next launch. Updated RootViewModel tests are iOS-only and await runtime validation. The percentages below are historical measurements.
 
 Measured 19 September 2026 after reorganising the tests. This is a snapshot, not a completeness certificate.
 

@@ -1,3 +1,27 @@
+## User-run iOS tests and fixture corrections — 19 September 2026
+
+- User supplied an iPhone 13 Pro Max / iOS 26.2 simulator run: 169 of 171 tests passed across 61 suites. Two tests produced eight assertion issues; the log completed normally without a test-process crash. RootViewModel and StorePurchase suites passed at runtime.
+- Fixed the two outdated setups without weakening assertions: HomeViewModelTests now loads progress explicitly before preparing daily reads; LibraryPresentationTests loads the member catalogue after granting access. The shared graph intentionally prepares only the free introduction while access is denied.
+- User's simulator launch log measured introduction file read/header at 0.329 ms and construction at 1.298 ms, progress load at 30.598 ms, onboarding readiness at 32.259 ms and entitlement verification at 71.917 ms. These overlapping phase timings are not a physical-device or first-frame measurement.
+- Updated iOS test sources type-check; corrected runtime results await the user's next Command-U run.
+
+## Startup review and shared-load regression tests — 19 September 2026
+
+- ProgressManager now owns one pending load shared by launch callers. Cancelling a caller does not cancel the read; a failed read clears the pending task and can retry. New controlled-gate tests exercise success, shared failure, cancellation, retry and repeat calls.
+- RootViewModel likewise shares its member-load task across startup and SwiftUI access-change callers. A cancelled observer cannot strand another caller behind an abandoned load. The iOS regression test covers cancellation during overlapping activation. Access is rechecked after profile loading before revealing a storyteller.
+- Bundled catalogue books and authors are published together after the final suspension, avoiding partial cache state.
+- 126 model tests in 34 suites pass in the parallel runner; no process crash. Generated DAT freshness and diff checks pass. Swift 6 iOS source/test type-checking passes. iOS runtime tests remain unexecuted because the simulator runtime is unavailable; this pass does not establish device launch performance.
+
+## Immutable core snapshots and purchase-gated launch — 19 September 2026
+
+- Core-library reads now use bundled `Library.dat` or installed `core-library.dat` directly, with no SwiftData open, import or write. The separate introduction remains available before payment; the Library feature rejects full loads and sync while purchase access is unconfirmed or denied, and rechecks access after suspended reads.
+- Root handles verified purchase/restore transitions and loads mutable progress independently. A fresh progress read no longer creates or seeds a database. The first real save writes its full baseline atomically; subsequent saves retain incremental updates. Existing user data, store path and schema are preserved.
+- GitHub updates validate/reuse pack files, encode the same book-table DAT format, include authors/manifest/arrival metadata and SHA-256 integrity checking, verify the round trip, then atomically replace the prepared core snapshot. The active session stays unchanged. Legacy database catalogues migrate during background preparation; obsolete catalogue/pack collections are removed only after successful snapshot validation. Corrupt downloadable content falls back to the bundle and can be repaired by a successful update.
+- 125 model tests in 34 suites pass in the normal parallel runner. Tests cover actual 52-book compiler/reader byte equality, optional metadata, malformed input, access denial/revocation, no database side effects, first-save rollback, migration preserving progress, interrupted downloads and failed final writes. No test-process crash occurred.
+- A debug Mac test sample loaded the actual 52-book core in approximately 6.6 ms without creating a database. This is not a device launch measurement or an improvement percentage. Existing progress, StoreKit and first-frame timing still need physical-device measurement.
+- App and test sources passed Swift 6 iOS SDK type-checking. Generic simulator build remains blocked by unavailable CoreSimulator runtimes (`LaunchScreen.storyboard: iOS 26.2 Platform Not Installed`); iOS ViewModel runtime tests and physical launch validation remain outstanding. No UI automation was used.
+- Startup documentation is in `docs/startup.md`. Templates, add-on packs and per-level files are intentionally deferred.
+
 ## Binary bundled library and staged launch — 19 September 2026
 
 - Added an indexed, versioned DAT generator and bounds-checked reader. Both the actual 52-book library and separate `cafe` onboarding file are generated during Xcode builds. Editable JSON remains source/test data; it is no longer copied into the app. Full Book equality was verified, including every optional property used by the shipped library.

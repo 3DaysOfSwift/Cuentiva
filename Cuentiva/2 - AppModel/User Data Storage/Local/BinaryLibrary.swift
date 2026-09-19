@@ -139,3 +139,99 @@ struct BinaryLibrary: Sendable {
         }
     }
 }
+
+extension BinaryLibrary {
+    /// Used only when preparing a downloaded replacement, never on the display path.
+    /// Matches the build-time compiler's version-one wire format.
+    static func encode(_ books: [Book]) throws -> Data {
+        guard !books.isEmpty, books.count <= 20_000 else { throw AppFailure.invalidBook }
+        let writer = Writer()
+        writer.data = Data("CUENLIB\0".utf8) + writer.word(1) + writer.word(UInt32(books.count))
+        writer.data.append(Data(count: books.count * bookStride))
+        for (index, book) in books.enumerated() {
+            let record = try writer.book(book)
+            guard record.count == bookStride else { throw AppFailure.invalidBook }
+            let start = 16 + index * bookStride
+            writer.data.replaceSubrange(start..<(start + bookStride), with: record)
+        }
+        return writer.data
+    }
+
+    private final class Writer {
+        var data = Data()
+        private var strings: [String: Data] = [:]
+        func word(_ value: UInt32) -> Data {
+            var little = value.littleEndian
+            return withUnsafeBytes(of: &little) { Data($0) }
+        }
+        func number(_ value: Int) throws -> Data {
+            guard let value = UInt32(exactly: value) else { throw AppFailure.invalidBook }
+            return word(value)
+        }
+        func append(_ bytes: Data) throws -> Data {
+            guard data.count < Int(UInt32.max), bytes.count < Int(UInt32.max) - data.count else {
+                throw AppFailure.invalidBook
+            }
+            let offset = try number(data.count)
+            data.append(bytes)
+            return offset
+        }
+        func text(_ value: String?) throws -> Data {
+            guard let value else { return word(.max) + word(0) }
+            if let descriptor = strings[value] { return descriptor }
+            let bytes = Data(value.utf8)
+            let descriptor = try append(bytes) + number(bytes.count)
+            strings[value] = descriptor
+            return descriptor
+        }
+        func table<T>(_ values: [T]?, encode: (T) throws -> Data) throws -> Data {
+            guard let values else { return word(.max) + word(0) }
+            var records = Data()
+            for value in values { records.append(try encode(value)) }
+            return try append(records) + number(values.count)
+        }
+        func record<T>(_ value: T?, encode: (T) throws -> Data) throws -> Data {
+            guard let value else { return word(.max) }
+            return try append(encode(value))
+        }
+        func sentence(_ value: Sentence) throws -> Data {
+            try text(value.id) + text(value.spanish) + text(value.english) + text(value.speaker)
+        }
+        func vocabulary(_ value: VocabularyEntry) throws -> Data {
+            try text(value.word) + text(value.lemma) + number(value.occurrences)
+        }
+        func author(_ value: Author) throws -> Data {
+            try text(value.id) + text(value.name) + text(value.portrait) + text(value.introduction) + text(value.note)
+        }
+        func verb(_ value: VerbFocus) throws -> Data {
+            try text(value.infinitive) + text(value.tense) + text(value.scope) + table(value.forms, encode: text)
+        }
+        func location(_ value: StoryLocation) throws -> Data {
+            guard value.valid, value.capturedAt.timeIntervalSinceReferenceDate.isFinite else { throw AppFailure.invalidBook }
+            var bytes = Data()
+            for number in [value.latitude, value.longitude, value.accuracy, value.capturedAt.timeIntervalSinceReferenceDate] {
+                var little = number.bitPattern.littleEndian
+                bytes.append(withUnsafeBytes(of: &little) { Data($0) })
+            }
+            return try bytes + text(value.placeName)
+        }
+        func book(_ value: Book) throws -> Data {
+            var bytes = Data()
+            let fields: [String?] = [value.id, value.title, value.englishTitle, value.author, value.level,
+                value.symbol, value.summary, value.license, value.authorID, value.format?.rawValue, value.scene]
+            for field in fields { bytes.append(try text(field)) }
+            bytes.append(try number(value.palette))
+            bytes.append(word(value.isDemoLocation.map { $0 ? 1 : 0 } ?? 2))
+            bytes.append(try table(value.sentences, encode: sentence))
+            bytes.append(try table(value.vocabulary, encode: vocabulary))
+            bytes.append(try table(value.continuation, encode: sentence))
+            bytes.append(try table(value.matchGlossary?.sorted { $0.key < $1.key }) {
+                try text($0.key) + text($0.value)
+            })
+            bytes.append(try record(value.verbFocus, encode: verb))
+            bytes.append(try record(value.submissionLocation, encode: location))
+            bytes.append(try record(value.personalAuthor, encode: author))
+            return bytes
+        }
+    }
+}

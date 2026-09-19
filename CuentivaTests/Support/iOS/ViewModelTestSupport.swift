@@ -77,7 +77,7 @@ actor ReaderPauseProbe {
 func makeViewModelTestGraph() async throws -> (TestPurchases, ProgressManager, LibraryManager, LearningManager, ContributionManager) {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
         try await progress.load()
-        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress); try await library.load()
+        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress); try await library.loadIntroduction()
         return (purchases, progress, library, LearningManager(purchases: purchases, progress: progress), ContributionManager(repository: MemoryContributions(), purchases: purchases, progress: progress))
     }
 

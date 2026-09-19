@@ -72,7 +72,7 @@ Each screen owns its adjacent `@MainActor @Observable` ViewModel. Presentation c
 | ChatManager | Earned-doubloon topic sessions with on-device AI and bounded model context |
 | ContributionManager | Legacy draft compatibility; no public submission UI |
 
-Repositories isolate bundled/remote JSON from local SwiftData persistence. Database transactions are atomic and state publishes only after successful persistence. Concurrent progress mutations return a recoverable busy error instead of overwriting one another. Tracked lesson tasks belong to the LessonViewModel; stale audio callbacks are invalidated when a lesson changes. Main-actor managers publish observable state, while decoding and database work happen outside MainActor in repository/model actors.
+Repositories separate immutable core DAT content, remote JSON transport and mutable SwiftData persistence. Database transactions are atomic and state publishes only after successful persistence. Concurrent progress mutations are queued in FIFO order instead of overwriting one another. Tracked lesson tasks belong to the LessonViewModel; stale audio callbacks are invalidated when a lesson changes. Main-actor managers publish observable state, while decoding and database work happen outside MainActor in repository/model actors.
 
 Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replaceable `LessonAudio` boundary. This demo does not depend on SpeechAnalyzer model downloads. Recognition feedback is not a pronunciation assessment.
 
@@ -190,7 +190,7 @@ book. Swiping or tapping a page indicator selects another book and updates its
 details and reading action. The next day's selection uses the existing freshness
 rules; permanent completion records are retained.
 
-Local storage uses SwiftData for the catalogue, reading progress, storyteller profile, private stories and drafts. Topic chats live in memory until their screen closes. Existing JSON data is imported once, then obsolete files are deleted after the database has been verified readable. Bundled seed books and GitHub downloads still use JSON. Downloaded catalogues become active on the next launch. See [startup and storage behavior](docs/startup.md).
+The immutable core library is read directly from bundled or installed `.dat` files, only after purchase access is confirmed. The free onboarding book is a separate file. SwiftData stores mutable progress, rewards, storyteller profiles, private stories and drafts; it is not opened to read core books. GitHub updates are prepared atomically in the background for the next launch. See [startup and storage behavior](docs/startup.md).
 
 For contributors, start with [the architecture guide](docs/architecture.md) and [contribution guidelines](CONTRIBUTING.md). Release preparation is tracked in [App Store submission](docs/app-store/README.md).
 

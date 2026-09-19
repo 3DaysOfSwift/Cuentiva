@@ -47,6 +47,9 @@ struct RootView: View {
                 StorytellerRevealView(feature: AppModel.shared.fantasy) { viewModel.showingStoryteller = false }
             }
             .task { await viewModel.start() }
+            .task(id: viewModel.hasAccess && !viewModel.checkingAccess) {
+                await viewModel.accessChanged()
+            }
             .onChange(of: viewModel.writingUnlocked) { _, unlocked in
                 if !unlocked && selectedTab == .write { selectedTab = .discover }
             }

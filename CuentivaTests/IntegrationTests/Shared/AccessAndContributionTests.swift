@@ -74,11 +74,12 @@ import Testing
         var anaBook = sample("ana-book"); anaBook.authorID = "ana"
         let legacyBook = sample("legacy")
         let library = LibraryManager(repository: MemoryBooks(values: [anaBook, legacyBook]), purchases: purchases, progress: progress)
-        try await library.load()
+        await #expect(throws: AppFailure.self) { try await library.load() }
         let ana = Author.demoProfiles[0]
         #expect(await library.authors.isEmpty)
         #expect(await library.books(by: ana).isEmpty)
         purchases.hasAccess = true
+        try await library.load()
         #expect(await library.authors.map(\.id) == ["ana"])
         #expect(await library.books(by: ana).map(\.id) == ["ana-book"])
         try await progress.recordEncounter(book: anaBook, sentence: anaBook.sentences[0])
@@ -92,9 +93,10 @@ import Testing
         try await progress.load()
         let first = sample("first"), second = sample("second")
         let library = LibraryManager(repository: MemoryBooks(values: [first, second]), purchases: purchases, progress: progress)
-        try await library.load()
+        await #expect(throws: AppFailure.self) { try await library.load() }
         #expect(await library.nextRead == nil)
         purchases.hasAccess = true
+        try await library.load()
         let initial = await library.nextRead?.id
         #expect(initial != nil)
         try await progress.setLearningLevel(.c2)
@@ -111,9 +113,10 @@ import Testing
     }
     @Test func librarySearchAndCompletedCollectionAreGated() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), book = sample(); try await progress.load()
-        let library = LibraryManager(repository: MemoryBooks(values: [book]), purchases: purchases, progress: progress); try await library.load()
+        let library = LibraryManager(repository: MemoryBooks(values: [book]), purchases: purchases, progress: progress); await #expect(throws: AppFailure.self) { try await library.load() }
         #expect(await library.search("", level: nil, completedOnly: false).isEmpty)
         purchases.hasAccess = true
+        try await library.load()
         #expect(await library.search("cafe", level: "A1", completedOnly: false).count == 1)
         #expect(await library.search("", level: "B1", completedOnly: false).isEmpty)
         #expect(await library.search("", level: nil, completedOnly: true).isEmpty)
@@ -126,9 +129,10 @@ import Testing
         let story = sample("story")
         var script = sample("script"); script.format = .movieScript; script.scene = "A café"
         let library = LibraryManager(repository: MemoryBooks(values: [story, script]), purchases: purchases, progress: progress)
-        try await library.load()
+        await #expect(throws: AppFailure.self) { try await library.load() }
         #expect(await library.search("", level: nil, completedOnly: false, format: .movieScript, sort: .title).isEmpty)
         purchases.hasAccess = true
+        try await library.load()
         #expect(await library.search("cafe", level: "A1", completedOnly: false, format: .movieScript, sort: .title).map(\.id) == ["script"])
         #expect(await library.search("cafe", level: "B1", completedOnly: false, format: .movieScript, sort: .title).isEmpty)
         #expect(await library.search("", level: nil, completedOnly: false, format: .story, sort: .library).map(\.id) == ["story"])

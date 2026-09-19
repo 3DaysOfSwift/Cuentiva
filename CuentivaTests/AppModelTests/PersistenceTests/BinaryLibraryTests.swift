@@ -21,9 +21,34 @@ import Testing
         let library = try BinaryLibrary(url: (try resource("Library.dat")))
         #expect(library.count == 52)
         #expect(try library.books() == expected)
+        let encoded = try BinaryLibrary.encode(expected)
+        #expect(try BinaryLibrary(data: encoded).books() == expected)
+        #expect(encoded == (try Data(contentsOf: resource("Library.dat"))))
         #expect(try library.book(at: 51) == expected[51])
         #expect(throws: AppFailure.self) { try library.book(at: -1) }
         #expect(throws: AppFailure.self) { try library.book(at: 52) }
+    }
+
+    @Test func downloadedWriterPreservesOptionalMetadataAndRejectsInvalidIntegers() throws {
+        var book = sample()
+        book.authorID = "fantasy"
+        book.personalAuthor = Author(id: "fantasy", name: "Luz", portrait: "fox",
+            introduction: "¡Hola! 🦊", note: "A personal storyteller")
+        book.matchGlossary = ["árbol": "tree", "café": "coffee"]
+        book.isDemoLocation = false
+        book.submissionLocation = StoryLocation(latitude: 1, longitude: 2, accuracy: 3,
+            capturedAt: Date(timeIntervalSinceReferenceDate: 1234), placeName: "México")
+        book.format = .movieScript
+        book.scene = "A forest"
+        book.continuation = []
+        book.verbFocus = VerbFocus(infinitive: "ser", tense: "present", forms: ["soy", "eres"], scope: "Test")
+        #expect(try BinaryLibrary(data: BinaryLibrary.encode([book])).books() == [book])
+        book.continuation = [.init(id: "last", spanish: "¡Hasta mañana!", english: "See you tomorrow!", speaker: "Luz")]
+        #expect(try BinaryLibrary(data: BinaryLibrary.encode([book])).books() == [book])
+        #expect(throws: AppFailure.self) { try BinaryLibrary.encode([]) }
+        let invalid = Book(id: "bad", title: "Bad", englishTitle: "Bad", author: "Test", level: "A1",
+            symbol: "book", palette: -1, summary: "", sentences: [], vocabulary: [], license: "Test")
+        #expect(throws: AppFailure.self) { try BinaryLibrary.encode([invalid]) }
     }
 
     @Test func introductionWorksWithoutFullLibraryFile() async throws {
@@ -53,51 +78,42 @@ import Testing
         #expect(throws: AppFailure.self) { try BinaryLibrary(data: count).book(at: 0) }
     }
 
-    @Test func realLibraryPersistsAndReloadsWithSeparatePhaseTimings() async throws {
+    @Test func realLibraryLoadsWithoutOpeningOrWritingAnyDatabase() async throws {
         let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = SwiftDataStore(url: directory.appending(path: "app.store"))
+        let database = directory.appending(path: "app.store")
+        let store = SwiftDataStore(url: database)
         let bundle = BundledBookRepository(url: (try resource("Library.dat")))
-        let transport = try TestCatalogueTransport([sample()])
-        let repository = SyncedBookRepository(bundled: bundle, transport: transport,
+        let repository = SyncedBookRepository(bundled: bundle, transport: try TestCatalogueTransport([sample()]),
             cacheURL: directory.appending(path: "catalogue.json"), store: store)
-        let clock = ContinuousClock()
-        let started = clock.now
+        let started = ContinuousClock.now
         let books = try await repository.books()
-        let displayed = clock.now
+        print("Actual 52-book DAT display load: \(started.duration(to: .now))")
         #expect(books.count == 52)
-        #expect(try await store.read("catalogue") == nil)
-        let importing = clock.now
-        try await repository.prepareStorage()
-        let imported = clock.now
-        let reopened = SyncedBookRepository(bundled: MemoryBooks(values: []), transport: transport,
-            cacheURL: directory.appending(path: "catalogue.json"), store: store)
-        #expect(try await reopened.books() == books)
-        print("Actual 52-book phases: database open + DAT load \(started.duration(to: displayed)); import \(importing.duration(to: imported)); stored catalogue read \(imported.duration(to: clock.now))")
+        #expect(!FileManager.default.fileExists(atPath: directory.path))
     }
 
-    @Test func firstDisplayDoesNotWaitForCatalogueCommitAndImportCanRetry() async throws {
+    @Test func freshProgressIsReadOnlyAndFirstSaveSurvivesReopening() async throws {
         let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = SwiftDataStore(url: directory.appending(path: "app.store"))
-        let repository = SyncedBookRepository(bundled: MemoryBooks(values: [sample()]),
-            transport: try TestCatalogueTransport([sample()]), cacheURL: directory.appending(path: "catalogue.json"), store: store)
-        #expect(try await repository.books() == [sample()])
-        #expect(try await store.read("catalogue") == nil)
+        let url = directory.appending(path: "progress.json")
+        let repository = LocalProgressRepository(url: url, store: store)
+        var progress = try await repository.load()
+        #expect(progress.completed.isEmpty)
+        #expect(!FileManager.default.fileExists(atPath: directory.path))
+        progress.completed.insert("cafe")
         #if DEBUG
         try await store.failNextCommitForTesting()
-        await #expect(throws: (any Error).self) { try await repository.prepareStorage() }
-        #expect(try await repository.books() == [sample()])
-        #expect(try await store.read("catalogue") == nil)
+        await #expect(throws: (any Error).self) { try await repository.save(progress) }
+        #expect(try await store.read("progress") == nil)
         #endif
-        try await repository.prepareStorage()
-        #expect(try await store.read("catalogue") != nil)
-        let reopened = SyncedBookRepository(bundled: MemoryBooks(values: []),
-            transport: try TestCatalogueTransport([sample()]), cacheURL: directory.appending(path: "catalogue.json"), store: store)
-        #expect(try await reopened.books() == [sample()])
+        try await repository.save(progress)
+        let reopened = LocalProgressRepository(url: url, store: store)
+        #expect(try await reopened.load() == progress)
     }
 
-    @Test func lateBundledImportCannotOverwriteNewerDownloadedCatalogue() async throws {
+    @Test func openingOlderSessionNeverOverwritesDownloadedSnapshot() async throws {
         let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = SwiftDataStore(url: directory.appending(path: "app.store"))
@@ -107,10 +123,12 @@ import Testing
         let second = SyncedBookRepository(bundled: MemoryBooks(values: [sample()]), transport: transport, cacheURL: cache, store: store)
         _ = try await first.books()
         _ = try await second.sync()
-        try await first.prepareStorage()
+        #expect(try await first.books() == [sample()])
         let next = SyncedBookRepository(bundled: MemoryBooks(values: []), transport: transport, cacheURL: cache, store: store)
         #expect(try await next.books().map(\.id) == ["cafe", "new"])
+        #expect(!FileManager.default.fileExists(atPath: directory.appending(path: "app.store").path))
     }
+
 }
 
 #if !canImport(CuentivaAppModel)
