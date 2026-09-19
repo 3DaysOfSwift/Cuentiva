@@ -193,3 +193,11 @@ rules; permanent completion records are retained.
 Local storage uses SwiftData for the catalogue, reading progress, storyteller profile, private stories and drafts. Topic chats live in memory until their screen closes. Existing JSON data is imported once, then obsolete files are deleted after the database has been verified readable. Bundled seed books and GitHub downloads still use JSON. Downloaded catalogues become active on the next launch. See [startup and storage behavior](docs/startup.md).
 
 For contributors, start with [the architecture guide](docs/architecture.md) and [contribution guidelines](CONTRIBUTING.md). Release preparation is tracked in [App Store submission](docs/app-store/README.md).
+
+### Bundled library preparation
+
+Edit `Cuentiva/3 - App Resources/Books.json`. Xcode automatically compiles the
+binary library and separate onboarding book into the app. Run
+`python3 scripts/build_library_dat.py` to refresh committed test fixtures.
+See [binary library measurements and format](diagnostics/library-loading/README.md)
+for timings, validation limits and repeatable benchmarks.

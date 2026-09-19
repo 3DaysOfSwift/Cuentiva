@@ -8,7 +8,7 @@ struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     var body: some View {
         Group {
-            if viewModel.ready && !viewModel.checkingAccess {
+            if viewModel.canShowContent {
                 if viewModel.hasAccess {
                     TabView(selection: $selectedTab) {
                         Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) {

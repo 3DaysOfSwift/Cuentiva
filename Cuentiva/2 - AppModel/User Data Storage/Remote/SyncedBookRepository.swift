@@ -85,6 +85,7 @@ actor SyncedBookRepository: SyncingBookRepository {
     private var currentBooks: [Book]?
     private var currentAuthors: [Author] = Author.demoProfiles
     private var syncing = false
+    private var needsBundledImport = false
     private var currentArrivals: [String: Date] = [:]
     private var preparedURL: URL { cacheURL.appendingPathExtension("prepared") }
     init(bundled: any BookRepository, transport: any CatalogueTransport, cacheURL: URL, store: SwiftDataStore) {
@@ -225,8 +226,11 @@ actor SyncedBookRepository: SyncingBookRepository {
         }
         if try await store.read("catalogue") == nil {
             let books = try await bundled.books()
-            let authors = await bundled.authors()
-            try await saveCatalogue(books: books, authors: authors, arrivals: [:], manifest: nil, importing: true)
+            currentBooks = books
+            currentAuthors = await bundled.authors()
+            needsBundledImport = true
+            // Return usable values immediately. The post-launch sync owns import.
+            return books
         }
         guard let (header, books, authors) = try await readCatalogue() else { throw AppFailure.invalidBook }
         currentBooks = books
@@ -235,11 +239,24 @@ actor SyncedBookRepository: SyncingBookRepository {
         LegacyJSONCleanup.remove([cacheURL, preparedURL, directory])
         return books
     }
+    /// The free lesson does not open the catalogue database or decode the full library.
+    func introduction() async throws -> Book { try await bundled.introduction() }
+
+    /// Save only if no catalogue has won the race. A downloaded revision must
+    /// never be replaced by a late bundled import. Failed commits remain retryable.
+    func prepareStorage() async throws {
+        _ = try await books()
+        guard needsBundledImport, let books = currentBooks else { return }
+        try await saveCatalogue(books: books, authors: currentAuthors, arrivals: currentArrivals,
+                                manifest: nil, importing: true)
+        needsBundledImport = false
+    }
+
     func sync() async throws -> [Book] {
         guard !syncing else { throw AppFailure.busy }
         syncing = true
         defer { syncing = false }
-        _ = try await books()
+        try await prepareStorage()
         let data = try await transport.fetch(pack: nil)
         guard data.count <= 409_600 else { throw AppFailure.invalidBook }
         let manifest = try JSONDecoder().decode(CatalogueManifest.self, from: data)

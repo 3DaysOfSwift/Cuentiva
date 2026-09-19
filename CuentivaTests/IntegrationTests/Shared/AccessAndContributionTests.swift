@@ -194,9 +194,9 @@ import Testing
     @Test func bundledContentIsAlignedAndIndexed() async throws {
         #if canImport(CuentivaAppModel)
         let root = TestResources.repositoryRoot
-        let url = root.appending(path: "Cuentiva/3 - App Resources/Books.json")
+        let url = root.appending(path: "Cuentiva/3 - App Resources/Library.dat")
         #else
-        let url = try #require(Bundle.main.url(forResource: "Books", withExtension: "json"))
+        let url = try #require(Bundle.main.url(forResource: "Library", withExtension: "dat"))
         #endif
         let books = try await BundledBookRepository(url: url).books()
         #expect(books.count == 52); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])

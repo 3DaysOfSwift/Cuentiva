@@ -1,0 +1,6 @@
+Verified exact equality of all 52 books, including text and optional metadata.
+JSON: read + all Book values: first 8.893 ms, median 7.107 ms, p95 7.616 ms; checksum 5252
+DAT: read + header only: first 0.057 ms, median 0.019 ms, p95 0.022 ms; checksum 5252
+DAT: read + first complete Book: first 0.084 ms, median 0.069 ms, p95 0.078 ms; checksum 1616
+DAT: read + all Book values: first 2.330 ms, median 2.335 ms, p95 2.394 ms; checksum 5252
+Introduction DAT: read + complete Book: first 0.761 ms, median 0.061 ms, p95 0.065 ms; checksum 1616

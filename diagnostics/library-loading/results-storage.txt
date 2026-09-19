@@ -1,0 +1,1 @@
+Actual 52-book phases: database open + DAT load 0.009275541 seconds; import 0.038324666 seconds; stored catalogue read 0.01711125 seconds

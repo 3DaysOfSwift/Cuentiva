@@ -1,0 +1,6 @@
+Verified exact equality of all 500 books, including text and optional metadata.
+JSON: read + all Book values: first 67.560 ms, median 68.481 ms, p95 69.962 ms; checksum 50500
+DAT: read + header only: first 0.195 ms, median 0.042 ms, p95 0.046 ms; checksum 50500
+DAT: read + first complete Book: first 0.119 ms, median 0.093 ms, p95 0.097 ms; checksum 1616
+DAT: read + all Book values: first 23.573 ms, median 22.811 ms, p95 23.442 ms; checksum 50500
+Introduction DAT: read + complete Book: first 0.795 ms, median 0.063 ms, p95 0.080 ms; checksum 1616

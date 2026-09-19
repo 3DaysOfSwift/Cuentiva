@@ -1,5 +1,7 @@
 # API and test coverage audit
 
+Latest binary-library pass: 120 model tests pass, with six new persistence/format tests and an additional iOS-only launch-gating test awaiting runtime validation. The percentages below are unchanged historical measurements.
+
 Measured 19 September 2026 after reorganising the tests. This is a snapshot, not a completeness certificate.
 
 Subsequent investigation isolated the recurring crash to concurrent SwiftData container creation and tested a shared opening actor in a temporary project copy. See the [reproducer and findings](../diagnostics/swiftdata-store-opening/README.md). The opening safeguard is now applied: 114 model tests passed in 11 full parallel runs, including three new store-opening regressions. The coverage percentages below remain the original serial-run audit.

@@ -43,8 +43,46 @@ import Testing
         #expect(purchases.refreshCalls == 2)
     }
 
+    @Test func onboardingCanAppearWhileFullCatalogueIsStillLoading() async throws {
+        let purchases = TestPurchases()
+        let library = GatedLaunchLibrary()
+        let root = RootViewModel(purchases: purchases, library: library,
+            progress: ProgressManager(repository: MemoryProgress()),
+            fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
+        let launch = Task { await root.start() }
+        defer { library.finish(); launch.cancel() }
+        try await waitUntil { library.continuation != nil }
+        #expect(root.onboardingReady)
+        #expect(!root.ready)
+        #expect(root.canShowContent)
+        // A purchase must not expose an unprepared member library.
+        purchases.hasAccess = true
+        #expect(!root.canShowContent)
+        library.finish()
+        await launch.value
+        #expect(root.ready)
+        #expect(root.canShowContent)
+    }
+
     @Test func rootLoadsIsolatedGraph() async throws {
         let (p, s, l, _, _) = try await makeViewModelTestGraph(); let vm = RootViewModel(purchases: p, library: l, progress: s, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
         await vm.load(); #expect(vm.ready); #expect(!vm.hasAccess)
     }
+}
+
+@MainActor private final class GatedLaunchLibrary: LibraryFeature {
+    let books = [sample()]
+    var introduction: Book? { books.first }
+    let revision = LibraryRevision()
+    var syncing = false
+    var syncMessage: String?
+    var continuation: CheckedContinuation<Void, Never>?
+    func loadIntroduction() async throws {}
+    func load() async throws { await withCheckedContinuation { continuation = $0 } }
+    func finish() { let pending = continuation; continuation = nil; pending?.resume() }
+    func sync() async {}
+    func matchingBooks(_ query: LibraryQuery) async -> [Book] { books }
+    func presentation(_ query: LibraryQuery) async -> LibraryPresentation { LibraryPresentation(books: books) }
+    func prepareDailyReads() async throws {}
+    func loadMoreDailyReads() async throws {}
 }

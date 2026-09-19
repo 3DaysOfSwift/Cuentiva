@@ -56,11 +56,16 @@ struct LibraryPresentation: Sendable {
     func matchingBooks(_ query: LibraryQuery) async -> [Book]
     func presentation(_ query: LibraryQuery) async -> LibraryPresentation
     func load() async throws
+    func loadIntroduction() async throws
     func sync() async
     var syncing: Bool { get }
     var syncMessage: String? { get }
     func prepareDailyReads() async throws
     func loadMoreDailyReads() async throws
+}
+
+extension LibraryFeature {
+    func loadIntroduction() async throws { try await load() }
 }
 
 @MainActor @Observable final class LibraryManager: LibraryFeature {
@@ -83,7 +88,8 @@ struct LibraryPresentation: Sendable {
         let ids = Set(personal.map(\.id))
         return personal + catalogueBooks.filter { !ids.contains($0.id) }
     }
-    var introduction: Book? { catalogueBooks.first { $0.id == "cafe" } }
+    private var introductoryBook: Book?
+    var introduction: Book? { introductoryBook ?? catalogueBooks.first { $0.id == "cafe" } }
     var revision: LibraryRevision {
         .init(catalogue: catalogueRevision, personal: personalLibrary?.libraryRevision,
             progress: progress.revision, hasAccess: purchases.hasAccess, checkingAccess: purchases.checking,
@@ -109,6 +115,12 @@ struct LibraryPresentation: Sendable {
     }
     var recommendationBuildCount: Int { get async { await worker.recommendationBuildCount } }
     var discoveryBuildCount: Int { get async { await worker.discoveryBuildCount } }
+    func loadIntroduction() async throws {
+        guard introductoryBook == nil else { return }
+        async let book = repository.introduction()
+        try await progress.load()
+        introductoryBook = try await book
+    }
     func load() async throws {
         if catalogueBooks.isEmpty {
             async let catalogue = repository.books()

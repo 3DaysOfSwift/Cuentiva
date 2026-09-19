@@ -1,10 +1,15 @@
 import Foundation
 protocol BookRepository: Sendable {
     func books() async throws -> [Book]
+    func introduction() async throws -> Book
     func authors() async -> [Author]
     func arrivals() async -> [String: Date]
 }
 extension BookRepository {
+    func introduction() async throws -> Book {
+        guard let book = try await books().first(where: { $0.id == "cafe" }) else { throw AppFailure.invalidBook }
+        return book
+    }
     func arrivals() async -> [String: Date] { [:] }
     func authors() async -> [Author] { Author.demoProfiles } }
 protocol ProgressRepository: Sendable {

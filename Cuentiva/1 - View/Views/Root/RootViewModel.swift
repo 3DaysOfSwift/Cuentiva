@@ -16,6 +16,10 @@ import Observation
     private var checkedIntroduction = false
     var showingStoryteller = false
     var ready = false
+    private(set) var onboardingReady = false
+    var canShowContent: Bool {
+        !checkingAccess && (hasAccess ? ready : (onboardingReady || ready))
+    }
     var error: String?
     var hasAccess: Bool { purchases.hasAccess }
     init(
@@ -34,10 +38,20 @@ import Observation
         guard !starting else { return }
         starting = true
         defer { starting = false }
-        async let local: Void = load()
         async let access: Void = refreshPurchases()
-        _ = await (local, access)
+        await loadIntroduction()
+        await load()
+        await access
         await syncLibrary()
+    }
+
+    private func loadIntroduction() async {
+        let started = Date()
+        do {
+            try await library.loadIntroduction()
+            onboardingReady = true
+            logger.info("Onboarding ready in \(Date().timeIntervalSince(started), privacy: .public) seconds")
+        } catch { self.error = error.localizedDescription }
     }
 
     func enteredBackground() { hasEnteredBackground = true }

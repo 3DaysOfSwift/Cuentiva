@@ -12,7 +12,7 @@ let package = Package(
             dependencies: ["CuentivaAppModel"],
             path: "CuentivaTests",
             exclude: [
-                "ViewModelTests", "PresentationTests", "AppModelTests", "Support/iOS",
+                "PresentationTests", "AppModelTests/AppModelTests.swift", "Support/iOS",
                 "IntegrationTests/SpeechCallbackTests.swift",
                 "IntegrationTests/StorePurchaseTests.swift",
                 "IntegrationTests/LibraryPresentationTests.swift",

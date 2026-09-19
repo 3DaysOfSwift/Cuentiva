@@ -5,10 +5,10 @@ Tests are grouped by responsibility. Production behaviour belongs to the feature
 | Folder | What it verifies | Runs in |
 | --- | --- | --- |
 | `AppModelTests` | Dependency wiring and shared access/progress through an isolated AppModel | Xcode |
-| `ViewModelTests` | One `NameViewModelTests.swift` per view model: screen state, actions, errors and cancellation | Xcode |
-| `FeatureTests/<Feature>` | Feature APIs, domain rules, access gates and rewards | Swift package and Xcode |
-| `ConcurrencyTests` | Ordering, overlapping operations, cancellation and shared refreshes | Swift package and Xcode |
-| `PersistenceTests` | Real temporary SwiftData stores, catalogue sync, migration and atomic rollback | Swift package and Xcode |
+| `PresentationTests/ViewModelTests` | One `NameViewModelTests.swift` per view model: screen state, actions, errors and cancellation | Xcode |
+| `AppModelTests/FeatureTests/<Feature>` | Feature APIs, domain rules, access gates and rewards | Swift package and Xcode |
+| `AppModelTests/ConcurrencyTests` | Ordering, overlapping operations, cancellation and shared refreshes | Swift package and Xcode |
+| `AppModelTests/PersistenceTests` | Real temporary SwiftData stores, catalogue sync, migration and atomic rollback | Swift package and Xcode |
 | `PresentationTests` | Theme selection and presentation-specific state | Xcode |
 | `IntegrationTests/Shared` | Workflows spanning several model features | Swift package and Xcode |
 | `IntegrationTests` (other files) | Screen coordination, speech adapters and StoreKit sandbox integration | Xcode; StoreKit requires simulator |

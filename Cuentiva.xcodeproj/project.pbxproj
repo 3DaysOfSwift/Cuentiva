@@ -29,7 +29,7 @@
 		223A4F39989188727D61F3B3 /* ModelFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCA26440E263655C8EAF47D /* ModelFixtures.swift */; };
 		2388717427E57ED34732DED7 /* LessonViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 390812B685A815AEE53C1F05 /* LessonViewModel.swift */; };
 		25296BECC944F58CF98771FE /* LearningLevelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F1CFCE640384A9EC12DCC51 /* LearningLevelTests.swift */; };
-		255ABBB105F25A56F02B8BAF /* Books.json in Resources */ = {isa = PBXBuildFile; fileRef = 432D7CF1733771C78DFAAC9E /* Books.json */; };
+
 		26F2D6B7180D656CF49983A5 /* ProgressManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18799BC49755CA6C411C5E56 /* ProgressManager.swift */; };
 		27B0C4899568DE38272362FD /* AuthorViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C66B458DB16638F61594DB96 /* AuthorViewModelTests.swift */; };
 		28CFE7748D340FC213F36D0D /* CommunityAuthors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 822DB11ED83B109A718D4F8D /* CommunityAuthors.swift */; };
@@ -175,6 +175,11 @@
 		F4A4329B68AD3931F126A10F /* TopicRequestBoard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFFE7E8DBAC7799D7EA06042 /* TopicRequestBoard.swift */; };
 		F8515861B90246DCFA60FDFA /* TopicRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71955E4954C8E1E4614DA0AE /* TopicRequest.swift */; };
 		FBF0B8705DC9367B4E818CA9 /* StoryParagraphRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12102DC4C66B23219F4943 /* StoryParagraphRow.swift */; };
+		8DA8C9B3AD4480900FC3C2E4 /* BinaryLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = B405F3EFAEC0849E87C121DF /* BinaryLibrary.swift */; };
+		ACEC85513695A4C930AC65E0 /* BinaryLibraryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83BA73932418840872678228 /* BinaryLibraryTests.swift */; };
+		D4E0EBC068A5F4D271CA383B /* Library.dat in Resources */ = {isa = PBXBuildFile; fileRef = 25ADA9BE32F0F37665C4ACA9 /* Library.dat */; };
+		F511F816AA5395DAFE299CEF /* Introduction.dat in Resources */ = {isa = PBXBuildFile; fileRef = C448A737281986EF3AC86AB4 /* Introduction.dat */; };
+		5AEE89A8C6168733D76A755A /* Books.json in Test Resources */ = {isa = PBXBuildFile; fileRef = 432D7CF1733771C78DFAAC9E; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -361,6 +366,10 @@
 		FAF1F7B88E6CFD40636811A9 /* LanguageTerm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTerm.swift; sourceTree = "<group>"; };
 		FBEA330C85B09B99B4DD90F4 /* LessonViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViewModelTests.swift; sourceTree = "<group>"; };
 		FEDA66EEE66264CF52DCFEEC /* CuentivaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuentivaApp.swift; sourceTree = "<group>"; };
+		B405F3EFAEC0849E87C121DF /* BinaryLibrary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BinaryLibrary.swift"; sourceTree = "<group>"; };
+		83BA73932418840872678228 /* BinaryLibraryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BinaryLibraryTests.swift"; sourceTree = "<group>"; };
+		25ADA9BE32F0F37665C4ACA9 /* Library.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Library.dat"; sourceTree = "DERIVED_FILE_DIR"; };
+		C448A737281986EF3AC86AB4 /* Introduction.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Introduction.dat"; sourceTree = "DERIVED_FILE_DIR"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -461,6 +470,7 @@
 		37E222C1CDD414E8034049BE /* PersistenceTests */ = {
 			isa = PBXGroup;
 			children = (
+				83BA73932418840872678228 /* BinaryLibraryTests.swift */,
 				3AE16001ADD439DCFBC1D550 /* StoreOpeningTests.swift */,
 				6BF85887240691FD82D7BFC1 /* CatalogueAddressTests.swift */,
 				A25CF74BB127B2020597BE18 /* CatalogueSyncTests.swift */,
@@ -524,6 +534,8 @@
 		40DDF4A082D6630DBD1955EC /* 3 - App Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C448A737281986EF3AC86AB4 /* Introduction.dat */,
+				25ADA9BE32F0F37665C4ACA9 /* Library.dat */,
 				432D7CF1733771C78DFAAC9E /* Books.json */,
 				024C09AE9C4C923058DC9B6C /* PrivacyInfo.xcprivacy */,
 				2721CA1AC4587BDF99F89E71 /* Cuentiva.storekit */,
@@ -929,6 +941,7 @@
 		B310CBD0E45EBC1B730B579C /* Local */ = {
 			isa = PBXGroup;
 			children = (
+				B405F3EFAEC0849E87C121DF /* BinaryLibrary.swift */,
 				63393034B3C80361072D8D53 /* ProgressRecords.swift */,
 				111E91D09E0545EEBFAF8332 /* SwiftDataStore.swift */,
 				E50A39939B0BCA7590A7DD9D /* LocalRepositories.swift */,
@@ -1071,6 +1084,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 61AF5D6BEA2D148C6F2833BF /* Build configuration list for PBXNativeTarget "CuentivaTests" */;
 			buildPhases = (
+				EF86DAFFAE8C4283A6CB2781 /* Test Resources */,
 				6E431EB0650617AA1756B320 /* Sources */,
 				1ABF84E55BD30AC2CEF8FC42 /* Frameworks */,
 			);
@@ -1088,6 +1102,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 10F22E9B1C74CB19D5242D9B /* Build configuration list for PBXNativeTarget "Cuentiva" */;
 			buildPhases = (
+				93DA21E642EB2CA85990BF30 /* Compile bundled library */,
 				BCE16DD0260827ECF338C787 /* Sources */,
 				0189424A5A60FED329FA868E /* Resources */,
 				7561BFB015D8F536760CB671 /* Frameworks */,
@@ -1144,20 +1159,38 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				255ABBB105F25A56F02B8BAF /* Books.json in Resources */,
+				F511F816AA5395DAFE299CEF /* Introduction.dat */,
+				D4E0EBC068A5F4D271CA383B /* Library.dat */,
 				70383857801EB3BE559F581E /* PrivacyInfo.xcprivacy in Resources */,
 				7FEE17085A526D31C36F2BB4 /* Assets.xcassets in Resources */,
 				1F1782310977A7B3A6CCDCA3 /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		EF86DAFFAE8C4283A6CB2781 /* Test Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (5AEE89A8C6168733D76A755A,); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
+
+
+/* Begin PBXShellScriptBuildPhase section */
+		93DA21E642EB2CA85990BF30 /* Compile bundled library */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ("$(SRCROOT)/scripts/build_library_dat.py", "$(SRCROOT)/Cuentiva/3 - App Resources/Books.json");
+			name = "Compile bundled library";
+			outputPaths = ("$(DERIVED_FILE_DIR)/Library.dat", "$(DERIVED_FILE_DIR)/Introduction.dat");
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\n/usr/bin/python3 \"$SRCROOT/scripts/build_library_dat.py\" --output-dir \"$DERIVED_FILE_DIR\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6E431EB0650617AA1756B320 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ACEC85513695A4C930AC65E0 /* BinaryLibraryTests.swift */,
 				542C59EB355F062E21588243 /* StoreOpeningTests.swift in Sources */,
 				C2D74E2309A996143CAFDA47 /* AppModelTests.swift in Sources */,
 				1546DD17BC7534AE16BEBEE2 /* FeatureConcurrencyTests.swift in Sources */,
@@ -1228,6 +1261,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8DA8C9B3AD4480900FC3C2E4 /* BinaryLibrary.swift */,
 				F1CCAB3D62CE13D122614F78 /* ProgressRecords.swift in Sources */,
 				0A48B90A416E7CB34A572391 /* SwiftDataStore.swift in Sources */,
 				DD3DADD05BB5902B94987962 /* CuentivaApp.swift in Sources */,

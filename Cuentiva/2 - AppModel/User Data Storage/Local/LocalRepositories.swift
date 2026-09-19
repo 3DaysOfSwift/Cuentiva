@@ -1,17 +1,28 @@
 import Foundation
 
 actor BundledBookRepository: BookRepository {
-    let url: URL?
-    init(url: URL? = Bundle.main.url(forResource: "Books", withExtension: "json")) { self.url = url }
+    private let url: URL?
+    private let introductionURL: URL?
+    init(url: URL? = Bundle.main.url(forResource: "Library", withExtension: "dat"),
+         introductionURL: URL? = Bundle.main.url(forResource: "Introduction", withExtension: "dat")) {
+        self.url = url
+        self.introductionURL = introductionURL
+    }
+    func introduction() async throws -> Book {
+        guard let introductionURL else { throw AppFailure.invalidBook }
+        let library = try BinaryLibrary(url: introductionURL)
+        let book = try library.book(at: 0)
+        guard library.count == 1, book.id == "cafe" else { throw AppFailure.invalidBook }
+        return book
+    }
     func books() throws -> [Book] {
         guard let url else { throw AppFailure.invalidBook }
-        let books = try JSONDecoder().decode([Book].self, from: Data(contentsOf: url))
+        let books = try BinaryLibrary(url: url).books()
         guard Set(books.map(\.id)).count == books.count,
             books.allSatisfy({
                 !$0.sentences.isEmpty && Set($0.fullText.map(\.id)).count == $0.fullText.count
                     && $0.fullText.allSatisfy { !$0.spanish.isEmpty && !$0.english.isEmpty }
-            })
-        else { throw AppFailure.invalidBook }
+            }) else { throw AppFailure.invalidBook }
         return books
     }
 }
