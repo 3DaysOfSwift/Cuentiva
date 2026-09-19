@@ -4,6 +4,7 @@ enum VocabularyState: String, Codable, CaseIterable, Sendable { case unknown, le
 enum LearningLevel: String, Codable, CaseIterable, Sendable { case a1 = "A1", a2 = "A2", b1 = "B1", b2 = "B2", c1 = "C1", c2 = "C2" }
 struct LearnerProgress: Codable, Sendable, Equatable {
     /// Shared across all targets; only distinct, saved completions unlock writing.
+    var chatUnlocked: Bool { completed.count >= ReadingMilestones.chatOfferBookCount }
     var writingUnlocked: Bool { completed.count >= ReadingMilestones.writingBookCount }
     var isVIP: Bool { completed.count >= ReadingMilestones.honouredReaderBookCount }
     var readerBadges: [ReaderBadge] {
@@ -25,6 +26,7 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var availableThemes: [ColourThemeID] {
         [.library, .midnight] + ThemePack.allCases.filter(hasInstalled).flatMap(\.themes)
     }
+    var lastWelcomeDay: String? = nil
     var schemaVersion = 1
     var selectedLearningLevel: LearningLevel? = nil
     var completed: Set<String> = []
@@ -57,6 +59,7 @@ struct CompletionReceipt: Identifiable, Sendable {
     let total: Int
     var streakCelebration: Int? = nil
     var streakThemeGift: ThemePack? = nil
+    var unlocksChat: Bool { isNew && total == ReadingMilestones.chatOfferBookCount }
     var offersChat: Bool { total >= ReadingMilestones.chatOfferBookCount }
     var unlocksWriting: Bool { isNew && total == ReadingMilestones.writingBookCount }
     var celebratesHundredBooks: Bool { isNew && total == ReadingMilestones.honouredReaderBookCount }

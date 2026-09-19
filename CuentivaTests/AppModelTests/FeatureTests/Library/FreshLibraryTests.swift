@@ -52,6 +52,31 @@ import Testing
         #expect(await library.dailyReads.isEmpty)
     }
 
+    @Test func formatCountsRespectFiltersWhileCompletedStatsStayLifetime() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let story = sample("story")
+        var verbs = sample("verbs"); verbs.format = .verbs
+        let library = LibraryManager(repository: MemoryBooks(values: [story, verbs]), purchases: purchases, progress: progress)
+        try await progress.load(); try await library.load()
+        let filtered = await library.presentation(.init(format: .verbs))
+        #expect(filtered.books.map(\.id) == ["verbs"])
+        #expect(filtered.formatCounts[.verbs] == 1)
+        #expect(filtered.formatCounts[.story] == 1)
+        try await progress.recordEncounter(book: story, sentence: story.sentences[0])
+        _ = try await progress.complete(book: story)
+        let completed = await library.presentation(.init(completedOnly: true, format: .verbs))
+        #expect(completed.books.isEmpty)
+        #expect(completed.formatCounts[.story] == 1)
+        #expect(completed.formatCounts[.verbs, default: 0] == 0)
+        #expect(completed.completedTotal == 1)
+        #expect(completed.practiceDays == 1)
+        #expect(completed.doubloons == 1)
+        let missing = await library.presentation(.init(text: "no matching words"))
+        #expect(missing.formatCounts.isEmpty)
+        #expect(missing.completedTotal == 1)
+    }
+
     final class Clock { var date = Date(timeIntervalSince1970: 1_800_014_400) }
     @Test func loadingAndDisplayingLibraryNeverWritesProgress() async throws {
         let store = MemoryProgress(), purchases = TestPurchases(); purchases.hasAccess = true

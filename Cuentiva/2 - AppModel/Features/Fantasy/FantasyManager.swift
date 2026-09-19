@@ -12,6 +12,7 @@ import Observation
     func drawCreature() async throws -> FantasyCreature
     func saveDetails(name: String, biography: String) async throws
     func createIdentity(name: String, biography: String) async throws
+    func saveIdentity(name: String, biography: String) async throws
     func createStory(memory: String) async throws -> FantasyStory
     var nextPublicationDate: Date? { get }
     func publishedBook(for story: FantasyStory) -> Book?
@@ -119,6 +120,22 @@ import Observation
         next.profile?.details = StorytellerDetails(name: name, biography: biography)
         try await repository.save(next); archive = next
     }
+    /// Direct editing needs no generation or Apple Intelligence availability.
+    func saveIdentity(name: String, biography: String) async throws {
+        guard loaded, !busy else { throw AppFailure.busy }
+        guard profile != nil else { throw AppFailure.unavailable("Choose your character first.") }
+        let identity = FantasyIdentity(name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            biography: biography.trimmingCharacters(in: .whitespacesAndNewlines))
+        try FantasyValidation.identity(identity)
+        busy = true; defer { busy = false }
+        var next = archive
+        next.profile?.identity = identity
+        next.profile?.details = .init(name: identity.name, biography: identity.biography)
+        next.introductionSeen = true
+        try await repository.save(next)
+        archive = next
+    }
+
     func createIdentity(name: String, biography: String) async throws {
         guard loaded, !busy else { throw AppFailure.busy }
         guard let profile else { throw AppFailure.unavailable("Reveal your creature first.") }

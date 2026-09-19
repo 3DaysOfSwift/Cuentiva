@@ -17,7 +17,7 @@ struct StorytellerRevealView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                Text(model.stage == .identity ? "Meet your storyteller" : "Reveal your spirit animal")
+                Text(model.stage == .details ? "Your storyteller" : "Your storyteller")
                     .font(.system(.largeTitle, design: .serif))
                 if [.spinning, .slowing, .number].contains(model.stage) {
                     Text("\(model.number)")
@@ -38,64 +38,53 @@ struct StorytellerRevealView: View {
                     }
                     if model.stage == .creature {
                         Text("You’re a \(model.creature?.title.lowercased() ?? "storyteller")!").font(.title2)
-                        Button("Give my storyteller a voice") { model.editDetails() }.buttonStyle(PrimaryButton())
+                        Text("Make Cuentiva yours. Let your storyteller welcome you from your Home Screen.").foregroundStyle(theme.theme.muted)
                     } else if model.stage == .details {
-                        Text("Save your name and bio on this device. When Apple Intelligence is available, it can turn them into a fantasy name and biography.").foregroundStyle(theme.theme.muted)
-                        TextField("Your name", text: $model.name).textContentType(.givenName).focused($editingDetails)
+                        Text("Your character is chosen. Make this name and biography your own, or keep them just as they are.").foregroundStyle(theme.theme.muted)
+                        TextField("Storyteller name", text: $model.name).focused($editingDetails)
                             .padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
-                        TextField("A short bio: your adventures, interests and dreams", text: $model.biography, axis: .vertical)
-                            .focused($editingDetails).lineLimit(3...6).padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
-                        Button("Save name and bio") {
-                            editingDetails = false
-                            operation = Task { await model.saveDetails() }
-                        }.buttonStyle(PrimaryButton()).disabled(!model.canSaveDetails)
-                        if let message = model.savedMessage {
-                            Text(message).font(.footnote).foregroundStyle(theme.theme.accent)
-                        }
-                        Button(model.busy ? "Dreaming up your storyteller…" : "Reveal my storyteller") {
-                            editingDetails = false
-                            operation = Task { await model.generateIdentity() }
-                        }.buttonStyle(.bordered).disabled(model.busy || model.availabilityMessage != nil || model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || model.biography.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                    } else if let identity = model.identity {
-                        Text(identity.name).font(.system(.largeTitle, design: .serif)).transition(.scale.combined(with: .opacity))
-                        Text(identity.biography)
-                        Button("Edit my name and bio") { model.editDetails() }
-                        Button("Begin my next chapter") {
-                            operation = Task { if await model.finish() { onContinue() } }
-                        }.buttonStyle(PrimaryButton())
+                        Text("One short name, up to 24 letters.").font(.caption).foregroundStyle(theme.theme.muted)
+                        TextField("Storyteller biography", text: $model.biography, axis: .vertical)
+                            .focused($editingDetails).lineLimit(4...8).padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 12))
                     }
                 }
-                if model.canOfferIcon, [.creature, .identity].contains(model.stage) {
-                    Divider()
-                    Text("Your character. Your Cuentiva.").font(.title2)
-                    Text("Let your storyteller welcome you from your Home Screen as you learn to tell your own adventures in Spanish.")
-                        .font(.subheadline).foregroundStyle(theme.theme.muted)
-                    if model.usesStorytellerIcon {
-                        Label("Your storyteller is your app icon", systemImage: "checkmark.circle.fill")
-                        Button("Use Pipa again") { operation = Task { await model.restorePipaIcon() } }
-                            .disabled(model.changingIcon)
-                    } else {
-                        Button(model.changingIcon ? "Changing icon…" : "Use my storyteller as the app icon") {
-                            operation = Task { await model.useStorytellerIcon() }
-                        }.buttonStyle(.bordered).disabled(model.changingIcon)
-                        Text("Prefer Pipa? Simply continue without changing your icon.").font(.caption)
-                    }
-                    if let message = model.iconMessage { Text(message).font(.footnote) }
-                }
-                if let message = model.availabilityMessage {
-                    Text(message).font(.footnote).foregroundStyle(theme.theme.muted)
-                    Button("Check again") { Task { await model.refreshAvailability() } }
-                }
+                if let message = model.iconMessage { Text(message).font(.footnote) }
                 InlineError(message: model.error)
                 if !model.ready, model.error != nil {
                     Button("Retry loading my storyteller") { Task { await model.prepare() } }
                 }
-                if model.stage != .identity {
+                if model.stage != .details && model.stage != .creature {
                     Button("Continue to the library for now") {
                         operation = Task { if await model.finish() { onContinue() } }
                     }.font(.footnote).disabled(model.busy)
                 }
             }.multilineTextAlignment(.center).padding(26)
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if model.stage == .creature || model.stage == .details {
+                VStack(spacing: 10) {
+                    if model.stage == .creature {
+                        if model.canOfferIcon {
+                            Button(model.changingIcon ? "Changing icon…" : "Use my storyteller as the app icon") {
+                                operation = Task { await model.chooseIconAndEdit() }
+                            }.buttonStyle(PrimaryButton()).disabled(model.changingIcon || model.busy)
+                            Button("Keep Pipa and continue") { model.editDetails() }
+                                .font(.footnote).disabled(model.changingIcon || model.busy)
+                        } else {
+                            Button("Name my storyteller") { model.editDetails() }.buttonStyle(PrimaryButton())
+                        }
+                    } else {
+                        Button(model.busy ? "Saving…" : "Save my storyteller") {
+                            editingDetails = false
+                            operation = Task {
+                                await model.saveDetails()
+                                if model.savedMessage != nil { onContinue() }
+                            }
+                        }.buttonStyle(PrimaryButton()).disabled(!model.canSaveDetails)
+                    }
+                }.padding(.horizontal, 26).padding(.vertical, 12)
+                    .background(theme.theme.paper).dockedAreaBorder()
+            }
         }
         .scrollDismissesKeyboard(.interactively)
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink)

@@ -5,6 +5,9 @@ struct BookCover: View {
     let book: Book
     var completed = false
     var compact = false
+    var showsReadingAction = false
+    var readingCelebration = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .title3) private var compactHeight = 220.0
     @ScaledMetric(relativeTo: .largeTitle) private var fullHeight = 310.0
     private var color: Color {
@@ -30,6 +33,7 @@ struct BookCover: View {
                     Text(book.storytellerName.uppercased())
                         .font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1)
                         .padding(.trailing, compact ? 52 : 68)
+                        .opacity(showsReadingAction ? 0 : 1)
                 }.padding(compact ? 17 : 25).foregroundStyle(theme.theme.coverInk)
             }
             if completed {
@@ -37,9 +41,31 @@ struct BookCover: View {
                     .foregroundStyle(theme.theme.onAccent, theme.theme.accent).padding(9)
             }
         }.frame(height: compact ? compactHeight : fullHeight)
+            .overlay(alignment: .bottom) {
+                if showsReadingAction {
+                    LinearGradient(colors: [theme.theme.accent, theme.theme.accent.opacity(0)],
+                        startPoint: .bottomLeading, endPoint: .topTrailing)
+                        .frame(height: compact ? 100 : 140)
+                        .allowsHitTesting(false)
+                }
+            }
             .overlay(alignment: .bottomTrailing) {
                 AuthorPortrait(author: book.storyteller, size: compact ? 52 : 68)
                     .padding(compact ? 12 : 17)
+            }
+            .overlay(alignment: .bottomLeading) {
+                if showsReadingAction {
+                    Image(systemName: "play.fill")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(theme.theme.onAccent)
+                        .frame(width: 44, height: 44)
+                        .background(theme.theme.accent, in: Circle())
+                        .phaseAnimator([1.0, 1.12, 0.96, 1.0], trigger: readingCelebration) { content, scale in
+                            content.scaleEffect(reduceMotion ? 1 : scale)
+                        } animation: { _ in .spring(duration: 0.3, bounce: 0.45) }
+                        .padding(compact ? 12 : 17)
+                        .accessibilityHidden(true)
+                }
             }
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .shadow(color: color.opacity(0.18), radius: 10, x: 0, y: 5)

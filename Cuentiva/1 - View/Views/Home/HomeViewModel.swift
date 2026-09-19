@@ -21,11 +21,13 @@ import Observation
         .init(text: query, level: level == "All" ? nil : level, format: format, sort: sort,
             hideCompleted: hideCompleted, recommendations: query.isEmpty && sort == .library && hideCompleted)
     }
-    func refresh() async {
+    @discardableResult
+    func refresh() async -> Bool {
         let requested = refreshID
         let result = await library.presentation(requested.query)
-        guard !Task.isCancelled, requested == refreshID else { return }
+        guard !Task.isCancelled, requested == refreshID else { return false }
         presentation = result
+        return true
     }
     var dailyReadsCompleted: Bool { presentation.dailyReadsCompleted }
     var showTomorrowFooter: Bool { dailyReads.count == 3 && dailyReadsCompleted }
@@ -44,9 +46,7 @@ import Observation
     var readButtonTitle: String {
         if preparingDailyReads { return "Loading books…" }
         if dailyReadsCompleted { return "Load 3 more books" }
-        guard let book = focusedRead else { return "Read book" }
-        guard let number = progress.snapshot.nextCompletionNumber(for: book.id) else { return "Read again" }
-        return "Read book \(number)"
+        return "Read book"
     }
 
     func performReadingAction() async {
@@ -103,6 +103,7 @@ import Observation
         !progress.snapshot.attempts[book.id, default: []].isEmpty
             || progress.snapshot.positions[book.id, default: 0] > 0
     }
+    var furtherRecommendations: [Book] { presentation.moreBooks.filter { book in !dailyReads.contains { $0.id == book.id } } }
     var books: [Book] { presentation.books }
     var total: Int { progress.snapshot.completed.count }
     var streak: Int { progress.streak }

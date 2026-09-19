@@ -59,6 +59,9 @@ enum ProgressRecords {
             rows["bookLastRead"] = try RecordCoding.encode(value.bookLastRead != nil)
             try map("bookLastRead", value.bookLastRead ?? [:], previous?.bookLastRead ?? [:], into: &rows)
         }
+        if previous == nil || previous?.lastWelcomeDay != value.lastWelcomeDay {
+            rows["lastWelcomeDay"] = try RecordCoding.encode(value.lastWelcomeDay)
+        }
         if previous == nil || previous?.dailyReadingDate != value.dailyReadingDate {
             rows["dailyReadingDate"] = try RecordCoding.encode(value.dailyReadingDate)
         }
@@ -152,6 +155,9 @@ enum ProgressRecords {
         if let marker = rows["bookLastRead"], try RecordCoding.decode(Bool.self, marker) { value.bookLastRead = [:] }
         for (key, data) in rows where key.hasPrefix("bookLastRead/") {
             value.bookLastRead?[String(key.dropFirst(13))] = try RecordCoding.decode(Date.self, data)
+        }
+        if let data = rows["lastWelcomeDay"] {
+            value.lastWelcomeDay = try RecordCoding.decode(type(of: value.lastWelcomeDay), data)
         }
         if let data = rows["dailyReadingDate"] {
             value.dailyReadingDate = try RecordCoding.decode(type(of: value.dailyReadingDate), data)

@@ -7,6 +7,8 @@ import Observation
     var loaded: Bool { get }
     var streak: Int { get }
     var week: [WeekDay] { get }
+    var dailyWelcome: DailyWelcome? { get }
+    func acknowledgeWelcome(day: String) async throws
     func load() async throws
     func registerLibrary(_ books: [Book]) async throws
     func saveDailyReading(_ ids: [String], date: Date) async throws
@@ -56,6 +58,17 @@ import Observation
             format: "%04d-%02d-%02d",
             calendar.component(.year, from: date), calendar.component(.month, from: date),
             calendar.component(.day, from: date))
+    }
+    var dailyWelcome: DailyWelcome? {
+        let day = dayKey(now())
+        guard loaded, snapshot.lastWelcomeDay != day else { return nil }
+        return DailyWelcome(day: day, streak: streak,
+            practicedToday: snapshot.practiceDays.contains(day),
+            returningReader: !snapshot.practiceDays.isEmpty)
+    }
+    func acknowledgeWelcome(day: String) async throws {
+        guard day == dayKey(now()) else { return }
+        try await commit { $0.lastWelcomeDay = day }
     }
     var streak: Int { streak(in: snapshot) }
     private func streak(in value: LearnerProgress) -> Int {

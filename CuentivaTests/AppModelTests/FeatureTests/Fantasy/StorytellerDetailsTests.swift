@@ -7,6 +7,22 @@ import Testing
 #endif
 
 @Suite @MainActor struct StorytellerDetailsTests {
+    @Test func editedIdentitySavesWithoutAIAndPreservesItOnFailure() async throws {
+        let repository = FantasyTestRepository()
+        let feature = FantasyManager(repository: repository, generator: UnavailableFantasyGenerator(), draw: { .fox })
+        try await feature.load(); _ = try await feature.drawCreature()
+        let defaults = FantasyCreature.fox.defaultIdentity
+        try await feature.saveIdentity(name: defaults.name, biography: defaults.biography)
+        let reopened = FantasyManager(repository: repository, generator: UnavailableFantasyGenerator())
+        try await reopened.load()
+        #expect(reopened.profile?.identity == defaults)
+        #expect(reopened.introductionSeen)
+        await #expect(throws: AppFailure.self) { try await feature.saveIdentity(name: "Two Names", biography: defaults.biography) }
+        await repository.setFailure()
+        await #expect(throws: (any Error).self) { try await feature.saveIdentity(name: "Faro", biography: "A new biography.") }
+        #expect(feature.profile?.identity == defaults)
+    }
+
     @Test func saveAndReopenBioWithoutAI() async throws {
         let repository = FantasyTestRepository()
         let feature = FantasyManager(repository: repository, generator: UnavailableFantasyGenerator())

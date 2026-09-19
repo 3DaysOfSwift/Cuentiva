@@ -15,6 +15,19 @@ import Testing
         #expect(!vm.showingPractice)
     }
 
+    @Test func eleventhNewBookOffersChatGiftButRereadsDoNot() {
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
+        let model = CompletionViewModel(receipt: receipt)
+        #expect(receipt.unlocksChat)
+        #expect(!model.continueJourney(receipt, practiceAllowed: false))
+        #expect(model.showingChatGift)
+        let reread = CompletionReceipt(book: sample(), isNew: false, total: 11)
+        model.prepare(reread)
+        #expect(!reread.unlocksChat)
+        #expect(!model.showingChatGift)
+        #expect(model.continueJourney(reread, practiceAllowed: false))
+    }
+
     @Test func celebrationCountsOnce() {
         let receipt = CompletionReceipt(book: sample(), isNew: true, total: 2), vm = CompletionViewModel()
         vm.prepare(receipt); #expect(vm.displayedTotal == 1); vm.celebrate(receipt); vm.prepare(receipt); #expect(vm.displayedTotal == 2)

@@ -3,7 +3,7 @@ import Observation
 import UIKit
 
 @MainActor @Observable final class StorytellerRevealViewModel {
-    enum Stage { case spinning, slowing, number, creature, details, identity }
+    enum Stage { case spinning, slowing, number, creature, details }
     private let feature: any FantasyFeature
     private let supportsIcons: @MainActor () -> Bool
     private let currentIcon: @MainActor () -> String?
@@ -45,16 +45,17 @@ import UIKit
         !busy && ready && !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !biography.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     func editDetails() {
-        name = feature.profile?.details?.name ?? ""
-        biography = feature.profile?.details?.biography ?? ""
+        let identity = feature.profile?.identity ?? creature?.defaultIdentity
+        name = identity?.name ?? ""
+        biography = identity?.biography ?? ""
         savedMessage = nil; error = nil; stage = .details
     }
     func saveDetails() async {
         guard !busy else { return }
         busy = true; error = nil; savedMessage = nil; defer { busy = false }
         do {
-            try await feature.saveDetails(name: name, biography: biography)
-            savedMessage = "Your name and bio are saved on this device. You can reveal your fantasy storyteller later."
+            try await feature.saveIdentity(name: name, biography: biography)
+            savedMessage = "Your storyteller is saved on this device."
         } catch { self.error = error.localizedDescription }
     }
     var confettiStart: Date?
@@ -85,7 +86,7 @@ import UIKit
             ready = true
             name = feature.profile?.details?.name ?? ""
             biography = feature.profile?.details?.biography ?? ""
-            if identity != nil { stage = .identity }
+            if identity != nil { editDetails() }
             else if let creature { number = feature.profile?.revealNumber ?? creature.rawValue; stage = feature.profile?.details == nil ? .creature : .details }
         } catch { self.error = error.localizedDescription }
     }
@@ -117,15 +118,8 @@ import UIKit
             self.error = error.localizedDescription; stage = .spinning
         }
     }
-    func generateIdentity() async {
-        guard !busy else { return }
-        busy = true; error = nil; defer { busy = false }
-        do {
-            try await feature.saveDetails(name: name, biography: biography)
-            try await feature.createIdentity(name: name, biography: biography)
-            name = ""; biography = "" // Clear the form; saved details remain editable.
-            stage = .identity; confettiStart = Date().addingTimeInterval(-0.65)
-        } catch is CancellationError { }
-        catch { self.error = error.localizedDescription }
+    func chooseIconAndEdit() async {
+        await useStorytellerIcon()
+        if usesStorytellerIcon { editDetails() }
     }
 }

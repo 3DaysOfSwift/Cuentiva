@@ -8,9 +8,17 @@ struct CompletedView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 25) {
-                Text("Look how far\nyou’ve read.").font(.system(.largeTitle, design: .serif))
+                VStack(alignment: .leading, spacing: 6) {
+                    PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 100)
+                        .padding(.bottom, 10)
+                    Text("\(viewModel.total)").font(.system(size: 72, weight: .medium, design: .serif)).monospacedDigit()
+                    Text(viewModel.total == 1 ? "BOOK READ" : "BOOKS READ").font(.headline).tracking(2)
+                    Text("\(viewModel.practiceDays) days practised · \(viewModel.doubloons) doubloons available")
+                        .font(.subheadline).foregroundStyle(theme.theme.muted)
+                }
+                Text("Look how far you’ve read.").font(.system(.title2, design: .serif))
                 Text("Every finished story belongs here. Your collection stays with you, even when a streak ends.").foregroundStyle(theme.theme.muted)
-                LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
+                LibraryControls(format: $viewModel.format, sort: $viewModel.sort, counts: viewModel.presentation.formatCounts, horizontalInset: 24)
                 if viewModel.books.isEmpty { ContentUnavailableView("No completed books here", systemImage: "books.vertical", description: Text("Try another filter or finish a book to add it to your shelf.")) }
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 25) {
                     ForEach(viewModel.books) { book in

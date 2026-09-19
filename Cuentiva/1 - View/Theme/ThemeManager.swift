@@ -8,7 +8,7 @@ import SwiftUI
     private var preferredTheme: ColourThemeID
     var availableThemes: [ColourThemeID] { progress.snapshot.availableThemes }
     var selectedTheme: ColourThemeID {
-        get { availableThemes.contains(preferredTheme) ? preferredTheme : .library }
+        get { availableThemes.contains(preferredTheme) ? preferredTheme : .midnight }
         set {
             guard availableThemes.contains(newValue) else { return }
             preferredTheme = newValue
@@ -19,6 +19,6 @@ import SwiftUI
     init(preferences: UserDefaults = .standard, progress: any ProgressFeature = AppModel.shared.progress) {
         self.preferences = preferences
         self.progress = progress
-        preferredTheme = preferences.string(forKey: Self.preferenceKey).flatMap(ColourThemeID.init(rawValue:)) ?? .library
+        preferredTheme = preferences.string(forKey: Self.preferenceKey).flatMap(ColourThemeID.init(rawValue:)) ?? .midnight
     }
 }

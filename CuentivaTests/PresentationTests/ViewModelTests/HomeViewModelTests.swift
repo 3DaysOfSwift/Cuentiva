@@ -76,9 +76,9 @@ import Testing
         let second = Task { await home.refresh() }
         try await waitUntil { library.pending.count == 2 }
         library.pending[1].resume(returning: .init(books: [sample("second")]))
-        await second.value
+        #expect(await second.value)
         library.pending[0].resume(returning: .init(books: [sample("first")]))
-        await first.value
+        #expect(await first.value == false)
         #expect(home.books.map(\.id) == ["second"])
     }
 }

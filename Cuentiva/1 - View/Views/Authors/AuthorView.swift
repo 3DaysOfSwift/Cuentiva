@@ -1,11 +1,9 @@
 import SwiftUI
 
 struct AuthorView: View {
-    let onWrite: (() -> Void)?
     @State private var model: AuthorViewModel
     @Environment(ThemeManager.self) private var theme
-    init(author: Author, onWrite: (() -> Void)? = nil) {
-        self.onWrite = onWrite
+    init(author: Author) {
         _model = State(initialValue: AuthorViewModel(author: author))
     }
     var body: some View {
@@ -19,8 +17,10 @@ struct AuthorView: View {
                     Text("Behind the stories").font(.headline)
                     Text(model.author.note).font(.system(.body, design: .serif))
                 }.padding(20).frame(maxWidth: .infinity, alignment: .leading).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
-                NavigationLink { ChatView(author: model.author) } label: {
-                    Label("Talk with \(model.author.name)", systemImage: "bubble.left.and.bubble.right")
+                if model.chatUnlocked {
+                    NavigationLink { ChatView(author: model.author) } label: {
+                        Label("Talk with \(model.author.name)", systemImage: "bubble.left.and.bubble.right")
+                    }
                 }
                 Text("Stories by \(model.author.name)").font(.system(.title2, design: .serif))
                 ForEach(model.books) { book in
@@ -31,9 +31,6 @@ struct AuthorView: View {
                             Text("\(book.level) · \(book.fullText.count) \(book.unitName)").font(.caption).foregroundStyle(theme.theme.muted)
                         }
                     }.buttonStyle(.plain)
-                }
-                if let onWrite {
-                    Button(action: onWrite) { Label("Create a tale of your own", systemImage: "square.and.pencil") }
                 }
             }.padding(23)
         }

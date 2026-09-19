@@ -19,14 +19,14 @@ struct CompletionView: View {
             VStack(spacing: 25) {
                 VStack(spacing: 5) {
                     Text("\(viewModel.displayedTotal)").font(.system(size: 72, weight: .medium, design: .serif)).contentTransition(.numericText())
-                    Text("BOOKS LEARNED").font(.caption.bold()).tracking(3)
+                    Text(viewModel.displayedTotal == 1 ? "BOOK LEARNED" : "BOOKS LEARNED").font(.caption.bold()).tracking(3)
                     Text(receipt.isNew ? "+1 to your collection" : "A familiar story, practiced again").font(.subheadline).foregroundStyle(theme.theme.accent)
                 }
                 if receipt.isNew {
                     Label("+1 doubloon", systemImage: "circle.circle.fill")
                         .font(.subheadline).foregroundStyle(theme.theme.rewardGold)
                 }
-                if receipt.offersChat {
+                if receipt.offersChat && !receipt.unlocksChat {
                     Button {
                         viewModel.showingChat = true
                     } label: {
@@ -51,8 +51,14 @@ struct CompletionView: View {
                         .multilineTextAlignment(.center)
                     Text("Five little adventures in Spanish. Every story is another step on your journey.")
                         .multilineTextAlignment(.center)
+                } else if receipt.unlocksChat {
+                    Image(systemName: "gift.fill").font(.system(size: 80)).foregroundStyle(theme.theme.accent)
+                    Text("Eleven books.\nA new way to connect.")
+                        .font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
+                    Text("You’ve earned a new gift. Let’s put those Spanish words into a conversation.")
+                        .multilineTextAlignment(.center)
                 } else if receipt.themePackGift != nil {
-                    Text("\(receipt.total) books.\nA new gift awaits.")
+                    Text("\(receipt.total) \(receipt.total == 1 ? "book" : "books").\nA new gift awaits.")
                         .font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
                     Text("You’ve earned a pack of five colour themes. Make your next chapter feel a little more yours.")
                         .multilineTextAlignment(.center)
@@ -80,7 +86,7 @@ struct CompletionView: View {
                     VStack(spacing: 14) {
                         Text("Keep your story going. Spend less.")
                             .font(.system(.title2, design: .serif, weight: .medium))
-                        Text("You’ve read \(receipt.total) books! Save on a year of reading with the annual plan.")
+                        Text("You’ve read \(receipt.total) \(receipt.total == 1 ? "book" : "books")! Save on a year of reading with the annual plan.")
                         Text("\(viewModel.annualPrice) per year, billed yearly, instead of \(viewModel.monthlyPrice) per month.")
                             .font(.headline)
                         Text("Ahorra con el plan anual")
@@ -98,9 +104,10 @@ struct CompletionView: View {
             }.padding(28).frame(maxWidth: .infinity)
         }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Button("Continue reading →", action: continueJourney)
+                Button(receipt.unlocksChat ? "Open my gift →" : "Finish →", action: continueJourney)
                     .buttonStyle(PrimaryButton()).padding(.horizontal, 28).padding(.vertical, 12)
                     .background(theme.theme.paper)
+                    .dockedAreaBorder()
             }
             .opacity(contentVisible ? 1 : 0)
             .offset(y: contentVisible ? 0 : 18)
@@ -159,6 +166,11 @@ struct CompletionView: View {
             }
             .fullScreenCover(item: $viewModel.showingThemePack, onDismiss: { dismiss() }) { pack in
                 ThemePackGiftView(pack: pack) { viewModel.showingThemePack = nil }
+            }
+            .fullScreenCover(isPresented: $viewModel.showingChatGift, onDismiss: { dismiss() }) {
+                NavigationStack {
+                    ChatGiftView { viewModel.showingChatGift = false }
+                }
             }
             .navigationDestination(isPresented: $viewModel.showingChat) {
                 ChatView(author: receipt.book.storyteller)

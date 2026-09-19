@@ -11,6 +11,13 @@ enum FantasyCreature: Int, Codable, CaseIterable, Sendable, Identifiable {
     var title: String {
         switch self { case .turtle: "Turtle"; case .unicorn: "Winged unicorn"; case .fox: "Fox" }
     }
+    var defaultIdentity: FantasyIdentity {
+        switch self {
+        case .fox: .init(name: "Foxy", biography: "A curious fox with a travelling library and a notebook full of adventures. Foxy turns everyday memories into magical tales, discovering new words and new friends along the way.")
+        case .turtle: .init(name: "Tula", biography: "A thoughtful turtle who carries stories wherever the path leads. Tula listens closely, notices little wonders and turns each journey into a tale worth sharing.")
+        case .unicorn: .init(name: "Alba", biography: "An adventurous winged unicorn who follows bright ideas across distant skies. Alba gathers surprising encounters and weaves them into joyful stories about friendship and discovery.")
+        }
+    }
     var appIconName: String { "AppIcon" + portrait }
     var portrait: String {
         switch self { case .turtle: "SpiritTurtle"; case .unicorn: "SpiritUnicorn"; case .fox: "SpiritFox" }

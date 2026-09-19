@@ -35,7 +35,7 @@ struct StatsView: View {
                 }
                 Divider()
                 VStack(spacing: 22) {
-                    stat("Books read", value: "\(viewModel.booksRead)", symbol: "books.vertical")
+                    stat(viewModel.booksRead == 1 ? "Book read" : "Books read", value: "\(viewModel.booksRead)", symbol: "books.vertical")
                     stat("Doubloons available", value: "\(viewModel.doubloons)", symbol: "star.circle")
                     stat("Days practised", value: "\(viewModel.practiceDays)", symbol: "calendar")
                     VStack(alignment: .leading, spacing: 8) {

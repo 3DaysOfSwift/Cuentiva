@@ -78,3 +78,63 @@ Validation: 125 model tests passed, including querying Pipa before/after introdu
 New completions at totals 10, 20, 30 and every further multiple of ten show an annual-plan card to verified monthly-only subscribers. Annual/lifetime access, entitlement checking, rereads, unavailable prices, mismatched currencies and no savings suppress the offer. The card uses StoreKit-localized monthly and yearly prices, says the annual price is billed yearly, and opens Apple’s subscription management for confirmation. It never purchases automatically or claims a new trial. Keep monthly for now dismisses the card for that completion. Existing gifts and completion navigation are preserved.
 
 126 model tests passed, including milestone boundaries and exclusion rules. StoreKit integration coverage now checks monthly/annual identification, dismissal and the next milestone; those iOS runtime tests still need execution in a working simulator. Same-group, same-level monthly and annual products must be configured in App Store Connect.
+
+## Consistent anchored-control edges — 19 September 2026
+
+Onboarding, sentence lessons, chapter completion, book completion and the docked chat composer now use the same DockedAreaBorder modifier: a full-width, one-point theme-ink line at 30% opacity. It does not intercept touches or become an accessibility element. Existing padding and surface colours are preserved.
+
+## Library counts and completed totals — 19 September 2026
+
+Format controls now display counts and scroll horizontally rather than truncating longer labels. Counts respect search, difficulty, completion visibility and recommendation selection, but ignore the currently selected format so every tab previews its own result count. The same controls on Completed count matching completed books.
+
+Completed leads with a large lifetime books-read total, practice-day count and available doubloons. Those statistics remain independent of collection filters. Counts and statistics are prepared with the library presentation on its worker actor. Pipa’s fixed portrait now sits beside a compact title/subtitle stack in Meet the storytellers.
+
+Validation: 127 model tests passed, including filtered-format counts and lifetime statistics. The Completed view-model stale-response test also checks that older results cannot replace current statistics. iOS runtime visual checks remain outstanding.
+
+## Progressive chat visibility — 19 September 2026
+
+Storyteller Chat is hidden in Settings and author profiles until 11 distinct books are completed. LearnerProgress owns the shared unlock rule; ChatManager also enforces it before accepting a message. The existing completion invitation remains the introduction to this feature. Unlocking costs nothing; starting a topic still costs one earned doubloon. Resetting reading progress relocks it.
+
+Validation: 128 model tests passed, including rejection before book 11 despite an available coin balance and access after the eleventh completion. Existing chat payment and concurrency fixtures now explicitly represent readers who have earned the unlock.
+
+## Today and Bookstore — 19 September 2026
+
+The former Books tab is now Today, retaining daily reading, the weekly storytellers, the format showcase and further unread recommendations after finishing the daily selection. Bookstore is a separate full-catalogue screen with search, difficulty/type filters and sorting. Hide completed books defaults to on and can be turned off; it does not use the daily recommendation eligibility filter. Completed and the progressively unlocked Write tab remain separate.
+
+Bookstore has its own view model and matching test file. Its regression test covers the default completion filter, showing finished books again, full-catalogue mode and an empty search. Xcode membership and loading-placeholder tabs were updated. Simulator runtime testing remains outstanding.
+
+## Mystery storyteller invitation — 19 September 2026
+
+The invitation no longer previews a fox before the creature draw. A central silhouette and question mark are surrounded by smaller portraits of Pipa, Brasa, Nube and Tilo. The artwork fades in after a short pause, then scales through 0.9, 1.1, 0.95 and 1. Reduce Motion shows it immediately without scaling. This artwork does not choose or change the reader’s saved character.
+
+## Character reveal finishes with editing — 19 September 2026
+
+After the creature draw, the main bottom-anchored action is Use my storyteller as the app icon. A successful icon change opens the final name/bio editor; failure stays on the reveal with retry text. Readers may retain Pipa, and unsupported devices proceed directly to editing. The footer uses the shared top border.
+
+The editor uses the saved identity or the creature’s bundled name and biography. Save my storyteller validates and persists the edited identity and completed introduction atomically, without AI generation. The Give my storyteller a voice and second Reveal my storyteller actions are removed. Existing identities remain editable. Names retain the one-word, 24-letter rule.
+
+
+## Reading identity and removal of standalone Write
+
+- Today shows the revealed personal character beside the lifetime books-read count.
+- Completed shows the same circular portrait above its count. Both portraits open the saved character editor; neither appears before a character has been revealed.
+- Removed the Write tab, story-creation calls to action, standalone composer, and obsolete contribution/drafts screens and their view models.
+- The five-book gift now introduces a personal character and app-icon choice, without promising story generation or private publishing.
+- Spanish conversation practice remains the writing experience, unlocked after 11 books and using doubloons.
+- Existing profile and story archive storage remains compatible; this UI removal does not delete readers’ saved data.
+- Validation: 129 model tests passed; all remaining iOS app/test sources type-check. Simulator UI/runtime validation still requires the working local Xcode runtime.
+
+
+## WhosApp messaging gift
+
+- The eleventh newly completed book introduces a dedicated chat gift, explaining practice for future Spanish-speaking friends and telling stories from the reader’s own life.
+- The gift leads to storyteller selection. A WhosApp tab appears at the same existing 11-book unlock; existing eligible readers also see it.
+- Recipients come from the library’s storyteller profiles. Selecting one opens the existing conversation and spends no coin.
+- Existing on-device AI availability, one-doubloon admission, failed-reply protection, and session-end rules remain in the chat feature.
+- Added completion routing and WhosApp view-model tests for the milestone, rereads, locked access, loaded profiles, and unchanged coin balance.
+
+## Minimal launch presentation
+
+Removed the simulated Today loading screen and its Xcode references. The static launch storyboard is now a Midnight-coloured surface; it does not infer an app theme from system dark mode. Once SwiftUI starts, the selected app palette surrounds a small progress indicator (or a retryable error). Purchase verification and progress-loading gates are unchanged; this visual simplification does not claim to reduce their duration.
+
+Midnight is the default when no valid saved theme exists. Existing explicit theme choices remain unchanged; the static launch background always uses Midnight. Theme-selection tests cover the default, persistence, and obsolete preferences.

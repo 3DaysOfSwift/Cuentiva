@@ -9,7 +9,7 @@ struct OnboardingView: View {
                 else {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            HStack { Label("CUENTIVA", systemImage: "book.pages").font(.subheadline.weight(.bold)).tracking(2); Spacer(); Text("YOUR FIRST CHAPTER").font(.system(size: 9, weight: .semibold, design: .monospaced)) }
+                            HStack { Label("CUENTIVA", systemImage: "book.pages").font(.subheadline.weight(.bold)).tracking(2); Spacer(); Text("LITTLE STORIES ABOUT LIFE").font(.system(size: 9, weight: .semibold, design: .monospaced)) }
                             Image("StorytellerPipa").resizable().scaledToFit()
                                 .frame(width: 150, height: 150)
                                 .clipShape(RoundedRectangle(cornerRadius: 32))
@@ -45,10 +45,7 @@ struct OnboardingView: View {
                                 .buttonStyle(PrimaryButton())
                                 .padding(.horizontal, 26).padding(.vertical, 12)
                                 .background(theme.theme.paper)
-                                .overlay(alignment: .top) {
-                                    Rectangle().fill(theme.theme.ink.opacity(0.3)).frame(height: 1)
-                                        .allowsHitTesting(false)
-                                }
+                                .dockedAreaBorder()
                         }
                     }
                 }

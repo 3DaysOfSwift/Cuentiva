@@ -222,6 +222,7 @@ private actor GatedProgressRepository: ProgressRepository {
 
     @Test func overlappingDebitsCannotSpendLastCoinTwice() async throws {
         var initial = LearnerProgress(); initial.doubloons = 1
+        initial.completed = Set((0..<11).map { "earned-\($0)" })
         let store = GatedProgressRepository(initial)
         let progress = ProgressManager(repository: store); try await progress.load()
         let first = Task { try await progress.payForChat { true } }
@@ -236,6 +237,7 @@ private actor GatedProgressRepository: ProgressRepository {
 
     @Test(arguments: [false, true]) func dismissalDuringPaymentKeepsAdmissionAcrossRelaunch(cancelTask: Bool) async throws {
         var initial = LearnerProgress(); initial.doubloons = 1
+        initial.completed = Set((0..<11).map { "earned-\($0)" })
         let store = GatedProgressRepository(initial)
         let progress = ProgressManager(repository: store); try await progress.load()
         let author = Author.demoProfiles[0]
@@ -263,6 +265,7 @@ private actor GatedProgressRepository: ProgressRepository {
 
     @Test func failedSettlementPreservesCreditRatherThanLosingPayment() async throws {
         var initial = LearnerProgress(); initial.doubloons = 1
+        initial.completed = Set((0..<11).map { "earned-\($0)" })
         let store = GatedProgressRepository(initial, failOnSave: 2)
         let progress = ProgressManager(repository: store); try await progress.load()
         var delivered = false

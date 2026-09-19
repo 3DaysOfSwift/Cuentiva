@@ -6,8 +6,6 @@ import Testing
         let model = WritingUnlockedViewModel()
         #expect(model.stage == .announcement)
         model.next()
-        #expect(model.stage == .gift)
-        model.next()
         #expect(model.stage == .invitation)
         model.next()
         #expect(model.stage == .character)

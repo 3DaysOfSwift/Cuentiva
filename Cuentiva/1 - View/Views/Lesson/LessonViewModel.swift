@@ -36,7 +36,7 @@ import Observation
     var nextTitle: String {
         guard let book else { return "Next" }
         return index == book.sentences.count - 1
-            ? "First chapter completed"
+            ? "Complete chapter 1"
             : (book.kind == .movieScript ? "Next line" : "Next sentence")
     }
     var allowed: Bool {

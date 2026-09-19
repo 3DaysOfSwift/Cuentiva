@@ -4,6 +4,7 @@ import Observation
 @MainActor @Observable final class AuthorViewModel {
     let author: Author
     private let library: any LibraryFeature
+    var chatUnlocked: Bool { progress.snapshot.chatUnlocked }
     private let progress: any ProgressFeature
     var selectedBook: Book?
     private(set) var books: [Book] = []

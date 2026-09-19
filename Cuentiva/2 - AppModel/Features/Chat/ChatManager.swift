@@ -30,7 +30,7 @@ import Observation
     private(set) var busy = false
     private(set) var unavailable: String?
     var coins: Int { progress.snapshot.availableChatCoins }
-    var hasAccess: Bool { coins > 0 || sessionPaid }
+    var hasAccess: Bool { progress.snapshot.chatUnlocked && (coins > 0 || sessionPaid) }
 
     init(generator: any ChatGenerator, progress: any ProgressFeature) {
         self.progress = progress
@@ -66,6 +66,9 @@ import Observation
         sessionAuthorID == author.id ? sessionConversation : .init()
     }
     func send(_ message: String, to author: Author, level: String) async throws {
+        guard progress.snapshot.chatUnlocked else {
+            throw AppFailure.unavailable("Storyteller Chat unlocks after you complete 11 books.")
+        }
         guard hasAccess else {
             throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.")
         }

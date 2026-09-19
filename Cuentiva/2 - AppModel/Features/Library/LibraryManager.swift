@@ -40,6 +40,10 @@ struct LibraryRequest: Equatable {
 }
 
 struct LibraryPresentation: Sendable {
+    var formatCounts: [BookFormat: Int] = [:]
+    var completedTotal = 0
+    var practiceDays = 0
+    var doubloons = 0
     var books: [Book] = []
     var dailyReads: [Book] = []
     var nextRead: Book?
@@ -230,9 +234,16 @@ private actor LibraryWorker {
         use(input, revision: revision)
         let shared = discoveryState()
         var result = shared.presentation
-        result.books = query.recommendations ? shared.recommendations.filter {
-            (query.level == nil || $0.level == query.level) && (query.format == nil || $0.kind == query.format)
-        } : search(query)
+        var allFormats = query
+        allFormats.format = nil
+        let candidates = query.recommendations ? shared.recommendations.filter {
+            query.level == nil || $0.level == query.level
+        } : search(allFormats)
+        result.formatCounts = Dictionary(grouping: candidates, by: \.kind).mapValues(\.count)
+        result.books = candidates.filter { query.format == nil || $0.kind == query.format }
+        result.completedTotal = input.progress.completed.count
+        result.practiceDays = input.progress.practiceDays.count
+        result.doubloons = input.progress.availableChatCoins
         for book in result.books where coverageByID[book.id] == nil {
             let lemmas = Set(book.vocabulary.map(\.lemma))
             let known = lemmas.filter { input.progress.vocabulary[$0] == .known }.count

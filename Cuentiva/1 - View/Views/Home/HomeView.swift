@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct HomeView: View {
-    let onWrite: (() -> Void)?
-    @State private var viewModel = HomeViewModel()
+    @State private var viewModel: HomeViewModel
+
+    init(viewModel: HomeViewModel = HomeViewModel()) {
+        _viewModel = State(initialValue: viewModel)
+    }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @Environment(ThemeManager.self) private var theme
@@ -26,10 +29,11 @@ struct HomeView: View {
                             Text("\(viewModel.total)")
                                 .font(.system(.title, design: .serif, weight: .medium))
                                 .monospacedDigit()
-                            Text("BOOKS READ").font(.caption2.weight(.semibold))
+                            Text(viewModel.total == 1 ? "BOOK READ" : "BOOKS READ").font(.caption2.weight(.semibold))
                                 .foregroundStyle(theme.theme.muted)
                         }.accessibilityElement(children: .ignore)
-                            .accessibilityLabel("\(viewModel.total) books read in total")
+                            .accessibilityLabel("\(viewModel.total) \(viewModel.total == 1 ? "book" : "books") read in total")
+                        PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 44)
                     }
                     ScrollView(.horizontal) {
                         HStack(spacing: 16) {
@@ -38,7 +42,9 @@ struct HomeView: View {
                                     Button {
                                         viewModel.selectedBook = book
                                     } label: {
-                                        BookCover(book: book, completed: viewModel.completed(book), compact: true)
+                                        BookCover(book: book, completed: viewModel.completed(book), compact: true,
+                                            showsReadingAction: viewModel.focusedRead?.id == book.id,
+                                            readingCelebration: viewModel.readCelebration)
                                             .frame(width: 190)
                                             .overlay {
                                                 RoundedRectangle(cornerRadius: 8)
@@ -64,7 +70,8 @@ struct HomeView: View {
                                     .id(book.id)
                                     .accessibilityAddTraits(viewModel.focusedRead?.id == book.id ? .isSelected : [])
                                     .accessibilityLabel(
-                                        "\(book.englishTitle)\(viewModel.completed(book) ? ", completed" : ", unread")")
+                                        "\(book.englishTitle), by \(book.storytellerName)\(viewModel.completed(book) ? ", completed" : ", unread")")
+                                    .accessibilityHint("Open this book to read")
                                 }
                             }.scrollTargetLayout()
                             // Outside the book targets: scrolling here never selects a fourth book.
@@ -85,25 +92,18 @@ struct HomeView: View {
                     Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
                     Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
                         .font(.caption).foregroundStyle(theme.theme.muted)
-                    Button {
-                        Task { await viewModel.performReadingAction() }
-                    } label: {
-                        HStack {
-                            Text(viewModel.readButtonTitle)
-                            Image(systemName: "arrow.right")
-                        }
-                        .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
-                        .foregroundStyle(viewModel.dailyReadsCompleted ? theme.theme.accent : theme.theme.onAccent)
-                        .background(viewModel.dailyReadsCompleted ? Color.clear : theme.theme.accent, in: RoundedRectangle(cornerRadius: 18))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 18)
-                                .strokeBorder(theme.theme.accent, lineWidth: viewModel.dailyReadsCompleted ? 1.5 : 0)
-                        }
-                    }.buttonStyle(.plain).disabled(viewModel.preparingDailyReads)
-                    .phaseAnimator([1.0, 1.08, 0.98, 1.0], trigger: viewModel.readCelebration) { content, scale in
-                        content.scaleEffect(reduceMotion ? 1 : scale)
-                    } animation: { _ in
-                        .spring(duration: 0.3, bounce: 0.45)
+                    if viewModel.dailyReadsCompleted {
+                        Button {
+                            Task { await viewModel.performReadingAction() }
+                        } label: {
+                            Label(viewModel.readButtonTitle, systemImage: "arrow.right")
+                                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
+                                .foregroundStyle(theme.theme.accent)
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .strokeBorder(theme.theme.accent, lineWidth: 1.5)
+                                }
+                        }.buttonStyle(.plain).disabled(viewModel.preparingDailyReads)
                     }
                 } else {
                     Text("New stories will appear here as the library grows.")
@@ -121,10 +121,10 @@ struct HomeView: View {
                         .font(.subheadline).foregroundStyle(theme.theme.muted)
                 }
                 Divider()
-                CommunityAuthors(authors: viewModel.authors, onWrite: onWrite, horizontalInset: 23)
+                CommunityAuthors(authors: viewModel.authors, horizontalInset: 23)
                 Divider()
-                Text("Three ways into Spanish").font(.system(.title2, design: .serif, weight: .medium))
-                Text("Play a part in a movie script, practise verbs in action, or discover a little story.")
+                Text("Three types of books").font(.system(.largeTitle, design: .serif, weight: .medium))
+                Text("Stories, movie scripts, and information about verbs.")
                     .font(.subheadline).foregroundStyle(theme.theme.muted)
                 ScrollView(.horizontal) {
                     HStack(alignment: .top, spacing: 16) {
@@ -143,48 +143,21 @@ struct HomeView: View {
                 }.contentMargins(.horizontal, 23, for: .scrollContent)
                     .scrollIndicators(.hidden).padding(.horizontal, -23)
                 Divider()
-                Text("A1 – B1 Book Library").font(.system(.title2, design: .serif, weight: .medium))
-                Picker("Difficulty", selection: $viewModel.level) {
-                    ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) }
-                }.pickerStyle(.segmented)
-                LibraryControls(format: $viewModel.format, sort: $viewModel.sort)
-                Toggle(
-                    viewModel.revisiting && viewModel.query.isEmpty && viewModel.sort == .library
-                        ? "Daily selection · revisiting favourites" : "Hide completed books",
-                    isOn: $viewModel.hideCompleted
-                )
-                .font(.subheadline).tint(theme.theme.accent)
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20, alignment: .top)], spacing: 26) {
-                    ForEach(viewModel.books) { book in
-                        Button {
-                            viewModel.selectedBook = book
-                        } label: {
-                            VStack(alignment: .leading, spacing: 10) {
-                                BookCover(book: book, completed: viewModel.completed(book), compact: true)
-                                Text(book.englishTitle).font(.subheadline.weight(.semibold)).foregroundStyle(
-                                    theme.theme.ink)
-                                Text("\(book.level) · \(book.fullText.count) \(book.unitName)").font(.caption)
-                                    .foregroundStyle(theme.theme.muted)
-                                Text(book.summary).font(.caption).foregroundStyle(theme.theme.muted)
-                                Text(viewModel.coverage(book)).font(.caption2).foregroundStyle(theme.theme.muted)
+                if !viewModel.furtherRecommendations.isEmpty {
+                    Text("More adventures for you").font(.system(.title2, design: .serif, weight: .medium))
+                    ScrollView(.horizontal) {
+                        HStack(alignment: .top, spacing: 16) {
+                            ForEach(viewModel.furtherRecommendations) { book in
+                                Button { viewModel.selectedBook = book } label: {
+                                    VStack(alignment: .leading, spacing: 10) {
+                                        BookCover(book: book, compact: true)
+                                        Text(book.englishTitle).font(.headline)
+                                        Text(book.summary).font(.caption).foregroundStyle(theme.theme.muted)
+                                    }.frame(width: 190, alignment: .topLeading)
+                                }.buttonStyle(.plain)
                             }
-                        }.buttonStyle(.plain)
-                    }
-                }
-                if viewModel.books.isEmpty {
-                    ContentUnavailableView {
-                        Label("No matching books", systemImage: "books.vertical")
-                    } description: {
-                        Text(
-                            viewModel.hideCompleted
-                                ? "Try changing your filters or show completed books to read a favourite again."
-                                : "Try a different search or change your filters.")
-                    } actions: {
-                        if viewModel.hideCompleted {
-                            Button("Show completed books") { viewModel.hideCompleted = false }
-                                .tint(theme.theme.accent)
-                        }
-                    }
+                        }.padding(.vertical, 12)
+                    }.scrollIndicators(.hidden)
                 }
                 Text(
                     "DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary."
@@ -198,8 +171,6 @@ struct HomeView: View {
         }.scrollBounceBehavior(.always, axes: .vertical)
             .background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $viewModel.query, placement: .toolbar, prompt: "Find a story or a person")
-            .searchToolbarBehavior(.minimize)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     NavigationLink {

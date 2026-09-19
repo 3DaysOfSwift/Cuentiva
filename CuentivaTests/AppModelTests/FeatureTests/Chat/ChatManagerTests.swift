@@ -37,11 +37,30 @@ private actor ChatTestGenerator: ChatGenerator {
     private let author = Author.demoProfiles[0]
     private func wallet(_ coins: Int = 2, repository: MemoryProgress = MemoryProgress()) async throws -> ProgressManager {
         var value = LearnerProgress(); value.doubloons = coins
+        value.completed = Set((0..<11).map { "earned-\($0)" })
         try await repository.save(value)
         let progress = ProgressManager(repository: repository)
         try await progress.load()
         return progress
     }
+    @Test func coinsDoNotBypassReadingUnlock() async throws {
+        var value = LearnerProgress(); value.doubloons = 10
+        value.completed = Set((0..<10).map { "earned-\($0)" })
+        let store = MemoryProgress(); try await store.save(value)
+        let progress = ProgressManager(repository: store); try await progress.load()
+        let chat = ChatManager(generator: ChatTestGenerator(), progress: progress)
+        try await chat.prepare()
+        #expect(!progress.snapshot.chatUnlocked)
+        #expect(!chat.hasAccess)
+        await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A1") }
+        #expect(progress.snapshot.availableChatCoins == 10)
+        let book = sample("eleventh")
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        #expect(progress.snapshot.chatUnlocked)
+        #expect(chat.hasAccess)
+    }
+
     @Test func completionEarnsOnceAndPracticeDoesNotAwardAgain() async throws {
         let repository = MemoryProgress()
         let progress = try await wallet(0, repository: repository)

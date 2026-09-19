@@ -4,6 +4,7 @@ struct ThemePackGiftView: View {
     @State private var model: ThemePackGiftViewModel
     @Environment(ThemeManager.self) private var theme
     let onContinue: () -> Void
+    private var palette: AppColourTheme { model.previewTheme?.palette ?? theme.theme }
 
     init(pack: ThemePack, onContinue: @escaping () -> Void) {
         _model = State(initialValue: ThemePackGiftViewModel(pack: pack))
@@ -12,44 +13,66 @@ struct ThemePackGiftView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                Image(systemName: model.installed ? "checkmark.seal.fill" : "gift.fill")
-                    .font(.system(size: 90)).foregroundStyle(theme.theme.accent)
+                Image(systemName: model.installationConfirmed ? "checkmark.seal.fill" : "gift.fill")
+                    .font(.system(size: 90)).foregroundStyle(palette.accent)
                     .accessibilityHidden(true)
-                Text(model.installed ? "Your new colours are ready." : "A little colour for your next chapter.")
+                Text(model.installationConfirmed ? "Your new colours are ready." : "A little colour for your next chapter.")
                     .font(.system(.largeTitle, design: .serif))
                 Text(model.pack.giftReason)
-                    .foregroundStyle(theme.theme.muted)
+                    .foregroundStyle(palette.muted)
                 if model.opened || model.installed {
                     Text("\(model.pack.title) · \(model.pack.themes.count) \(model.pack.themes.count == 1 ? "colour theme" : "colour themes")").font(.headline)
+                    Text("Tap a colour to preview it here. Install to make it your app theme.")
+                        .font(.footnote).foregroundStyle(palette.muted)
                     ForEach(model.pack.themes) { choice in
-                        HStack {
-                            Circle().fill(choice.palette.accent).frame(width: 28, height: 28)
-                                .overlay { Circle().strokeBorder(theme.theme.muted.opacity(0.5), lineWidth: 1) }
-                            Text(choice.title)
-                            Spacer()
+                        Button { model.previewTheme = choice } label: {
+                            HStack {
+                                Circle().fill(choice.palette.accent).frame(width: 28, height: 28)
+                                    .overlay { Circle().strokeBorder(palette.muted.opacity(0.5), lineWidth: 1) }
+                                Text(choice.title)
+                                Spacer()
+                                if model.previewTheme == choice {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(palette.accent)
+                                }
+                            }
+                            .padding(14)
+                            .background(palette.surface, in: RoundedRectangle(cornerRadius: 14))
+                            .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
+                        .disabled(model.installing || model.installationConfirmed)
+                        .accessibilityAddTraits(model.previewTheme == choice ? .isSelected : [])
+                        .accessibilityHint("Preview this colour theme on this screen only")
                     }
-                    if model.installed {
-                        Text("Find your installed colours in Settings → Colour theme. Your current theme stays selected.")
-                        Button("Continue  →", action: onContinue).buttonStyle(PrimaryButton())
+                    if model.installationConfirmed {
+                        Label("Installed — your new theme is ready.", systemImage: "checkmark.circle.fill")
+                            .font(.headline).foregroundStyle(palette.accent)
                     } else {
                         Button(model.installing ? "Installing…" : "Install") {
-                            Task { await model.install(keeping: theme) }
-                        }.buttonStyle(PrimaryButton()).disabled(model.installing)
+                            model.installationRequested = true
+                        }.buttonStyle(PrimaryButton(palette: palette)).disabled(!model.canInstall)
+                            .opacity(model.canInstall ? 1 : 0.45)
                         Text("Ready on this device. No download or purchase needed.")
-                            .font(.footnote).foregroundStyle(theme.theme.muted)
+                            .font(.footnote).foregroundStyle(palette.muted)
                     }
                 } else {
-                    Button("Open my gift  →") { model.opened = true }.buttonStyle(PrimaryButton())
+                    Button("Open my gift  →") { model.opened = true }.buttonStyle(PrimaryButton(palette: palette))
                 }
-                InlineError(message: model.error)
-                if !model.installed {
-                    Button("Save for later", action: onContinue).disabled(model.installing)
-                    Text("Your earned pack will be waiting in Settings.")
-                        .font(.footnote).foregroundStyle(theme.theme.muted)
+                if let error = model.error {
+                    Text(error).font(.footnote).foregroundStyle(palette.error)
                 }
+
             }.multilineTextAlignment(.center).padding(28).padding(.top, 30)
-        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
+        }.background(palette.paper).foregroundStyle(palette.ink)
+            .tint(palette.accent)
+            .environment(\.colorScheme, palette.colorScheme)
             .interactiveDismissDisabled(model.installing)
+            .task(id: model.installationRequested) {
+                if model.installationRequested { await model.install(using: theme) }
+            }
+            .onChange(of: model.shouldDismiss) { _, dismiss in
+                if dismiss { onContinue() }
+            }
     }
 }

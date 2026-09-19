@@ -25,6 +25,6 @@ struct ChatComposerView: View {
             if characterCount > ChatLimits.message - 50 {
                 Text("\(characterCount)/\(ChatLimits.message) characters").font(.caption)
             }
-        }.padding().background(theme.theme.surface)
+        }.padding().background(theme.theme.surface).dockedAreaBorder()
     }
 }

@@ -9,19 +9,19 @@ import Testing
         let preferences = try #require(UserDefaults(suiteName: suite))
         defer { preferences.removePersistentDomain(forName: suite) }
         let manager = ThemeManager(preferences: preferences, progress: ProgressManager(repository: MemoryProgress()))
-        #expect(manager.selectedTheme == .library)
-        manager.selectedTheme = .midnight
+        #expect(manager.selectedTheme == .midnight)
+        manager.selectedTheme = .library
         let restored = ThemeManager(preferences: preferences, progress: ProgressManager(repository: MemoryProgress()))
-        #expect(restored.selectedTheme == .midnight)
-        #expect(restored.theme.colorScheme == .dark)
-        restored.selectedTheme = .library
-        #expect(ThemeManager(preferences: preferences, progress: ProgressManager(repository: MemoryProgress())).theme.colorScheme == .light)
+        #expect(restored.selectedTheme == .library)
+        #expect(restored.theme.colorScheme == .light)
+        restored.selectedTheme = .midnight
+        #expect(ThemeManager(preferences: preferences, progress: ProgressManager(repository: MemoryProgress())).theme.colorScheme == .dark)
     }
-    @Test func obsoleteThemeFallsBackToLibrary() throws {
+    @Test func obsoleteThemeFallsBackToMidnight() throws {
         let suite = "CuentivaThemeTests.\(UUID().uuidString)"
         let preferences = try #require(UserDefaults(suiteName: suite))
         defer { preferences.removePersistentDomain(forName: suite) }
         preferences.set("removed-palette", forKey: "appearance.colourTheme")
-        #expect(ThemeManager(preferences: preferences, progress: ProgressManager(repository: MemoryProgress())).selectedTheme == .library)
+        #expect(ThemeManager(preferences: preferences, progress: ProgressManager(repository: MemoryProgress())).selectedTheme == .midnight)
     }
 }

@@ -35,7 +35,7 @@ struct SettingsView: View {
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
             if !viewModel.themePacks.isEmpty {
-                Section("Your theme gifts") {
+                Section("Your gifts") {
                     ForEach(viewModel.themePacks) { pack in
                         Button { viewModel.showingThemePack = pack } label: {
                             HStack {
@@ -52,13 +52,15 @@ struct SettingsView: View {
                     Link("Manage subscription", destination: url)
                 }
             }.listRowBackground(themeManager.theme.surface)
-            Section("Conversation") {
-                NavigationLink { ChatView() } label: {
-                    Label("Storyteller Chat", systemImage: "bubble.left.and.bubble.right")
-                }
-                Text("Practise Spanish with your favourite characters. Earn one doubloon by completing a story, then spend it on one continuous topic chat.")
-                    .font(.footnote).foregroundStyle(themeManager.theme.muted)
-            }.listRowBackground(themeManager.theme.surface)
+            if viewModel.chatUnlocked {
+                Section("Conversation") {
+                    NavigationLink { ChatView() } label: {
+                        Label("Storyteller Chat", systemImage: "bubble.left.and.bubble.right")
+                    }
+                    Text("Practise Spanish with your favourite characters. Earn one doubloon by completing a story, then spend it on one continuous topic chat.")
+                        .font(.footnote).foregroundStyle(themeManager.theme.muted)
+                }.listRowBackground(themeManager.theme.surface)
+            }
             Section("Language help") {
                 NavigationLink { LanguageTermsView() } label: {
                     Label("Decipher language terms", systemImage: "text.book.closed")
@@ -128,6 +130,11 @@ struct SettingsView: View {
                 .foregroundStyle(themeManager.theme.muted)
                 .textCase(nil)
                 .padding(.vertical, 20)
+            }.listRowBackground(themeManager.theme.surface)
+            Section {
+                NavigationLink { WhyCuentivaView() } label: {
+                    Label("Why Cuentiva is unique", systemImage: "sparkles")
+                }
             }.listRowBackground(themeManager.theme.surface)
         }.navigationTitle("Settings")
             .scrollContentBackground(.hidden)

@@ -11,7 +11,7 @@ struct ChapterCompletedView: View {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 110)).foregroundStyle(theme.theme.accent)
                     .accessibilityHidden(true)
-                Text("First chapter completed")
+                Text("Completed")
                     .font(.system(.largeTitle, design: .serif, weight: .medium))
                 Text("Well done! You’ve welcomed new Spanish words into your vocabulary. Now let them flow together as you read the story.")
                     .font(.title3).foregroundStyle(theme.theme.muted)
@@ -21,8 +21,8 @@ struct ChapterCompletedView: View {
                 .frame(maxWidth: .infinity)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            Button("Read more fluently  →", action: onContinue).buttonStyle(PrimaryButton())
-                .padding(25).background(theme.theme.paper)
+            Button("Practice fluency  →", action: onContinue).buttonStyle(PrimaryButton())
+                .padding(25).background(theme.theme.paper).dockedAreaBorder()
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink)
     }

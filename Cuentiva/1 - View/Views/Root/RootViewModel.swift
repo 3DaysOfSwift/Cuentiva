@@ -3,7 +3,10 @@ import OSLog
 import Observation
 
 @MainActor @Observable final class RootViewModel {
+    private(set) var dailyWelcome: DailyWelcomeViewModel?
+    let today: HomeViewModel
     private let progress: any ProgressFeature
+    var chatUnlocked: Bool { progress.snapshot.chatUnlocked }
     var writingUnlocked: Bool { progress.snapshot.writingUnlocked }
     private let purchases: any PurchaseFeature
     private let library: any LibraryFeature
@@ -27,6 +30,7 @@ import Observation
         library: any LibraryFeature = AppModel.shared.library,
         progress: any ProgressFeature = AppModel.shared.progress, fantasy: any FantasyFeature = AppModel.shared.fantasy
     ) {
+        today = HomeViewModel(library: library, progress: progress)
         self.progress = progress
         self.fantasy = fantasy
         self.purchases = purchases
@@ -56,6 +60,28 @@ import Observation
         } catch { self.error = error.localizedDescription }
     }
 
+    private func prepareWelcome() {
+        guard hasAccess, !checkingAccess, let welcome = progress.dailyWelcome else { return }
+        guard dailyWelcome?.welcome.day != welcome.day else { return }
+        dailyWelcome = DailyWelcomeViewModel(welcome: welcome, progress: progress)
+    }
+
+    func beginDay() async {
+        guard ready, hasAccess, !checkingAccess, let welcome = dailyWelcome else { return }
+        guard await welcome.beginDay(), dailyWelcome === welcome else { return }
+        // A suspended app may be welcoming a new calendar day. Prepare that
+        // day's selection before fading back to the retained Today screen.
+        while hasAccess && !checkingAccess && !Task.isCancelled {
+            if await today.refresh() {
+                guard dailyWelcome === welcome, hasAccess, !checkingAccess else { return }
+                today.focusNextRead()
+                dailyWelcome = nil
+                showingStoryteller = checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
+                return
+            }
+        }
+    }
+
     func enteredBackground() { hasEnteredBackground = true }
 
     func becameActive() async {
@@ -71,8 +97,9 @@ import Observation
     /// Also handles a purchase/restore made while onboarding is visible.
     func accessChanged() async {
         guard !checkingAccess else { return }
-        guard hasAccess else { ready = false; showingStoryteller = false; return }
+        guard hasAccess else { ready = false; showingStoryteller = false; dailyWelcome = nil; return }
         await load()
+        prepareWelcome()
         await syncLibrary()
     }
     func syncLibrary() async {
@@ -107,20 +134,31 @@ import Observation
             // loads independently; the UI must not present invented zero counts.
             async let catalogue: Void = library.load()
             try await progress.load()
+            prepareWelcome()
             try await catalogue
             try Task.checkCancellation()
             guard hasAccess, !checkingAccess else { return }
-            ready = true
-            logger.info(
-                "Local library ready in \(Date().timeIntervalSince(started), privacy: .public) seconds; purchase check pending: \(self.purchases.checking, privacy: .public)"
-            )
             if !checkedIntroduction {
                 do {
                     try await fantasy.load()
                     guard hasAccess, !checkingAccess else { return }
-                    showingStoryteller = writingUnlocked && !fantasy.introductionSeen
                     checkedIntroduction = true
-                } catch { /* Profile storage must never block library access. Write offers a retry. */  }
+                } catch { /* Profile storage must never block library access. */  }
+            }
+            // Prepare the first visible presentation before mounting Today. This
+            // is read-only; its existing appearance task persists the daily selection.
+            // A revision can change while the worker is preparing (for example,
+            // introduction loading); never reveal a discarded, empty presentation.
+            while hasAccess && !checkingAccess {
+                try Task.checkCancellation()
+                if await today.refresh() {
+                    guard hasAccess, !checkingAccess else { return }
+                    today.focusNextRead()
+                    ready = true
+                    showingStoryteller = dailyWelcome == nil && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
+                    logger.info("Local library ready in \(Date().timeIntervalSince(started), privacy: .public) seconds; purchase check pending: \(self.purchases.checking, privacy: .public)")
+                    break
+                }
             }
         } catch { self.error = error.localizedDescription }
     }
