@@ -31,6 +31,7 @@ import Foundation
     }
     static func live() -> AppModel {
         let directory = URL.applicationSupportDirectory.appending(path: "Cuentiva")
+        // One database for the app; feature repositories share its lifetime and records.
         let store = SwiftDataStore(url: directory.appending(path: "Cuentiva.store"))
         let progress = ProgressManager(
             repository: LocalProgressRepository(url: directory.appending(path: "progress.json"), store: store))

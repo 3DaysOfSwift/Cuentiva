@@ -23,6 +23,7 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
+      codeCoverageEnabled = "YES"
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"

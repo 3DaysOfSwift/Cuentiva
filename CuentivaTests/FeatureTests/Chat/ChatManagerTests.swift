@@ -1,8 +1,8 @@
 import Foundation
 import Testing
 
-#if canImport(CuentivaCore)
-    @testable import CuentivaCore
+#if canImport(CuentivaAppModel)
+    @testable import CuentivaAppModel
 #else
     @testable import Cuentiva
 #endif

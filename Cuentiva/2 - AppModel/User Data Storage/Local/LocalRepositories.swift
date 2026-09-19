@@ -19,9 +19,9 @@ actor LocalProgressRepository: ProgressRepository {
     private let url: URL
     private let store: SwiftDataStore
     private var savedProgress: LearnerProgress?
-    init(url: URL, store: SwiftDataStore? = nil) {
+    init(url: URL, store: SwiftDataStore) {
         self.url = url
-        self.store = store ?? SwiftDataStore(url: url.appendingPathExtension("store"))
+        self.store = store
     }
     func load() async throws -> LearnerProgress {
         if let rows = try await store.read("progress") { return try remember(rows) }
@@ -51,9 +51,9 @@ actor LocalProgressRepository: ProgressRepository {
 actor LocalContributionRepository: ContributionRepository {
     private let url: URL
     private let store: SwiftDataStore
-    init(url: URL, store: SwiftDataStore? = nil) {
+    init(url: URL, store: SwiftDataStore) {
         self.url = url
-        self.store = store ?? SwiftDataStore(url: url.appendingPathExtension("store"))
+        self.store = store
     }
     func drafts() async throws -> [Contribution] {
         if let rows = try await store.read("drafts") {

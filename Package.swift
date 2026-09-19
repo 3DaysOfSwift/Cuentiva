@@ -2,11 +2,22 @@
 import PackageDescription
 
 let package = Package(
-    name: "CuentivaCore",
+    name: "CuentivaAppModel",
     platforms: [.macOS(.v15)],
-    products: [.library(name: "CuentivaCore", targets: ["CuentivaCore"])],
+    products: [.library(name: "CuentivaAppModel", targets: ["CuentivaAppModel"])],
     targets: [
-        .target(name: "CuentivaCore", path: "Cuentiva/2 - AppModel", exclude: ["AppModel.swift", "Features/Audio", "Features/Chat/AppleChatGenerator.swift", "Features/Fantasy/AppleFantasyGenerator.swift", "Features/Nearby/AppleStoryLocationProvider.swift"]),
-        .testTarget(name: "CuentivaCoreTests", dependencies: ["CuentivaCore"], path: "CuentivaTests", exclude: ["ViewModelTests.swift"])
+        .target(name: "CuentivaAppModel", path: "Cuentiva/2 - AppModel", exclude: ["AppModel.swift", "Features/Audio", "Features/Chat/AppleChatGenerator.swift", "Features/Fantasy/AppleFantasyGenerator.swift", "Features/Nearby/AppleStoryLocationProvider.swift"]),
+        .testTarget(
+            name: "CuentivaAppModelTests",
+            dependencies: ["CuentivaAppModel"],
+            path: "CuentivaTests",
+            exclude: [
+                "ViewModelTests", "PresentationTests", "AppModelTests", "Support/iOS",
+                "IntegrationTests/SpeechCallbackTests.swift",
+                "IntegrationTests/StorePurchaseTests.swift",
+                "IntegrationTests/LibraryPresentationTests.swift",
+                "README.md", "API-COVERAGE.md"
+            ]
+        )
     ]
 )

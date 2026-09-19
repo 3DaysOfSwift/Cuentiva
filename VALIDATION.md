@@ -1,3 +1,25 @@
+## Shared store ownership and opening safeguard — 19 September 2026
+
+- Applied the shared off-main-actor container opener investigated below. Only container creation is serialized; tests remain parallel and each store keeps its own worker. All five repository constructors now require explicit store injection. AppModel remains the sole production store owner at the existing `Cuentiva.store` path; schema and stored records are unchanged.
+- Added three StoreOpeningTests for 32 concurrent isolated stores, concurrent collections surviving a fresh container, and failed-opening recovery. Updated persistence fixtures to own and inject stores explicitly. One intermediate assertion failure exposed accidental fixture sharing between independent invalid-catalogue scenarios; corrected their isolation without weakening assertions.
+- All 114 model tests in 33 suites passed, followed by 10 fresh-process repetitions of the full parallel suite (1,140 further passing tests). No process crash occurred in this pass. These results support the mitigation; they do not guarantee the Apple framework cannot crash on other OS versions.
+- All app and test sources passed Swift 6 iOS SDK type-checking. Project format and whitespace checks passed. iOS runtime verification remains required before release.
+- Added the one-store rule to AGENTS.md and the CFA canonical Swift coding guide plus all five bundled guide copies. Historical results below describe earlier passes, before this mitigation.
+
+## Store-opening crash isolation — 19 September 2026
+
+- Reproduced the signal-11 crash in a standalone Foundation/SwiftData program, without app code or the test runner. Concurrent ModelContainer initialization for one model type and separate fresh SQLite URLs produced the same Core Data dictionary/`_generateTriggerSQL` stack as the full-suite crash. Variants without uniqueness, versioning or migration plans also crashed.
+- Eighty fresh-process control runs that serialized only container creation succeeded (32 containers each). A private shared opening actor was then tested in a temporary project copy: the initial build/test and 20 further full parallel-suite runs all passed, 111 tests per run. Production source and normal test parallelism settings are unchanged. This is a tested mitigation, not an applied production fix or an iOS validation result.
+- Added `diagnostics/swiftdata-store-opening` with a standalone Swift reproducer, bounded Python harness, raw experiment exit codes, findings and the exact candidate patch. The committed harness reproduced signal 11 on its fifth parallel smoke run and passed two serial smoke runs. Patch applicability and whitespace checks passed. See the diagnostic README for scope, evidence and remaining verification.
+
+## Test organisation and API coverage — 19 September 2026
+
+- Replaced four mixed test files with AppModelTests, ViewModelTests, FeatureTests, ConcurrencyTests, PersistenceTests, PresentationTests, IntegrationTests and Support folders. Every one of the 22 view models has a matching test file. All 140 existing test declarations were retained; 16 were added. Xcode registers all 62 test/support Swift files exactly once in matching groups. Package.swift excludes iOS-only suites and documentation; fixture paths remain valid after moving files.
+- Added direct AppModel composition coverage and focused view-model checks for chat state/errors/cancellation, theme installation failure/retry, author cancellation, stale Completed responses, writing unlock stages and language help. Added five package tests for PracticeManager and LearningManager. Theme presentation tests now inject isolated progress instead of accidentally constructing AppModel.shared.
+- App and all test sources passed Swift 6 iOS SDK type-checking. Project/plist, test registration, retained-test inventory and whitespace checks passed. Enabled Xcode scheme code coverage. The test README and API-COVERAGE.md distinguish execution coverage, scenario coverage and unverified platform integration.
+- The parallel package run reproduced the earlier SIGSEGV (signal 11). Crash report: `~/Library/Logs/DiagnosticReports/swiftpm-testing-helper-2026-09-19-083025.ips`; the failing stack includes Core Data `_generateTriggerSQL` during store creation. The user was notified immediately. This remains unresolved; no production fix or test serialization workaround was applied.
+- A diagnostic run with `--no-parallel --enable-code-coverage` passed all 111 model tests in 32 suites. These serial-run measurements are recorded in API-COVERAGE.md. They do not establish that the crash is fixed. CoreSimulatorService remains unavailable here, so iOS AppModel/view-model/StoreKit tests await runtime validation with Command-U.
+
 ## Architecture refinement — 19 September 2026
 
 - View refresh identifiers now contain small revision tokens instead of complete catalogue/progress snapshots. Library worker inputs are private; personal publication sorting happens in the worker for these requests.

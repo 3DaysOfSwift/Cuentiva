@@ -98,6 +98,10 @@ The UI uses Dynamic Type, text/icon feedback rather than colour alone, accessibl
 
 ## Tests
 
+See the [test folder guide](CuentivaTests/README.md) for suite organisation and the
+[API coverage audit](CuentivaTests/API-COVERAGE.md) for measured coverage and remaining gaps.
+There is one file per view model under `CuentivaTests/ViewModelTests`.
+
 Run the Xcode test target for screen-model and feature tests. The core rules can also run on macOS without a simulator:
 
 ```sh

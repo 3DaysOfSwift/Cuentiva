@@ -15,9 +15,9 @@ protocol FantasyRepository: Sendable {
 actor LocalFantasyRepository: FantasyRepository {
     private let url: URL
     private let store: SwiftDataStore
-    init(url: URL, store: SwiftDataStore? = nil) {
+    init(url: URL, store: SwiftDataStore) {
         self.url = url
-        self.store = store ?? SwiftDataStore(url: url.appendingPathExtension("store"))
+        self.store = store
     }
     func load() async throws -> FantasyArchive {
         if let rows = try await store.read("fantasy") {

@@ -7,9 +7,9 @@ protocol ChatRepository: Sendable {
 actor LocalChatRepository: ChatRepository {
     private let url: URL
     private let store: SwiftDataStore
-    init(url: URL, store: SwiftDataStore? = nil) {
+    init(url: URL, store: SwiftDataStore) {
         self.url = url
-        self.store = store ?? SwiftDataStore(url: url.appendingPathExtension("store"))
+        self.store = store
     }
     private struct Header: Codable {
         let author: String

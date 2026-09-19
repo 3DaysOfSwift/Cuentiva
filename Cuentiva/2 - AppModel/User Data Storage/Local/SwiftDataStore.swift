@@ -126,6 +126,21 @@ enum RecordCoding {
     }
 }
 
+/// Core Data container creation is serialized across independent test graphs.
+/// Normal database operations remain isolated to each store’s worker actor.
+private actor StoreOpener {
+    static let shared = StoreOpener()
+    func open(at url: URL) throws -> DatabaseWorker {
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+        let schema = Schema(versionedSchema: CuentivaStoreSchema.self)
+        let configuration = ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
+        let container = try ModelContainer(
+            for: schema, migrationPlan: CuentivaStoreMigrationPlan.self, configurations: [configuration])
+        return DatabaseWorker(modelContainer: container)
+    }
+}
+
 /// Lazy opening avoids building a persistent container in AppModel's main-thread initializer.
 actor SwiftDataStore {
     private let url: URL
@@ -134,15 +149,7 @@ actor SwiftDataStore {
     private func worker() async throws -> DatabaseWorker {
         if let opening { return try await opening.value }
         let url = url
-        let task = Task.detached {
-            try FileManager.default.createDirectory(
-                at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            let schema = Schema(versionedSchema: CuentivaStoreSchema.self)
-            let configuration = ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
-            let container = try ModelContainer(
-                for: schema, migrationPlan: CuentivaStoreMigrationPlan.self, configurations: [configuration])
-            return DatabaseWorker(modelContainer: container)
-        }
+        let task = Task { try await StoreOpener.shared.open(at: url) }
         opening = task
         do { return try await task.value } catch {
             opening = nil

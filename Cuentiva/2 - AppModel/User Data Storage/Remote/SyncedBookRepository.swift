@@ -87,8 +87,8 @@ actor SyncedBookRepository: SyncingBookRepository {
     private var syncing = false
     private var currentArrivals: [String: Date] = [:]
     private var preparedURL: URL { cacheURL.appendingPathExtension("prepared") }
-    init(bundled: any BookRepository, transport: any CatalogueTransport, cacheURL: URL, store: SwiftDataStore? = nil) {
-        self.store = store ?? SwiftDataStore(url: cacheURL.appendingPathExtension("store"))
+    init(bundled: any BookRepository, transport: any CatalogueTransport, cacheURL: URL, store: SwiftDataStore) {
+        self.store = store
         self.bundled = bundled
         self.transport = transport
         self.cacheURL = cacheURL
