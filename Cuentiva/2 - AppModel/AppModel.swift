@@ -9,7 +9,6 @@ import Foundation
     let contributions: any ContributionFeature
     let languageTerms: any LanguageTermsFeature = LanguageTermsManager()
     let practice: any PracticeFeature
-    let nearby: any NearbyFeature
     let chat: any ChatFeature
     let fantasy: any FantasyFeature
     let makeAudio: () -> any LessonAudio
@@ -21,7 +20,6 @@ import Foundation
         self.chat = chat
         self.fantasy = fantasy
         self.practice = PracticeManager(progress: progress, purchases: purchases)
-        self.nearby = NearbyManager(library: library, purchases: purchases)
         self.library = library
         self.progress = progress
         self.purchases = purchases

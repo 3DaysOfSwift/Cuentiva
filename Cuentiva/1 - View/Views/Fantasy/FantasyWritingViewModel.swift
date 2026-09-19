@@ -17,7 +17,7 @@ import Observation
         defer { busy = false; nextPublicationDate = feature.nextPublicationDate }
         do {
             _ = try await feature.publish(story)
-            publicationNotice = "Published privately. Your book is now in Discover under your storyteller’s name."
+            publicationNotice = "Published privately. Your book is now in Books under your storyteller’s name."
         } catch { self.error = error.localizedDescription }
     }
     var creature: FantasyCreature? { feature.profile?.creature }

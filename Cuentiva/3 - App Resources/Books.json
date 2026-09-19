@@ -1,105 +1,235 @@
 [
   {
     "id": "cafe",
-    "title": "El café de Ana",
-    "englishTitle": "Ana’s little café",
-    "author": "Brasa",
+    "title": "El viaje de Pipa",
+    "englishTitle": "The Journey of Pipa",
+    "author": "Pipa",
     "level": "A1",
-    "symbol": "cup.and.saucer",
+    "symbol": "airplane",
     "palette": 0,
-    "summary": "A morning, a small café, and a familiar face.",
+    "summary": "Over a coffee break from designing clothes, Pipa shares his journey through the Americas and a WhatsApp language exchange in Colombia, where he practises Spanish before his next adventure in Argentina.",
     "sentences": [
       {
         "id": "cafe-1",
-        "spanish": "Me llamo Ana.",
-        "english": "My name is Ana."
+        "spanish": "Me llamo Pipa y soy diseñador de ropa.",
+        "english": "My name is Pipa, and I am a clothing designer."
       },
       {
         "id": "cafe-2",
-        "spanish": "Vivo en una ciudad pequeña.",
-        "english": "I live in a small city."
+        "spanish": "Hoy descanso del trabajo en mi oficina y tomo un café.",
+        "english": "Today I take a break from work in my office and have a coffee."
       },
       {
         "id": "cafe-3",
-        "spanish": "Trabajo en un café.",
-        "english": "I work in a café."
+        "spanish": "Quiero escribir sobre mis aventuras por América.",
+        "english": "I want to write about my adventures across the Americas."
       },
       {
         "id": "cafe-4",
-        "spanish": "El café está cerca de mi casa.",
-        "english": "The café is near my house."
+        "spanish": "Mi viaje empieza en México, en Puerto Escondido.",
+        "english": "My journey begins in Mexico, in Puerto Escondido."
       },
       {
         "id": "cafe-5",
-        "spanish": "Cada mañana preparo pan y café.",
-        "english": "Every morning I prepare bread and coffee."
+        "spanish": "Después voy hacia Tabasco con mi mochila.",
+        "english": "Then I head towards Tabasco with my backpack."
       },
       {
         "id": "cafe-6",
-        "spanish": "Mi vecino viene a las ocho.",
-        "english": "My neighbor comes at eight."
+        "spanish": "Sigo hacia Guatemala y Belice, donde conozco a nuevos amigos.",
+        "english": "I continue towards Guatemala and Belize, where I meet new friends."
       },
       {
         "id": "cafe-7",
-        "spanish": "Hablamos de nuestra familia.",
-        "english": "We talk about our family."
+        "spanish": "Visito Costa Rica y Perú antes de llegar a Colombia.",
+        "english": "I visit Costa Rica and Peru before arriving in Colombia."
       },
       {
         "id": "cafe-8",
-        "spanish": "Me gusta empezar el día así.",
-        "english": "I like to start the day this way."
+        "spanish": "Allí enseño inglés a cambio de aprender español.",
+        "english": "There I teach English in exchange for learning Spanish."
       }
     ],
     "vocabulary": [
       {
         "word": "a",
         "lemma": "a",
+        "occurrences": 5
+      },
+      {
+        "word": "abro",
+        "lemma": "abrir",
+        "occurrences": 1
+      },
+      {
+        "word": "allí",
+        "lemma": "allí",
+        "occurrences": 1
+      },
+      {
+        "word": "alumnos",
+        "lemma": "alumno",
         "occurrences": 2
       },
       {
-        "word": "ana",
-        "lemma": "ana",
+        "word": "amigos",
+        "lemma": "amigo",
         "occurrences": 1
       },
       {
-        "word": "aquí",
-        "lemma": "aquí",
+        "word": "américa",
+        "lemma": "américa",
         "occurrences": 1
       },
       {
-        "word": "así",
-        "lemma": "así",
+        "word": "antes",
+        "lemma": "antes",
         "occurrences": 1
       },
       {
-        "word": "cada",
-        "lemma": "cada",
+        "word": "aprender",
+        "lemma": "aprender",
+        "occurrences": 1
+      },
+      {
+        "word": "argentina",
+        "lemma": "argentina",
+        "occurrences": 1
+      },
+      {
+        "word": "arte",
+        "lemma": "arte",
+        "occurrences": 1
+      },
+      {
+        "word": "aventura",
+        "lemma": "aventura",
+        "occurrences": 1
+      },
+      {
+        "word": "aventuras",
+        "lemma": "aventura",
+        "occurrences": 1
+      },
+      {
+        "word": "ayudan",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "ayudo",
+        "lemma": "ayudar",
+        "occurrences": 1
+      },
+      {
+        "word": "belice",
+        "lemma": "belice",
         "occurrences": 1
       },
       {
         "word": "café",
         "lemma": "café",
-        "occurrences": 5
+        "occurrences": 2
       },
       {
-        "word": "casa",
-        "lemma": "casa",
+        "word": "cambiar",
+        "lemma": "cambiar",
         "occurrences": 1
       },
       {
-        "word": "cerca",
-        "lemma": "cerca",
+        "word": "cambio",
+        "lemma": "cambio",
         "occurrences": 1
       },
       {
-        "word": "ciudad",
-        "lemma": "ciudad",
+        "word": "chat",
+        "lemma": "chat",
+        "occurrences": 2
+      },
+      {
+        "word": "chats",
+        "lemma": "chat",
+        "occurrences": 1
+      },
+      {
+        "word": "colombia",
+        "lemma": "colombia",
+        "occurrences": 2
+      },
+      {
+        "word": "compartir",
+        "lemma": "compartir",
+        "occurrences": 1
+      },
+      {
+        "word": "con",
+        "lemma": "con",
+        "occurrences": 6
+      },
+      {
+        "word": "conozco",
+        "lemma": "conocer",
+        "occurrences": 1
+      },
+      {
+        "word": "contar",
+        "lemma": "contar",
+        "occurrences": 2
+      },
+      {
+        "word": "conversaciones",
+        "lemma": "conversación",
+        "occurrences": 1
+      },
+      {
+        "word": "conversar",
+        "lemma": "conversar",
+        "occurrences": 1
+      },
+      {
+        "word": "costa",
+        "lemma": "costa",
+        "occurrences": 1
+      },
+      {
+        "word": "cuaderno",
+        "lemma": "cuaderno",
+        "occurrences": 1
+      },
+      {
+        "word": "cómo",
+        "lemma": "cómo",
         "occurrences": 1
       },
       {
         "word": "de",
         "lemma": "de",
-        "occurrences": 3
+        "occurrences": 5
+      },
+      {
+        "word": "del",
+        "lemma": "del",
+        "occurrences": 1
+      },
+      {
+        "word": "descanso",
+        "lemma": "descansar",
+        "occurrences": 1
+      },
+      {
+        "word": "después",
+        "lemma": "después",
+        "occurrences": 1
+      },
+      {
+        "word": "diseñador",
+        "lemma": "diseñador",
+        "occurrences": 1
+      },
+      {
+        "word": "donde",
+        "lemma": "donde",
+        "occurrences": 1
       },
       {
         "word": "dos",
@@ -107,19 +237,9 @@
         "occurrences": 1
       },
       {
-        "word": "día",
-        "lemma": "día",
-        "occurrences": 1
-      },
-      {
         "word": "el",
         "lemma": "el",
-        "occurrences": 4
-      },
-      {
-        "word": "empezar",
-        "lemma": "empezar",
-        "occurrences": 1
+        "occurrences": 3
       },
       {
         "word": "empieza",
@@ -129,55 +249,65 @@
       {
         "word": "en",
         "lemma": "en",
-        "occurrences": 3
+        "occurrences": 7
+      },
+      {
+        "word": "enseño",
+        "lemma": "enseñar",
+        "occurrences": 1
+      },
+      {
+        "word": "envío",
+        "lemma": "enviar",
+        "occurrences": 1
       },
       {
         "word": "es",
         "lemma": "ser",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
-        "word": "esta",
-        "lemma": "esta",
+        "word": "escondido",
+        "lemma": "escondido",
         "occurrences": 1
       },
       {
-        "word": "está",
-        "lemma": "estar",
-        "occurrences": 2
-      },
-      {
-        "word": "familia",
-        "lemma": "familia",
+        "word": "escribir",
+        "lemma": "escribir",
         "occurrences": 1
       },
       {
-        "word": "foto",
-        "lemma": "foto",
-        "occurrences": 2
+        "word": "español",
+        "lemma": "español",
+        "occurrences": 3
       },
       {
-        "word": "grande",
-        "lemma": "grande",
+        "word": "fluidez",
+        "lemma": "fluidez",
         "occurrences": 1
       },
       {
-        "word": "gusta",
-        "lemma": "gustar",
+        "word": "guatemala",
+        "lemma": "guatemala",
         "occurrences": 1
       },
       {
-        "word": "hablamos",
+        "word": "hablar",
         "lemma": "hablar",
-        "occurrences": 1
+        "occurrences": 2
       },
       {
-        "word": "hay",
-        "lemma": "haber",
-        "occurrences": 1
+        "word": "hacia",
+        "lemma": "hacia",
+        "occurrences": 2
       },
       {
         "word": "historia",
+        "lemma": "historia",
+        "occurrences": 1
+      },
+      {
+        "word": "historias",
         "lemma": "historia",
         "occurrences": 1
       },
@@ -187,24 +317,19 @@
         "occurrences": 1
       },
       {
-        "word": "igual",
-        "lemma": "igual",
-        "occurrences": 1
-      },
-      {
-        "word": "junto",
-        "lemma": "junto",
-        "occurrences": 1
-      },
-      {
-        "word": "la",
-        "lemma": "el",
+        "word": "inglés",
+        "lemma": "inglés",
         "occurrences": 3
       },
       {
         "word": "las",
         "lemma": "el",
-        "occurrences": 1
+        "occurrences": 2
+      },
+      {
+        "word": "les",
+        "lemma": "les",
+        "occurrences": 2
       },
       {
         "word": "llamo",
@@ -212,68 +337,88 @@
         "occurrences": 1
       },
       {
-        "word": "lugar",
-        "lemma": "lugar",
+        "word": "llegar",
+        "lemma": "llegar",
         "occurrences": 1
-      },
-      {
-        "word": "madre",
-        "lemma": "madre",
-        "occurrences": 1
-      },
-      {
-        "word": "mañana",
-        "lemma": "mañana",
-        "occurrences": 2
       },
       {
         "word": "me",
         "lemma": "me",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
-        "word": "mesa",
-        "lemma": "mesa",
-        "occurrences": 4
+        "word": "mensajes",
+        "lemma": "mensaje",
+        "occurrences": 1
       },
       {
         "word": "mi",
         "lemma": "mi",
+        "occurrences": 7
+      },
+      {
+        "word": "mis",
+        "lemma": "mi",
         "occurrences": 4
       },
       {
-        "word": "nuestra",
-        "lemma": "nuestra",
+        "word": "mochila",
+        "lemma": "mochila",
         "occurrences": 1
       },
       {
-        "word": "ocho",
-        "lemma": "ocho",
+        "word": "más",
+        "lemma": "más",
         "occurrences": 1
       },
       {
-        "word": "otra",
-        "lemma": "otra",
+        "word": "méxico",
+        "lemma": "méxico",
         "occurrences": 1
       },
       {
-        "word": "pan",
-        "lemma": "pan",
+        "word": "nuevos",
+        "lemma": "nuevo",
+        "occurrences": 1
+      },
+      {
+        "word": "oficina",
+        "lemma": "oficina",
+        "occurrences": 1
+      },
+      {
+        "word": "otro",
+        "lemma": "otro",
+        "occurrences": 1
+      },
+      {
+        "word": "palabras",
+        "lemma": "palabra",
         "occurrences": 1
       },
       {
         "word": "para",
         "lemma": "para",
+        "occurrences": 3
+      },
+      {
+        "word": "perú",
+        "lemma": "perú",
         "occurrences": 1
       },
       {
-        "word": "pequeña",
-        "lemma": "pequeña",
+        "word": "pipa",
+        "lemma": "pipa",
         "occurrences": 1
       },
       {
-        "word": "pongo",
-        "lemma": "poner",
+        "word": "por",
+        "lemma": "por",
+        "occurrences": 1
+      },
+      {
+        "word": "practico",
+        "lemma": "practicar",
         "occurrences": 1
       },
       {
@@ -282,23 +427,63 @@
         "occurrences": 1
       },
       {
-        "word": "recordar",
-        "lemma": "recordar",
+        "word": "pronto",
+        "lemma": "pronto",
+        "occurrences": 1
+      },
+      {
+        "word": "propia",
+        "lemma": "propio",
+        "occurrences": 1
+      },
+      {
+        "word": "pueden",
+        "lemma": "poder",
+        "occurrences": 1
+      },
+      {
+        "word": "puerto",
+        "lemma": "puerto",
+        "occurrences": 1
+      },
+      {
+        "word": "que",
+        "lemma": "que",
+        "occurrences": 2
+      },
+      {
+        "word": "quiero",
+        "lemma": "querer",
+        "occurrences": 2
+      },
+      {
+        "word": "rica",
+        "lemma": "rica",
+        "occurrences": 1
+      },
+      {
+        "word": "ropa",
+        "lemma": "ropa",
+        "occurrences": 1
+      },
+      {
+        "word": "sigo",
+        "lemma": "seguir",
         "occurrences": 1
       },
       {
         "word": "sobre",
         "lemma": "sobre",
+        "occurrences": 2
+      },
+      {
+        "word": "soy",
+        "lemma": "ser",
         "occurrences": 1
       },
       {
-        "word": "sonríe",
-        "lemma": "sonreír",
-        "occurrences": 1
-      },
-      {
-        "word": "su",
-        "lemma": "su",
+        "word": "tabasco",
+        "lemma": "tabasco",
         "occurrences": 1
       },
       {
@@ -307,169 +492,230 @@
         "occurrences": 1
       },
       {
-        "word": "tazas",
-        "lemma": "taza",
-        "occurrences": 1
-      },
-      {
-        "word": "tenemos",
+        "word": "tienes",
         "lemma": "tener",
         "occurrences": 1
       },
       {
-        "word": "trabajo",
-        "lemma": "trabajar",
+        "word": "tomo",
+        "lemma": "tomar",
         "occurrences": 1
       },
       {
-        "word": "trae",
-        "lemma": "traer",
+        "word": "trabajo",
+        "lemma": "trabajo",
+        "occurrences": 1
+      },
+      {
+        "word": "tú",
+        "lemma": "tú",
         "occurrences": 1
       },
       {
         "word": "un",
         "lemma": "uno",
-        "occurrences": 2
+        "occurrences": 3
       },
       {
         "word": "una",
         "lemma": "uno",
-        "occurrences": 5
-      },
-      {
-        "word": "vecino",
-        "lemma": "vecino",
-        "occurrences": 3
-      },
-      {
-        "word": "ventana",
-        "lemma": "ventana",
         "occurrences": 1
       },
       {
-        "word": "viene",
-        "lemma": "venir",
+        "word": "viaje",
+        "lemma": "viaje",
         "occurrences": 1
       },
       {
-        "word": "vivo",
-        "lemma": "vivir",
+        "word": "viajes",
+        "lemma": "viaje",
+        "occurrences": 1
+      },
+      {
+        "word": "vida",
+        "lemma": "vida",
+        "occurrences": 1
+      },
+      {
+        "word": "visito",
+        "lemma": "visitar",
+        "occurrences": 1
+      },
+      {
+        "word": "volar",
+        "lemma": "volar",
+        "occurrences": 1
+      },
+      {
+        "word": "voy",
+        "lemma": "ir",
+        "occurrences": 2
+      },
+      {
+        "word": "whatsapp",
+        "lemma": "whatsapp",
         "occurrences": 1
       },
       {
         "word": "y",
         "lemma": "y",
-        "occurrences": 2
+        "occurrences": 8
+      },
+      {
+        "word": "yo",
+        "lemma": "yo",
+        "occurrences": 1
       }
     ],
     "license": "Original fictional demo text created for this project; not a verified community memoir. Production licensing and linguistic review pending.",
     "continuation": [
       {
         "id": "cafe-extra-1",
-        "spanish": "Hoy mi vecino trae una foto.",
-        "english": "Today my neighbor brings a photograph."
+        "spanish": "En Colombia abro dos chats de WhatsApp con mis alumnos.",
+        "english": "In Colombia I open two WhatsApp chats with my students."
       },
       {
         "id": "cafe-extra-2",
-        "spanish": "En la foto hay una mesa grande.",
-        "english": "There is a big table in the photograph."
+        "spanish": "Un chat es para hablar en inglés y el otro es para hablar en español.",
+        "english": "One chat is for speaking English, and the other is for speaking Spanish."
       },
       {
         "id": "cafe-extra-3",
-        "spanish": "Es el café de su madre.",
-        "english": "It is his mother’s café."
+        "spanish": "En el chat de español les envío mensajes sobre mis viajes.",
+        "english": "In the Spanish chat I send them messages about my travels."
       },
       {
         "id": "cafe-extra-4",
-        "spanish": "La mesa está junto a una ventana.",
-        "english": "The table is next to a window."
+        "spanish": "Mis alumnos me ayudan con las palabras y yo les ayudo con el inglés.",
+        "english": "My students help me with the words, and I help them with English."
       },
       {
         "id": "cafe-extra-5",
-        "spanish": "Tenemos una mesa igual aquí.",
-        "english": "We have an identical table here."
+        "spanish": "Pronto voy a volar a Argentina y quiero conversar con más fluidez.",
+        "english": "Soon I am going to fly to Argentina, and I want to speak more fluently."
       },
       {
         "id": "cafe-extra-6",
-        "spanish": "Pongo dos tazas sobre la mesa.",
-        "english": "I put two cups on the table."
+        "spanish": "Me preparo para las conversaciones que pueden cambiar mi vida.",
+        "english": "I prepare for the conversations that can change my life."
       },
       {
         "id": "cafe-extra-7",
-        "spanish": "Mi vecino sonríe y empieza otra historia.",
-        "english": "My neighbor smiles and begins another story."
+        "spanish": "Con mi café y mi cuaderno, practico cómo contar mi propia historia.",
+        "english": "With my coffee and my notebook, I practise how to tell my own story."
       },
       {
         "id": "cafe-extra-8",
-        "spanish": "Esta mañana el café también es un lugar para recordar.",
-        "english": "This morning the café is also a place for remembering."
+        "spanish": "Contar historias es un arte: tú también tienes una aventura que compartir.",
+        "english": "Telling stories is an art: you too have an adventure to share."
       }
     ],
     "matchGlossary": {
-      "a": "to",
-      "ana": "Ana (name)",
-      "aquí": "here",
-      "así": "like this",
-      "cada": "each",
-      "café": "coffee / café",
-      "casa": "house",
-      "cerca": "near",
-      "ciudad": "city",
+      "a": "to / at",
+      "abro": "I open",
+      "allí": "there",
+      "alumnos": "students",
+      "amigos": "friends",
+      "américa": "the Americas",
+      "antes": "before",
+      "aprender": "to learn",
+      "argentina": "Argentina",
+      "arte": "art",
+      "aventura": "adventure",
+      "aventuras": "adventures",
+      "ayudan": "they help",
+      "ayudo": "I help",
+      "belice": "Belize",
+      "café": "coffee",
+      "cambiar": "to change",
+      "cambio": "exchange",
+      "chat": "chat",
+      "chats": "chats",
+      "colombia": "Colombia",
+      "compartir": "to share",
+      "con": "with",
+      "conozco": "I meet / know",
+      "contar": "to tell",
+      "conversaciones": "conversations",
+      "conversar": "to converse",
+      "costa": "coast (Costa Rica: country)",
+      "cuaderno": "notebook",
+      "cómo": "how",
       "de": "of / from",
+      "del": "from the / of the",
+      "descanso": "I rest / take a break",
+      "después": "afterwards",
+      "diseñador": "designer",
+      "donde": "where",
       "dos": "two",
-      "día": "day",
       "el": "the",
-      "empezar": "to begin",
       "empieza": "begins",
-      "en": "in / on",
-      "es": "is (identity)",
-      "esta": "this (feminine)",
-      "está": "is (location)",
-      "familia": "family",
-      "foto": "photo",
-      "grande": "big",
-      "gusta": "is pleasing to",
-      "hablamos": "we talk",
-      "hay": "there is / there are",
+      "en": "in",
+      "enseño": "I teach",
+      "envío": "I send",
+      "es": "is",
+      "escondido": "hidden (Puerto Escondido: place)",
+      "escribir": "to write",
+      "español": "Spanish",
+      "fluidez": "fluency",
+      "guatemala": "Guatemala",
+      "hablar": "to speak",
+      "hacia": "towards",
       "historia": "story",
+      "historias": "stories",
       "hoy": "today",
-      "igual": "the same",
-      "junto": "beside (with a)",
-      "la": "the",
-      "las": "the (plural)",
+      "inglés": "English",
+      "las": "the (feminine plural)",
+      "les": "to them",
       "llamo": "am called (with me)",
-      "lugar": "place",
-      "madre": "mother",
-      "mañana": "morning / tomorrow",
+      "llegar": "to arrive",
       "me": "me / myself",
-      "mesa": "table",
+      "mensajes": "messages",
       "mi": "my",
-      "nuestra": "our",
-      "ocho": "eight",
-      "otra": "another",
-      "pan": "bread",
+      "mis": "my (plural)",
+      "mochila": "backpack",
+      "más": "more",
+      "méxico": "Mexico",
+      "nuevos": "new",
+      "oficina": "office",
+      "otro": "other",
+      "palabras": "words",
       "para": "for / in order to",
-      "pequeña": "small (feminine)",
-      "pongo": "I put",
+      "perú": "Peru",
+      "pipa": "Pipa (name)",
+      "por": "through / across",
+      "practico": "I practise",
       "preparo": "I prepare",
-      "recordar": "to remember",
-      "sobre": "on / about",
-      "sonríe": "smiles",
-      "su": "his / her / their",
+      "pronto": "soon",
+      "propia": "own",
+      "pueden": "they can",
+      "puerto": "port (Puerto Escondido: place)",
+      "que": "that",
+      "quiero": "I want",
+      "rica": "rich (Costa Rica: country)",
+      "ropa": "clothes",
+      "sigo": "I continue",
+      "sobre": "about",
+      "soy": "I am",
+      "tabasco": "Tabasco",
       "también": "also",
-      "tazas": "cups",
-      "tenemos": "we have",
-      "trabajo": "I work",
-      "trae": "brings",
+      "tienes": "you have",
+      "tomo": "I have / drink",
+      "trabajo": "work",
+      "tú": "you",
       "un": "a / one",
       "una": "a / one",
-      "vecino": "neighbour",
-      "ventana": "window",
-      "viene": "comes",
-      "vivo": "I live",
-      "y": "and"
+      "viaje": "journey",
+      "viajes": "travels",
+      "vida": "life",
+      "visito": "I visit",
+      "volar": "to fly",
+      "voy": "I go / am going",
+      "whatsapp": "WhatsApp",
+      "y": "and",
+      "yo": "I"
     },
-    "authorID": "ana"
+    "authorID": "marta"
   },
   {
     "id": "garden",
@@ -479,7 +725,7 @@
     "level": "A1",
     "symbol": "leaf",
     "palette": 1,
-    "summary": "A father shares the small things that make a garden grow.",
+    "summary": "Step into a small garden with a father and child, and discover how watering one new plant can turn watching someone else work into the joy of caring for something together.",
     "sentences": [
       {
         "id": "garden-1",
@@ -975,7 +1221,7 @@
     "level": "A2",
     "symbol": "tram",
     "palette": 2,
-    "summary": "A train journey turns into a chance to reconnect.",
+    "summary": "Join a traveller on a crowded Friday train to visit a grandmother, with mountain views, homemade soup and an overdue conversation waiting at the end of the journey.",
     "sentences": [
       {
         "id": "train-1",
@@ -1533,7 +1779,7 @@
     "level": "A2",
     "symbol": "water.waves",
     "palette": 3,
-    "summary": "Starting something new is easier with a friend beside you.",
+    "summary": "Follow a nervous beginner into the swimming pool with Elena, whose encouragement helps make difficult lessons, slow breathing and a first unaided swim feel worth the effort.",
     "sentences": [
       {
         "id": "sea-1",
@@ -2146,7 +2392,7 @@
     "level": "B1",
     "symbol": "bicycle",
     "palette": 4,
-    "summary": "An old bicycle brings a neighborhood a little closer.",
+    "summary": "After losing a shop job, a neighbour discovers an old bicycle in the courtyard, borrows some tools and begins building a workshop that brings the whole neighbourhood together.",
     "sentences": [
       {
         "id": "repair-1",
@@ -2914,7 +3160,7 @@
     "level": "A1",
     "symbol": "wrench.and.screwdriver",
     "palette": 0,
-    "summary": "Earning through useful work, with room for family.",
+    "summary": "Spend a morning in Tomás’s bicycle workshop as he explains a repair, agrees a fair price and finishes in time for something just as important: an afternoon with his daughter.",
     "sentences": [
       {
         "id": "repair-hour-1",
@@ -3352,7 +3598,7 @@
     "level": "B1",
     "symbol": "book.closed",
     "palette": 1,
-    "summary": "A family learns what lending money involves.",
+    "summary": "When an aunt needs a new bakery oven, a family conversation explores the practical questions behind lending money, from repayment plans to protecting the trust between people.",
     "sentences": [
       {
         "id": "loan-notebook-1",
@@ -4005,7 +4251,7 @@
     "level": "A2",
     "symbol": "map",
     "palette": 2,
-    "summary": "Work done today may earn money later, but sales are never guaranteed.",
+    "summary": "Clara turns her knowledge of local streets into a little guidebook, discovering that making something useful takes patience, updates and work long before anyone decides to buy it.",
     "sentences": [
       {
         "id": "small-guide-1",
@@ -4578,7 +4824,7 @@
     "level": "B1",
     "symbol": "signpost.right",
     "palette": 3,
-    "summary": "Three relatives compare earning methods without promising easy wealth.",
+    "summary": "Pull up a chair as three cousins compare translating, lending and creating a course, before their grandmother asks how earning a living fits around the lives they want to lead.",
     "sentences": [
       {
         "id": "three-paths-1",
@@ -5276,7 +5522,7 @@
     "level": "A1",
     "symbol": "envelope",
     "palette": 4,
-    "summary": "Planning spending, saving, and a small gift.",
+    "summary": "A first paycheck becomes three envelopes for household expenses, savings and a small gift, as two siblings discover that a thoughtful dinner can say more than an expensive present.",
     "sentences": [
       {
         "id": "three-envelopes-1",
@@ -5719,7 +5965,7 @@
     "level": "A2",
     "symbol": "cloud.rain",
     "palette": 0,
-    "summary": "A small reserve offers choices when plans change.",
+    "summary": "Lucía is saving for a television when rain starts coming through the roof, turning a shopping plan into a family conversation about repairs, unexpected costs and keeping options open.",
     "sentences": [
       {
         "id": "rainy-roof-1",
@@ -6297,7 +6543,7 @@
     "level": "B1",
     "symbol": "chart.line.uptrend.xyaxis",
     "palette": 1,
-    "summary": "Learning to ask about investment risk before chasing returns.",
+    "summary": "An exciting advertisement tempts Elena with quick returns, but her questions about risk, fees and evidence lead her towards a calmer decision before she spends any money.",
     "sentences": [
       {
         "id": "patient-investor-1",
@@ -6955,7 +7201,7 @@
     "level": "A2",
     "symbol": "scissors",
     "palette": 2,
-    "summary": "A goal becomes useful when it leads to a small action.",
+    "summary": "Marta dreams of opening a sewing workshop, but her first real step is much smaller: a crooked pocket, a request for help and another attempt to keep her keys safe.",
     "sentences": [
       {
         "id": "first-stitch-1",
@@ -7493,7 +7739,7 @@
     "level": "B1",
     "symbol": "door.left.hand.open",
     "palette": 3,
-    "summary": "Changing the method instead of simply working harder.",
+    "summary": "When Diego’s guitar-lesson flyers bring almost no replies, listening to his neighbours reveals that a different timetable may help more than simply handing out more paper.",
     "sentences": [
       {
         "id": "different-door-1",
@@ -8141,7 +8387,7 @@
     "level": "A1",
     "symbol": "heart",
     "palette": 4,
-    "summary": "A person’s worth is larger than their bank balance.",
+    "summary": "With little money but a useful set of tools, a friend helps repair a kitchen table and shares a meal that offers a gentle reminder of what people can give each other.",
     "sentences": [
       {
         "id": "empty-wallet-1",
@@ -8634,7 +8880,7 @@
     "level": "A2",
     "symbol": "person.3",
     "palette": 0,
-    "summary": "Cooperation, fair credit, and asking what each person can offer.",
+    "summary": "An empty courtyard becomes the setting for a neighbourhood meal as cooking, chairs, posters and tidying each find their place in a celebration that nobody could prepare alone.",
     "sentences": [
       {
         "id": "shared-table-1",
@@ -9217,7 +9463,7 @@
     "level": "A2",
     "symbol": "eurosign.circle",
     "palette": 1,
-    "summary": "A parent models honesty in an ordinary moment.",
+    "summary": "A parent and child discover extra coins in their shopping change, return to explain the mistake and find a small, affordable way to enjoy an ice cream together.",
     "sentences": [
       {
         "id": "honest-change-1",
@@ -9735,7 +9981,7 @@
     "level": "A2",
     "symbol": "carrot",
     "palette": 2,
-    "summary": "An affordable family meal and a habit that can last.",
+    "summary": "Cook alongside a father and child as they check the cupboard, visit the market and make a simple family meal they can enjoy today and look forward to making again.",
     "sentences": [
       {
         "id": "sunday-pot-1",
@@ -10298,7 +10544,7 @@
     "level": "B1",
     "symbol": "film",
     "palette": 3,
-    "summary": "A fictional family discusses Fat, Sick & Nearly Dead and the limits of personal testimony.",
+    "summary": "After watching Fat, Sick & Nearly Dead, Julia and her father discuss why an inspiring personal story still leaves questions about evidence, individual needs and safe changes to daily habits.",
     "sentences": [
       {
         "id": "film-conversation-1",
@@ -11171,7 +11417,7 @@
     "level": "B1",
     "symbol": "leaf",
     "palette": 4,
-    "summary": "A worried reader learns to distinguish a striking claim from evidence.",
+    "summary": "An alarming message about plants sends Nora to a dietitian with a notebook of questions, beginning a conversation about food preparation, reliable evidence and looking beyond frightening headlines.",
     "sentences": [
       {
         "id": "beans-question-1",
@@ -11884,7 +12130,7 @@
     "level": "A1",
     "symbol": "sun.max",
     "palette": 0,
-    "summary": "A small yes makes space for a new friendship.",
+    "summary": "A quiet Saturday changes when a neighbour offers an invitation, and a nervous walk beside the river becomes a conversation about books and the beginning of a new friendship.",
     "sentences": [
       {
         "id": "first-invitation-1",
@@ -12342,7 +12588,7 @@
     "level": "A2",
     "symbol": "hand.raised",
     "palette": 1,
-    "summary": "Openness works best alongside personal boundaries.",
+    "summary": "Inspired by Yes Man, Laura tries a dance class she once avoided, while learning that welcoming new experiences can also mean choosing when an honest no is right for her.",
     "sentences": [
       {
         "id": "thoughtful-yes-1",
@@ -12955,7 +13201,7 @@
     "level": "B1",
     "symbol": "pencil.and.list.clipboard",
     "palette": 2,
-    "summary": "A personal definition of enough becomes an honest budget.",
+    "summary": "Óscar puts his idea of a comfortable life onto paper, comparing everyday costs with his income and looking for a realistic next step that leaves room for rest and friendship.",
     "sentences": [
       {
         "id": "enough-on-paper-1",
@@ -13648,7 +13894,7 @@
     "level": "A2",
     "symbol": "desktopcomputer",
     "palette": 3,
-    "summary": "An earning idea begins with listening to a real need.",
+    "summary": "Eva asks her neighbours what they need and discovers a chance to help organise digital photographs, learning to discuss prices, respect privacy and understand the value of her time.",
     "sentences": [
       {
         "id": "useful-service-1",
@@ -14281,7 +14527,7 @@
     "level": "A2",
     "symbol": "bird",
     "palette": 4,
-    "summary": "A garden visit introduces seed dispersal without giving plants human intentions.",
+    "summary": "A bird eating a berry starts a garden conversation between Leo and his mother about the surprising journeys seeds take through animals, across the wind and into new places.",
     "sentences": [
       {
         "id": "travelling-seed-1",
@@ -14909,7 +15155,7 @@
     "level": "B1",
     "symbol": "questionmark.circle",
     "palette": 0,
-    "summary": "A surprising chemical fact is a reason to investigate, not panic.",
+    "summary": "A kitchen debate about whether tomatoes are fruit leads Marina and her brother into a second mystery, where a surprising chemical name teaches them to ask better questions before sharing a headline.",
     "sentences": [
       {
         "id": "tomato-question-1",
@@ -15612,7 +15858,7 @@
     "level": "B1",
     "symbol": "tree",
     "palette": 1,
-    "summary": "Ripeness and natural defenses vary between plants.",
+    "summary": "Inés and her grandfather examine a branch of colourful fruit, discovering that ripeness, beauty and a hungry bird are not enough to tell them which unfamiliar plants are safe.",
     "sentences": [
       {
         "id": "garden-colours-1",
@@ -16290,7 +16536,7 @@
     "level": "A2",
     "symbol": "basket",
     "palette": 2,
-    "summary": "Food safety depends on specific conditions, not alarming generalizations.",
+    "summary": "While choosing potatoes for a meal, Andrés learns to pay attention to their condition and to distinguish a specific food concern from the ordinary noises of a working stomach.",
     "sentences": [
       {
         "id": "potato-basket-1",
@@ -16898,7 +17144,7 @@
     "level": "A1",
     "symbol": "carrot",
     "palette": 3,
-    "summary": "Raw and cooked foods both have a place at the table.",
+    "summary": "Two carrots take different paths through one kitchen, becoming a crisp salad and a warm soup as a family shares a colourful meal with plenty of flavours to explore.",
     "sentences": [
       {
         "id": "two-carrots-1",
@@ -17371,7 +17617,7 @@
     "level": "A2",
     "symbol": "figure.walk",
     "palette": 4,
-    "summary": "Care for the body is a practice, not a promise of perfect health.",
+    "summary": "Raúl remembers every car service but rarely pauses for himself, until a tired day encourages him to approach sleep, meals, walks and asking for help with more patience.",
     "sentences": [
       {
         "id": "body-care-1",
@@ -17984,7 +18230,7 @@
     "level": "A2",
     "symbol": "drop",
     "palette": 0,
-    "summary": "Celebration does not require alcohol or an explanation.",
+    "summary": "At a lively party, Beatriz chooses water with lemon and finds that a thoughtful friend, a shared toast and a funny story are all she needs to join the celebration.",
     "sentences": [
       {
         "id": "water-toast-1",
@@ -18582,7 +18828,7 @@
     "level": "B1",
     "symbol": "pause.circle",
     "palette": 1,
-    "summary": "A dramatic diet claim becomes an opportunity for a better question.",
+    "summary": "A persuasive video offers Sergio a dramatic answer to a health worry, but a conversation with a professional helps him pause, ask questions and look for changes that fit his circumstances.",
     "sentences": [
       {
         "id": "pause-before-plan-1",
@@ -19275,7 +19521,7 @@
     "level": "A1",
     "symbol": "books.vertical",
     "palette": 2,
-    "summary": "Reading becomes a conversation and a small daily practice.",
+    "summary": "A reader’s evening habit of ten pages grows into daily conversations with a sister, where unanswered questions, different ways of reading and changing opinions become part of learning together.",
     "sentences": [
       {
         "id": "ten-pages-1",
@@ -19788,7 +20034,7 @@
     "level": "B1",
     "symbol": "magnifyingglass",
     "palette": 3,
-    "summary": "A reader distinguishes philosophical inspiration from scientific evidence.",
+    "summary": "Join a book club discussing The Kybalion, where Julia and her friends explore philosophical ideas while asking how a helpful metaphor differs from a claim that science can test.",
     "sentences": [
       {
         "id": "metaphor-not-law-1",
@@ -20486,7 +20732,7 @@
     "level": "A2",
     "symbol": "laptopcomputer",
     "palette": 0,
-    "summary": "An iOS developer learns to make room for the places beyond the screen.",
+    "summary": "Travel with Nicolás as he builds iPhone apps between Lisbon and Mexico, balancing deadlines, unreliable connections and new Spanish words with the life waiting outside his laptop.",
     "sentences": [
       {
         "id": "world-in-backpack-1",
@@ -21239,7 +21485,7 @@
     "level": "B1",
     "symbol": "paintpalette",
     "palette": 1,
-    "summary": "An in-house designer uses AI to explore a corporate identity while owning the decisions.",
+    "summary": "Follow Valeria through a company’s visual redesign as she listens to people, explores ideas with AI and turns promising sketches into an identity shaped by careful human decisions.",
     "sentences": [
       {
         "id": "brand-from-within-1",
@@ -22152,7 +22398,7 @@
     "level": "A2",
     "symbol": "globe.americas",
     "palette": 2,
-    "summary": "An English traveler finds a shared future in Mexico.",
+    "summary": "Oliver leaves a familiar office routine to travel for four years, eventually meeting Elena in a Mexican library and discovering a shared future built through walks, questions and conversation.",
     "sentences": [
       {
         "id": "four-years-road-1",
@@ -22930,7 +23176,7 @@
     "level": "A2",
     "symbol": "calendar",
     "palette": 3,
-    "summary": "At seventy, a retired office worker makes his first small plan for today.",
+    "summary": "After forty years in an office, Arturo opens an empty retirement calendar and begins replacing long-postponed wishes with a phone call, a day trip and his first drawing class.",
     "sentences": [
       {
         "id": "calendar-of-later-1",
@@ -23698,7 +23944,7 @@
     "level": "B1",
     "symbol": "book",
     "palette": 4,
-    "summary": "A family question connects food, scientific names, and knowledge passed between generations.",
+    "summary": "Ada’s question about beef sends a family into the library, where everyday words and scientific names open a conversation that she cannot wait to share with her little brother.",
     "sentences": [
       {
         "id": "cow-two-names-1",
@@ -24451,7 +24697,7 @@
     "level": "B1",
     "symbol": "cube",
     "palette": 0,
-    "summary": "Science fantasy: an imagined future of shared abundance, safe roads, and a cosmic thank-you.",
+    "summary": "Imagine a future where people and intelligent machines work towards shared abundance, then follow humanity’s extraordinary plan to send a glowing thank-you into space for distant visitors to discover.",
     "sentences": [
       {
         "id": "cube-among-stars-1",
@@ -25559,7 +25805,7 @@
     "level": "B1",
     "symbol": "globe.europe.africa",
     "palette": 0,
-    "summary": "A playground question separates gravitational attraction from rotation.",
+    "summary": "When Alba wonders why a spinning Earth does not send everyone flying, a dropped ball in the park helps her father explain gravity, rotation and the ground beneath their feet.",
     "sentences": [
       {
         "id": "feet-on-earth-1",
@@ -26417,7 +26663,7 @@
     "level": "A2",
     "symbol": "sun.max",
     "palette": 1,
-    "summary": "A planetarium visit reveals the journey of our whole solar system.",
+    "summary": "A planetarium visit takes Mateo beyond Earth’s orbit as he discovers that the Sun and its planets travel together through the galaxy, even while he seems to sit perfectly still.",
     "sentences": [
       {
         "id": "travelling-sun-1",
@@ -27165,7 +27411,7 @@
     "level": "B1",
     "symbol": "sparkles",
     "palette": 2,
-    "summary": "Jupiter challenges a learner’s picture of a gas giant.",
+    "summary": "Irene draws a spacecraft landing on Jupiter, then discovers a problem with its landing legs that leads her into the strange depths of a planet without familiar solid ground.",
     "sentences": [
       {
         "id": "no-place-to-land-1",
@@ -27978,7 +28224,7 @@
     "level": "A1",
     "symbol": "suitcase",
     "palette": 0,
-    "summary": "At an airport, two travelers discover that their matching suitcases hide very different plans.",
+    "summary": "Play through an airport mix-up as two travellers compare identical red suitcases, question their surprising contents and discover that twenty bananas can make a very useful clue.",
     "format": "movieScript",
     "scene": "At an airport, two travelers discover that their matching suitcases hide very different plans.",
     "sentences": [
@@ -28448,7 +28694,7 @@
     "level": "A2",
     "symbol": "fork.knife",
     "palette": 1,
-    "summary": "At a small restaurant, a surprise guest changes a birthday dinner.",
+    "summary": "Take a role in a restaurant conversation where a reservation for two needs an extra chair, a birthday surprise is disguised as a repair job and a candle matters more than a hammer.",
     "format": "movieScript",
     "scene": "At a small restaurant, a surprise guest changes a birthday dinner.",
     "sentences": [
@@ -29113,7 +29359,7 @@
     "level": "B1",
     "symbol": "tram",
     "palette": 2,
-    "summary": "On a station platform, two siblings decide whether a missed train has ruined their evening.",
+    "summary": "Two siblings miss their train and debate whether to give up, until memories of their mother, a possible bus and a misplaced present give their evening a new direction.",
     "format": "movieScript",
     "scene": "On a station platform, two siblings decide whether a missed train has ruined their evening.",
     "sentences": [
@@ -29987,7 +30233,7 @@
     "level": "A2",
     "symbol": "text.book.closed",
     "palette": 2,
-    "summary": "Identity, relationships, and roles. Six present-indicative forms; vosotros is used in Spain.",
+    "summary": "A forgotten letter brings Ana’s family together for a difficult conversation, letting you practise the present-tense forms of ser through questions of identity, family relationships and belonging.",
     "format": "verbs",
     "verbFocus": {
       "infinitive": "ser",
@@ -30874,7 +31120,7 @@
     "level": "A2",
     "symbol": "text.book.closed",
     "palette": 3,
-    "summary": "Location and how someone feels or is doing. Six present-indicative forms; vosotros is used in Spain.",
+    "summary": "Go backstage with Inés as a missing dress and an approaching audience turn rehearsal into a search, practising the present-tense forms of estar through places, feelings and reassurance.",
     "format": "verbs",
     "verbFocus": {
       "infinitive": "estar",
@@ -31751,7 +31997,7 @@
     "level": "B1",
     "symbol": "text.book.closed",
     "palette": 4,
-    "summary": "Wants, wishes, and affection. Six present-indicative forms; vosotros is used in Spain.",
+    "summary": "At Lucas’s last dinner before travelling, his family shares wishes, worries and affection, bringing the present-tense forms of querer to life in a conversation about leaving and staying connected.",
     "format": "verbs",
     "verbFocus": {
       "infinitive": "querer",
@@ -32648,7 +32894,7 @@
     "level": "A2",
     "symbol": "globe.asia.australia",
     "palette": 1,
-    "summary": "One table, many worlds. An original fictional travel encounter.",
+    "summary": "Find a seat at a Bangkok café where travellers from different backgrounds share languages and stories, and a friendly misunderstanding opens a conversation about identity and belonging.",
     "sentences": [
       {
         "id": "nearby-bangkok-1",
@@ -33265,7 +33511,7 @@
     "level": "A2",
     "symbol": "sun.horizon",
     "palette": 0,
-    "summary": "Two rhythms by the sea. An original fictional travel encounter.",
+    "summary": "Explore two sides of Pattaya through an early seaside walk with Jorge and an evening invitation to dance, discovering different ways to enjoy conversation, food and music by the coast.",
     "sentences": [
       {
         "id": "nearby-pattaya-1",
@@ -33902,7 +34148,7 @@
     "level": "A2",
     "symbol": "sparkles",
     "palette": 3,
-    "summary": "Between silence and celebration. An original fictional travel encounter.",
+    "summary": "Begin a Chiang Mai day with a restless meditation session, then join a neighbourhood celebration where shared food, music and lights bring a different kind of attention to the evening.",
     "sentences": [
       {
         "id": "nearby-thailand-1",

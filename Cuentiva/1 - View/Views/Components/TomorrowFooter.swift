@@ -8,7 +8,7 @@ struct TomorrowFooter: View {
             Text("Vuelve mañana")
                 .font(.system(.title2, design: .serif, weight: .medium))
                 .multilineTextAlignment(.center)
-            Image("SpiritFox")
+            Image("StorytellerPipa")
                 .resizable().scaledToFill()
                 .frame(width: 112, height: 112)
                 .clipShape(Circle())

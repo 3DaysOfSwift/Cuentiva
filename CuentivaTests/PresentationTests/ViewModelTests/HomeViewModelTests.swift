@@ -26,6 +26,46 @@ import Testing
         #expect(home.completed(first))
     }
 
+    @Test func celebratesOnlyNewDailyCompletionWithAnotherUnreadBook() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: (0..<3).map { sample("bounce-\($0)") }), purchases: purchases, progress: progress)
+        try await progress.load()
+        try await library.load()
+        let home = HomeViewModel(library: library, progress: progress)
+        await home.prepareDailyReads()
+        let first = try #require(home.focusedRead)
+        home.selectedBook = first
+        home.selectedBook = nil
+        await home.readingDismissed()
+        #expect(home.readCelebration == 0) // Closing an unfinished lesson is not a completion.
+        home.selectedBook = first
+        try await progress.recordEncounter(book: first, sentence: first.sentences[0])
+        _ = try await progress.completeReading(book: first)
+        home.selectedBook = nil
+        await home.readingDismissed()
+        #expect(home.total == 1)
+        #expect(home.focusedRead?.id != first.id)
+        #expect(home.readCelebration == 1)
+        await home.readingDismissed()
+        #expect(home.readCelebration == 1)
+        home.selectedBook = first
+        home.selectedBook = nil
+        await home.readingDismissed()
+        #expect(home.readCelebration == 1) // Rereading cannot trigger the reward again.
+        let remaining = home.dailyReads.filter { !home.completed($0) }
+        for book in remaining {
+            home.selectedBook = book
+            try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+            _ = try await progress.completeReading(book: book)
+            home.selectedBook = nil
+            await home.readingDismissed()
+        }
+        #expect(home.total == 3)
+        #expect(home.dailyReadsCompleted)
+        #expect(home.readCelebration == 2) // No bounce for Load 3 more books.
+    }
+
     @Test func staleLibraryResponseDoesNotReplaceNewSearch() async throws {
         let library = DelayedLibrary()
         let home = HomeViewModel(library: library, progress: ProgressManager(repository: MemoryProgress()))

@@ -3,30 +3,15 @@ import Observation
 @MainActor @Observable final class ContributionViewModel {
     private let feature: any ContributionFeature
     var draft = Contribution()
-    private let locationProvider: any StoryLocationProvider = AppleStoryLocationProvider()
     var confirmingRemoval = false
     func removeDraft() async {
         guard !busy else { return }; busy = true; defer { busy = false }
         do { try await feature.remove(draft.id); edit(Contribution()); notice = "Story and submission location removed from this device." }
         catch { self.error = error.localizedDescription }
     }
-    var attachLocation = false
-    var locationToConfirm: StoryLocation?
-    var confirmingLocation = false
     func requestSubmission() async {
         guard !busy else { return }
-        if !attachLocation || draft.submissionLocation != nil { await save(submit: true); return }
-        busy = true; error = nil
-        do { locationToConfirm = try await locationProvider.currentLocation(); confirmingLocation = true }
-        catch { self.error = error.localizedDescription }
-        busy = false
-    }
-    func confirmSubmission() async {
-        guard let location = locationToConfirm else { return }
-        draft.submissionLocation = location
         await save(submit: true)
-        if error != nil { draft.submissionLocation = nil }
-        locationToConfirm = nil
     }
     var tips: [String] = []
     var error: String?
@@ -86,5 +71,5 @@ import Observation
         do { try await feature.save(draft, submit: submit); if let saved = feature.drafts.first(where: { $0.id == draft.id }) { draft = saved }; notice = submit ? "Saved for review on this device. Nothing has been uploaded." : "Draft saved on this device." }
         catch { self.error = error.localizedDescription }
     }
-    func edit(_ value: Contribution) { draft = value; attachLocation = value.submissionLocation != nil; locationToConfirm = nil; notice = nil; tips = []; preview = false; browsingTopics = false }
+    func edit(_ value: Contribution) { draft = value; notice = nil; tips = []; preview = false; browsingTopics = false }
 }

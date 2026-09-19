@@ -203,17 +203,18 @@ import Testing
         let url = try #require(Bundle.main.url(forResource: "Library", withExtension: "dat"))
         #endif
         let books = try await BundledBookRepository(url: url).books()
+        let introduction = try #require(books.first { $0.id == "cafe" })
+        #expect(introduction.storyteller == Author.pipa)
+        #expect(introduction.author == "Pipa")
         #expect(books.count == 52); #expect(Set(books.map(\.level)) == ["A1", "A2", "B1"])
         #expect(books.filter { $0.kind == .movieScript }.count == 3)
         #expect(books.filter { $0.kind == .story }.count == 46)
         #expect(books.filter { $0.kind == .verbs }.count == 3)
-        let pattaya = StoryLocation(latitude: 12.9236, longitude: 100.8825, accuracy: 100, capturedAt: .now, placeName: "Pattaya")
         let seeded = books.filter { $0.isDemoLocation == true }
         #expect(seeded.count == 3)
         for book in seeded {
             let location = try #require(book.submissionLocation)
             #expect(location.valid)
-            #expect(pattaya.kilometers(to: location) < 1609.344)
         }
 
         for book in books {

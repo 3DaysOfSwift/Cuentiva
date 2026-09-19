@@ -4,7 +4,14 @@ import Observation
 @MainActor @Observable final class HomeViewModel {
     private let library: any LibraryFeature
     private let progress: any ProgressFeature
-    var selectedBook: Book?
+    var selectedBook: Book? {
+        didSet {
+            guard let selectedBook else { return }
+            readingVisit = (selectedBook.id, completed(selectedBook), dailyReads.contains { $0.id == selectedBook.id })
+        }
+    }
+    private var readingVisit: (id: String, wasCompleted: Bool, wasDailyRead: Bool)?
+    private(set) var readCelebration = 0
     var focusedBookID: String?
     var dailyReadingError: String?
     private(set) var preparingDailyReads = false
@@ -28,6 +35,7 @@ import Observation
     var sort: BookSort = .library
     var level = "All"
     var hideCompleted = true
+    var formatShowcase: [Book] { presentation.formatShowcase }
     var authors: [Author] { presentation.authors }
     var dailyReads: [Book] { presentation.dailyReads }
     var revisiting: Bool { presentation.revisiting }
@@ -66,6 +74,17 @@ import Observation
             }
         } catch { dailyReadingError = error.localizedDescription }
     }
+    func readingDismissed() async {
+        let visit = readingVisit
+        readingVisit = nil
+        await refresh()
+        focusNextRead()
+        guard let visit, visit.wasDailyRead, !visit.wasCompleted,
+              progress.snapshot.completed.contains(visit.id),
+              let next = focusedRead, next.id != visit.id, !completed(next) else { return }
+        readCelebration += 1
+    }
+
     func focusNextRead() { focusedBookID = nextRead?.id }
     func prepareDailyReads() async {
         guard !preparingDailyReads else { return }

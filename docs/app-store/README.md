@@ -26,7 +26,7 @@ StoreKit configuration files do not create live products. Configure prices and a
 - [ ] Test fresh purchase, restore, cancelled purchase, offline owner access and earned-coin chat sessions in TestFlight/sandbox.
 - [ ] Test AI-supported and unsupported devices; unavailable AI must not be sold as usable. Confirm chat availability and coin charging on hardware.
 - [ ] Review all bundled stories, generated-content behavior and artwork rights; answer the age-rating questionnaire from the actual content/capabilities.
-- [ ] Complete App Privacy after reviewing app, GitHub delivery, Apple location/purchase services and any support-site data handling. Do not copy a blanket “no network data” claim.
+- [ ] Complete App Privacy after reviewing app, GitHub delivery, Apple purchase services and any support-site data handling. Do not copy a blanket “no network data” claim.
 - [ ] Capture current iPhone and iPad screenshots, finalize metadata and accessibility declarations based on testing.
 - [ ] Attach first IAPs to the initial app-version submission, add review notes and select a release option.
 

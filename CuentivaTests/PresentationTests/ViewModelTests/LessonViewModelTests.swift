@@ -6,7 +6,40 @@ import Testing
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
         let (_,_,_,learning,_) = try await makeViewModelTestGraph(); let vm = LessonViewModel(learning: learning, audio: TestAudio())
         vm.load(sample()); vm.mode = "Write"; vm.answer = "El cafe esta aqui"; await vm.check(); await vm.next()
-        #expect(vm.feedback?.matched == 1); #expect(vm.showingReader)
+        #expect(vm.feedback?.matched == 1); #expect(vm.showingChapterCelebration); #expect(!vm.showingReader)
+    }
+
+    @Test func chapterCelebrationDoesNotCompleteBookOrGrantReward() async throws {
+        let (_, progress, _, learning, _) = try await makeViewModelTestGraph()
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(sample())
+        vm.readMoreFluently()
+        #expect(!vm.showingReader)
+        await vm.next()
+        #expect(vm.showingChapterCelebration)
+        #expect(progress.snapshot.completed.isEmpty)
+        vm.readMoreFluently()
+        #expect(vm.showingReader)
+        #expect(progress.snapshot.completed.isEmpty)
+    }
+
+    @Test func failedChapterSaveStaysInLessonAndCanRetry() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases()
+        let learning = LearningManager(purchases: purchases, progress: progress)
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(sample())
+        await repository.setFailure(true)
+        await vm.next()
+        #expect(vm.error != nil)
+        #expect(!vm.showingChapterCelebration)
+        #expect(!vm.showingReader)
+        await repository.setFailure(false)
+        await vm.next()
+        #expect(vm.error == nil)
+        #expect(vm.showingChapterCelebration)
     }
 
     @Test func writingSurvivesTabSwitchesAndSentenceNavigation() async throws {
@@ -27,8 +60,10 @@ import Testing
         let (_,_,_,learning,_) = try await makeViewModelTestGraph()
         let vm = LessonViewModel(learning: learning, audio: TestAudio())
         let book = sample()
-        vm.load(book); #expect(vm.nextTitle == "Read the full story"); await vm.next()
-        #expect(vm.showingReader); #expect(vm.error == nil)
+        vm.load(book); #expect(vm.nextTitle == "First chapter completed"); await vm.next()
+        #expect(vm.showingChapterCelebration); #expect(!vm.showingReader); #expect(vm.error == nil)
+        vm.readMoreFluently()
+        #expect(vm.showingReader); #expect(!vm.showingChapterCelebration)
         let resumed = LessonViewModel(learning: learning, audio: TestAudio()); resumed.load(book)
         #expect(resumed.showingReader)
     }
@@ -44,9 +79,11 @@ import Testing
         #expect(vm.answer == "Hola"); #expect(!vm.isPartnerLine)
         #expect(vm.nextTitle == "Next line")
         await vm.next()
-        #expect(vm.isPartnerLine); #expect(vm.nextTitle == "Read the full script")
+        #expect(vm.isPartnerLine); #expect(vm.nextTitle == "First chapter completed")
         await vm.next()
-        #expect(vm.showingReader); #expect(vm.error == nil)
+        #expect(vm.showingChapterCelebration); #expect(!vm.showingReader); #expect(vm.error == nil)
+        vm.readMoreFluently()
+        #expect(vm.showingReader); #expect(!vm.showingChapterCelebration)
         let resumed = LessonViewModel(learning: learning, audio: TestAudio()); resumed.load(book)
         #expect(resumed.showingReader)
     }

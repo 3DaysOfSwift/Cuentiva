@@ -1,8 +1,10 @@
 {
   "images": [
     {
+      "filename": "AppIcon.png",
       "idiom": "universal",
-      "filename": "portrait.png"
+      "platform": "ios",
+      "size": "1024x1024"
     }
   ],
   "info": {

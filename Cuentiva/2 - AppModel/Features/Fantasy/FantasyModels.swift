@@ -11,6 +11,7 @@ enum FantasyCreature: Int, Codable, CaseIterable, Sendable, Identifiable {
     var title: String {
         switch self { case .turtle: "Turtle"; case .unicorn: "Winged unicorn"; case .fox: "Fox" }
     }
+    var appIconName: String { "AppIcon" + portrait }
     var portrait: String {
         switch self { case .turtle: "SpiritTurtle"; case .unicorn: "SpiritUnicorn"; case .fox: "SpiritFox" }
     }

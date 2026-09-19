@@ -15,6 +15,13 @@ struct BookReaderView: View {
                     ScrollView {
                         LazyVStack(spacing: book.kind == .movieScript ? 30 : 24) {
                             ForEach(Array(book.fullText.enumerated()), id: \.element.id) { index, sentence in
+                                if index == 0 || index == book.sentences.count {
+                                    Text(index == 0 ? "Chapter 1" : "Chapter 2")
+                                        .font(.system(.title, design: .serif, weight: .medium))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.top, index == 0 ? 0 : 20)
+                                        .accessibilityAddTraits(.isHeader)
+                                }
                                 Group {
                                     if book.kind == .movieScript {
                                         ScriptDialogueRow(sentence: sentence,

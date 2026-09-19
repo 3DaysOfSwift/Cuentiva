@@ -39,6 +39,6 @@ Storyteller Chat costs one earned doubloon per session, charged on the first suc
 
 Write creates private local tales. There is no public upload or publishing platform. “Publish to my library” adds one saved tale per seven days to the user's own Discover collection.
 
-Microphone access is requested for speaking practice. Spanish recognition requires on-device support and offers writing as a fallback. Nearby optionally requests location and uses Apple's location/place services. The current nearby stories are explicitly fictional examples.
+Microphone access is requested for speaking practice. Spanish recognition requires on-device support and offers writing as a fallback. Cuentiva does not request location access.
 
 Before submission: confirm the exact reviewed build's navigation, IAP availability, support/privacy URLs and device behavior. Do not submit these notes as verification that testing has already happened.

@@ -3,7 +3,6 @@ import StoreKit
 struct CompletionView: View {
     let receipt: CompletionReceipt
     @State private var viewModel: CompletionViewModel
-    @State private var showPractice = false
     @State private var contentVisible = false
     @State private var confettiStart: Date?
     @Environment(\.requestReview) private var requestReview
@@ -52,15 +51,11 @@ struct CompletionView: View {
                         .multilineTextAlignment(.center)
                     Text("Five little adventures in Spanish. Every story is another step on your journey.")
                         .multilineTextAlignment(.center)
-                    Button("Continue  →") { viewModel.presentWritingMilestone(receipt) }
-                        .buttonStyle(PrimaryButton())
-                } else if let pack = receipt.themePackGift {
+                } else if receipt.themePackGift != nil {
                     Text("\(receipt.total) books.\nA new gift awaits.")
                         .font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
                     Text("You’ve earned a pack of five colour themes. Make your next chapter feel a little more yours.")
                         .multilineTextAlignment(.center)
-                    Button("See my gift  →") { viewModel.showingThemePack = pack }
-                        .buttonStyle(PrimaryButton())
                 } else if receipt.celebratesHundredBooks {
                     Text("One hundred books.\nThat’s something to celebrate.")
                         .font(.system(.largeTitle, design: .serif))
@@ -71,21 +66,24 @@ struct CompletionView: View {
                     Text("Your badges are waiting in your reading stats. Here’s to your next chapter.")
                         .font(.subheadline).foregroundStyle(theme.theme.muted)
                         .multilineTextAlignment(.center)
-                    Button("Keep growing  →") { dismiss() }.buttonStyle(PrimaryButton())
                 } else {
                     Label(receipt.book.kind == .movieScript ? "SCRIPT COMPLETED" : "BOOK COMPLETED", systemImage: "checkmark.seal.fill").font(.caption.bold()).tracking(2)
                     Text("One more story.\nA little more you.").font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
                     BookCover(book: receipt.book, completed: true, compact: true).frame(width: 155)
-                    Text(receipt.book.englishTitle).font(.title3.weight(.semibold))
                     Text("\(receipt.book.fullText.count) \(receipt.book.unitName) · \(receipt.book.wordCount) Spanish words").font(.subheadline).foregroundStyle(theme.theme.muted)
-                    Button("Continue  →") { if receipt.streakCelebration != nil && AppModel.shared.practice.allowed(receipt.book) { showPractice = true } else { dismiss() } }.buttonStyle(PrimaryButton())
                     if AppModel.shared.practice.allowed(receipt.book) {
-                        Button("Your turn · read it in Spanish") { showPractice = true }
+                        Button("Your turn · read it in Spanish") { viewModel.showingPractice = true }
                         Button("Finish for today") { dismiss() }
                     }
                 }
+                BookDetailsView(book: receipt.book, completed: true)
             }.padding(28).frame(maxWidth: .infinity)
         }
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                Button("Continue reading →", action: continueJourney)
+                    .buttonStyle(PrimaryButton()).padding(.horizontal, 28).padding(.vertical, 12)
+                    .background(theme.theme.paper)
+            }
             .opacity(contentVisible ? 1 : 0)
             .offset(y: contentVisible ? 0 : 18)
             .background(theme.theme.paper).foregroundStyle(theme.theme.ink)
@@ -135,7 +133,7 @@ struct CompletionView: View {
             .task(id: viewModel.hasCelebrated) {
                 guard viewModel.hasCelebrated else { return }
                 do { try await Task.sleep(for: .seconds(2)) } catch { return }
-                guard !Task.isCancelled, !showPractice, !viewModel.showingChat else { return }
+                guard !Task.isCancelled, !viewModel.showingPractice, !viewModel.showingChat else { return }
                 if viewModel.takeReviewRequest(receipt) { requestReview() }
             }
             .fullScreenCover(isPresented: $viewModel.showingWritingMilestone, onDismiss: { dismiss() }) {
@@ -148,8 +146,14 @@ struct CompletionView: View {
                 ChatView(author: receipt.book.storyteller)
             }
             .onDisappear { confettiStart = nil }
-            .fullScreenCover(isPresented: $showPractice, onDismiss: { dismiss() }) {
+            .fullScreenCover(isPresented: $viewModel.showingPractice, onDismiss: { dismiss() }) {
                 NavigationStack { PracticeView(book: receipt.book, streak: receipt.streakCelebration) }
             }
+    }
+
+    private func continueJourney() {
+        if viewModel.continueJourney(receipt, practiceAllowed: AppModel.shared.practice.allowed(receipt.book)) {
+            dismiss()
+        }
     }
 }

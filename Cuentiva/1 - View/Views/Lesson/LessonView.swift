@@ -9,6 +9,9 @@ struct LessonView: View {
     var body: some View {
         Group {
             if viewModel.showingReader { BookReaderView(book: book) }
+            else if viewModel.showingChapterCelebration {
+                ChapterCompletedView(hasNextChapter: !(book.continuation ?? []).isEmpty, onContinue: viewModel.readMoreFluently)
+            }
             else {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 25) {

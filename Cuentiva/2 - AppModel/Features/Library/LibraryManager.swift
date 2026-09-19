@@ -23,6 +23,7 @@ struct LibraryRevision: Sendable, Equatable {
 }
 
 private struct LibraryInput: Sendable {
+    var introduction: Book? = nil
     let catalogue: [Book]
     let personal: PersonalLibraryContent
     let authors: [Author]
@@ -46,6 +47,7 @@ struct LibraryPresentation: Sendable {
     var revisiting = false
     var authors: [Author] = []
     var coverage: [String: String] = [:]
+    var formatShowcase: [Book] = []
     var moreBooks: [Book] = []
 }
 
@@ -97,7 +99,7 @@ extension LibraryFeature {
             day: calendar.startOfDay(for: now()))
     }
     private var input: LibraryInput {
-        LibraryInput(catalogue: catalogueBooks, personal: personalLibrary?.libraryContent ?? .init(),
+        LibraryInput(introduction: introduction, catalogue: catalogueBooks, personal: personalLibrary?.libraryContent ?? .init(),
             authors: authorProfiles, arrivals: catalogueArrivals, progress: progress.snapshot,
             hasAccess: purchases.hasAccess && !purchases.checking,
             day: calendar.startOfDay(for: now()), calendar: calendar)
@@ -119,6 +121,7 @@ extension LibraryFeature {
     func loadIntroduction() async throws {
         guard introductoryBook == nil else { return }
         introductoryBook = try await repository.introduction()
+        catalogueRevision = UUID()
     }
     func load() async throws {
         guard purchases.hasAccess, !purchases.checking else { throw AppFailure.locked }
@@ -213,9 +216,7 @@ private actor LibraryWorker {
         personalBooks = input.personal.preparedBooks()
         let personalIDs = Set(personalBooks.map(\.id))
         books = personalBooks + input.catalogue.filter { !personalIDs.contains($0.id) }
-        available = input.hasAccess ? books.filter {
-            $0.submissionLocation == nil || input.progress.completed.contains($0.id)
-        } : []
+        available = input.hasAccess ? books : []
         discovery = nil
         coverageByID = [:]
     }
@@ -242,7 +243,14 @@ private actor LibraryWorker {
     }
 
     private func search(_ query: LibraryQuery) -> [Book] {
-        let matches = available.filter { book in
+        // Author profiles may show the free introduction before paid content loads.
+        let candidates: [Book]
+        if !input.hasAccess, query.authorID != nil, let introduction = input.introduction {
+            candidates = [introduction]
+        } else {
+            candidates = available
+        }
+        let matches = candidates.filter { book in
             (query.text.isEmpty || "\(book.title) \(book.englishTitle) \(book.storytellerName) \(book.cast.joined(separator: " "))"
                 .localizedStandardContains(query.text))
             && (!query.hideCompleted || !input.progress.completed.contains(book.id))
@@ -280,6 +288,9 @@ private actor LibraryWorker {
             nextRead: selection.first { !input.progress.completed.contains($0.id) } ?? selection.first,
             dailyReadsCompleted: finished, revisiting: !available.isEmpty && recycling,
             authors: Author.weeklyOrder(profiles.filter { visibleIDs.contains($0.id) }, on: input.day),
+            formatShowcase: [BookFormat.movieScript, .verbs, .story].compactMap { format in
+                available.first { $0.kind == format }
+            },
             moreBooks: Array(dailyOrder(unread, recycling: false).prefix(3)))
         let result = (recommendations: ordered, presentation: presentation)
         discovery = result

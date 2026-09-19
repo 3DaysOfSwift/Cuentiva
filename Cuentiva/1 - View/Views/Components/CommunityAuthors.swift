@@ -7,8 +7,14 @@ struct CommunityAuthors: View {
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Meet the storytellers").font(.system(.title3, design: .serif))
-            Text("A curious cast. A world of stories. Who will you read with today?")
+            HStack(alignment: .top, spacing: 16) {
+                Text("Meet the storytellers").font(.system(.title2, design: .serif, weight: .medium))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                NavigationLink { AuthorView(author: .pipa, onWrite: onWrite) } label: {
+                    AuthorPortrait(author: .pipa, size: 48)
+                }.buttonStyle(.plain).accessibilityLabel("Meet Pipa, your travelling companion")
+            }
+            Text("Helping bring Spanish to life through our storytelling")
                 .font(.subheadline).foregroundStyle(theme.theme.muted)
             ScrollView(.horizontal) {
                 HStack(alignment: .top, spacing: 26) {

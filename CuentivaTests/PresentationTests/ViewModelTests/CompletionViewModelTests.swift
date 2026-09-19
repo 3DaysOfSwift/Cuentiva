@@ -3,6 +3,18 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct CompletionViewModelTests {
+    @Test func nextChapterPreservesWritingGiftAndNormalDismissal() {
+        let fifth = CompletionReceipt(book: sample(), isNew: true, total: 5)
+        let vm = CompletionViewModel(receipt: fifth)
+        #expect(!vm.continueJourney(fifth, practiceAllowed: false))
+        #expect(vm.showingWritingMilestone)
+        let ordinary = CompletionReceipt(book: sample(), isNew: true, total: 6)
+        vm.prepare(ordinary)
+        #expect(vm.continueJourney(ordinary, practiceAllowed: false))
+        #expect(!vm.showingWritingMilestone)
+        #expect(!vm.showingPractice)
+    }
+
     @Test func celebrationCountsOnce() {
         let receipt = CompletionReceipt(book: sample(), isNew: true, total: 2), vm = CompletionViewModel()
         vm.prepare(receipt); #expect(vm.displayedTotal == 1); vm.celebrate(receipt); vm.prepare(receipt); #expect(vm.displayedTotal == 2)

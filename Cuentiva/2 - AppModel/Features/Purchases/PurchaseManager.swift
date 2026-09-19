@@ -26,11 +26,14 @@ enum LibraryAccess {
     var checking: Bool { get }
     var offers: [Product] { get }
     var message: String? { get }
+    func hasOneWeekTrial(for plan: LibraryPlan) -> Bool
     func refresh() async
     func purchase(plan: LibraryPlan) async throws
     func restore() async throws
 }
 extension PurchaseFeature {
+    func hasOneWeekTrial(for plan: LibraryPlan) -> Bool { false }
+
     func offer(for plan: LibraryPlan) -> Product? {
         offers.first { $0.id == plan.productID }
     }
@@ -48,6 +51,10 @@ extension PurchaseFeature {
     private(set) var hasAccess = false
     private(set) var checking = true
     private(set) var offers: [Product] = []
+    private var trialEligiblePlans: Set<LibraryPlan> = []
+    func hasOneWeekTrial(for plan: LibraryPlan) -> Bool {
+        !hasAccess && trialEligiblePlans.contains(plan)
+    }
     private(set) var message: String?
     private var listener: Task<Void, Never>?
     private var verificationFailure: String?
@@ -95,9 +102,25 @@ extension PurchaseFeature {
         checking = false
         // Owners need verified access, not a network lookup for a price.
         // Keep an already loaded offer when returning to the foreground.
-        guard !hasAccess, offers.count < LibraryPlan.allCases.count else { return }
+        trialEligiblePlans = []
+        guard !hasAccess else { return }
         do {
-            offers = try await loadProducts(LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
+            if offers.count < LibraryPlan.allCases.count {
+                offers = try await loadProducts(LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
+            }
+            // The group, not the selected billing period, determines trial eligibility.
+            var eligible: Set<LibraryPlan> = []
+            for plan in LibraryPlan.allCases {
+                guard let subscription = offer(for: plan)?.subscription,
+                      let intro = subscription.introductoryOffer,
+                      intro.paymentMode == .freeTrial,
+                      intro.periodCount == 1,
+                      (intro.period.unit == .week && intro.period.value == 1)
+                        || (intro.period.unit == .day && intro.period.value == 7),
+                      await subscription.isEligibleForIntroOffer else { continue }
+                eligible.insert(plan)
+            }
+            trialEligiblePlans = hasAccess ? [] : eligible
             message = offers.isEmpty ? "Purchase options are temporarily unavailable. Please try again later." : nil
         } catch { message = error.localizedDescription }
     }

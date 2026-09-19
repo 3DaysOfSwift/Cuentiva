@@ -51,7 +51,7 @@ struct FantasyWritingView: View {
                     }
                     Text("Saved privately on this device.").font(.caption).foregroundStyle(theme.theme.muted)
                     if model.storyIsPublished {
-                        Label("In your Discover library", systemImage: "checkmark.seal.fill")
+                        Label("In your Books library", systemImage: "checkmark.seal.fill")
                             .foregroundStyle(theme.theme.accent)
                     } else {
                         Button("Publish to my library") { Task { await model.publish() } }

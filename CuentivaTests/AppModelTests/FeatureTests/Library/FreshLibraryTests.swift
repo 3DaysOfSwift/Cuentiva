@@ -7,6 +7,51 @@ import Testing
 #endif
 
 @MainActor @Suite struct FreshLibraryTests {
+    @Test func formatShowcaseKeepsEditorialOrderAcrossSearchFilters() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        var script = sample("script"); script.format = .movieScript
+        var verbs = sample("verbs"); verbs.format = .verbs
+        var story = sample("story")
+        story.submissionLocation = StoryLocation(latitude: 13.75, longitude: 100.5, accuracy: 100, capturedAt: .now, placeName: "Bangkok")
+        let library = LibraryManager(repository: MemoryBooks(values: [story, verbs, script]), purchases: purchases, progress: progress)
+        try await progress.load()
+        try await library.load()
+        let all = await library.presentation(.init())
+        #expect(Set(all.books.map(\.id)) == ["script", "verbs", "story"])
+        #expect(all.formatShowcase.map(\.id) == ["script", "verbs", "story"])
+        let filtered = await library.presentation(.init(text: "no matching story", level: "B1"))
+        #expect(filtered.books.isEmpty)
+        #expect(filtered.formatShowcase.map(\.id) == ["script", "verbs", "story"])
+        purchases.hasAccess = false
+        #expect(await library.presentation(.init()).formatShowcase.isEmpty)
+    }
+
+    @Test func formatShowcaseDoesNotInventMissingTypes() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
+        try await progress.load()
+        try await library.load()
+        #expect(await library.presentation(.init()).formatShowcase.map(\.kind) == [.story])
+        #expect(Author.demoProfiles.filter { $0.id == Author.pipa.id }.count == 1)
+        #expect(Author.pipa.portrait == "StorytellerPipa")
+    }
+
+    @Test func freeIntroductionAppearsOnlyOnItsAuthorsProfile() async throws {
+        let purchases = TestPurchases()
+        let progress = ProgressManager(repository: MemoryProgress())
+        var book = sample("cafe"); book.authorID = Author.pipa.id
+        let library = LibraryManager(repository: MemoryBooks(values: [book, sample("paid")]), purchases: purchases, progress: progress)
+        try await progress.load()
+        #expect(await library.books(by: .pipa).isEmpty)
+        try await library.loadIntroduction()
+        #expect(await library.books(by: .pipa).map(\.id) == ["cafe"])
+        #expect(await library.matchingBooks(.init(authorID: "ana")).isEmpty)
+        #expect(await library.matchingBooks(.init()).isEmpty)
+        #expect(await library.dailyReads.isEmpty)
+    }
+
     final class Clock { var date = Date(timeIntervalSince1970: 1_800_014_400) }
     @Test func loadingAndDisplayingLibraryNeverWritesProgress() async throws {
         let store = MemoryProgress(), purchases = TestPurchases(); purchases.hasAccess = true

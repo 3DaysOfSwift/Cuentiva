@@ -33,7 +33,7 @@ Chat continues to use earned doubloons and requires supported on-device Apple In
 
 Publish [support](support-page.md) and [privacy](privacy-page.md) after replacing their placeholders. Supply the final HTTPS URLs and public support contact; add them in App Store Connect and inside the app. A privacy sentence is not a policy link.
 
-Complete App Privacy from the released implementation and service behavior. Local storage alone does not establish the answer for GitHub delivery, location services or website support forms. The checked-in privacy manifest is not a substitute for the questionnaire. Declare accessibility features only after testing them.
+Complete App Privacy from the released implementation and service behavior. Local storage alone does not establish the answer for GitHub delivery or website support forms. The checked-in privacy manifest is not a substitute for the questionnaire. Declare accessibility features only after testing them.
 
 ## 4. Product page
 

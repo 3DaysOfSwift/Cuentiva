@@ -34,7 +34,6 @@ Subsequent investigation isolated the recurring crash to concurrent SwiftData co
 | `LanguageTermsManager` | 8/8 (100.0%) | `FeatureTests/LanguageTerms`; shared integration/concurrency suites as applicable |
 | `LearningManager` | 29/30 (96.7%) | `FeatureTests/Learning`; shared integration/concurrency suites as applicable |
 | `LibraryManager` | 283/304 (93.1%) | `FeatureTests/Library`; shared integration/concurrency suites as applicable |
-| `NearbyManager` | 22/25 (88.0%) | `FeatureTests/Nearby`; shared integration/concurrency suites as applicable |
 | `PracticeManager` | 28/28 (100.0%) | `FeatureTests/Practice`; shared integration/concurrency suites as applicable |
 | `ProgressManager` | 317/319 (99.4%) | `FeatureTests/Progress`; shared integration/concurrency suites as applicable |
 | `PurchaseManager` | 82/235 (34.9%) | `FeatureTests/Purchases`; shared integration/concurrency suites as applicable |
@@ -85,11 +84,7 @@ State exposed by the contract: `books`, `introduction`, `revision`, `syncing`, `
 
 Filtering, daily rotation, personal content, stable authors and worker reuse are covered. Expand sync-failure status and overlapping sync/preparation tests. Manager conveniences (`search`, `discover`, `books(by:)`, daily reads/authors) are also used by existing tests.
 
-### NearbyManager
-
-Executed contract members: `stories()`.
-
-Access, radius and location filtering are covered. Request cancellation has separate concurrency tests; real CoreLocation permission and geocoding still require device/simulator validation.
+Nearby and its obsolete location tests were removed on 19 September 2026. Library tests now cover ordinary access to stories containing legacy location metadata.
 
 ### PracticeManager
 

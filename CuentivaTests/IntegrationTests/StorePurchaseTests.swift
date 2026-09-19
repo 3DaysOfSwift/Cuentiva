@@ -17,6 +17,19 @@ import StoreKitTest
         await purchases.refresh()
         #expect(!purchases.hasAccess)
         #expect(purchases.offers.count == 2)
+        for choice in LibraryPlan.allCases {
+            let product = try #require(purchases.offer(for: choice))
+            let intro = try #require(product.subscription?.introductoryOffer)
+            #expect(intro.paymentMode == .freeTrial)
+            #expect(intro.period.unit == .week)
+            #expect(intro.period.value == 1)
+            #expect(intro.periodCount == 1)
+            #expect(purchases.hasOneWeekTrial(for: choice))
+            let paywall = PaywallViewModel(purchases: purchases)
+            paywall.selectedPlan = choice
+            #expect(paywall.trialNotice?.contains("1 week free trial") == true)
+            #expect(paywall.trialNotice?.contains(product.displayPrice) == true)
+        }
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
         let root = RootViewModel(purchases: purchases, library: library, progress: progress, fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))
@@ -24,6 +37,8 @@ import StoreKitTest
         #expect(!root.hasAccess)
         try await purchases.purchase(plan: plan)
         #expect(purchases.hasAccess)
+        #expect(!purchases.hasOneWeekTrial(for: .monthly))
+        #expect(!purchases.hasOneWeekTrial(for: .annual))
         #expect(root.hasAccess)
 
         // A fresh manager has no app-local record, as after reinstalling.

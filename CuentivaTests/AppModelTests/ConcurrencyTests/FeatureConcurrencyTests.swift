@@ -302,38 +302,7 @@ private actor GatedProgressRepository: ProgressRepository {
         #expect(decoded.availableChatCoins == 1)
     }
 
-    @Test func locationCancellationCleansUpAndIgnoresLateCallbacks() async throws {
-        let request = LocationRequest()
-        var oldID: UUID?
-        var cleanupCount = 0
-        let old = Task { try await request.value(start: { oldID = $0 }, stop: { cleanupCount += 1 }) }
-        try await waitUntil { oldID != nil }
-        old.cancel()
-        await #expect(throws: CancellationError.self) { try await old.value }
-        #expect(cleanupCount == 1)
-        var newID: UUID?
-        let next = Task { try await request.value(start: { newID = $0 }, stop: { cleanupCount += 1 }) }
-        try await waitUntil { newID != nil }
-        request.finish(.failure(AppFailure.unavailable("Test storage failure")), id: try #require(oldID))
-        #expect(request.id == newID)
-        let place = StoryLocation(latitude: 1, longitude: 2, accuracy: 10, capturedAt: .now, placeName: "Test")
-        request.finish(.success(place), id: try #require(newID))
-        request.finish(.success(place), id: try #require(newID))
-        #expect(try await next.value == place)
-        #expect(cleanupCount == 2)
-    }
 
-    @Test func alreadyCancelledLocationDoesNotStartHardware() async throws {
-        let request = LocationRequest()
-        var started = false
-        let task = Task {
-            return try await request.value(start: { _ in started = true }, stop: {})
-        }
-        task.cancel()
-        await #expect(throws: CancellationError.self) { try await task.value }
-        #expect(!started)
-        #expect(request.id == nil)
-    }
 }
 
 private actor ImmediateChatGenerator: ChatGenerator {

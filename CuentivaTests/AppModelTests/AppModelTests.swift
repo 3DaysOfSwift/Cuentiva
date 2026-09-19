@@ -29,8 +29,6 @@ import Testing
         #expect(app.chat.coins == 1)
         purchases.hasAccess = false
         #expect(!app.practice.allowed(book))
-        let location = StoryLocation(latitude: 0, longitude: 0, accuracy: 1, capturedAt: .now, placeName: "Test")
-        #expect(app.nearby.stories(around: location, kilometers: 10).isEmpty)
     }
 }
 

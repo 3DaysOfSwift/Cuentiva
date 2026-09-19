@@ -29,10 +29,11 @@ struct Author: Identifiable, Hashable, Codable, Sendable {
     }
     static let supportedPortraits: Set<String> = Set(["", "AuthorAna", "AuthorLuis", "AuthorMarta"])
         .union(demoProfiles.map(\.portrait))
+    static let pipa: Author = .init(id: "marta", name: "Pipa", portrait: "StorytellerPipa", introduction: "A curious lizard with a travel notebook and a talent for finding new paths.", note: "Every journey begins with a question. Mine is usually: what is around that corner?")
     static let demoProfiles: [Author] = [
         .init(id: "ana", name: "Brasa", portrait: "StorytellerBrasa", introduction: "A little dragon with a generous heart and a weakness for café stories.", note: "I collect small acts of kindness. There is usually a cup of coffee nearby."),
         .init(id: "luis", name: "Musgo", portrait: "StorytellerMusgo", introduction: "A woodland wizard who finds magic in gardens, family and everyday care.", note: "Slow down with me. The smallest things often have the biggest stories."),
-        .init(id: "marta", name: "Pipa", portrait: "StorytellerPipa", introduction: "A curious lizard with a travel notebook and a talent for finding new paths.", note: "Every journey begins with a question. Mine is usually: what is around that corner?"),
+        pipa,
         .init(id: "credit-fade9533cfe2", name: "Zumi", portrait: "StorytellerZumi", introduction: "A tiny fly with enormous curiosity about work, ideas and how things happen.", note: "I ask questions, make mistakes and try again. Come and see what we discover."),
         .init(id: "credit-53e13e40b11a", name: "Luma", portrait: "StorytellerLuma", introduction: "A gentle moth who follows the light of a good idea.", note: "An ordinary day can hold a surprising possibility. Let us look for one together."),
         .init(id: "credit-5b644d127a59", name: "Nube", portrait: "StorytellerNube", introduction: "A wandering cloud creature with a pocket full of stories and a playful imagination.", note: "I bring tales about being human: the funny moments, the difficult choices and the joy of starting again."),

@@ -24,7 +24,7 @@ Cuentiva downloads library content from GitHub. These requests expose ordinary c
 
 Apple handles purchases and purchase verification through the App Store. Cuentiva does not receive your payment-card details.
 
-If you choose Nearby, the app requests your location and uses Apple's location and map services to find stories and identify the place. Your browsing location is not saved by Cuentiva. You can decline permission and use Discover.
+Cuentiva does not request your location. Older local drafts may retain location metadata saved by an earlier version; this remains on your device.
 
 ## Support and this website
 
@@ -32,7 +32,7 @@ If you contact us, we receive the information you choose to send so we can respo
 
 ## Your choices
 
-You can change microphone and location permissions in iOS Settings. Cuentiva offers a learning-progress reset in its settings; that is not a deletion of every story or conversation. Removing the app removes its local app storage, subject to device backups managed by Apple. Contact us about information you have sent directly for support.
+You can change microphone permission in iOS Settings. Cuentiva offers a learning-progress reset in its settings; that is not a deletion of every story or conversation. Removing the app removes its local app storage, subject to device backups managed by Apple. Contact us about information you have sent directly for support.
 
 ## Changes
 

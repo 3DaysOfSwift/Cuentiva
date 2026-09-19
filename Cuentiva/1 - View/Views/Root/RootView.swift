@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RootView: View {
-    private enum LibraryTab { case discover, nearby, completed, write }
+    private enum LibraryTab { case discover, completed, write }
     @State private var selectedTab: LibraryTab = .discover
     @State private var viewModel = RootViewModel()
     @Environment(ThemeManager.self) private var theme
@@ -11,11 +11,8 @@ struct RootView: View {
             if viewModel.canShowContent {
                 if viewModel.hasAccess {
                     TabView(selection: $selectedTab) {
-                        Tab("Discover", systemImage: "books.vertical", value: LibraryTab.discover) {
+                        Tab("Books", systemImage: "books.vertical", value: LibraryTab.discover) {
                             NavigationStack { HomeView(onWrite: viewModel.writingUnlocked ? { selectedTab = .write } : nil) }
-                        }
-                        Tab("Nearby", systemImage: "location", value: LibraryTab.nearby) {
-                            NavigationStack { NearbyView() }
                         }
                         Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) {
                             NavigationStack { CompletedView() }

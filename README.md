@@ -6,7 +6,7 @@
 
 Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Read at your own pace, listen to Spanish, practise speaking or writing, and collect the books you complete.
 
-Cuentiva combines a shared reading collection with private, personalised fantasy stories created on the device. Public story submission has been retired. Readers can publish one saved AI tale to their own Discover library every seven days, credited to their personal storyteller; nothing is uploaded. New avatars have an 80% chance of being the fox, with existing avatars preserved. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with local contribution drafts and example Nearby Stories. The bundled stories are fictional, and personal tales stay on the device.
+Cuentiva combines a shared reading collection with private, personalised fantasy stories created on the device. Public story submission has been retired. Readers can publish one saved AI tale to their own Discover library every seven days, credited to their personal storyteller; nothing is uploaded. New avatars have an 80% chance of being the fox, with existing avatars preserved. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with private local drafts. The bundled stories are fictional, and personal tales stay on the device.
 
 ## Cooperative Feature Architecture (CFA)
 
@@ -42,7 +42,7 @@ For a physical device, select your signing team. The bundle ID is `com.3DaysOfSw
 
 - One free A1 introductory book; onboarding can resume mid-book.
 - One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
-- Fifty-two bundled books: 46 stories, three Movie Scripts, and three Verbs books across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index. The three geotagged Thailand examples are discovered through Nearby; the other books appear in Discover.
+- Fifty-two bundled books: 46 stories, three Movie Scripts, and three Verbs books across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index. All 52 books, including the three fictional Thailand stories, appear in Books.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
 - Writing mode hides the reference sentence and gives aligned word-level feedback. Accents are treated separately; ñ is not treated as n.
@@ -66,7 +66,6 @@ Each screen owns its adjacent `@MainActor @Observable` ViewModel. Presentation c
 | ProgressManager | Committed learner state, streaks, vocabulary evidence, completion counting |
 | PurchaseManager | Verified StoreKit ownership, purchase/restore, expiry handling and legacy lifetime recovery, transaction updates |
 | PracticeManager | Completed-book practice eligibility, vocabulary statistics, matching glossaries and rewards |
-| NearbyManager | Location-based discovery within the selected radius |
 | LanguageTermsManager | Searchable bilingual language-term explanations |
 | FantasyManager | Private storyteller identity, generated drafts and weekly personal publication |
 | ChatManager | Earned-doubloon topic sessions with on-device AI and bounded model context |
@@ -126,7 +125,7 @@ Scripts show their scene and named speakers. Choose a role or read all roles and
 
 ## Extended story reading
 
-All 46 stories have continuations matching their original sentence counts. The original 43-story collection added 370 bilingual pairs, and the three Nearby examples each add eight more. The guided lesson retains its original sentences. Read the full story opens a flowing single-column English–Spanish reader containing both halves, with slow automatic Spanish playback, word highlighting, automatic following, a one-second pause between pairs, and a small audio toggle. Scripts retain their alternating character layout. Both formats share BookReaderViewModel and the same final completion action. Reopening an unfinished book resumes the full-reader stage from its start. Previously earned completions remain intact.
+All 46 stories have continuations matching their original sentence counts. The original 43-story collection added 370 bilingual pairs, and the three Thailand stories each add eight more. The guided lesson retains its original sentences. Read the full story opens a flowing single-column English–Spanish reader containing both halves, with slow automatic Spanish playback, word highlighting, automatic following, a one-second pause between pairs, and a small audio toggle. Scripts retain their alternating character layout. Both formats share BookReaderViewModel and the same final completion action. Reopening an unfinished book resumes the full-reader stage from its start. Previously earned completions remain intact.
 
 The free café introduction includes its continuation before the purchase gate. Existing sentence IDs and vocabulary lemma mappings are retained. New vocabulary uses curated mappings with surface fallback. All content still needs native-speaker editorial review. Read the [370 new sentence pairs](Documentation/STORY-CONTINUATIONS.md).
 
@@ -138,9 +137,9 @@ Verbs is a third content type in the shared Discover/Completed type picker. The 
 
 The topic-request and review workflow is retired. Its models and historical documentation remain for compatibility with earlier local drafts; no submission controls are exposed. Write now creates private personal tales on the device.
 
-## Nearby Stories
+## Retired location discovery
 
-Nearby discovers geotagged books within 5, 25 or 100 km, or 1,000 miles (default). Completed stories remain readable after travel. Leaving new public stories at locations is retired. The collection includes three clearly labelled fictional Thailand stories with example locations. See [Nearby Stories](Documentation/NEARBY-STORIES.md) for behavior, privacy and server integration.
+Nearby has been removed. All bundled stories are available in Books without location access. Legacy location metadata remains readable for saved-draft and binary-library compatibility.
 
 ## Your turn and Match Pairs
 

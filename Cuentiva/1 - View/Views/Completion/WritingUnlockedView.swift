@@ -40,7 +40,7 @@ struct WritingUnlockedView: View {
                             Text("Your free gift: Write is now unlocked.")
                                 .font(.headline).foregroundStyle(theme.theme.accent)
                             Text("Choose your character. Turn a memory or a wonderfully silly idea into a cute, bite-sized fantasy story in Spanish.")
-                            Text("Your tales carry your fantasy name, not your real name. We publish them straight back to YOU — in your private Discover library, never a public feed.")
+                            Text("Your tales carry your fantasy name, not your real name. We publish them straight back to YOU — in your private Books library, never a public feed.")
                             Text("Learn by writing and reading stories that are yours, on your most personal device: your phone.")
                             Text("Story generation uses Apple Intelligence on a supported device. You can set up your character now and write when it’s available.")
                                 .font(.footnote).foregroundStyle(theme.theme.muted)

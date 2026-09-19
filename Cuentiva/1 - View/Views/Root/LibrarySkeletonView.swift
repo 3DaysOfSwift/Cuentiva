@@ -5,7 +5,7 @@ struct LibrarySkeletonView: View {
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         TabView {
-            Tab("Discover", systemImage: "books.vertical") {
+            Tab("Books", systemImage: "books.vertical") {
                 NavigationStack {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 22) {
@@ -37,7 +37,6 @@ struct LibrarySkeletonView: View {
                         }
                 }
             }
-            Tab("Nearby", systemImage: "location") { Color.clear }
             Tab("Completed", systemImage: "checkmark.seal") { Color.clear }
             Tab("Contribute", systemImage: "square.and.pencil") { Color.clear }
         }.allowsHitTesting(false).accessibilityElement(children: .ignore).accessibilityLabel("Loading your library")

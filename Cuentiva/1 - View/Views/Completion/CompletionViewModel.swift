@@ -5,6 +5,7 @@ import Observation
     private(set) var displayedTotal = 0
     private(set) var hasCelebrated = false
     var showingChat = false
+    var showingPractice = false
     var showingWritingMilestone = false
     var showingThemePack: ThemePack?
     private var reviewRequested = false
@@ -14,6 +15,15 @@ import Observation
         writingMilestonePresented = true
         showingWritingMilestone = true
     }
+    /// Returns true when the completion screen should close.
+    func continueJourney(_ receipt: CompletionReceipt, practiceAllowed: Bool) -> Bool {
+        if receipt.unlocksWriting { presentWritingMilestone(receipt) }
+        else if let pack = receipt.themePackGift { showingThemePack = pack }
+        else if receipt.streakCelebration != nil && practiceAllowed { showingPractice = true }
+        else { return true }
+        return false
+    }
+
     func takeReviewRequest(_ receipt: CompletionReceipt) -> Bool {
         guard receipt.requestsReview, !reviewRequested else { return false }
         reviewRequested = true
@@ -32,6 +42,7 @@ import Observation
         writingMilestonePresented = false
         showingWritingMilestone = false
         showingChat = false
+        showingPractice = false
         showingThemePack = nil
         displayedTotal = receipt.isNew ? max(0, receipt.total - 1) : receipt.total
     }

@@ -18,7 +18,8 @@ import Observation
     var showSpanish = false
     var error: String?
     var busy = false
-    var showingReader = false
+    private(set) var showingReader = false
+    private(set) var showingChapterCelebration = false
     private var recordingTask: Task<Void, Never>?
     var sentence: Sentence? {
         guard let book, book.sentences.indices.contains(index) else { return nil }
@@ -35,7 +36,7 @@ import Observation
     var nextTitle: String {
         guard let book else { return "Next" }
         return index == book.sentences.count - 1
-            ? (book.kind == .movieScript ? "Read the full script" : "Read the full story")
+            ? "First chapter completed"
             : (book.kind == .movieScript ? "Next line" : "Next sentence")
     }
     var allowed: Bool {
@@ -98,7 +99,7 @@ import Observation
             switch try await learning.advance(book: book, from: index) {
             case .position(let next): index = next
             case .fullReading:
-                showingReader = true
+                showingChapterCelebration = true
                 return
             }
             answer = sentence.flatMap { writingDrafts[$0.id] } ?? ""
@@ -106,6 +107,12 @@ import Observation
             showSpanish = false
         } catch { self.error = error.localizedDescription }
     }
+    func readMoreFluently() {
+        guard showingChapterCelebration, allowed else { return }
+        showingChapterCelebration = false
+        showingReader = true
+    }
+
     func back() async {
         guard let book, index > 0, !busy else { return }
         busy = true

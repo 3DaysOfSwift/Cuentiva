@@ -31,7 +31,13 @@
           "familyShareable": false,
           "groupNumber": 1,
           "internalID": "CuentivaMonthly",
-          "introductoryOffer": null,
+          "introductoryOffer": {
+            "internalID": "CuentivaMonthlyFreeWeek",
+            "displayPrice": "0",
+            "paymentMode": "free",
+            "subscriptionPeriod": "P1W",
+            "numberOfPeriods": 1
+          },
           "localizations": [
             {
               "description": "Access the Cuentiva library with a monthly subscription.",
@@ -53,7 +59,13 @@
           "familyShareable": false,
           "groupNumber": 1,
           "internalID": "CuentivaAnnual",
-          "introductoryOffer": null,
+          "introductoryOffer": {
+            "internalID": "CuentivaAnnualFreeWeek",
+            "displayPrice": "0",
+            "paymentMode": "free",
+            "subscriptionPeriod": "P1W",
+            "numberOfPeriods": 1
+          },
           "localizations": [
             {
               "description": "Access the Cuentiva library with a annual subscription.",

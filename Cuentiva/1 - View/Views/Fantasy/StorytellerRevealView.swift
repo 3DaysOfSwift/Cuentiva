@@ -65,6 +65,23 @@ struct StorytellerRevealView: View {
                         }.buttonStyle(PrimaryButton())
                     }
                 }
+                if model.canOfferIcon, [.creature, .identity].contains(model.stage) {
+                    Divider()
+                    Text("Your character. Your Cuentiva.").font(.title2)
+                    Text("Let your storyteller welcome you from your Home Screen as you learn to tell your own adventures in Spanish.")
+                        .font(.subheadline).foregroundStyle(theme.theme.muted)
+                    if model.usesStorytellerIcon {
+                        Label("Your storyteller is your app icon", systemImage: "checkmark.circle.fill")
+                        Button("Use Pipa again") { operation = Task { await model.restorePipaIcon() } }
+                            .disabled(model.changingIcon)
+                    } else {
+                        Button(model.changingIcon ? "Changing icon…" : "Use my storyteller as the app icon") {
+                            operation = Task { await model.useStorytellerIcon() }
+                        }.buttonStyle(.bordered).disabled(model.changingIcon)
+                        Text("Prefer Pipa? Simply continue without changing your icon.").font(.caption)
+                    }
+                    if let message = model.iconMessage { Text(message).font(.footnote) }
+                }
                 if let message = model.availabilityMessage {
                     Text(message).font(.footnote).foregroundStyle(theme.theme.muted)
                     Button("Check again") { Task { await model.refreshAvailability() } }

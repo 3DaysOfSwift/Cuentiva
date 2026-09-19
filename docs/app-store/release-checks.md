@@ -24,7 +24,7 @@ Do not mark a check complete without results from the exact candidate. App Store
 ## Iteration 3: presentation and submission
 
 - [ ] iPhone and iPad layouts, keyboard, long titles, all themes, large text, VoiceOver and Reduce Motion.
-- [ ] Microphone/location denied: clear fallback. No unnecessary permission prompt at launch.
+- [ ] Microphone denied: clear fallback. No unnecessary permission prompt at launch.
 - [ ] Review bundled stories and artwork rights; inspect AI behavior against advertised use.
 - [ ] Screenshots match final UI and state purchase/device requirements.
 - [ ] Privacy, age rating, accessibility and export declarations reviewed against actual build.

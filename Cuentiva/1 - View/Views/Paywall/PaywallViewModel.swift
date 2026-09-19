@@ -4,10 +4,13 @@ import Observation
     private let purchases: any PurchaseFeature
     var busy = false
     var error: String?
-    var declined = false
     var title: String { "Your next chapter\nis waiting." }
     var selectedPlan: LibraryPlan = .annual
-    var button: String { "Subscribe · \(price)" }
+    var trialNotice: String? {
+        guard purchases.hasOneWeekTrial(for: selectedPlan) else { return nil }
+        return "1 week free trial · then \(price). Cancel at least 24 hours before the trial ends to avoid payment."
+    }
+    var button: String { "1 week free trial · \(price)" }
     var price: String { price(for: selectedPlan) }
     func price(for plan: LibraryPlan) -> String {
         purchases.offer(for: plan).map { "\($0.displayPrice) / \(plan.billingPeriod)" } ?? "Price unavailable"

@@ -12,14 +12,25 @@ struct HomeView: View {
                 StreakBar(days: viewModel.week)
                 Divider()
                 if !viewModel.dailyReads.isEmpty {
-                    HStack {
-                        if viewModel.dailyReadsCompleted {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.theme.accent)
-                        }
-                        Text("Today’s books")
-                    }.font(.system(.title2, design: .serif, weight: .medium))
-                        .accessibilityElement(children: .ignore)
-                        .accessibilityLabel(viewModel.dailyReadsCompleted ? "Today’s books, completed" : "Today’s books")
+                    HStack(alignment: .top, spacing: 16) {
+                        HStack {
+                            if viewModel.dailyReadsCompleted {
+                                Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.theme.accent)
+                            }
+                            Text("Your next book")
+                        }.font(.system(.largeTitle, design: .serif, weight: .medium))
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(viewModel.dailyReadsCompleted ? "Your next book, selection completed" : "Your next book")
+                        Spacer(minLength: 0)
+                        VStack(spacing: 2) {
+                            Text("\(viewModel.total)")
+                                .font(.system(.title, design: .serif, weight: .medium))
+                                .monospacedDigit()
+                            Text("BOOKS READ").font(.caption2.weight(.semibold))
+                                .foregroundStyle(theme.theme.muted)
+                        }.accessibilityElement(children: .ignore)
+                            .accessibilityLabel("\(viewModel.total) books read in total")
+                    }
                     ScrollView(.horizontal) {
                         HStack(spacing: 16) {
                             HStack(spacing: 16) {
@@ -70,60 +81,29 @@ struct HomeView: View {
 
                 }
                 if let book = viewModel.focusedRead {
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack(alignment: .center, spacing: 16) {
-                            NavigationLink {
-                                AuthorView(author: book.storyteller)
-                            } label: {
-                                AuthorPortrait(author: book.storyteller, size: 76)
-                                    .overlay(alignment: .bottomTrailing) {
-                                        if viewModel.completed(book) {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .symbolRenderingMode(.palette)
-                                                .foregroundStyle(theme.theme.onAccent, theme.theme.accent)
-                                                .font(.system(size: 28))
-                                                .background(theme.theme.paper, in: Circle())
-                                                .accessibilityHidden(true)
-                                        }
-                                    }
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("About \(book.storytellerName)")
-                            VStack(alignment: .leading, spacing: 6) {
-                                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                                    if viewModel.completed(book) {
-                                        Image(systemName: "checkmark").foregroundStyle(theme.theme.accent)
-                                            .accessibilityHidden(true)
-                                    }
-                                    Text(book.title).fixedSize(horizontal: false, vertical: true)
-                                }.font(.title2.weight(.semibold))
-                                    .accessibilityElement(children: .ignore)
-                                    .accessibilityLabel(book.title + (viewModel.completed(book) ? ", completed" : ""))
-                                Text(book.englishTitle).font(.subheadline)
-                                    .foregroundStyle(theme.theme.muted)
-                                    .fixedSize(horizontal: false, vertical: true)
-                                Text("By \(book.storytellerName)")
-                                    .font(.subheadline).foregroundStyle(theme.theme.muted)
-                            }
+                    Text(book.englishTitle).font(.title2.weight(.semibold))
+                    Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
+                    Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
+                        .font(.caption).foregroundStyle(theme.theme.muted)
+                    Button {
+                        Task { await viewModel.performReadingAction() }
+                    } label: {
+                        HStack {
+                            Text(viewModel.readButtonTitle)
+                            Image(systemName: "arrow.right")
                         }
-                        Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
-                            .font(.caption).foregroundStyle(theme.theme.muted)
-                        Text(book.summary).font(.subheadline).foregroundStyle(theme.theme.muted)
-                        Button {
-                            Task { await viewModel.performReadingAction() }
-                        } label: {
-                            HStack {
-                                Text(viewModel.readButtonTitle)
-                                Image(systemName: "arrow.right")
-                            }
-                            .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
-                            .foregroundStyle(viewModel.dailyReadsCompleted ? theme.theme.accent : theme.theme.onAccent)
-                            .background(viewModel.dailyReadsCompleted ? Color.clear : theme.theme.accent, in: RoundedRectangle(cornerRadius: 18))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 18)
-                                    .strokeBorder(theme.theme.accent, lineWidth: viewModel.dailyReadsCompleted ? 1.5 : 0)
-                            }
-                        }.buttonStyle(.plain).disabled(viewModel.preparingDailyReads)
+                        .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
+                        .foregroundStyle(viewModel.dailyReadsCompleted ? theme.theme.accent : theme.theme.onAccent)
+                        .background(viewModel.dailyReadsCompleted ? Color.clear : theme.theme.accent, in: RoundedRectangle(cornerRadius: 18))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 18)
+                                .strokeBorder(theme.theme.accent, lineWidth: viewModel.dailyReadsCompleted ? 1.5 : 0)
+                        }
+                    }.buttonStyle(.plain).disabled(viewModel.preparingDailyReads)
+                    .phaseAnimator([1.0, 1.08, 0.98, 1.0], trigger: viewModel.readCelebration) { content, scale in
+                        content.scaleEffect(reduceMotion ? 1 : scale)
+                    } animation: { _ in
+                        .spring(duration: 0.3, bounce: 0.45)
                     }
                 } else {
                     Text("New stories will appear here as the library grows.")
@@ -141,8 +121,29 @@ struct HomeView: View {
                         .font(.subheadline).foregroundStyle(theme.theme.muted)
                 }
                 Divider()
-                Text("Bring Spanish to life through stories").font(.system(.title2, design: .serif, weight: .medium))
                 CommunityAuthors(authors: viewModel.authors, onWrite: onWrite, horizontalInset: 23)
+                Divider()
+                Text("Three ways into Spanish").font(.system(.title2, design: .serif, weight: .medium))
+                Text("Play a part in a movie script, practise verbs in action, or discover a little story.")
+                    .font(.subheadline).foregroundStyle(theme.theme.muted)
+                ScrollView(.horizontal) {
+                    HStack(alignment: .top, spacing: 16) {
+                        ForEach(viewModel.formatShowcase) { book in
+                            Button { viewModel.selectedBook = book } label: {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    Text(book.kind == .movieScript ? "Scripts" : book.kind == .verbs ? "Verb training" : "Stories")
+                                        .font(.headline)
+                                    BookCover(book: book, completed: viewModel.completed(book), compact: true)
+                                    Text(book.englishTitle).font(.subheadline.weight(.semibold))
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }.frame(width: 190, alignment: .topLeading)
+                            }.buttonStyle(.plain)
+                        }
+                    }.padding(.vertical, 12)
+                }.contentMargins(.horizontal, 23, for: .scrollContent)
+                    .scrollIndicators(.hidden).padding(.horizontal, -23)
+                Divider()
+                Text("A1 – B1 Book Library").font(.system(.title2, design: .serif, weight: .medium))
                 Picker("Difficulty", selection: $viewModel.level) {
                     ForEach(["All", "A1", "A2", "B1"], id: \.self) { Text($0).tag($0) }
                 }.pickerStyle(.segmented)
@@ -153,7 +154,7 @@ struct HomeView: View {
                     isOn: $viewModel.hideCompleted
                 )
                 .font(.subheadline).tint(theme.theme.accent)
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 26) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20, alignment: .top)], spacing: 26) {
                     ForEach(viewModel.books) { book in
                         Button {
                             viewModel.selectedBook = book
@@ -164,6 +165,7 @@ struct HomeView: View {
                                     theme.theme.ink)
                                 Text("\(book.level) · \(book.fullText.count) \(book.unitName)").font(.caption)
                                     .foregroundStyle(theme.theme.muted)
+                                Text(book.summary).font(.caption).foregroundStyle(theme.theme.muted)
                                 Text(viewModel.coverage(book)).font(.caption2).foregroundStyle(theme.theme.muted)
                             }
                         }.buttonStyle(.plain)
@@ -191,7 +193,7 @@ struct HomeView: View {
                 .overlay(alignment: .top) {
                     HiddenProgressView()
                         .fixedSize(horizontal: false, vertical: true)
-                        .alignmentGuide(.top) { dimensions in dimensions[.bottom] + 80 }
+                        .alignmentGuide(.top) { dimensions in dimensions[.bottom] + 90 }
                 }
         }.scrollBounceBehavior(.always, axes: .vertical)
             .background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("")
@@ -229,7 +231,7 @@ struct HomeView: View {
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }
             }
-            .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { Task { await viewModel.refresh(); viewModel.focusNextRead() } }) { book in
+            .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { Task { await viewModel.readingDismissed() } }) { book in
                 NavigationStack { LessonView(book: book) }
             }
     }

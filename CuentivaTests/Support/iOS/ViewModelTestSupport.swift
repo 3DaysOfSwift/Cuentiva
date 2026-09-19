@@ -61,18 +61,6 @@ actor ReaderPauseProbe {
     func loadMoreDailyReads() async throws {}
 }
 
-@MainActor final class CancellableTestLocation: StoryLocationProvider {
-    let request = LocationRequest()
-    var stopped = false
-    func currentLocation() async throws -> StoryLocation {
-        try await request.value(start: { _ in }, stop: { self.stopped = true })
-    }
-}
-
-@MainActor final class EmptyNearby: NearbyFeature {
-    func stories(around location: StoryLocation, kilometers: Double) -> [Book] { [] }
-}
-
 @MainActor
 func makeViewModelTestGraph() async throws -> (TestPurchases, ProgressManager, LibraryManager, LearningManager, ContributionManager) {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())

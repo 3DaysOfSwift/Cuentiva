@@ -1,3 +1,18 @@
+## Next-book encouragement — 19 September 2026
+
+- Books now displays “Your next book”, the lifetime completion count, and top-aligned grid columns.
+- Returning from a newly completed daily recommendation focuses the next unread book and triggers a spring scale animation on its reading button. Dismissal without completion, rereads, repeated callbacks and finishing the whole set do not trigger it. Reduce Motion keeps the button still.
+- Added a HomeViewModel regression scenario for those transitions. All iOS app and test sources pass Swift 6 SDK type-checking. iOS runtime execution remains unavailable from this session, so the new test and animation still require Command-U/device validation.
+- Verified doubloon spending: the storyteller profile currently offers Talk with… without the 11-book presentation gate; completion-screen chat invitations start at 11. The first valid reply is charged once, after generation; subsequent replies in that session are free.
+
+## Phone UX polish — 19 September 2026
+
+- 126 model tests in 34 suites pass in the parallel SwiftPM runner; no test-process crash. All iOS app and test sources pass Swift 6 iOS SDK type-checking.
+- Added iOS regression cases for chapter celebration, no early completion, failed save/retry, next-chapter milestone routing, and StoreKit introductory-offer configuration/eligible copy. These require the next Command-U run; type-checking is not runtime execution.
+- Content repository: all 3 pack tests pass; built 52 books into 4 release packs locally. Bundled DAT freshness, project-file syntax and diff checks pass.
+- Simulator runtime execution is still blocked from the agent session: CoreSimulatorService connection refused and no available device set. No UI automation was used. Layout, Dynamic Type and purchase-sheet verification remain device checks.
+- Production trial configuration and existing snapshot rollout are described in `Documentation/PHONE-UX-POLISH.md`. Neither App Store Connect nor GitHub publishing was performed.
+
 ## User-run iOS tests and fixture corrections — 19 September 2026
 
 - User supplied an iPhone 13 Pro Max / iOS 26.2 simulator run: 169 of 171 tests passed across 61 suites. Two tests produced eight assertion issues; the log completed normally without a test-process crash. RootViewModel and StorePurchase suites passed at runtime.
