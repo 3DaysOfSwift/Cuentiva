@@ -9,7 +9,7 @@ struct NearbyView: View {
             VStack(alignment: .leading, spacing: 24) {
                 Text("Every place\nhas a story.").font(.system(.largeTitle, design: .serif))
                 Text("Discover stories from the collection connected to places around you.").foregroundStyle(theme.theme.muted)
-                Button { Task { await viewModel.refresh() } } label: {
+                Button { viewModel.findStories() } label: {
                     Label(viewModel.busy ? "Finding your place…" : "Find stories near me", systemImage: "location")
                 }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)
                 Text("Location is requested only when you tap. Your browsing location is not saved. Apple’s location service identifies the place name.")
@@ -48,6 +48,7 @@ struct NearbyView: View {
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
             .navigationTitle("Nearby Stories").navigationBarTitleDisplayMode(.inline)
             .fullScreenCover(item: $viewModel.selectedBook) { book in NavigationStack { LessonView(book: book) } }
+            .onDisappear { viewModel.clearLocation() }
             .onChange(of: phase) { _, value in if value == .background { viewModel.clearLocation() } }
     }
 }

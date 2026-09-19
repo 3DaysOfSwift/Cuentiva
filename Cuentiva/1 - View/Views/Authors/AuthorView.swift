@@ -39,6 +39,7 @@ struct AuthorView: View {
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
         .navigationTitle(model.author.name).navigationBarTitleDisplayMode(.inline)
-        .fullScreenCover(item: $model.selectedBook) { book in NavigationStack { LessonView(book: book) } }
+        .task(id: model.refreshID) { await model.refresh() }
+            .fullScreenCover(item: $model.selectedBook) { book in NavigationStack { LessonView(book: book) } }
     }
 }

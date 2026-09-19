@@ -225,10 +225,11 @@ struct HomeView: View {
             }
             // Persist the daily selection after this screen is mounted, never from library loading.
             .task { await viewModel.prepareDailyReads() }
+            .task(id: viewModel.refreshID) { await viewModel.refresh() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }
             }
-            .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { viewModel.focusNextRead() }) { book in
+            .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { Task { await viewModel.refresh(); viewModel.focusNextRead() } }) { book in
                 NavigationStack { LessonView(book: book) }
             }
     }

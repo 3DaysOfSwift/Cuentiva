@@ -30,9 +30,20 @@ enum LibraryAccess {
     func purchase(plan: LibraryPlan) async throws
     func restore() async throws
 }
+extension PurchaseFeature {
+    func offer(for plan: LibraryPlan) -> Product? {
+        offers.first { $0.id == plan.productID }
+    }
+
+    var annualPlanSaves: Bool {
+        guard let monthly = offer(for: .monthly), let annual = offer(for: .annual) else { return false }
+        return annual.price < monthly.price * 12
+    }
+}
+
 @MainActor @Observable final class PurchaseManager: PurchaseFeature {
-    static let productID = "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime"
-    private let entitlementProductIDs = Set(LibraryPlan.allCases.map(\.productID) + [PurchaseManager.productID])
+    static let legacyLifetimeProductID = "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime"
+    private let entitlementProductIDs = Set(LibraryPlan.allCases.map(\.productID) + [PurchaseManager.legacyLifetimeProductID])
     private var expirationTask: Task<Void, Never>?
     private(set) var hasAccess = false
     private(set) var checking = true
@@ -58,6 +69,21 @@ enum LibraryAccess {
         guard !refreshing else { return }
         refreshing = true
         defer { refreshing = false }
+        observeTransactions()
+        let started = Date()
+        logger.info("Entitlement check started")
+        await updateEntitlements()
+        logger.info("Entitlement check took \(Date().timeIntervalSince(started), privacy: .public) seconds")
+        checking = false
+        // Owners need verified access, not a network lookup for a price.
+        // Keep an already loaded offer when returning to the foreground.
+        guard !hasAccess, offers.count < LibraryPlan.allCases.count else { return }
+        do {
+            offers = try await Product.products(for: LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
+            message = offers.isEmpty ? "Purchase options are temporarily unavailable. Please try again later." : nil
+        } catch { message = error.localizedDescription }
+    }
+    private func observeTransactions() {
         if listener == nil {
             listener = Task { [weak self] in
                 for await update in Transaction.updates {
@@ -74,19 +100,8 @@ enum LibraryAccess {
                 }
             }
         }
-        let started = Date()
-        logger.info("Entitlement check started")
-        await updateEntitlements()
-        logger.info("Entitlement check took \(Date().timeIntervalSince(started), privacy: .public) seconds")
-        checking = false
-        // Owners need verified access, not a network lookup for a price.
-        // Keep an already loaded offer when returning to the foreground.
-        guard !hasAccess, offers.count < LibraryPlan.allCases.count else { return }
-        do {
-            offers = try await Product.products(for: LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
-            message = offers.isEmpty ? "Purchase options are temporarily unavailable. Please try again later." : nil
-        } catch { message = error.localizedDescription }
     }
+
     private func updateEntitlements(confirmed: Transaction? = nil) async {
         entitlementRevision += 1
         let revision = entitlementRevision
@@ -116,16 +131,21 @@ enum LibraryAccess {
         // A purchase, revocation, or newer scan supersedes an in-flight snapshot.
         guard revision == entitlementRevision else { return }
         hasAccess = active
+        scheduleExpirationCheck(at: expiry)
+        verificationFailure = active ? nil : failedVerification
+        logger.info("Entitlement check finished; access: \(active), verification failure: \(failedVerification != nil)")
+    }
+    private func scheduleExpirationCheck(at expiry: Date?) {
         expirationTask?.cancel()
+        expirationTask = nil
         if let expiry {
             expirationTask = Task { [weak self] in
                 do { try await Task.sleep(for: .seconds(max(0, expiry.timeIntervalSinceNow))) } catch { return }
                 await self?.updateEntitlements()
             }
         }
-        verificationFailure = active ? nil : failedVerification
-        logger.info("Entitlement check finished; access: \(active), verification failure: \(failedVerification != nil)")
     }
+
     private func verificationMessage(_ error: Error) -> String {
         "A purchase for this feature was found, but Apple could not verify it. Your purchase has not been treated as missing. Please reconnect to the internet and restore again. (\(String(describing: error)))"
     }
@@ -136,7 +156,7 @@ enum LibraryAccess {
     }
     private func isActive(_ transaction: Transaction) -> Bool {
         guard entitlementProductIDs.contains(transaction.productID) else { return false }
-        let lifetime = transaction.productID == Self.productID && transaction.productType == .nonConsumable
+        let lifetime = transaction.productID == Self.legacyLifetimeProductID && transaction.productType == .nonConsumable
         guard lifetime || transaction.productType == .autoRenewable else { return false }
         return LibraryAccess.isActive(expiration: transaction.expirationDate,
             revoked: transaction.revocationDate != nil, upgraded: transaction.isUpgraded, lifetime: lifetime)
@@ -147,7 +167,9 @@ enum LibraryAccess {
         defer { operationInProgress = false }
         await updateEntitlements()
         guard !hasAccess else { return }
-        guard let offer = offers.first(where: { $0.id == plan.productID }) else { throw AppFailure.unavailable("Purchase options have not loaded. Please retry.") }
+        guard let offer = offer(for: plan) else {
+            throw AppFailure.unavailable("Purchase options have not loaded. Please retry.")
+        }
         let result: Product.PurchaseResult
         do { result = try await offer.purchase() } catch {
             // StoreKit may report an error after an existing purchase has become available.
@@ -197,5 +219,8 @@ enum LibraryAccess {
         }
         message = nil
     }
-    isolated deinit { listener?.cancel(); expirationTask?.cancel() }
+    isolated deinit {
+        listener?.cancel()
+        expirationTask?.cancel()
+    }
 }

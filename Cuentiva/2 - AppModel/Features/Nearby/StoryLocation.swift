@@ -25,3 +25,34 @@ struct StoryLocation: Codable, Hashable, Sendable {
 @MainActor protocol StoryLocationProvider: AnyObject {
     func currentLocation() async throws -> StoryLocation
 }
+
+/// Bridges one callback request into structured concurrency. Tokens prevent late
+/// callbacks (including cancellation) from completing a subsequent request.
+@MainActor final class LocationRequest {
+    private var pending: CheckedContinuation<StoryLocation, any Error>?
+    private var stop: (() -> Void)?
+    private(set) var id: UUID?
+    func value(start: (UUID) -> Void, stop: @escaping () -> Void) async throws -> StoryLocation {
+        guard pending == nil else { throw AppFailure.busy }
+        let token = UUID()
+        return try await withTaskCancellationHandler {
+            try Task.checkCancellation()
+            return try await withCheckedThrowingContinuation { continuation in
+                id = token
+                pending = continuation
+                self.stop = stop
+                start(token)
+            }
+        } onCancel: {
+            Task { @MainActor in self.finish(.failure(CancellationError()), id: token) }
+        }
+    }
+    func finish(_ result: Result<StoryLocation, any Error>, id token: UUID) {
+        guard id == token else { return }
+        let continuation = pending
+        let cleanup = stop
+        pending = nil; id = nil; stop = nil
+        cleanup?()
+        continuation?.resume(with: result)
+    }
+}

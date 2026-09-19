@@ -45,6 +45,9 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var rewardedBooks: Set<String>? = nil
     var bestMatches: [String: Int]? = nil
     var doubloons: Int? = nil
+    /// A paid first reply that has not yet been delivered. Counts as one usable coin.
+    var pendingChatAdmission: Bool? = nil
+    var availableChatCoins: Int { (doubloons ?? 0) + (pendingChatAdmission == true ? 1 : 0) }
     var evidence: [String: Int] = [:]
 }
 struct CompletionReceipt: Identifiable, Sendable {

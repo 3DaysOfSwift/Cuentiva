@@ -64,7 +64,6 @@ struct ChatView: View {
                         Button("Check again") { Task { await model.prepare() } }
                             .disabled(model.feature.preparing)
                     }
-                    if let notice = model.notice { Text(notice).foregroundStyle(theme.theme.accent) }
                     InlineError(message: model.preparationError)
                     InlineError(message: model.error)
                     InlineError(message: model.audioError)

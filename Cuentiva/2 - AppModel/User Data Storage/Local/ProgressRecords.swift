@@ -77,6 +77,9 @@ enum ProgressRecords {
             rows["bestMatches"] = try RecordCoding.encode(value.bestMatches != nil)
             try map("bestMatches", value.bestMatches ?? [:], previous?.bestMatches ?? [:], into: &rows)
         }
+        if previous == nil || previous?.pendingChatAdmission != value.pendingChatAdmission {
+            rows["pendingChatAdmission"] = try RecordCoding.encode(value.pendingChatAdmission)
+        }
         if previous == nil || previous?.doubloons != value.doubloons {
             rows["doubloons"] = try RecordCoding.encode(value.doubloons)
         }
@@ -171,6 +174,7 @@ enum ProgressRecords {
         for (key, data) in rows where key.hasPrefix("bestMatches/") {
             value.bestMatches?[String(key.dropFirst(12))] = try RecordCoding.decode(Int.self, data)
         }
+        if let data = rows["pendingChatAdmission"] { value.pendingChatAdmission = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["doubloons"] { value.doubloons = try RecordCoding.decode(type(of: value.doubloons), data) }
         for (key, data) in rows where key.hasPrefix("evidence/") {
             value.evidence[String(key.dropFirst(9))] = try RecordCoding.decode(Int.self, data)

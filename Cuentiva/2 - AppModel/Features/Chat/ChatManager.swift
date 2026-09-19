@@ -29,7 +29,7 @@ import Observation
     private(set) var ready = false
     private(set) var busy = false
     private(set) var unavailable: String?
-    var coins: Int { progress.snapshot.doubloons ?? 0 }
+    var coins: Int { progress.snapshot.availableChatCoins }
     var hasAccess: Bool { coins > 0 || sessionPaid }
 
     init(generator: any ChatGenerator, progress: any ProgressFeature) {
@@ -95,10 +95,15 @@ import Observation
         conversation.memory = String(reply.memory.prefix(ChatLimits.memory))
         // Charge only after a valid first reply. Later messages never debit again.
         // Publish only after durable payment succeeds; AI failures cost nothing.
-        if !sessionPaid { try await progress.spendChatCoin() }
-        if sessionID == sendingSessionID {
-            sessionPaid = true
+        if sessionPaid {
             sessionConversation = conversation
+        } else {
+            try await progress.payForChat {
+                guard self.sessionID == sendingSessionID else { return false }
+                self.sessionPaid = true
+                self.sessionConversation = conversation
+                return true
+            }
         }
     }
     private func makeRequest(message: String, author: Author, level: String, conversation: ChatConversation) -> ChatRequest {

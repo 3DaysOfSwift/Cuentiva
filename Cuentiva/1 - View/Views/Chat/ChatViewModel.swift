@@ -9,7 +9,6 @@ import Observation
     var level: LearningLevel
     private(set) var preparationError: String?
     var error: String?
-    var notice: String?
     var sending = false
     var confirmingClear = false
     var translations: Set<UUID> = []
@@ -48,7 +47,6 @@ import Observation
         let text = draft
         sending = true
         error = nil
-        notice = nil
         replyTask = Task {
             defer {
                 sending = false

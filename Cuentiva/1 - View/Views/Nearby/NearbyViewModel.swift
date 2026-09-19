@@ -6,6 +6,11 @@ import Observation
     private let provider: any StoryLocationProvider
     private let progress: any ProgressFeature
     private var generation = UUID()
+    @ObservationIgnored private var locationTask: Task<Void, Never>?
+    func findStories() {
+        guard locationTask == nil else { return }
+        locationTask = Task { await refresh() }
+    }
     var location: StoryLocation?
     var radius = 1609.344
     var busy = false
@@ -19,11 +24,25 @@ import Observation
     }
     func completed(_ book: Book) -> Bool { progress.snapshot.completed.contains(book.id) }
     func refresh() async {
-        guard !busy else { return }; busy = true; error = nil; defer { busy = false }
-        location = nil
+        guard !busy else { return }
+        busy = true; error = nil; location = nil
         let token = generation
-        do { let value = try await provider.currentLocation(); if token == generation { location = value } }
-        catch { self.error = error.localizedDescription }
+        defer {
+            if token == generation { busy = false; locationTask = nil }
+        }
+        do {
+            let value = try await provider.currentLocation()
+            guard !Task.isCancelled, token == generation else { return }
+            location = value
+        } catch is CancellationError {
+            // Leaving Nearby is not an error to display.
+        } catch {
+            if token == generation { self.error = error.localizedDescription }
+        }
     }
-    func clearLocation() { generation = UUID(); location = nil }
+    func clearLocation() {
+        generation = UUID()
+        locationTask?.cancel(); locationTask = nil
+        location = nil; error = nil; busy = false
+    }
 }

@@ -113,8 +113,8 @@ actor LaunchBooks: SyncingBookRepository {
         let book = sample()
         try await progress.recordEncounter(book: book, sentence: book.sentences[0])
         _ = try await progress.complete(book: book)
-        _ = try await progress.rewardPractice(book: book, matches: 2)
-        _ = try await progress.rewardPractice(book: book, matches: 2)
+        try await progress.recordPractice(book: book, matches: 1)
+        try await progress.recordPractice(book: book, matches: 1)
         #expect(stats.booksRead == 1)
         #expect(stats.doubloons == 1)
         #expect(stats.streak == 1)
@@ -133,6 +133,7 @@ actor LaunchBooks: SyncingBookRepository {
         #expect(home.readButtonTitle == "Read book 1")
         try await progress.recordEncounter(book: first, sentence: first.sentences[0])
         _ = try await progress.complete(book: first)
+        await home.refresh()
         home.focusNextRead()
         #expect(home.readButtonTitle == "Read book 2")
         #expect(home.focusedRead?.id != first.id)
@@ -163,19 +164,24 @@ actor LaunchBooks: SyncingBookRepository {
     @Test func homeAndCollectionReflectCommittedCompletion() async throws {
         let (p,s,l,_,_) = try await graph(); p.hasAccess = true
         let home = HomeViewModel(library: l, progress: s), collection = CompletedViewModel(library: l)
+        await home.refresh(); await collection.refresh()
         #expect(home.books.count == 1); #expect(collection.books.isEmpty)
         #expect(home.hideCompleted)
         #expect(home.nextRead?.id == "cafe")
         home.query = "cafe"; home.level = "A1"; home.format = .story; home.sort = .title
+        await home.refresh()
         #expect(home.books.count == 1)
         let book = sample(); try await s.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await s.complete(book: book)
+        await home.refresh(); await collection.refresh()
         #expect(home.total == 1); #expect(collection.books.count == 1)
         #expect(home.books.isEmpty)
         #expect(home.nextRead?.id == "cafe")
         #expect(home.revisiting)
         home.hideCompleted = false
+        await home.refresh()
         #expect(home.books.count == 1)
         home.level = "B1"
+        await home.refresh()
         #expect(home.books.isEmpty)
     }
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
@@ -448,10 +454,10 @@ actor ReaderPauseProbe {
         #expect(model.stage == .ready); #expect(feature.coins == 1)
         model.startGame(); model.stage = .playing
         await model.chooseSpanish("está"); await model.chooseEnglish("está")
-        #expect(model.stage == .result); #expect(model.matches == 1); #expect(!model.awarded)
+        #expect(model.stage == .result); #expect(model.matches == 1)
         model.startGame(); model.stage = .playing
         await model.chooseEnglish("está"); await model.chooseSpanish("está")
-        #expect(!model.awarded); #expect(feature.coins == 1)
+        #expect(feature.coins == 1)
     }
 }
 
@@ -550,4 +556,68 @@ import StoreKitTest
         model.prepare(fifteenth)
         #expect(!model.takeReviewRequest(fifteenth))
     }
+}
+
+@Suite(.timeLimit(.minutes(1))) @MainActor struct ViewModelConcurrencyTests {
+    private func waitUntil(_ condition: () -> Bool) async throws {
+        let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+        while !condition() {
+            guard ContinuousClock.now < deadline else { throw AppFailure.unavailable("Test did not reach its gate.") }
+            await Task.yield()
+        }
+    }
+    @Test func staleLibraryResponseDoesNotReplaceNewSearch() async throws {
+        let library = DelayedLibrary()
+        let home = HomeViewModel(library: library, progress: ProgressManager(repository: MemoryProgress()))
+        home.query = "first"
+        let first = Task { await home.refresh() }
+        try await waitUntil { library.pending.count == 1 }
+        home.query = "second"
+        let second = Task { await home.refresh() }
+        try await waitUntil { library.pending.count == 2 }
+        library.pending[1].resume(returning: .init(books: [sample("second")]))
+        await second.value
+        library.pending[0].resume(returning: .init(books: [sample("first")]))
+        await first.value
+        #expect(home.books.map(\.id) == ["second"])
+    }
+    @Test func leavingNearbyCancelsItsOwnedLocationTask() async throws {
+        let provider = CancellableTestLocation()
+        let viewModel = NearbyViewModel(feature: EmptyNearby(), provider: provider,
+            progress: ProgressManager(repository: MemoryProgress()))
+        viewModel.findStories()
+        try await waitUntil { provider.request.id != nil }
+        viewModel.clearLocation()
+        try await waitUntil { provider.stopped }
+        #expect(!viewModel.busy)
+        #expect(viewModel.location == nil)
+        #expect(viewModel.error == nil)
+    }
+}
+
+@MainActor private final class DelayedLibrary: LibraryFeature {
+    var books: [Book] = []
+    var introduction: Book? { nil }
+    var syncing = false
+    var syncMessage: String?
+    let input = LibraryInput(catalogue: [], personal: [], authors: [], arrivals: [:], progress: .init(),
+        hasAccess: true, day: .distantPast, calendar: .current)
+    var pending: [CheckedContinuation<LibraryPresentation, Never>] = []
+    func presentation(_ query: LibraryQuery) async -> LibraryPresentation {
+        await withCheckedContinuation { pending.append($0) }
+    }
+    func load() async throws {}
+    func sync() async {}
+    func prepareDailyReads() async throws {}
+    func loadMoreDailyReads() async throws {}
+}
+@MainActor private final class CancellableTestLocation: StoryLocationProvider {
+    let request = LocationRequest()
+    var stopped = false
+    func currentLocation() async throws -> StoryLocation {
+        try await request.value(start: { _ in }, stop: { self.stopped = true })
+    }
+}
+@MainActor private final class EmptyNearby: NearbyFeature {
+    func stories(around location: StoryLocation, kilometers: Double) -> [Book] { [] }
 }

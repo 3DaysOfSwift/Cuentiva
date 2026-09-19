@@ -6,6 +6,15 @@ import Observation
     var format: BookFormat?
     var sort: BookSort = .library
     var selectedBook: Book?
-    var books: [Book] { library.search(query, level: nil, completedOnly: true, format: format, sort: sort) }
+    private(set) var books: [Book] = []
+    var refreshID: LibraryRequest {
+        .init(input: library.input, query: .init(text: query, completedOnly: true, format: format, sort: sort))
+    }
+    func refresh() async {
+        let requested = refreshID
+        let result = await library.presentation(requested.query)
+        guard !Task.isCancelled, requested == refreshID else { return }
+        books = result.books
+    }
     init(library: any LibraryFeature = AppModel.shared.library) { self.library = library }
 }

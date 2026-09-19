@@ -8,7 +8,19 @@ import Observation
     var focusedBookID: String?
     var dailyReadingError: String?
     private(set) var preparingDailyReads = false
-    var dailyReadsCompleted: Bool { library.dailyReadsCompleted }
+    private(set) var presentation = LibraryPresentation()
+    var refreshID: LibraryRequest { .init(input: library.input, query: libraryQuery) }
+    private var libraryQuery: LibraryQuery {
+        .init(text: query, level: level == "All" ? nil : level, format: format, sort: sort,
+            hideCompleted: hideCompleted, recommendations: query.isEmpty && sort == .library && hideCompleted)
+    }
+    func refresh() async {
+        let requested = refreshID
+        let result = await library.presentation(requested.query)
+        guard !Task.isCancelled, requested == refreshID else { return }
+        presentation = result
+    }
+    var dailyReadsCompleted: Bool { presentation.dailyReadsCompleted }
     var showTomorrowFooter: Bool { dailyReads.count == 3 && dailyReadsCompleted }
     private(set) var dailyReadingNotice: String?
     var query = ""
@@ -16,10 +28,10 @@ import Observation
     var sort: BookSort = .library
     var level = "All"
     var hideCompleted = true
-    var authors: [Author] { library.authors }
-    var dailyReads: [Book] { library.dailyReads }
-    var revisiting: Bool { library.revisiting }
-    var nextRead: Book? { library.nextRead }
+    var authors: [Author] { presentation.authors }
+    var dailyReads: [Book] { presentation.dailyReads }
+    var revisiting: Bool { presentation.revisiting }
+    var nextRead: Book? { presentation.nextRead }
     var focusedRead: Book? { dailyReads.first { $0.id == focusedBookID } ?? nextRead }
     var readButtonTitle: String {
         if preparingDailyReads { return "Loading books…" }
@@ -45,6 +57,7 @@ import Observation
         defer { preparingDailyReads = false }
         do {
             try await library.loadMoreDailyReads()
+            await refresh()
             focusNextRead()
             if dailyReads.count < 3 {
                 dailyReadingNotice = dailyReads.count == 1
@@ -61,6 +74,7 @@ import Observation
         do {
             try await library.prepareDailyReads()
             dailyReadingError = nil
+            await refresh()
             focusNextRead()
         } catch {
             dailyReadingError = "Couldn’t save today’s selection. Please try again."
@@ -70,19 +84,12 @@ import Observation
         !progress.snapshot.attempts[book.id, default: []].isEmpty
             || progress.snapshot.positions[book.id, default: 0] > 0
     }
-    var books: [Book] {
-        if query.isEmpty && sort == .library && hideCompleted {
-            return library.discover(level: level == "All" ? nil : level, format: format)
-        }
-        return library.search(
-            query, level: level == "All" ? nil : level, completedOnly: false, format: format, sort: sort,
-            hideCompleted: hideCompleted)
-    }
+    var books: [Book] { presentation.books }
     var total: Int { progress.snapshot.completed.count }
     var streak: Int { progress.streak }
     var week: [WeekDay] { progress.week }
     func completed(_ book: Book) -> Bool { progress.snapshot.completed.contains(book.id) }
-    func coverage(_ book: Book) -> String { library.coverage(book) }
+    func coverage(_ book: Book) -> String { presentation.coverage[book.id] ?? "" }
     init(
         library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress
     ) {

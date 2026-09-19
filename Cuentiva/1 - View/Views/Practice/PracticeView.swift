@@ -173,7 +173,7 @@ struct PracticeView: View {
             Label("\(model.coins) doubloons available", systemImage: "circle.circle.fill").font(.title2).foregroundStyle(theme.theme.rewardGold)
             if model.matches == 0 { Text("Try another round to practise these words. Your story-completion doubloon is already earned.") }
             if model.saving { ProgressView("Saving your round…") }
-            if model.error != nil { Button("Retry saving reward") { Task { await model.saveReward() } } }
+            if model.error != nil { Button("Retry saving score") { Task { await model.saveScore() } } }
             Button("Play again") { model.prepareGame() }.buttonStyle(PrimaryButton()).disabled(model.saving || model.error != nil)
             Button("Finish for today") { dismiss() }
         }

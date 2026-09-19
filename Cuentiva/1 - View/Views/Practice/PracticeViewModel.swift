@@ -18,7 +18,6 @@ import Observation
     var right: [String] = []
     var remaining: [String] = []
     var feedback = ""
-    var awarded = false
     var error: String?
     var saving = false
     var sentenceIndex = 0
@@ -42,7 +41,7 @@ import Observation
     func prepareGame() { stage = .ready; error = nil }
     func startGame() {
         guard allowed, let glossary else { return }
-        matches = 0; mistakes = 0; missed = []; seconds = 30; countdown = 3; awarded = false; error = nil
+        matches = 0; mistakes = 0; missed = []; seconds = 30; countdown = 3; error = nil
         remaining = glossary.keys.sorted().shuffled(); board = []; selectedSpanish = nil; selectedEnglish = nil; feedback = ""
         fillBoard(); stage = .countdown; deadline = now().advanced(by: .seconds(3))
     }
@@ -89,12 +88,12 @@ import Observation
     private func finishGame() async {
         guard stage == .playing else { return }
         stage = .result
-        await saveReward()
+        await saveScore()
     }
-    func saveReward() async {
+    func saveScore() async {
         guard !saving, matches > 0 else { return }
         saving = true; defer { saving = false }; error = nil
-        do { awarded = try await feature.reward(book, matches: matches) }
+        do { try await feature.recordScore(book, matches: matches) }
         catch { self.error = error.localizedDescription }
     }
     func suspend() {

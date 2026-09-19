@@ -12,7 +12,7 @@ import Observation
     var streak: Int { progress.streak }
     var week: [WeekDay] { progress.week }
     var booksRead: Int { progress.snapshot.completed.count }
-    var doubloons: Int { progress.snapshot.doubloons ?? 0 }
+    var doubloons: Int { progress.snapshot.availableChatCoins }
     var practiceDays: Int { progress.snapshot.practiceDays.count }
     var firstPractice: Date? {
         let formatter = DateFormatter()

@@ -1,58 +1,94 @@
 import Foundation
 import Observation
 
+struct LibraryQuery: Sendable, Equatable {
+    var text = ""
+    var level: String?
+    var completedOnly = false
+    var format: BookFormat?
+    var sort: BookSort = .library
+    var hideCompleted = false
+    var recommendations = false
+    var authorID: String?
+}
+
+/// Value snapshot crossing the UI/worker boundary. Capturing it performs no catalogue calculations.
+struct LibraryInput: Sendable, Equatable {
+    let catalogue: [Book]
+    let personal: [Book]
+    let authors: [Author]
+    let arrivals: [String: Date]
+    let progress: LearnerProgress
+    let hasAccess: Bool
+    let day: Date
+    let calendar: Calendar
+}
+
+struct LibraryRequest: Equatable {
+    let input: LibraryInput
+    let query: LibraryQuery
+}
+
+struct LibraryPresentation: Sendable {
+    var books: [Book] = []
+    var dailyReads: [Book] = []
+    var nextRead: Book?
+    var dailyReadsCompleted = false
+    var revisiting = false
+    var authors: [Author] = []
+    var coverage: [String: String] = [:]
+    var moreBooks: [Book] = []
+}
+
 @MainActor protocol LibraryFeature: AnyObject, Sendable {
     var books: [Book] { get }
     var introduction: Book? { get }
+    var input: LibraryInput { get }
+    func presentation(_ query: LibraryQuery) async -> LibraryPresentation
     func load() async throws
     func sync() async
     var syncing: Bool { get }
     var syncMessage: String? { get }
-    func search(
-        _ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool
-    ) -> [Book]
-    func coverage(_ book: Book) -> String
-    var nextRead: Book? { get }
-    var dailyReads: [Book] { get }
     func prepareDailyReads() async throws
-    var dailyReadsCompleted: Bool { get }
     func loadMoreDailyReads() async throws
-    var revisiting: Bool { get }
-    func discover(level: String?, format: BookFormat?) -> [Book]
-    var authors: [Author] { get }
-    func books(by author: Author) -> [Book]
 }
+
 @MainActor @Observable final class LibraryManager: LibraryFeature {
     private var catalogueBooks: [Book] = []
     private var catalogueArrivals: [String: Date] = [:]
+    private var authorProfiles: [Author] = Author.demoProfiles
     private var preparingDaily = false
     private let personalLibrary: (any PersonalLibraryFeature)?
-    var books: [Book] {
-        let personal = personalLibrary?.publishedBooks ?? []
-        let ids = Set(personal.map(\.id))
-        return personal + catalogueBooks.filter { !ids.contains($0.id) }
-    }
-    private var authorProfiles: [Author] = Author.demoProfiles
-    private(set) var syncing = false
-    private(set) var syncMessage: String?
     private let repository: any BookRepository
     private let purchases: any PurchaseFeature
     private let progress: any ProgressFeature
     private let now: () -> Date
     private let calendar: Calendar
-    init(
-        repository: any BookRepository, purchases: any PurchaseFeature, progress: any ProgressFeature,
-        personalLibrary: (any PersonalLibraryFeature)? = nil, now: @escaping () -> Date = Date.init,
-        calendar: Calendar = .current
-    ) {
-        self.personalLibrary = personalLibrary
-        self.repository = repository
-        self.purchases = purchases
-        self.progress = progress
-        self.now = now
-        self.calendar = calendar
+    private let worker = LibraryWorker()
+    private(set) var syncing = false
+    private(set) var syncMessage: String?
+    var books: [Book] {
+        let personal = personalLibrary?.publishedBooks ?? []
+        let ids = Set(personal.map(\.id))
+        return personal + catalogueBooks.filter { !ids.contains($0.id) }
     }
-    var introduction: Book? { books.first { $0.id == "cafe" } }
+    var introduction: Book? { catalogueBooks.first { $0.id == "cafe" } }
+    var input: LibraryInput {
+        LibraryInput(catalogue: catalogueBooks, personal: personalLibrary?.publishedBooks ?? [],
+            authors: authorProfiles, arrivals: catalogueArrivals, progress: progress.snapshot,
+            hasAccess: purchases.hasAccess || purchases.checking,
+            day: calendar.startOfDay(for: now()), calendar: calendar)
+    }
+    init(repository: any BookRepository, purchases: any PurchaseFeature, progress: any ProgressFeature,
+         personalLibrary: (any PersonalLibraryFeature)? = nil,
+         now: @escaping () -> Date = Date.init, calendar: Calendar = .current) {
+        self.repository = repository; self.purchases = purchases; self.progress = progress
+        self.personalLibrary = personalLibrary; self.now = now; self.calendar = calendar
+    }
+    func presentation(_ query: LibraryQuery = .init()) async -> LibraryPresentation {
+        await worker.prepare(input, query: query)
+    }
+    var recommendationBuildCount: Int { get async { await worker.recommendationBuildCount } }
     func load() async throws {
         if catalogueBooks.isEmpty {
             async let catalogue = repository.books()
@@ -75,20 +111,99 @@ import Observation
                 "Couldn’t update the library. Your current books are still available. Try again when you’re connected."
         }
     }
+    func prepareDailyReads() async throws {
+        guard purchases.hasAccess, !books.isEmpty, !preparingDaily else { return }
+        preparingDaily = true
+        defer { preparingDaily = false }
+        try await progress.registerLibrary(books)
+        let selection = await presentation()
+        try Task.checkCancellation()
+        guard purchases.hasAccess else { return }
+        try await progress.saveDailyReading(selection.dailyReads.map(\.id), date: calendar.startOfDay(for: now()))
+    }
+    func loadMoreDailyReads() async throws {
+        guard purchases.hasAccess else { throw AppFailure.unavailable("Unlock the library to choose more books.") }
+        guard !preparingDaily else { throw AppFailure.busy }
+        preparingDaily = true
+        defer { preparingDaily = false }
+        let selection = await presentation()
+        try Task.checkCancellation()
+        guard purchases.hasAccess else { return }
+        guard selection.dailyReadsCompleted else { return }
+        guard !selection.moreBooks.isEmpty else {
+            throw AppFailure.unavailable("You’ve read every available book. Revisit a favourite below, or check back for new stories.")
+        }
+        try await progress.saveDailyReading(selection.moreBooks.map(\.id), date: calendar.startOfDay(for: now()))
+    }
+}
+
+extension LibraryFeature {
+    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat? = nil,
+                sort: BookSort = .library, hideCompleted: Bool = false) async -> [Book] {
+        await presentation(.init(text: query, level: level, completedOnly: completedOnly,
+            format: format, sort: sort, hideCompleted: hideCompleted)).books
+    }
+    func discover(level: String?, format: BookFormat?) async -> [Book] {
+        await presentation(.init(level: level, format: format, recommendations: true)).books
+    }
+    func books(by author: Author) async -> [Book] {
+        await presentation(.init(authorID: author.id)).books
+    }
+    var dailyReads: [Book] { get async { await presentation(.init()).dailyReads } }
+    var dailyReadsCompleted: Bool { get async { await presentation(.init()).dailyReadsCompleted } }
+    var nextRead: Book? { get async { await presentation(.init()).nextRead } }
+    var revisiting: Bool { get async { await presentation(.init()).revisiting } }
+    var authors: [Author] { get async { await presentation(.init()).authors } }
+}
+
+/// All filtering, hashing, sorting, coverage and daily eligibility work runs here.
+/// No suspension occurs while preparing one internally consistent result.
+private actor LibraryWorker {
+    private var input = LibraryInput(catalogue: [], personal: [], authors: [], arrivals: [:],
+        progress: .init(), hasAccess: false, day: .distantPast, calendar: .current)
+    private var books: [Book] = []
+    private var previousQuery: LibraryQuery?
+    private var previousPresentation: LibraryPresentation?
+    func prepare(_ input: LibraryInput, query: LibraryQuery) -> LibraryPresentation {
+        if input == self.input, query == previousQuery, let previousPresentation { return previousPresentation }
+        self.input = input
+        let personalIDs = Set(input.personal.map(\.id))
+        books = input.personal + input.catalogue.filter { !personalIDs.contains($0.id) }
+        let matches = query.recommendations
+            ? discover(level: query.level, format: query.format)
+            : search(query.text, level: query.level, completedOnly: query.completedOnly,
+                format: query.format, sort: query.sort, hideCompleted: query.hideCompleted)
+        let selection = dailyReads
+        let finished = !selection.isEmpty && selection.allSatisfy { input.progress.completed.contains($0.id) }
+        let currentIDs = Set(selection.map(\.id))
+        let unread = finished ? available.filter {
+            !currentIDs.contains($0.id) && !input.progress.completed.contains($0.id)
+        } : []
+        let result = LibraryPresentation(
+            books: matches.filter { query.authorID == nil || $0.authorID == query.authorID },
+            dailyReads: selection,
+            nextRead: selection.first { !input.progress.completed.contains($0.id) } ?? selection.first,
+            dailyReadsCompleted: finished, revisiting: revisiting, authors: authors,
+            coverage: Dictionary(uniqueKeysWithValues: matches.map { ($0.id, coverage($0)) }),
+            moreBooks: Array(dailyOrder(unread, recycling: false).prefix(3)))
+        previousQuery = query
+        previousPresentation = result
+        return result
+    }
     func search(
         _ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort, hideCompleted: Bool
     ) -> [Book] {
         // Catalogue metadata may render during verification; lesson access
         // remains enforced independently by LearningManager.
-        guard purchases.hasAccess || purchases.checking else { return [] }
+        guard input.hasAccess else { return [] }
         let matches = books.filter { book in
-            (book.submissionLocation == nil || progress.snapshot.completed.contains(book.id))
+            (book.submissionLocation == nil || input.progress.completed.contains(book.id))
                 && (query.isEmpty
                     || "\(book.title) \(book.englishTitle) \(book.storytellerName) \(book.cast.joined(separator: " "))"
                         .localizedStandardContains(query))
-                && (!hideCompleted || !progress.snapshot.completed.contains(book.id))
+                && (!hideCompleted || !input.progress.completed.contains(book.id))
                 && (format == nil || book.kind == format) && (level == nil || book.level == level)
-                && (!completedOnly || progress.snapshot.completed.contains(book.id))
+                && (!completedOnly || input.progress.completed.contains(book.id))
         }
         switch sort {
         case .library: return matches
@@ -98,17 +213,17 @@ import Observation
         }
     }
     private func recent(_ book: Book) -> Bool {
-        guard let date = progress.snapshot.bookLastRead?[book.id] else { return false }
+        guard let date = input.progress.bookLastRead?[book.id] else { return false }
         let days =
-            calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: now()))
+            input.calendar.dateComponents([.day], from: input.calendar.startOfDay(for: date), to: input.calendar.startOfDay(for: input.day))
             .day ?? 4
         return (0...3).contains(days)
     }
     private func eligibleToday(_ book: Book) -> Bool {
-        guard !progress.snapshot.completed.contains(book.id) else { return false }
+        guard !input.progress.completed.contains(book.id) else { return false }
         let started =
-            progress.snapshot.bookLastRead?[book.id] != nil || !progress.snapshot.attempts[book.id, default: []].isEmpty
-            || progress.snapshot.positions[book.id, default: 0] > 0
+            input.progress.bookLastRead?[book.id] != nil || !input.progress.attempts[book.id, default: []].isEmpty
+            || input.progress.positions[book.id, default: 0] > 0
         return !started || recent(book)
     }
     private var available: [Book] {
@@ -124,23 +239,23 @@ import Observation
             (level == nil || $0.level == level) && (format == nil || $0.kind == format)
         }
     }
-    @ObservationIgnored private var recommendationOrder = LibraryRecommendationOrder()
+    private var recommendationOrder = LibraryRecommendationOrder()
     var recommendationBuildCount: Int { recommendationOrder.buildCount }
 
     private func dailyOrder(_ values: [Book], recycling: Bool) -> [Book] {
-        let snapshot = progress.snapshot
-        let arrivals = (snapshot.bookArrivals ?? [:]).merging(catalogueArrivals) { _, prepared in prepared }
+        let snapshot = input.progress
+        let arrivals = (snapshot.bookArrivals ?? [:]).merging(input.arrivals) { _, prepared in prepared }
         return recommendationOrder.order(
-            values, recycling: recycling, today: calendar.startOfDay(for: now()), calendar: calendar,
+            values, recycling: recycling, today: input.calendar.startOfDay(for: input.day), calendar: input.calendar,
             arrivals: arrivals, lastRead: snapshot.bookLastRead ?? [:], level: snapshot.selectedLearningLevel
         )
     }
     var dailyReads: [Book] {
         // Catalogue metadata may render during verification; lesson access
         // remains enforced independently by LearningManager.
-        guard purchases.hasAccess || purchases.checking else { return [] }
-        guard let date = progress.snapshot.dailyReadingDate, calendar.isDate(date, inSameDayAs: now()),
-            let ids = progress.snapshot.dailyReadingIDs
+        guard input.hasAccess else { return [] }
+        guard let date = input.progress.dailyReadingDate, input.calendar.isDate(date, inSameDayAs: input.day),
+            let ids = input.progress.dailyReadingIDs
         else { return Array(discover(level: nil, format: nil).prefix(3)) }
         // Retain completed cards in today's set; only replace books no longer available.
         let lookup = Dictionary(uniqueKeysWithValues: available.map { ($0.id, $0) })
@@ -150,43 +265,11 @@ import Observation
         let retainedIDs = Set(retained.map(\.id))
         return Array((retained + candidates.filter { !retainedIDs.contains($0.id) }).prefix(3))
     }
-    func prepareDailyReads() async throws {
-        guard purchases.hasAccess, !books.isEmpty, !preparingDaily else { return }
-        preparingDaily = true
-        defer { preparingDaily = false }
-        try await progress.registerLibrary(books)
-        try await progress.saveDailyReading(dailyReads.map(\.id), date: calendar.startOfDay(for: now()))
-    }
-    var dailyReadsCompleted: Bool {
-        let selection = dailyReads
-        return !selection.isEmpty && selection.allSatisfy { progress.snapshot.completed.contains($0.id) }
-    }
-    /// Replace only a finished selection, preserving every completion and reading position.
-    func loadMoreDailyReads() async throws {
-        guard purchases.hasAccess else { throw AppFailure.unavailable("Unlock the library to choose more books.") }
-        guard !preparingDaily else { throw AppFailure.busy }
-        guard dailyReadsCompleted else { return }
-        preparingDaily = true
-        defer { preparingDaily = false }
-        let currentIDs = Set(dailyReads.map(\.id))
-        let unread = available.filter {
-            !currentIDs.contains($0.id) && !progress.snapshot.completed.contains($0.id)
-        }
-        let next = Array(dailyOrder(unread, recycling: false).prefix(3))
-        guard !next.isEmpty else {
-            throw AppFailure.unavailable("You’ve read every available book. Revisit a favourite below, or check back for new stories.")
-        }
-        try await progress.saveDailyReading(next.map(\.id), date: calendar.startOfDay(for: now()))
-    }
-    var nextRead: Book? { dailyReads.first { !progress.snapshot.completed.contains($0.id) } ?? dailyReads.first }
     var authors: [Author] {
-        let personal = personalLibrary?.publishedBooks.first?.personalAuthor
-        let profiles = (personal.map { [$0] } ?? []) + authorProfiles.filter { $0.id != personal?.id }
+        let personal = input.personal.first?.personalAuthor
+        let profiles = (personal.map { [$0] } ?? []) + input.authors.filter { $0.id != personal?.id }
         let visibleIDs = Set(available.compactMap(\.authorID))
-        return Author.weeklyOrder(profiles.filter { visibleIDs.contains($0.id) }, on: now())
-    }
-    func books(by author: Author) -> [Book] {
-        search("", level: nil, completedOnly: false, format: nil, sort: .library).filter { $0.authorID == author.id }
+        return Author.weeklyOrder(profiles.filter { visibleIDs.contains($0.id) }, on: input.day)
     }
     private func titleOrder(_ lhs: Book, _ rhs: Book) -> Bool {
         let comparison = lhs.englishTitle.localizedCaseInsensitiveCompare(rhs.englishTitle)
@@ -194,16 +277,7 @@ import Observation
     }
     func coverage(_ book: Book) -> String {
         let lemmas = Set(book.vocabulary.map(\.lemma))
-        let known = lemmas.filter { progress.snapshot.vocabulary[$0] == .known }.count
+        let known = lemmas.filter { input.progress.vocabulary[$0] == .known }.count
         return "\(known) of \(lemmas.count) words known"
-    }
-}
-
-extension LibraryFeature {
-    func search(_ query: String, level: String?, completedOnly: Bool, format: BookFormat?, sort: BookSort) -> [Book] {
-        search(query, level: level, completedOnly: completedOnly, format: format, sort: sort, hideCompleted: false)
-    }
-    func search(_ query: String, level: String?, completedOnly: Bool) -> [Book] {
-        search(query, level: level, completedOnly: completedOnly, format: nil, sort: .library)
     }
 }

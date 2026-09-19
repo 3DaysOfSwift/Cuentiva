@@ -180,14 +180,14 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let library = LibraryManager(repository: MemoryBooks(values: [anaBook, legacyBook]), purchases: purchases, progress: progress)
         try await library.load()
         let ana = Author.demoProfiles[0]
-        #expect(library.authors.isEmpty)
-        #expect(library.books(by: ana).isEmpty)
+        #expect(await library.authors.isEmpty)
+        #expect(await library.books(by: ana).isEmpty)
         purchases.hasAccess = true
-        #expect(library.authors.map(\.id) == ["ana"])
-        #expect(library.books(by: ana).map(\.id) == ["ana-book"])
+        #expect(await library.authors.map(\.id) == ["ana"])
+        #expect(await library.books(by: ana).map(\.id) == ["ana-book"])
         try await progress.recordEncounter(book: anaBook, sentence: anaBook.sentences[0])
         _ = try await progress.complete(book: anaBook)
-        #expect(library.books(by: ana).count == 1)
+        #expect(await library.books(by: ana).count == 1)
         let oldData = try JSONEncoder().encode(legacyBook)
         #expect(try JSONDecoder().decode(Book.self, from: oldData).authorID == nil)
     }
@@ -197,32 +197,32 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let first = sample("first"), second = sample("second")
         let library = LibraryManager(repository: MemoryBooks(values: [first, second]), purchases: purchases, progress: progress)
         try await library.load()
-        #expect(library.nextRead == nil)
+        #expect(await library.nextRead == nil)
         purchases.hasAccess = true
-        let initial = library.nextRead?.id
+        let initial = await library.nextRead?.id
         #expect(initial != nil)
         try await progress.setLearningLevel(.c2)
-        #expect(library.nextRead?.id == initial)
+        #expect(await library.nextRead?.id == initial)
         try await progress.recordEncounter(book: second, sentence: second.sentences[0])
-        #expect(library.nextRead?.id == second.id)
+        #expect(await library.nextRead?.id == second.id)
         _ = try await progress.complete(book: second)
-        #expect(library.nextRead?.id == first.id)
+        #expect(await library.nextRead?.id == first.id)
         try await progress.recordEncounter(book: first, sentence: first.sentences[0])
         _ = try await progress.complete(book: first)
-        #expect(library.nextRead != nil)
-        #expect(library.revisiting)
+        #expect(await library.nextRead != nil)
+        #expect(await library.revisiting)
         #expect(progress.snapshot.completed == [first.id, second.id])
     }
     @Test func librarySearchAndCompletedCollectionAreGated() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), book = sample(); try await progress.load()
         let library = LibraryManager(repository: MemoryBooks(values: [book]), purchases: purchases, progress: progress); try await library.load()
-        #expect(library.search("", level: nil, completedOnly: false).isEmpty)
+        #expect(await library.search("", level: nil, completedOnly: false).isEmpty)
         purchases.hasAccess = true
-        #expect(library.search("cafe", level: "A1", completedOnly: false).count == 1)
-        #expect(library.search("", level: "B1", completedOnly: false).isEmpty)
-        #expect(library.search("", level: nil, completedOnly: true).isEmpty)
+        #expect(await library.search("cafe", level: "A1", completedOnly: false).count == 1)
+        #expect(await library.search("", level: "B1", completedOnly: false).isEmpty)
+        #expect(await library.search("", level: nil, completedOnly: true).isEmpty)
         try await progress.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await progress.complete(book: book)
-        #expect(library.search("", level: nil, completedOnly: true).count == 1)
+        #expect(await library.search("", level: nil, completedOnly: true).count == 1)
     }
     @Test func formatsCombineWithSearchLevelCompletionAndAccess() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress())
@@ -231,20 +231,20 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         var script = sample("script"); script.format = .movieScript; script.scene = "A café"
         let library = LibraryManager(repository: MemoryBooks(values: [story, script]), purchases: purchases, progress: progress)
         try await library.load()
-        #expect(library.search("", level: nil, completedOnly: false, format: .movieScript, sort: .title).isEmpty)
+        #expect(await library.search("", level: nil, completedOnly: false, format: .movieScript, sort: .title).isEmpty)
         purchases.hasAccess = true
-        #expect(library.search("cafe", level: "A1", completedOnly: false, format: .movieScript, sort: .title).map(\.id) == ["script"])
-        #expect(library.search("cafe", level: "B1", completedOnly: false, format: .movieScript, sort: .title).isEmpty)
-        #expect(library.search("", level: nil, completedOnly: false, format: .story, sort: .library).map(\.id) == ["story"])
-        #expect(library.search("", level: nil, completedOnly: false, format: nil, sort: .type).map(\.id) == ["script", "story"])
+        #expect(await library.search("cafe", level: "A1", completedOnly: false, format: .movieScript, sort: .title).map(\.id) == ["script"])
+        #expect(await library.search("cafe", level: "B1", completedOnly: false, format: .movieScript, sort: .title).isEmpty)
+        #expect(await library.search("", level: nil, completedOnly: false, format: .story, sort: .library).map(\.id) == ["story"])
+        #expect(await library.search("", level: nil, completedOnly: false, format: nil, sort: .type).map(\.id) == ["script", "story"])
         // Equal titles/difficulty use the stable ID tie-breaker.
         for sort in [BookSort.title, .difficulty] {
-            #expect(library.search("", level: nil, completedOnly: false, format: nil, sort: sort).map(\.id) == ["script", "story"])
+            #expect(await library.search("", level: nil, completedOnly: false, format: nil, sort: sort).map(\.id) == ["script", "story"])
         }
-        #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).isEmpty)
+        #expect(await library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).isEmpty)
         try await progress.recordEncounter(book: script, sentence: script.sentences[0])
         _ = try await progress.complete(book: script)
-        #expect(library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).map(\.id) == ["script"])
+        #expect(await library.search("", level: nil, completedOnly: true, format: .movieScript, sort: .title).map(\.id) == ["script"])
     }
     @Test(arguments: [BookFormat.story, .movieScript, .verbs])
     func completionWaitsForReaderAndPersistsAtomically(format: BookFormat) async throws {
@@ -281,8 +281,8 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         var verb = sample("verb"); verb.format = .verbs
         let library = LibraryManager(repository: MemoryBooks(values: [sample(), verb]), purchases: purchases, progress: progress)
         try await library.load()
-        #expect(library.search("cafe", level: "A1", completedOnly: false, format: .verbs, sort: .title).map(\.id) == ["verb"])
-        #expect(library.search("", level: nil, completedOnly: true, format: .verbs, sort: .type).isEmpty)
+        #expect(await library.search("cafe", level: "A1", completedOnly: false, format: .verbs, sort: .title).map(\.id) == ["verb"])
+        #expect(await library.search("", level: nil, completedOnly: true, format: .verbs, sort: .type).isEmpty)
     }
     @Test func localSubmissionNeverClaimsPublication() async throws {
         let purchases = TestPurchases(), progress = ProgressManager(repository: MemoryProgress()), repo = MemoryContributions()
@@ -426,10 +426,10 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let nearby = NearbyManager(library: library, purchases: purchases)
         #expect(nearby.stories(around: place(), kilometers: 5).map(\.id) == ["bali"])
         #expect(nearby.stories(around: place(date: .now.addingTimeInterval(-600)), kilometers: 5).isEmpty)
-        #expect(library.search("", level: nil, completedOnly: false).map(\.id) == ["cafe"])
+        #expect(await library.search("", level: nil, completedOnly: false).map(\.id) == ["cafe"])
         try await progress.recordEncounter(book: local, sentence: local.sentences[0])
         _ = try await progress.complete(book: local)
-        #expect(library.search("", level: nil, completedOnly: true).map(\.id) == ["bali"])
+        #expect(await library.search("", level: nil, completedOnly: true).map(\.id) == ["bali"])
         purchases.hasAccess = false
         #expect(nearby.stories(around: place(), kilometers: 100).isEmpty)
     }
@@ -454,7 +454,7 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
 }
 
 @Suite @MainActor struct PracticeProgressTests {
-    @Test func capturesBaselineAndAwardsOnceAcrossReload() async throws {
+    @Test func recordsPracticeWithoutAwardingExtraCoinsAcrossReload() async throws {
         let repo = MemoryProgress(), progress = ProgressManager(repository: MemoryProgress())
         let manager = ProgressManager(repository: repo); try await manager.load()
         let book = sample()
@@ -464,22 +464,24 @@ func sample(_ id: String = "cafe", sentences: Int = 1) -> Book {
         let receipt = try await manager.complete(book: book)
         #expect(receipt.streakCelebration == 1)
         #expect(try await manager.complete(book: book).streakCelebration == nil)
-        #expect(try await manager.rewardPractice(book: book, matches: 1) == false)
+        try await manager.recordPractice(book: book, matches: 1)
         let restored = ProgressManager(repository: repo); try await restored.load()
-        #expect(try await restored.rewardPractice(book: book, matches: 1) == false)
+        try await restored.recordPractice(book: book, matches: 1)
+        #expect(restored.snapshot.bestMatches?[book.id] == 1)
         #expect(restored.snapshot.doubloons == 1)
         #expect(restored.snapshot.completed.count == 1)
         try await progress.load()
-        await #expect(throws: (any Error).self) { try await progress.rewardPractice(book: book, matches: 1) }
+        await #expect(throws: (any Error).self) { try await progress.recordPractice(book: book, matches: 1) }
     }
-    @Test func failedRewardDoesNotMintCoin() async throws {
+    @Test func failedPracticeSavePreservesScoreAndCoins() async throws {
         let repo = MemoryProgress(), book = sample()
         let manager = ProgressManager(repository: repo); try await manager.load()
         try await manager.recordEncounter(book: book, sentence: book.sentences[0]); _ = try await manager.complete(book: book)
         await repo.setFailure(true)
-        await #expect(throws: (any Error).self) { try await manager.rewardPractice(book: book, matches: 1) }
+        await #expect(throws: (any Error).self) { try await manager.recordPractice(book: book, matches: 1) }
         #expect(manager.snapshot.doubloons == 1)
         #expect(manager.snapshot.rewardedBooks == [book.id])
+        #expect(manager.snapshot.bestMatches?[book.id] == nil)
     }
     @Test func legacyProgressDoesNotInventBaseline() async throws {
         let repo = MemoryProgress()
@@ -727,8 +729,8 @@ actor TestCatalogueTransport: CatalogueTransport {
         let progress = ProgressManager(repository: store)
         let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress)
         try await library.load()
-        #expect(library.dailyReads.count == 1)
-        #expect(library.discover(level: nil, format: nil).count == 1)
+        #expect(await library.dailyReads.count == 1)
+        #expect(await library.discover(level: nil, format: nil).count == 1)
         #expect(await store.saveAttempts == 0)
         // A persistence failure belongs to post-display preparation, not launch.
         await #expect(throws: AppFailure.self) { try await library.prepareDailyReads() }
@@ -740,20 +742,20 @@ actor TestCatalogueTransport: CatalogueTransport {
         let library = LibraryManager(repository: MemoryBooks(values: (0..<8).map { sample("cache-\($0)") }),
             purchases: purchases, progress: progress, now: { clock.date })
         try await library.load()
-        let initial = library.discover(level: nil, format: nil)
+        let initial = await library.discover(level: nil, format: nil)
         for _ in 0..<10 {
-            _ = library.dailyReads; _ = library.nextRead
-            #expect(library.discover(level: "A1", format: nil).map(\.id) == initial.map(\.id))
+            _ = await library.dailyReads; _ = await library.nextRead
+            #expect(await library.discover(level: "A1", format: nil).map(\.id) == initial.map(\.id))
         }
-        #expect(library.recommendationBuildCount == 1)
+        #expect(await library.recommendationBuildCount == 1)
         clock.date = try #require(Calendar.current.date(byAdding: .day, value: 1, to: clock.date))
-        _ = library.dailyReads
-        #expect(library.recommendationBuildCount == 2)
+        _ = await library.dailyReads
+        #expect(await library.recommendationBuildCount == 2)
         let book = initial[0]
         try await progress.recordEncounter(book: book, sentence: book.sentences[0])
         _ = try await progress.complete(book: book)
-        #expect(!library.discover(level: nil, format: nil).contains { $0.id == book.id })
-        #expect(library.recommendationBuildCount == 3)
+        #expect(await !library.discover(level: nil, format: nil).contains { $0.id == book.id })
+        #expect(await library.recommendationBuildCount == 3)
     }
     @Test func dailySelectionRetainsCompletedBooksAcrossRelaunchAndRenewsTomorrow() async throws {
         let clock = Clock(), store = MemoryProgress(), purchases = TestPurchases()
@@ -764,20 +766,20 @@ actor TestCatalogueTransport: CatalogueTransport {
         let library = LibraryManager(repository: source, purchases: purchases, progress: progress, now: { clock.date })
         try await library.load()
         try await library.prepareDailyReads()
-        let original = library.dailyReads
+        let original = await library.dailyReads
         for book in original {
             try await progress.recordEncounter(book: book, sentence: book.sentences[0])
             _ = try await progress.complete(book: book)
-            #expect(library.dailyReads.map(\.id) == original.map(\.id))
-            #expect(library.nextRead?.id == (original.first { !progress.snapshot.completed.contains($0.id) } ?? original[0]).id)
+            #expect(await library.dailyReads.map(\.id) == original.map(\.id))
+            #expect(await library.nextRead?.id == (original.first { !progress.snapshot.completed.contains($0.id) } ?? original[0]).id)
         }
         let reloadedProgress = ProgressManager(repository: store, now: { clock.date })
         let reloaded = LibraryManager(repository: source, purchases: purchases, progress: reloadedProgress, now: { clock.date })
         try await reloaded.load(); try await reloaded.prepareDailyReads()
-        #expect(reloaded.dailyReads.map(\.id) == original.map(\.id))
+        #expect(await reloaded.dailyReads.map(\.id) == original.map(\.id))
         clock.date = try #require(Calendar.current.date(byAdding: .day, value: 1, to: clock.date))
         try await reloaded.prepareDailyReads()
-        #expect(Set(reloaded.dailyReads.map(\.id)).isDisjoint(with: Set(original.map(\.id))))
+        #expect(Set(await reloaded.dailyReads.map(\.id)).isDisjoint(with: Set(original.map(\.id))))
         #expect(reloadedProgress.snapshot.completed.count == 3)
     }
     @Test func newArrivalsLeadAndOldAttemptsRestWithoutLosingProgress() async throws {
@@ -795,15 +797,15 @@ actor TestCatalogueTransport: CatalogueTransport {
         let updated = LibraryManager(repository: MemoryBooks(values: [old, ongoing, fresh]), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
         try await updated.load()
         try await updated.prepareDailyReads()
-        #expect(updated.nextRead?.id == fresh.id)
-        #expect(updated.dailyReads.map(\.id).contains(ongoing.id))
-        #expect(!updated.dailyReads.map(\.id).contains(old.id))
-        #expect(updated.search("", level: nil, completedOnly: false).count == 3)
+        #expect(await updated.nextRead?.id == fresh.id)
+        #expect(await updated.dailyReads.map(\.id).contains(ongoing.id))
+        #expect(await !updated.dailyReads.map(\.id).contains(old.id))
+        #expect(await updated.search("", level: nil, completedOnly: false).count == 3)
         #expect(progress.snapshot.bookArrivals?[old.id] == arrival)
         clock.date = try #require(calendar.date(byAdding: .day, value: 3, to: clock.date))
-        #expect(updated.dailyReads.map(\.id).contains(ongoing.id))
+        #expect(await updated.dailyReads.map(\.id).contains(ongoing.id))
         clock.date = try #require(calendar.date(byAdding: .day, value: 1, to: clock.date))
-        #expect(!updated.dailyReads.map(\.id).contains(ongoing.id))
+        #expect(await !updated.dailyReads.map(\.id).contains(ongoing.id))
         #expect(!progress.snapshot.attempts[old.id, default: []].isEmpty)
         let reloaded = ProgressManager(repository: store); try await reloaded.load()
         #expect(reloaded.snapshot.bookArrivals == progress.snapshot.bookArrivals)
@@ -817,12 +819,12 @@ actor TestCatalogueTransport: CatalogueTransport {
         let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress, now: { clock.date }, calendar: calendar)
         try await library.load()
         clock.date = try #require(calendar.date(byAdding: .year, value: 1, to: clock.date))
-        let today = Set(library.dailyReads.map(\.id))
+        let today = Set(await library.dailyReads.map(\.id))
         #expect(today.count == 3)
-        #expect(today == Set(library.dailyReads.map(\.id)))
+        #expect(today == Set(await library.dailyReads.map(\.id)))
         clock.date = try #require(calendar.date(byAdding: .day, value: 1, to: clock.date))
-        #expect(today.isDisjoint(with: Set(library.dailyReads.map(\.id))))
-        #expect(!library.revisiting)
+        #expect(today.isDisjoint(with: Set(await library.dailyReads.map(\.id))))
+        #expect(await !library.revisiting)
     }
     @Test func restingExhaustionRecyclesWithoutResettingAnything() async throws {
         let clock = Clock(), purchases = TestPurchases(); purchases.hasAccess = true
@@ -833,13 +835,13 @@ actor TestCatalogueTransport: CatalogueTransport {
         _ = try await progress.complete(book: book)
         try await progress.setVocabulary("café", state: .known)
         let before = try JSONEncoder().encode(progress.snapshot)
-        #expect(library.revisiting)
-        #expect(library.dailyReads.map(\.id) == [book.id])
+        #expect(await library.revisiting)
+        #expect(await library.dailyReads.map(\.id) == [book.id])
         #expect(progress.snapshot.completed == [book.id])
         #expect(progress.snapshot.vocabulary["café"] == .known)
         // Viewing recommendations performs no persistence writes or reset.
         #expect(try JSONDecoder().decode(LearnerProgress.self, from: before).practiceDays == progress.snapshot.practiceDays)
-        purchases.hasAccess = false; #expect(library.dailyReads.isEmpty)
+        purchases.hasAccess = false; #expect(await library.dailyReads.isEmpty)
     }
 }
 
@@ -956,14 +958,14 @@ private struct UnavailableFantasyGenerator: FantasyGenerator {
         let progress = ProgressManager(repository: MemoryProgress())
         let library = LibraryManager(repository: MemoryBooks(values: [sample(), sample("paid")]), purchases: purchases, progress: progress)
         try await library.load()
-        #expect(!library.dailyReads.isEmpty)
-        #expect(library.search("", level: nil, completedOnly: false).count == 2)
+        #expect(await !library.dailyReads.isEmpty)
+        #expect(await library.search("", level: nil, completedOnly: false).count == 2)
         let learning = LearningManager(purchases: purchases, progress: progress)
         #expect(!learning.canRead(sample("paid")))
         try await library.prepareDailyReads()
         #expect(progress.snapshot.dailyReadingIDs == nil)
         purchases.checking = false
-        #expect(library.dailyReads.isEmpty)
+        #expect(await library.dailyReads.isEmpty)
         purchases.hasAccess = true
         try await library.prepareDailyReads()
         #expect(progress.snapshot.dailyReadingIDs?.count == 2)
@@ -1061,11 +1063,11 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         let library = LibraryManager(repository: PersonalLibraryCatalogue(), purchases: purchases, progress: progress, personalLibrary: fantasy)
         try await library.load()
         let book = try await fantasy.publish(story)
-        #expect(library.discover(level: nil, format: nil).first?.id == book.id)
+        #expect(await library.discover(level: nil, format: nil).first?.id == book.id)
         await library.sync()
         #expect(Set(library.books.map(\.id)) == [book.id, "original"])
-        #expect(library.books(by: book.storyteller).map(\.id) == [book.id])
-        #expect(library.authors.contains { $0.id == book.authorID })
+        #expect(await library.books(by: book.storyteller).map(\.id) == [book.id])
+        #expect(await library.authors.contains { $0.id == book.authorID })
         let learning = LearningManager(purchases: purchases, progress: progress)
         #expect(learning.canRead(book))
         for index in book.sentences.indices { _ = try await learning.advance(book: book, from: index) }
@@ -1333,16 +1335,16 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress)
         try await library.load()
         try await library.prepareDailyReads()
-        let original = library.dailyReads
+        let original = await library.dailyReads
         let originalIDs = original.map(\.id)
-        #expect(!library.dailyReadsCompleted)
+        #expect(await !library.dailyReadsCompleted)
         try await library.loadMoreDailyReads()
-        #expect(library.dailyReads.map(\.id) == originalIDs)
+        #expect(await library.dailyReads.map(\.id) == originalIDs)
         for book in original {
             try await progress.recordEncounter(book: book, sentence: try #require(book.sentences.first))
             _ = try await progress.completeReading(book: book)
         }
-        #expect(library.dailyReadsCompleted)
+        #expect(await library.dailyReadsCompleted)
         let before = progress.snapshot
         if bookCount == 3 {
             await #expect(throws: AppFailure.self) { try await library.loadMoreDailyReads() }
@@ -1352,20 +1354,20 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         await repository.setFailure(true)
         await #expect(throws: AppFailure.self) { try await library.loadMoreDailyReads() }
         #expect(progress.snapshot == before)
-        #expect(library.dailyReads.map(\.id) == originalIDs)
+        #expect(await library.dailyReads.map(\.id) == originalIDs)
         await repository.setFailure(false)
         try await library.loadMoreDailyReads()
-        let nextIDs = library.dailyReads.map(\.id)
+        let nextIDs = await library.dailyReads.map(\.id)
         #expect(nextIDs.count == min(3, bookCount - 3))
         #expect(Set(nextIDs).isDisjoint(with: originalIDs))
-        #expect(!library.dailyReadsCompleted)
+        #expect(await !library.dailyReadsCompleted)
         #expect(progress.snapshot.completed == before.completed)
         #expect(progress.snapshot.positions == before.positions)
         #expect(progress.snapshot.vocabulary == before.vocabulary)
         let restoredProgress = ProgressManager(repository: repository)
         let restoredLibrary = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: restoredProgress)
         try await restoredLibrary.load()
-        #expect(restoredLibrary.dailyReads.map(\.id) == nextIDs)
+        #expect(await restoredLibrary.dailyReads.map(\.id) == nextIDs)
         purchases.hasAccess = false
         await #expect(throws: AppFailure.self) { try await library.loadMoreDailyReads() }
     }
@@ -1374,7 +1376,7 @@ private actor PersonalLibraryCatalogue: SyncingBookRepository {
         let library = LibraryManager(repository: MemoryBooks(values: []), purchases: purchases,
             progress: ProgressManager(repository: MemoryProgress()))
         try await library.load()
-        #expect(!library.dailyReadsCompleted)
+        #expect(await !library.dailyReadsCompleted)
     }
 }
 

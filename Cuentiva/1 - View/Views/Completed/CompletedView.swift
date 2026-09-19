@@ -23,6 +23,7 @@ struct CompletedView: View {
                 }
             }.padding(24)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("Completed books").searchable(text: $viewModel.query, prompt: "Search your collection")
+            .task(id: viewModel.refreshID) { await viewModel.refresh() }
             .fullScreenCover(item: $viewModel.selectedBook) { book in NavigationStack { BookReaderView(book: book).toolbar { ToolbarItem(placement: .topBarLeading) { Button("Close") { viewModel.selectedBook = nil } } } } }
             .fullScreenCover(item: $practiceBook) { book in NavigationStack { PracticeView(book: book, match: matchMode) } }
     }

@@ -1,3 +1,19 @@
+## Concurrency fixes — 19 September 2026
+
+- Progress mutations use a FIFO asynchronous gate, spanning repository I/O. Validation and rewards are calculated from the latest committed state after acquiring a turn. Failed saves leave the snapshot unchanged; cancelled queued operations do not write; later operations still run. Completion receipts are created inside the transaction, preventing duplicate rewards under overlap. Disk encoding and writes remain in the repository/storage actors.
+- Chat payment persists a recoverable admission before synchronously checking the session and delivering the first reply. Dismissal/cancellation during payment keeps that credit usable, including after relaunch, without writing during launch. A failed final settlement intentionally retains credit even if the reply was delivered; recovery favours the learner rather than risking lost coins. SwiftData progress records include the optional admission marker.
+- Location continuation ownership now has request tokens, cancellation cleanup and exactly-once completion. Apple adapters stop updates, cancel geocoding/timeouts and discard callbacks from older CLLocationManager instances. Nearby owns/cancels its task when leaving the screen or entering the background and suppresses stale results/errors.
+- Discover filtering, ordering, daily recommendations, author selection and vocabulary coverage run on LibraryWorker. Home, Completed and author screens render prepared results; input changes restart their view tasks, with cancellation/input checks rejecting stale responses. Existing recommendation/recycling, personal-book, purchase-access and daily-selection tests exercise the asynchronous API.
+- Added ten core concurrency tests (including two dismissal/cancellation variants) and two simulator view-model tests. The core suite passed all 101 tests. App and all test sources passed Swift 6 iOS SDK type-checking. Project/plist and whitespace checks passed. Forced-unwrap/forced-cast/forced-try audit found no code occurrences.
+- No test-process crash occurred during this pass; the earlier intermittent signal-11 failure remains unresolved. Xcode simulator tests were attempted but CoreSimulatorService was unavailable and no destination matched. The two new view-model tests are type-checked, not runtime-verified. Real CoreLocation permission/geocoding lifecycle and simulator UI behavior still need device/simulator validation.
+
+## Clarity cleanup — 19 September 2026
+
+- Practice APIs now record scores and return no fabricated reward flag. Removed the unused `awarded` state and renamed the retry action to saving a score. Persistence assertions check saved best matches and unchanged coins. Corrected a view-model fixture that requested more matches than its book contained.
+- Removed unused chat notice state left over from the purchase flow. Paywall async actions are expanded into readable steps. Product lookup and annual-plan savings live in the purchase model; the legacy lifetime identifier is explicitly named.
+- Extracted transaction observation and expiration scheduling from the purchase manager's longer workflows. No new architecture layer or pricing/access-policy changes were introduced. Force-unwrap/forced-cast/forced-try audit found none.
+- 91 core tests passed and app sources passed iOS SDK type-checking. One intermediate core test run terminated with signal 11, as observed in prior runs; retry passed. This intermittent test-runner failure remains unresolved. Xcode tests could not run because no simulator destination was available. Project/plist and whitespace checks passed.
+
 ## Monthly and annual subscriptions — 18 September 2026
 
 - Replaced the lifetime sales offer with auto-renewable monthly (USD 9.99) and annual (USD 39.99, paid yearly) plans in one StoreKit group at the same service level. Existing verified lifetime ownership remains supported but is not offered for sale.

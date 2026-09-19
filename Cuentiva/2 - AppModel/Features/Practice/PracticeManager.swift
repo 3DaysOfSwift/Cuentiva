@@ -11,7 +11,7 @@ struct PracticeStats {
     func allowed(_ book: Book) -> Bool
     func stats(_ book: Book) -> PracticeStats
     func glossary(_ book: Book) -> [String: String]?
-    func reward(_ book: Book, matches: Int) async throws -> Bool
+    func recordScore(_ book: Book, matches: Int) async throws
     func best(_ book: Book) -> Int
     var coins: Int { get }
     var week: [WeekDay] { get }
@@ -31,11 +31,11 @@ struct PracticeStats {
               Set(glossary.keys) == Set(book.vocabulary.map(\.word)), glossary.values.allSatisfy({ !$0.isEmpty }) else { return nil }
         return glossary
     }
-    func reward(_ book: Book, matches: Int) async throws -> Bool {
+    func recordScore(_ book: Book, matches: Int) async throws {
         guard allowed(book), glossary(book) != nil else { throw AppFailure.locked }
-        return try await progress.rewardPractice(book: book, matches: matches)
+        try await progress.recordPractice(book: book, matches: matches)
     }
     func best(_ book: Book) -> Int { progress.snapshot.bestMatches?[book.id] ?? 0 }
-    var coins: Int { progress.snapshot.doubloons ?? 0 }
+    var coins: Int { progress.snapshot.availableChatCoins }
     var week: [WeekDay] { progress.week }
 }

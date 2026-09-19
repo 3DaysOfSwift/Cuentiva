@@ -16,15 +16,28 @@ import Observation
     func completeReading(book: Book) async throws -> CompletionReceipt
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
     func setLearningLevel(_ level: LearningLevel?) async throws
-    func rewardPractice(book: Book, matches: Int) async throws -> Bool
+    func recordPractice(book: Book, matches: Int) async throws
     func installThemePack(_ pack: ThemePack) async throws
-    func spendChatCoin() async throws
+    func payForChat(deliver: @MainActor () -> Bool) async throws
     func reset() async throws
 }
 @MainActor @Observable final class ProgressManager: ProgressFeature {
     private(set) var snapshot = LearnerProgress()
     private(set) var loaded = false
-    private var saving = false
+    @ObservationIgnored private var saving = false
+    @ObservationIgnored private var waitingSaves: [CheckedContinuation<Void, Never>] = []
+
+    /// FIFO ownership spans the repository suspension. Each operation reads the
+    /// latest committed snapshot only after acquiring its turn.
+    var queuedSaveCount: Int { waitingSaves.count }
+    private func acquireSave() async {
+        if !saving { saving = true; return }
+        await withCheckedContinuation { waitingSaves.append($0) }
+    }
+    private func releaseSave() {
+        if waitingSaves.isEmpty { saving = false }
+        else { waitingSaves.removeFirst().resume() }
+    }
     private let repository: any ProgressRepository
     private let now: () -> Date
     private let calendar: Calendar
@@ -73,29 +86,30 @@ import Observation
             loaded = true
         }
     }
-    private func commit(_ update: (inout LearnerProgress) -> Void) async throws {
+    @discardableResult
+    private func commit<Value>(_ update: (inout LearnerProgress) throws -> Value) async throws -> Value {
+        await acquireSave()
+        defer { releaseSave() }
+        try Task.checkCancellation()
         guard loaded else { throw AppFailure.unavailable("Progress has not loaded. Please retry.") }
-        guard !saving else { throw AppFailure.busy }
-        saving = true
-        defer { saving = false }
         var next = snapshot
-        update(&next)
+        let result = try update(&next)
         if next.earnedStreakTheme != true && streak(in: next) >= 10 { next.earnedStreakTheme = true }
-        try await repository.save(next)
+        if next != snapshot { try await repository.save(next) }
+        // A successful save must be published even if cancellation arrived during I/O.
         snapshot = next
+        return result
     }
     func registerLibrary(_ books: [Book]) async throws {
-        let missing = books.map(\.id).filter { snapshot.bookArrivals?[$0] == nil }
-        guard !missing.isEmpty else { return }
         let arrived = now()
         try await commit { next in
+            let missing = books.map(\.id).filter { next.bookArrivals?[$0] == nil }
             if next.bookArrivals == nil { next.bookArrivals = [:] }
             for id in missing { next.bookArrivals?[id] = arrived }
         }
     }
     func saveDailyReading(_ ids: [String], date: Date) async throws {
         guard ids.count <= 3, Set(ids).count == ids.count else { throw AppFailure.invalidBook }
-        guard snapshot.dailyReadingIDs != ids || snapshot.dailyReadingDate != date else { return }
         try await commit { next in
             next.dailyReadingIDs = ids
             next.dailyReadingDate = date
@@ -148,39 +162,24 @@ import Observation
         }
     }
     func complete(book: Book) async throws -> CompletionReceipt {
-        guard Set(book.fullText.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else {
-            throw AppFailure.incomplete
-        }
-        let streakGift = snapshot.earnedStreakTheme == true && snapshot.celebratedStreakTheme != true
-        let isNew = !snapshot.completed.contains(book.id)
-        let celebrate = !(snapshot.celebratedCompletionDays ?? []).contains(dayKey(now()))
-        try await commit {
-            if streakGift { $0.celebratedStreakTheme = true }
-            if isNew {
-                $0.doubloons = ($0.doubloons ?? 0) + 1
-                if $0.rewardedBooks == nil { $0.rewardedBooks = [] }
-                $0.rewardedBooks?.insert(book.id)
-            }
-            $0.completed.insert(book.id)
-            $0.positions[book.id] = 0
-            if $0.celebratedCompletionDays == nil { $0.celebratedCompletionDays = [] }
-            $0.celebratedCompletionDays?.insert(dayKey(now()))
-        }
-        return .init(
-            book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil, streakThemeGift: streakGift ? .vip : nil)
+        try await finish(book: book, includingContinuation: false)
     }
     /// The final reader action records the continuation and completion in one save.
     func completeReading(book: Book) async throws -> CompletionReceipt {
-        guard Set(book.sentences.map(\.id)).isSubset(of: snapshot.attempts[book.id, default: []]) else {
-            throw AppFailure.incomplete
-        }
-        let streakGift = snapshot.earnedStreakTheme == true && snapshot.celebratedStreakTheme != true
-        let isNew = !snapshot.completed.contains(book.id)
-        let celebrate = !(snapshot.celebratedCompletionDays ?? []).contains(dayKey(now()))
+        try await finish(book: book, includingContinuation: true)
+    }
+    private func finish(book: Book, includingContinuation: Bool) async throws -> CompletionReceipt {
         try await commit { next in
-            for sentence in book.continuation ?? [] { addEncounter(book: book, sentence: sentence, to: &next) }
-            if next.celebratedCompletionDays == nil { next.celebratedCompletionDays = [] }
-            next.celebratedCompletionDays?.insert(dayKey(now()))
+            let required = includingContinuation ? book.sentences : book.fullText
+            guard Set(required.map(\.id)).isSubset(of: next.attempts[book.id, default: []]) else {
+                throw AppFailure.incomplete
+            }
+            if includingContinuation {
+                for sentence in book.continuation ?? [] { addEncounter(book: book, sentence: sentence, to: &next) }
+            }
+            let streakGift = next.earnedStreakTheme == true && next.celebratedStreakTheme != true
+            let isNew = !next.completed.contains(book.id)
+            let celebrate = !(next.celebratedCompletionDays ?? []).contains(dayKey(now()))
             if streakGift { next.celebratedStreakTheme = true }
             if isNew {
                 next.doubloons = (next.doubloons ?? 0) + 1
@@ -189,40 +188,60 @@ import Observation
             }
             next.completed.insert(book.id)
             next.positions[book.id] = 0
+            if next.celebratedCompletionDays == nil { next.celebratedCompletionDays = [] }
+            next.celebratedCompletionDays?.insert(dayKey(now()))
+            return CompletionReceipt(book: book, isNew: isNew, total: next.completed.count,
+                streakCelebration: celebrate ? streak(in: next) : nil, streakThemeGift: streakGift ? .vip : nil)
         }
-        return .init(
-            book: book, isNew: isNew, total: snapshot.completed.count, streakCelebration: celebrate ? streak : nil, streakThemeGift: streakGift ? .vip : nil)
     }
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws {
         try await commit { $0.vocabulary[lemma] = state }
     }
-    func rewardPractice(book: Book, matches: Int) async throws -> Bool {
-        guard snapshot.completed.contains(book.id), matches > 0, matches <= Set(book.vocabulary.map(\.word)).count
-        else { throw AppFailure.incomplete }
+    func recordPractice(book: Book, matches: Int) async throws {
         try await commit { next in
+            guard next.completed.contains(book.id), matches > 0, matches <= Set(book.vocabulary.map(\.word)).count
+            else { throw AppFailure.incomplete }
             if next.bestMatches == nil { next.bestMatches = [:] }
             let best = max(next.bestMatches?[book.id] ?? 0, matches)
             next.bestMatches?[book.id] = best
         }
-        return false
     }
     func setLearningLevel(_ level: LearningLevel?) async throws {
         try await commit { $0.selectedLearningLevel = level }
     }
-    func spendChatCoin() async throws {
-        guard (snapshot.doubloons ?? 0) > 0 else {
-            throw AppFailure.unavailable("Complete another story to earn a doubloon for a new chat.")
+    /// Persist an admission before delivering a reply. An unused admission remains
+    /// redeemable after dismissal, cancellation, a failed settlement, or relaunch.
+    /// Delivery is synchronous on MainActor, so session validity cannot change
+    /// between accepting the admission and publishing its reply.
+    func payForChat(deliver: @MainActor () -> Bool) async throws {
+        await acquireSave()
+        defer { releaseSave() }
+        try Task.checkCancellation()
+        guard loaded else { throw AppFailure.unavailable("Progress has not loaded. Please retry.") }
+        if snapshot.pendingChatAdmission != true {
+            guard (snapshot.doubloons ?? 0) > 0 else {
+                throw AppFailure.unavailable("Complete another story to earn a doubloon for a new chat.")
+            }
+            var next = snapshot
+            next.doubloons = (next.doubloons ?? 0) - 1
+            next.pendingChatAdmission = true
+            try await repository.save(next)
+            snapshot = next
         }
-        try await commit { $0.doubloons = ($0.doubloons ?? 0) - 1 }
+        guard !Task.isCancelled, deliver() else { throw CancellationError() }
+        var settled = snapshot
+        settled.pendingChatAdmission = false
+        try await repository.save(settled)
+        snapshot = settled
     }
     func installThemePack(_ pack: ThemePack) async throws {
-        if snapshot.hasInstalled(pack) { return }
-        guard snapshot.earnedThemePacks.contains(pack) else {
-            throw AppFailure.unavailable("This theme gift hasn’t been earned yet.")
-        }
-        try await commit {
-            if $0.installedThemePacks == nil { $0.installedThemePacks = [] }
-            $0.installedThemePacks?.insert(pack.rawValue)
+        try await commit { next in
+            if next.hasInstalled(pack) { return }
+            guard next.earnedThemePacks.contains(pack) else {
+                throw AppFailure.unavailable("This theme gift hasn’t been earned yet.")
+            }
+            if next.installedThemePacks == nil { next.installedThemePacks = [] }
+            next.installedThemePacks?.insert(pack.rawValue)
         }
     }
     func reset() async throws {

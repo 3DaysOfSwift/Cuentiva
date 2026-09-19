@@ -10,18 +10,36 @@ import Observation
     var button: String { "Subscribe · \(price)" }
     var price: String { price(for: selectedPlan) }
     func price(for plan: LibraryPlan) -> String {
-        purchases.offers.first { $0.id == plan.productID }.map { "\($0.displayPrice) / \(plan.billingPeriod)" } ?? "Price unavailable"
+        purchases.offer(for: plan).map { "\($0.displayPrice) / \(plan.billingPeriod)" } ?? "Price unavailable"
     }
-    func available(_ plan: LibraryPlan) -> Bool { purchases.offers.contains { $0.id == plan.productID } }
+    func available(_ plan: LibraryPlan) -> Bool { purchases.offer(for: plan) != nil }
     var available: Bool { available(selectedPlan) }
-    var annualSaves: Bool {
-        guard let month = purchases.offers.first(where: { $0.id == LibraryPlan.monthly.productID }),
-              let year = purchases.offers.first(where: { $0.id == LibraryPlan.annual.productID }) else { return false }
-        return year.price < month.price * 12
-    }
+    var annualSaves: Bool { purchases.annualPlanSaves }
     var storeMessage: String? { purchases.message }
     init(purchases: any PurchaseFeature = AppModel.shared.purchases) { self.purchases = purchases }
-    func purchase() async { guard !busy else { return }; busy = true; defer { busy = false }; error = nil; do { try await purchases.purchase(plan: selectedPlan) } catch { self.error = error.localizedDescription } }
-    func restore() async { guard !busy else { return }; busy = true; defer { busy = false }; error = nil; do { try await purchases.restore() } catch { self.error = error.localizedDescription } }
+    func purchase() async {
+        guard !busy else { return }
+        busy = true
+        error = nil
+        defer { busy = false }
+        do {
+            try await purchases.purchase(plan: selectedPlan)
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func restore() async {
+        guard !busy else { return }
+        busy = true
+        error = nil
+        defer { busy = false }
+        do {
+            try await purchases.restore()
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
     func reload() async { await purchases.refresh() }
 }
