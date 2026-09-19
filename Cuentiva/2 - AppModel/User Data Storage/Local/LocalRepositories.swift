@@ -19,7 +19,6 @@ actor LocalProgressRepository: ProgressRepository {
     private let url: URL
     private let store: SwiftDataStore
     private var savedProgress: LearnerProgress?
-    private var savedRows: [String: Data] = [:]
     init(url: URL, store: SwiftDataStore? = nil) {
         self.url = url
         self.store = store ?? SwiftDataStore(url: url.appendingPathExtension("store"))
@@ -37,15 +36,14 @@ actor LocalProgressRepository: ProgressRepository {
     }
     func save(_ progress: LearnerProgress) async throws {
         guard progress.schemaVersion == 1 else { throw AppFailure.unavailable("Unsupported progress version.") }
-        let rows = try ProgressRecords.encode(progress, previous: savedProgress, existing: savedRows)
-        try await store.replace("progress", values: rows)
+        if savedProgress == nil { _ = try await load() }
+        let changes = try ProgressRecords.changes(progress, previous: savedProgress)
+        try await store.apply("progress", changes: changes)
         savedProgress = progress
-        savedRows = rows
     }
     private func remember(_ rows: [String: Data]) throws -> LearnerProgress {
         let value = try ProgressRecords.decode(rows)
         LegacyJSONCleanup.remove([url])
-        savedRows = rows
         savedProgress = value
         return value
     }

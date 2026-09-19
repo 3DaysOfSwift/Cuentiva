@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import StoreKit
 #if canImport(CuentivaCore)
 @testable import CuentivaCore
 #else
@@ -47,6 +48,88 @@ private actor GatedProgressRepository: ProgressRepository {
             guard ContinuousClock.now < deadline else { throw AppFailure.unavailable("Test operation did not reach its gate.") }
             await Task.yield()
         }
+    }
+
+    @Test func purchaseRefreshWaitersShareTheWholeOperationAndRetryAfterFailure() async throws {
+        let gate = PurchaseRefreshGate()
+        let purchases = PurchaseManager(readEntitlements: {
+            await gate.readEntitlements()
+        }, readLatest: { _ in nil }, loadProducts: { _ in
+            try await gate.products()
+        }, observesTransactions: false)
+        var firstFinished = false
+        let first = Task { await purchases.refresh(); firstFinished = true }
+        try await waitUntil { gate.reading != nil }
+        var secondEntered = false
+        var secondFinished = false
+        let second = Task {
+            secondEntered = true
+            await purchases.refresh()
+            secondFinished = true
+        }
+        try await waitUntil { secondEntered }
+        #expect(!secondFinished)
+        #expect(gate.readCount == 1)
+        first.cancel()
+        gate.releaseEntitlements()
+        try await waitUntil { gate.pricing != nil }
+        #expect(!firstFinished && !secondFinished)
+        #expect(!gate.sharedOperationWasCancelled)
+        gate.releaseProducts()
+        await first.value; await second.value
+        #expect(firstFinished && secondFinished)
+        #expect(!purchases.checking)
+        #expect(purchases.message != nil)
+        #expect(gate.productCount == 1)
+        // Failure must clear the shared operation so a later explicit retry runs.
+        await purchases.refresh()
+        #expect(gate.readCount == 2)
+        #expect(gate.productCount == 2)
+    }
+
+    @Test func bookQueriesSkipDiscoveryAndFiltersReuseSharedPreparation() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: [sample(), sample("two")]), purchases: purchases, progress: progress)
+        try await library.load()
+        let initial = library.revision
+        #expect(library.revision == initial)
+        _ = await library.matchingBooks(.init(completedOnly: true))
+        _ = await library.books(by: Author.demoProfiles[0])
+        #expect(await library.discoveryBuildCount == 0)
+        #expect(await library.recommendationBuildCount == 0)
+        _ = await library.presentation(.init(recommendations: true))
+        _ = await library.presentation(.init(text: "cafe"))
+        _ = await library.presentation(.init(level: "B1"))
+        #expect(await library.discoveryBuildCount == 1)
+        #expect(library.revision == initial)
+        try await progress.setVocabulary("café", state: .known)
+        #expect(library.revision != initial)
+        _ = await library.presentation(.init())
+        #expect(await library.discoveryBuildCount == 2)
+        purchases.hasAccess = false
+        #expect(await library.matchingBooks(.init()).isEmpty)
+    }
+
+    @Test func personalRevisionChangesWithoutPreparingBooksOnTheUIActor() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let personal = RawPersonalLibrary()
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: [sample()]), purchases: purchases, progress: progress,
+            personalLibrary: personal)
+        try await library.load()
+        let before = library.revision
+        _ = library.revision
+        _ = await library.presentation(.init())
+        #expect(personal.legacyGetterCalls == 0)
+        let author = Author.demoProfiles[0]
+        var personalBook = sample("personal")
+        personalBook.personalAuthor = author
+        personal.libraryContent = .init(publications: [.init(storyID: UUID(), publishedAt: .now, book: personalBook)], author: author)
+        personal.libraryRevision = UUID()
+        #expect(library.revision != before)
+        #expect(await library.matchingBooks(.init()).first?.id == "personal")
+        #expect(personal.legacyGetterCalls == 0)
     }
 
     @Test func savesAreFIFOAndUseLatestCommittedState() async throws {
@@ -221,5 +304,84 @@ private actor ImmediateChatGenerator: ChatGenerator {
     func reply(to request: ChatRequest) -> ChatReply {
         .init(spanish: "Hola, ¿cómo estás?", english: "Hello, how are you?",
             correction: "", suggestion: "Muy bien.", memory: "Greetings")
+    }
+}
+
+@MainActor private final class PurchaseRefreshGate {
+    var reading: CheckedContinuation<Void, Never>?
+    var pricing: CheckedContinuation<Void, Never>?
+    var readCount = 0
+    var productCount = 0
+    var sharedOperationWasCancelled = false
+    func readEntitlements() async -> [VerificationResult<StoreKit.Transaction>] {
+        readCount += 1
+        if readCount == 1 { await withCheckedContinuation { reading = $0 } }
+        sharedOperationWasCancelled = Task.isCancelled
+        return []
+    }
+    func products() async throws -> [Product] {
+        productCount += 1
+        if productCount == 1 {
+            await withCheckedContinuation { pricing = $0 }
+            throw AppFailure.unavailable("Injected pricing failure")
+        }
+        return []
+    }
+    func releaseEntitlements() { reading?.resume(); reading = nil }
+    func releaseProducts() { pricing?.resume(); pricing = nil }
+}
+
+@MainActor private final class RawPersonalLibrary: PersonalLibraryFeature {
+    var libraryRevision = UUID()
+    var libraryContent = PersonalLibraryContent()
+    var legacyGetterCalls = 0
+    var publishedBooks: [Book] { legacyGetterCalls += 1; return libraryContent.preparedBooks() }
+}
+
+@Suite struct ProgressPatchTests {
+    @Test func deltaContainsOnlyChangedAndRemovedKeys() throws {
+        var before = LearnerProgress()
+        before.positions = ["one": 1, "two": 8]
+        before.vocabulary = ["old": .learning, "kept": .known]
+        var after = before
+        after.positions["one"] = 2
+        after.vocabulary.removeValue(forKey: "old")
+        after.vocabulary["new"] = .known
+        let delta = try ProgressRecords.changes(after, previous: before)
+        #expect(Set(delta.upserts.keys) == ["positions/one", "vocabulary/new"])
+        #expect(delta.removals == ["vocabulary/old"])
+        let restored = try ProgressRecords.decode(delta.applying(to: ProgressRecords.encode(before)))
+        #expect(restored == after)
+        #expect(try ProgressRecords.changes(after, previous: after).isEmpty)
+        let reset = try ProgressRecords.changes(.init(), previous: after)
+        #expect(try ProgressRecords.decode(reset.applying(to: ProgressRecords.encode(after))) == LearnerProgress())
+    }
+
+    @Test func multiRecordPatchRollsBackAndRetryUsesLastSuccessfulState() async throws {
+        let folder = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let store = SwiftDataStore(url: folder.appending(path: "test.store"))
+        let url = folder.appending(path: "progress.json")
+        let repository = LocalProgressRepository(url: url, store: store)
+        var before = try await repository.load()
+        before.positions = ["first": 1, "other": 9]
+        before.vocabulary = ["old": .learning, "untouched": .known]
+        try await repository.save(before)
+        var after = before
+        after.positions["first"] = 2
+        after.vocabulary.removeValue(forKey: "old")
+        after.vocabulary["new"] = .known
+        #if DEBUG
+        try await store.failNextCommitForTesting()
+        await #expect(throws: (any Error).self) { try await repository.save(after) }
+        let independentReader = LocalProgressRepository(url: url, store: store)
+        #expect(try await independentReader.load() == before)
+        #endif
+        // Retry without refreshing this repository's cached progress.
+        try await repository.save(after)
+        #expect(try await LocalProgressRepository(url: url, store: store).load() == after)
+        try await repository.save(.init())
+        #expect(try await LocalProgressRepository(url: url, store: store).load() == LearnerProgress())
     }
 }

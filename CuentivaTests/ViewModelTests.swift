@@ -600,9 +600,9 @@ import StoreKitTest
     var introduction: Book? { nil }
     var syncing = false
     var syncMessage: String?
-    let input = LibraryInput(catalogue: [], personal: [], authors: [], arrivals: [:], progress: .init(),
-        hasAccess: true, day: .distantPast, calendar: .current)
+    let revision = LibraryRevision()
     var pending: [CheckedContinuation<LibraryPresentation, Never>] = []
+    func matchingBooks(_ query: LibraryQuery) async -> [Book] { await presentation(query).books }
     func presentation(_ query: LibraryQuery) async -> LibraryPresentation {
         await withCheckedContinuation { pending.append($0) }
     }

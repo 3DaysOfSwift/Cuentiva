@@ -89,17 +89,20 @@ enum RecordCoding {
             throw error
         }
     }
-    func put(_ collection: String, key: String, data: Data) throws {
-        let identity = collection + ":" + key
-        var query = FetchDescriptor<StoredRecord>(predicate: #Predicate { $0.identity == identity })
-        query.fetchLimit = 1
-        let existing = try modelContext.fetch(query).first
+    /// One transaction for a small set of indexed records. No collection-wide fetch.
+    func apply(_ collection: String, changes: RecordChanges) throws {
+        guard !changes.isEmpty else { return }
         modelContext.autosaveEnabled = false
         do {
-            if let record = existing {
-                if record.payload != data { record.payload = data }
-            } else {
-                modelContext.insert(StoredRecord(collection: collection, key: key, payload: data))
+            for key in changes.removals {
+                if let record = try record(collection, key: key) { modelContext.delete(record) }
+            }
+            for (key, payload) in changes.upserts {
+                if let record = try record(collection, key: key) {
+                    if record.payload != payload { record.payload = payload }
+                } else {
+                    modelContext.insert(StoredRecord(collection: collection, key: key, payload: payload))
+                }
             }
             if modelContext.hasChanges { try commit() }
         } catch {
@@ -107,11 +110,19 @@ enum RecordCoding {
             throw error
         }
     }
-    func value(_ collection: String, key: String) throws -> Data? {
+    private func record(_ collection: String, key: String) throws -> StoredRecord? {
         let identity = collection + ":" + key
         var query = FetchDescriptor<StoredRecord>(predicate: #Predicate { $0.identity == identity })
         query.fetchLimit = 1
-        return try modelContext.fetch(query).first?.payload
+        return try modelContext.fetch(query).first
+    }
+    func put(_ collection: String, key: String, data: Data) throws {
+        var changes = RecordChanges()
+        changes[key] = data
+        try apply(collection, changes: changes)
+    }
+    func value(_ collection: String, key: String) throws -> Data? {
+        try record(collection, key: key)?.payload
     }
 }
 
@@ -146,6 +157,10 @@ actor SwiftDataStore {
         async throws -> [String: Data]
     {
         try await worker().replace(collection, values: values, onlyIfAbsent: onlyIfAbsent)
+    }
+    func apply(_ collection: String, changes: RecordChanges) async throws {
+        guard !changes.isEmpty else { return }
+        try await worker().apply(collection, changes: changes)
     }
     func put(_ collection: String, key: String, data: Data) async throws {
         try await worker().put(collection, key: key, data: data)

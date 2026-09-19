@@ -1,3 +1,12 @@
+## Architecture refinement — 19 September 2026
+
+- View refresh identifiers now contain small revision tokens instead of complete catalogue/progress snapshots. Library worker inputs are private; personal publication sorting happens in the worker for these requests.
+- Completed, author and search queries skip Discover preparation. Discover reuses daily recommendations, author selection and vocabulary coverage across filter changes until its inputs change.
+- Progress persistence generates a patch of changed records. SwiftData fetches affected records by identity and commits the patch atomically, with rollback on failure; ordinary saves no longer fetch the entire record collection.
+- Concurrent purchase refresh callers await the same feature-owned operation, including product loading. Cancelling one waiter does not cancel the shared refresh, and a failed lookup permits retry.
+- Added five focused tests covering preparation reuse, revision changes, shared purchase refreshes, record deltas and transactional rollback/retry. All 106 core tests passed. App and all test sources passed Swift 6 iOS SDK type-checking; project/plist and whitespace checks passed.
+- No test-process crash occurred in this pass; the earlier intermittent signal-11 failure remains unresolved. Xcode simulator testing was attempted but CoreSimulatorService was unavailable (destination lookup failed, exit 70). Simulator UI and live StoreKit behavior remain unverified by this pass.
+
 ## Concurrency fixes — 19 September 2026
 
 - Progress mutations use a FIFO asynchronous gate, spanning repository I/O. Validation and rewards are calculated from the latest committed state after acquiring a turn. Failed saves leave the snapshot unchanged; cancelled queued operations do not write; later operations still run. Completion receipts are created inside the transaction, preventing duplicate rewards under overlap. Disk encoding and writes remain in the repository/storage actors.

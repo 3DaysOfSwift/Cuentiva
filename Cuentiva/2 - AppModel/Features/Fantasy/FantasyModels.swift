@@ -84,6 +84,8 @@ struct FantasyPublication: Codable, Sendable {
 
 @MainActor protocol PersonalLibraryFeature: AnyObject, Sendable {
     var publishedBooks: [Book] { get }
+    var libraryRevision: UUID { get }
+    var libraryContent: PersonalLibraryContent { get }
 }
 
 extension FantasyStory {
@@ -101,5 +103,18 @@ extension FantasyStory {
                         Sentence(id: "\(bookID)-\($0.offset)", spanish: $0.element.spanish, english: $0.element.english)
                     }, vocabulary: vocabulary, license: "Private personal story",
                     authorID: author.id, personalAuthor: author)
+    }
+}
+
+/// Cheap snapshot for the library worker; sorting and author substitution happen there.
+struct PersonalLibraryContent: Sendable {
+    var publications: [FantasyPublication] = []
+    var author: Author?
+    func preparedBooks() -> [Book] {
+        publications.sorted { $0.publishedAt > $1.publishedAt }.map { publication in
+            var book = publication.book
+            book.personalAuthor = author ?? book.personalAuthor
+            return book
+        }
     }
 }

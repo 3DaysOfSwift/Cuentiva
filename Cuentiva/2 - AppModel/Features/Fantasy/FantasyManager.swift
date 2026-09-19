@@ -19,7 +19,13 @@ import Observation
 }
 
 @MainActor @Observable final class FantasyManager: FantasyFeature {
-    private var archive = FantasyArchive()
+    private(set) var libraryRevision = UUID()
+    private var archive = FantasyArchive() {
+        didSet { libraryRevision = UUID() }
+    }
+    var libraryContent: PersonalLibraryContent {
+        .init(publications: archive.publications ?? [], author: personalAuthor)
+    }
     private var loaded = false
     private var busy = false
     private let repository: any FantasyRepository
@@ -38,13 +44,7 @@ import Observation
         try await repository.save(next); archive = next
     }
     var stories: [FantasyStory] { archive.stories }
-    var publishedBooks: [Book] {
-        (archive.publications ?? []).sorted { $0.publishedAt > $1.publishedAt }.map { publication in
-            var book = publication.book
-            book.personalAuthor = personalAuthor ?? book.personalAuthor
-            return book
-        }
-    }
+    var publishedBooks: [Book] { libraryContent.preparedBooks() }
     private var personalAuthor: Author? {
         guard let profile, let identity = profile.identity else { return nil }
         return Author(id: "personal-storyteller", name: identity.name,

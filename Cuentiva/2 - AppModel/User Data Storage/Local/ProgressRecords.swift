@@ -2,11 +2,34 @@ import Foundation
 
 /// Fine-grained records allow a sentence advance to change only affected fields.
 /// Optional collection markers preserve legacy nil-versus-empty semantics.
+struct RecordChanges: Sendable {
+    private(set) var upserts: [String: Data] = [:]
+    private(set) var removals: Set<String> = []
+    var isEmpty: Bool { upserts.isEmpty && removals.isEmpty }
+    subscript(key: String) -> Data? {
+        get { upserts[key] }
+        set {
+            if let newValue { upserts[key] = newValue; removals.remove(key) }
+            else { upserts.removeValue(forKey: key); removals.insert(key) }
+        }
+    }
+    func applying(to existing: [String: Data]) -> [String: Data] {
+        var rows = existing
+        for key in removals { rows.removeValue(forKey: key) }
+        rows.merge(upserts) { _, new in new }
+        return rows
+    }
+}
+
 enum ProgressRecords {
     static func encode(_ value: LearnerProgress, previous: LearnerProgress? = nil, existing: [String: Data] = [:])
         throws -> [String: Data]
     {
-        var rows = existing
+        try changes(value, previous: previous).applying(to: existing)
+    }
+    /// Encode only changed fields and explicitly removed keys, never the full archive.
+    static func changes(_ value: LearnerProgress, previous: LearnerProgress?) throws -> RecordChanges {
+        var rows = RecordChanges()
         if previous == nil || previous?.earnedStreakTheme != value.earnedStreakTheme {
             rows["earnedStreakTheme"] = try RecordCoding.encode(value.earnedStreakTheme)
         }
@@ -89,15 +112,15 @@ enum ProgressRecords {
         return rows
     }
     private static func map<T: Codable & Equatable>(
-        _ name: String, _ current: [String: T], _ old: [String: T], into rows: inout [String: Data]
+        _ name: String, _ current: [String: T], _ old: [String: T], into rows: inout RecordChanges
     ) throws {
-        for key in old.keys where current[key] == nil { rows.removeValue(forKey: name + "/" + key) }
+        for key in old.keys where current[key] == nil { rows[name + "/" + key] = nil }
         for (key, value) in current where old[key] != value { rows[name + "/" + key] = try RecordCoding.encode(value) }
     }
-    private static func set(_ name: String, _ current: Set<String>, _ old: Set<String>, into rows: inout [String: Data])
+    private static func set(_ name: String, _ current: Set<String>, _ old: Set<String>, into rows: inout RecordChanges)
         throws
     {
-        for key in old.subtracting(current) { rows.removeValue(forKey: name + "/" + key) }
+        for key in old.subtracting(current) { rows[name + "/" + key] = nil }
         for key in current.subtracting(old) { rows[name + "/" + key] = try RecordCoding.encode(true) }
     }
     static func decode(_ rows: [String: Data]) throws -> LearnerProgress {

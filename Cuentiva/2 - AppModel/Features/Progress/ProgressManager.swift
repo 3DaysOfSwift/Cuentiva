@@ -3,6 +3,7 @@ import Observation
 
 @MainActor protocol ProgressFeature: AnyObject, Sendable {
     var snapshot: LearnerProgress { get }
+    var revision: UUID { get }
     var loaded: Bool { get }
     var streak: Int { get }
     var week: [WeekDay] { get }
@@ -22,7 +23,10 @@ import Observation
     func reset() async throws
 }
 @MainActor @Observable final class ProgressManager: ProgressFeature {
-    private(set) var snapshot = LearnerProgress()
+    private(set) var revision = UUID()
+    private(set) var snapshot = LearnerProgress() {
+        didSet { revision = UUID() }
+    }
     private(set) var loaded = false
     @ObservationIgnored private var saving = false
     @ObservationIgnored private var waitingSaves: [CheckedContinuation<Void, Never>] = []

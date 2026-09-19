@@ -9,7 +9,7 @@ import Observation
     var dailyReadingError: String?
     private(set) var preparingDailyReads = false
     private(set) var presentation = LibraryPresentation()
-    var refreshID: LibraryRequest { .init(input: library.input, query: libraryQuery) }
+    var refreshID: LibraryRequest { .init(revision: library.revision, query: libraryQuery) }
     private var libraryQuery: LibraryQuery {
         .init(text: query, level: level == "All" ? nil : level, format: format, sort: sort,
             hideCompleted: hideCompleted, recommendations: query.isEmpty && sort == .library && hideCompleted)

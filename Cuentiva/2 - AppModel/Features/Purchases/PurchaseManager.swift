@@ -53,23 +53,41 @@ extension PurchaseFeature {
     private var verificationFailure: String?
     private var entitlementRevision = 0
     private var operationInProgress = false
-    private var refreshing = false
+    @ObservationIgnored private var refreshTask: Task<Void, Never>?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Purchases")
+    private let observesTransactions: Bool
     private let readEntitlements: @MainActor () async -> [VerificationResult<Transaction>]
+    private let readLatest: @MainActor (String) async -> VerificationResult<Transaction>?
+    private let loadProducts: @MainActor ([String]) async throws -> [Product]
     init(
         readEntitlements: @escaping @MainActor () async -> [VerificationResult<Transaction>] = {
             var results: [VerificationResult<Transaction>] = []
             for await result in Transaction.currentEntitlements { results.append(result) }
             return results
-        }
+        },
+        readLatest: @escaping @MainActor (String) async -> VerificationResult<Transaction>? = {
+            await Transaction.latest(for: $0)
+        },
+        loadProducts: @escaping @MainActor ([String]) async throws -> [Product] = {
+            try await Product.products(for: $0)
+        },
+        observesTransactions: Bool = true
     ) {
+        self.observesTransactions = observesTransactions
         self.readEntitlements = readEntitlements
+        self.readLatest = readLatest
+        self.loadProducts = loadProducts
     }
     func refresh() async {
-        guard !refreshing else { return }
-        refreshing = true
-        defer { refreshing = false }
-        observeTransactions()
+        if let refreshTask { await refreshTask.value; return }
+        // Owned by the feature: cancelling one caller must not cancel other waiters.
+        let task = Task { await self.performRefresh() }
+        refreshTask = task
+        await task.value
+        refreshTask = nil
+    }
+    private func performRefresh() async {
+        if observesTransactions { observeTransactions() }
         let started = Date()
         logger.info("Entitlement check started")
         await updateEntitlements()
@@ -79,7 +97,7 @@ extension PurchaseFeature {
         // Keep an already loaded offer when returning to the foreground.
         guard !hasAccess, offers.count < LibraryPlan.allCases.count else { return }
         do {
-            offers = try await Product.products(for: LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
+            offers = try await loadProducts(LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
             message = offers.isEmpty ? "Purchase options are temporarily unavailable. Please try again later." : nil
         } catch { message = error.localizedDescription }
     }
@@ -111,7 +129,7 @@ extension PurchaseFeature {
         var results = await readEntitlements()
         // The latest verified transaction also recovers an incomplete entitlement index.
         for id in entitlementProductIDs {
-            if let latest = await Transaction.latest(for: id) { results.append(latest) }
+            if let latest = await readLatest(id) { results.append(latest) }
         }
         if let confirmed { results.append(.verified(confirmed)) }
         var verified: [String: Transaction] = [:]
