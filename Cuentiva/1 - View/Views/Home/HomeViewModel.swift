@@ -51,6 +51,8 @@ import Observation
             revivalAttempt = UUID()
         }
     }
+    var showingDailyPractice = false
+    var dailyPracticeSession: DailyPracticeSession? { progress.dailyPractice }
     var practiceBook: Book?
     var challengeDay: String?
     var dailyChallenge: DailyMatchChallenge? { progress.dailyChallenge }

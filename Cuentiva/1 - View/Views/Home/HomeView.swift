@@ -15,6 +15,10 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 StreakBar(days: viewModel.week)
+                if viewModel.dailyReads.count == 3 {
+                    DailyPracticeCard(completed: viewModel.dailyPracticeSession?.completed.count ?? 0,
+                        rewarded: viewModel.dailyPracticeSession?.rewarded ?? false) { viewModel.showingDailyPractice = true }
+                }
                 if viewModel.showingRevival {
                     VStack(alignment: .leading, spacing: 12) {
                         if viewModel.revivalPhase == .success {
@@ -195,6 +199,9 @@ struct HomeView: View {
             .task(id: viewModel.refreshID) { await viewModel.refresh() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }
+            }
+            .fullScreenCover(isPresented: $viewModel.showingDailyPractice) {
+                NavigationStack { DailyPracticeView(books: viewModel.dailyReads, feature: AppModel.shared.dailyPractice) }
             }
             .fullScreenCover(item: $viewModel.practiceBook) { book in
                 NavigationStack { PracticeView(book: book, match: true, challengeDay: viewModel.challengeDay) }

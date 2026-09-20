@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E1E63EC82076481C8173C91E /* DailyPracticeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F425F728FC546419FC82CF3; };
+		19E8900880EB45188E3CEFB5 /* DailyPracticeManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0494EE5CDF040AA92E0C2A7; };
+		C12378A903364475AAA4726C /* DailyPracticeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8C7D6F8D104FFB9B3704B7; };
+		DCBB8A2B631049ADA2DB1440 /* DailyPracticeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E9D401B3DBE46AAAEBB6472; };
+		FB4DA9F35C76452DA7A030DB /* DailyPracticeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC95A1D389FC4ABDB907042B; };
+		09C45A2235A74DD4B9CBDC5B /* DailyPracticeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 036495EF4BAB433594BFCD7E; };
+		C2CB45E41A254714AA83293D /* DailyPracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CF476A5865D405AA93ECF7D; };
 		01BB140433D274579B0E934D /* InlineError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE1BEB6017044EEC7F4F85E /* InlineError.swift */; };
 		E65201A709954F80B6CB9EB5 /* SlideToStartViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0706383D0ED641B6BBCF00F1 /* SlideToStartViewModel.swift */; };
 		BC377336B6B64295857F8949 /* SlideToStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DD221F62FD4C8589333F75 /* SlideToStartView.swift */; };
@@ -214,6 +221,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3F425F728FC546419FC82CF3 /* DailyPracticeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/PresentationTests/ViewModelTests/DailyPracticeViewModelTests.swift"; sourceTree = SOURCE_ROOT; };
+		B0494EE5CDF040AA92E0C2A7 /* DailyPracticeManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/AppModelTests/FeatureTests/Practice/DailyPracticeManagerTests.swift"; sourceTree = SOURCE_ROOT; };
+		EA8C7D6F8D104FFB9B3704B7 /* DailyPracticeSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Practice/DailyPracticeSession.swift"; sourceTree = SOURCE_ROOT; };
+		6E9D401B3DBE46AAAEBB6472 /* DailyPracticeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Practice/DailyPracticeManager.swift"; sourceTree = SOURCE_ROOT; };
+		AC95A1D389FC4ABDB907042B /* DailyPracticeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/DailyPractice/DailyPracticeViewModel.swift"; sourceTree = SOURCE_ROOT; };
+		036495EF4BAB433594BFCD7E /* DailyPracticeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/DailyPractice/DailyPracticeCard.swift"; sourceTree = SOURCE_ROOT; };
+		5CF476A5865D405AA93ECF7D /* DailyPracticeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/DailyPractice/DailyPracticeView.swift"; sourceTree = SOURCE_ROOT; };
 		024C09AE9C4C923058DC9B6C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		026ED7858EC8A278FC40CB0E /* StatsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModelTests.swift; sourceTree = "<group>"; };
 		04A8EB389D4E034E688959AF /* LanguageTermDetailViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTermDetailViewModelTests.swift; sourceTree = "<group>"; };
@@ -435,6 +449,13 @@
 		00AAA2D68ABF2349C21D9466 /* PresentationTests */ = {
 			isa = PBXGroup;
 			children = (
+				3F425F728FC546419FC82CF3 /* DailyPracticeViewModelTests.swift */,
+				B0494EE5CDF040AA92E0C2A7 /* DailyPracticeManagerTests.swift */,
+				EA8C7D6F8D104FFB9B3704B7 /* DailyPracticeSession.swift */,
+				6E9D401B3DBE46AAAEBB6472 /* DailyPracticeManager.swift */,
+				AC95A1D389FC4ABDB907042B /* DailyPracticeViewModel.swift */,
+				036495EF4BAB433594BFCD7E /* DailyPracticeCard.swift */,
+				5CF476A5865D405AA93ECF7D /* DailyPracticeView.swift */,
 				A4A71E72065219B579CC8F14 /* ThemeManagerTests.swift */,
 				82C0527E59A8FFB8A8A9D511 /* ViewModelTests */,
 			);
@@ -1229,6 +1250,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1E63EC82076481C8173C91E /* DailyPracticeViewModelTests.swift in Sources */,
+				19E8900880EB45188E3CEFB5 /* DailyPracticeManagerTests.swift in Sources */,
 				ACEC85513695A4C930AC65E0 /* BinaryLibraryTests.swift */,
 				542C59EB355F062E21588243 /* StoreOpeningTests.swift in Sources */,
 				C2D74E2309A996143CAFDA47 /* AppModelTests.swift in Sources */,
@@ -1302,6 +1325,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C12378A903364475AAA4726C /* DailyPracticeSession.swift in Sources */,
+				DCBB8A2B631049ADA2DB1440 /* DailyPracticeManager.swift in Sources */,
+				FB4DA9F35C76452DA7A030DB /* DailyPracticeViewModel.swift in Sources */,
+				09C45A2235A74DD4B9CBDC5B /* DailyPracticeCard.swift in Sources */,
+				C2CB45E41A254714AA83293D /* DailyPracticeView.swift in Sources */,
 				8DA8C9B3AD4480900FC3C2E4 /* BinaryLibrary.swift */,
 				F1CCAB3D62CE13D122614F78 /* ProgressRecords.swift in Sources */,
 				0A48B90A416E7CB34A572391 /* SwiftDataStore.swift in Sources */,

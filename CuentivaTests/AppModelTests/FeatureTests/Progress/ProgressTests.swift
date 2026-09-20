@@ -135,6 +135,30 @@ import Testing
         #expect(progress.snapshot.doubloons == 2)
     }
 
+    @Test func automaticLibraryCheckIsDailyPersistentAndDuplicateSafe() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress()
+        let progress = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await progress.load()
+        await repo.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.claimAutomaticLibraryCheck() }
+        #expect(progress.snapshot.lastAutomaticLibraryCheckDay == nil)
+        await repo.setFailure(false)
+        async let first = progress.claimAutomaticLibraryCheck()
+        async let second = progress.claimAutomaticLibraryCheck()
+        let claims = try await [first, second]
+        #expect(claims.filter { $0 }.count == 1)
+        let restored = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await restored.load()
+        #expect(try await restored.claimAutomaticLibraryCheck() == false)
+        #expect(try ProgressRecords.decode(ProgressRecords.encode(restored.snapshot)) == restored.snapshot)
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        #expect(try await restored.claimAutomaticLibraryCheck())
+        #expect(try await restored.claimAutomaticLibraryCheck() == false)
+    }
+
     @Test func completionIsIdempotentAndSurvivesReload() async throws {
         let repository = MemoryProgress(), book = sample()
         let progress = ProgressManager(repository: repository)

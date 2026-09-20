@@ -12,7 +12,13 @@ import Observation
     var week: [WeekDay] { get }
     var dailyWelcome: DailyWelcome? { get }
     var dailyChallenge: DailyMatchChallenge? { get }
+    var dailyPractice: DailyPracticeSession? { get }
+    func prepareDailyPractice(books: [Book]) async throws
+    func answerDailyPractice(_ choice: String, game: DailyPracticeGame, day: String) async throws -> Bool
+    func stopDailyTrail(day: String) async throws
+    func selectPracticeScenario(_ scenario: PracticeScenario, day: String) async throws
     @discardableResult func completeDailyGame(book: Book, day: String, words: Set<String>, elapsed: Double?) async throws -> MatchRewardReceipt?
+    func claimAutomaticLibraryCheck() async throws -> Bool
     func acknowledgeWelcome(day: String) async throws
     func load() async throws
     func registerLibrary(_ books: [Book]) async throws
@@ -34,6 +40,65 @@ import Observation
     func reset() async throws
 }
 @MainActor @Observable final class ProgressManager: ProgressFeature {
+    var dailyPractice: DailyPracticeSession? {
+        guard let value = snapshot.dailyPracticeSession, value.day == dayKey(now()), value.valid else { return nil }
+        return value
+    }
+    func prepareDailyPractice(books: [Book]) async throws {
+        try await commit { next in
+            let day = dayKey(now())
+            if let existing = next.dailyPracticeSession, existing.day == day {
+                guard existing.valid else { throw AppFailure.invalidBook }; return
+            }
+            guard next.dailyReadingDate.map({ calendar.isDate($0, inSameDayAs: now()) }) == true,
+                  next.dailyReadingIDs == books.map(\.id) else { throw AppFailure.incomplete }
+            next.dailyPracticeSession = try DailyPracticeSession.make(day: day, books: books)
+        }
+    }
+    private func savePractice(_ session: inout DailyPracticeSession, to next: inout LearnerProgress) {
+        if next.streakDays == nil { next.streakDays = next.practiceDays }
+        next.practiceDays.insert(dayKey(now()))
+        if session.completed.count == DailyPracticeGame.allCases.count && !session.rewarded {
+            next.doubloons = (next.doubloons ?? 0) + 1
+            session.rewarded = true
+        }
+        next.dailyPracticeSession = session
+    }
+    func answerDailyPractice(_ choice: String, game: DailyPracticeGame, day: String) async throws -> Bool {
+        try await commit { next in
+            guard var session = next.dailyPracticeSession, session.day == day, day == dayKey(now()), session.valid else {
+                throw AppFailure.unavailable("A new practice day has started. Return to Today.")
+            }
+            let exposed = game == .sentenceBuilder ? session.builderPhrase.spanish : choice
+            let accepted = try session.choose(choice, game: game)
+            if accepted {
+                recordExposure(exposed, to: &next)
+            }
+            savePractice(&session, to: &next)
+            return accepted
+        }
+    }
+    func stopDailyTrail(day: String) async throws {
+        try await commit { next in
+            guard var session = next.dailyPracticeSession, session.day == day, day == dayKey(now()),
+                  session.valid, !session.completed.contains(.sentenceTrail), session.trailScore > 0 else { throw AppFailure.incomplete }
+            session.completed.insert(.sentenceTrail)
+            savePractice(&session, to: &next)
+        }
+    }
+    func selectPracticeScenario(_ scenario: PracticeScenario, day: String) async throws {
+        try await commit { next in
+            guard var session = next.dailyPracticeSession, session.day == day, day == dayKey(now()), session.valid else { throw AppFailure.incomplete }
+            try session.selectScenario(scenario)
+            next.dailyPracticeSession = session
+        }
+    }
+    private func recordExposure(_ text: String, to next: inout LearnerProgress) {
+        if next.seenWords == nil { next.seenWords = [] }
+        next.seenWords?.formUnion(WordComparison.words(text).map(WordComparison.normalized))
+        if next.wordExposureHistory == nil { next.wordExposureHistory = [:] }
+        next.wordExposureHistory?[dayKey(now())] = next.seenWords?.count ?? 0
+    }
     private(set) var revision = UUID()
     private(set) var snapshot = LearnerProgress() {
         didSet { revision = UUID() }
@@ -108,6 +173,14 @@ import Observation
         return DailyWelcome(day: day, streak: streak,
             practicedToday: snapshot.qualifyingStreakDays.contains(day),
             returningReader: !snapshot.practiceDays.isEmpty)
+    }
+    func claimAutomaticLibraryCheck() async throws -> Bool {
+        try await commit { next in
+            let today = dayKey(now())
+            guard next.lastAutomaticLibraryCheckDay != today else { return false }
+            next.lastAutomaticLibraryCheckDay = today
+            return true
+        }
     }
     func acknowledgeWelcome(day: String) async throws {
         guard day == dayKey(now()) else { return }
@@ -237,8 +310,7 @@ import Observation
             if next.bookWordBaselines == nil { next.bookWordBaselines = [:] }
             next.bookWordBaselines?[book.id] = next.seenWords ?? []
         }
-        if next.seenWords == nil { next.seenWords = [] }
-        next.seenWords?.formUnion(WordComparison.words(sentence.spanish).map(WordComparison.normalized))
+        recordExposure(sentence.spanish, to: &next)
         let inserted = next.attempts[book.id, default: []].insert(sentence.id).inserted
         next.practiceDays.insert(dayKey(now()))
         if inserted {

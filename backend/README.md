@@ -17,3 +17,9 @@ bundled fallback remain. No authentication token is shipped in the app.
 See that repository's README for the schema, publication and review process,
 licensing status, preservation guidance and current capacity limits. Remote repository
 creation and initial publication must succeed before online sync is available.
+
+Automatic checks run once per local calendar day, with the check claim persisted
+in learner progress so relaunching does not repeat it. Failed automatic downloads
+can be retried explicitly in Settings. Verified updates activate on the next fresh
+launch. The publishing sources are aligned with editorial edition 4 and build four
+packs locally; publication remains a separate maintainer action.

@@ -3,6 +3,24 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct StatsViewModelTests {
+    @Test func rollingPracticeCountsAndExposureHistory() async throws {
+        let repo = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.practiceDays = ["2026-09-20", "2026-08-22", "2026-08-21", "2025-09-21", "2025-09-20"]
+        saved.seenWords = ["hola", "café", "ayer"]
+        saved.wordExposureHistory = ["2026-09-19": 2, "2026-09-20": 3]
+        try await repo.save(saved)
+        let progress = ProgressManager(repository: repo)
+        try await progress.load()
+        let model = StatsViewModel(progress: progress)
+        let formatter = DateFormatter(); formatter.dateFormat = "yyyy-MM-dd"
+        let now = try #require(formatter.date(from: "2026-09-20"))
+        #expect(model.daysPractised(inLast: 30, now: now) == 2)
+        #expect(model.daysPractised(inLast: 365, now: now) == 4)
+        #expect(model.practiceDays == 5)
+        #expect(model.exposedWords == 3)
+        #expect(model.exposureHistory.map(\.count) == [2, 3])
+    }
     @Test func statisticsReflectSavedPracticeAndAvoidDuplicateRewards() async throws {
         let progress = ProgressManager(repository: MemoryProgress())
         try await progress.load()

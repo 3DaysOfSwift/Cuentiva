@@ -1,4 +1,5 @@
 import SwiftUI
+import Charts
 
 struct StatsView: View {
     @State private var viewModel = StatsViewModel()
@@ -41,6 +42,21 @@ struct StatsView: View {
                         DoubloonBalance(count: viewModel.doubloons, size: 40).font(.title2)
                     }.frame(maxWidth: .infinity, alignment: .leading)
                     stat("Days practised", value: "\(viewModel.practiceDays)", symbol: "calendar")
+                    stat("Days practised in the last 30 days", value: "\(viewModel.daysPractised(inLast: 30))", symbol: "calendar")
+                    stat("Days practised in the last 365 days", value: "\(viewModel.daysPractised(inLast: 365))", symbol: "calendar")
+                    stat("Distinct Spanish words encountered", value: "\(viewModel.exposedWords)", symbol: "text.book.closed")
+                    if !viewModel.exposureHistory.isEmpty {
+                        Chart(viewModel.exposureHistory) { point in
+                            LineMark(x: .value("Date", point.date), y: .value("Words", point.count))
+                            PointMark(x: .value("Date", point.date), y: .value("Words", point.count))
+                        }
+                        .foregroundStyle(theme.theme.accent)
+                        .chartYScale(domain: 0...max(10, viewModel.exposedWords))
+                        .frame(height: 200)
+                        .accessibilityLabel("Word exposure over time")
+                    }
+                    Text("Exposure counts distinct written words you have encountered, not words mastered. Chart history begins when tracking is available; earlier reading is included in your starting total.")
+                        .font(.caption).foregroundStyle(theme.theme.muted)
                     VStack(alignment: .leading, spacing: 8) {
                         Label("First recorded practice", systemImage: "sunrise").font(.headline)
                         if let date = viewModel.firstPractice {

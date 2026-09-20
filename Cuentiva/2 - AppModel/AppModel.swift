@@ -8,6 +8,7 @@ import Foundation
     let learning: any LearningFeature
     let contributions: any ContributionFeature
     let languageTerms: any LanguageTermsFeature = LanguageTermsManager()
+    let dailyPractice: any DailyPracticeFeature
     let practice: any PracticeFeature
     let chat: any ChatFeature
     let fantasy: any FantasyFeature
@@ -19,6 +20,7 @@ import Foundation
     ) {
         self.chat = chat
         self.fantasy = fantasy
+        self.dailyPractice = DailyPracticeManager(progress: progress, purchases: purchases)
         self.practice = PracticeManager(progress: progress, purchases: purchases)
         self.library = library
         self.progress = progress

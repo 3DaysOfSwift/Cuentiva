@@ -30,6 +30,13 @@ enum ProgressRecords {
     /// Encode only changed fields and explicitly removed keys, never the full archive.
     static func changes(_ value: LearnerProgress, previous: LearnerProgress?) throws -> RecordChanges {
         var rows = RecordChanges()
+        if previous == nil || previous?.dailyPracticeSession != value.dailyPracticeSession {
+            rows["dailyPracticeSession"] = try RecordCoding.encode(value.dailyPracticeSession)
+        }
+        if previous == nil || previous?.wordExposureHistory != value.wordExposureHistory {
+            rows["wordExposureHistory"] = try RecordCoding.encode(value.wordExposureHistory)
+        }
+
         if previous == nil || previous?.streakDays != value.streakDays {
             rows["streakDays"] = try RecordCoding.encode(value.streakDays)
         }
@@ -67,6 +74,9 @@ enum ProgressRecords {
         if previous == nil || previous?.bookLastRead != value.bookLastRead {
             rows["bookLastRead"] = try RecordCoding.encode(value.bookLastRead != nil)
             try map("bookLastRead", value.bookLastRead ?? [:], previous?.bookLastRead ?? [:], into: &rows)
+        }
+        if previous == nil || previous?.lastAutomaticLibraryCheckDay != value.lastAutomaticLibraryCheckDay {
+            rows["lastAutomaticLibraryCheckDay"] = try RecordCoding.encode(value.lastAutomaticLibraryCheckDay)
         }
         if previous == nil || previous?.lastWelcomeDay != value.lastWelcomeDay {
             rows["lastWelcomeDay"] = try RecordCoding.encode(value.lastWelcomeDay)
@@ -155,6 +165,9 @@ enum ProgressRecords {
             throw AppFailure.unavailable("Your progress records are incomplete.")
         }
         var value = LearnerProgress()
+        if let data = rows["dailyPracticeSession"] { value.dailyPracticeSession = try RecordCoding.decode(DailyPracticeSession?.self, data) }
+        if let data = rows["wordExposureHistory"] { value.wordExposureHistory = try RecordCoding.decode([String: Int]?.self, data) }
+
         if let data = rows["streakDays"] { value.streakDays = try RecordCoding.decode(Set<String>?.self, data) }
         if let data = rows["revivedStreakDays"] { value.revivedStreakDays = try RecordCoding.decode(Set<String>?.self, data) }
         if let data = rows["rewardedStreakDays"] { value.rewardedStreakDays = try RecordCoding.decode(Set<String>?.self, data) }
@@ -189,6 +202,9 @@ enum ProgressRecords {
         if let marker = rows["bookLastRead"], try RecordCoding.decode(Bool.self, marker) { value.bookLastRead = [:] }
         for (key, data) in rows where key.hasPrefix("bookLastRead/") {
             value.bookLastRead?[String(key.dropFirst(13))] = try RecordCoding.decode(Date.self, data)
+        }
+        if let data = rows["lastAutomaticLibraryCheckDay"] {
+            value.lastAutomaticLibraryCheckDay = try RecordCoding.decode(String?.self, data)
         }
         if let data = rows["lastWelcomeDay"] {
             value.lastWelcomeDay = try RecordCoding.decode(type(of: value.lastWelcomeDay), data)

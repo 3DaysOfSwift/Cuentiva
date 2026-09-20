@@ -220,3 +220,17 @@ All 52 bundled books now include exact vocabulary-to-English coverage (4,260 pai
 - Week rows now carry saved revival state separately from practice, rendered as a filled restore icon with a “streak revived” accessibility label. Paid bridges do not inflate practice totals.
 - The Today revival action first reveals the existing coin slider. A valid slide starts one owned payment task, disables repeat submission, and shows the animated check, success haptic and committed balance only after storage succeeds. The celebration remains visible briefly before returning to the reading reminder. Failed saves reset the slider for retry. Reduce Motion suppresses coin travel/bounce.
 - Slider accessibility now accepts the purchase cost and explanatory hint, retaining the existing chat defaults. Tests verify button-to-slide without a charge, rejection of repeated slides, failed-save retry, successful presentation and the revived calendar marker. Validation: 157 shared tests and 49 presentation tests passed; iOS sources type-checked. Actual animations and haptics remain device-unverified.
+
+
+## Daily library checks and publisher alignment — 2026-09-20
+
+- Automatic checks claim the local calendar day through ProgressManager's serialized persistence before requesting the catalogue. Claims survive relaunch, coalesce concurrent requests and remain retryable if their save fails. Manual Settings checks bypass the automatic schedule.
+- Tests cover failed claim/retry, simultaneous claims, persistence/record round trips, same-day relaunch suppression, next-day eligibility and manual sync.
+- Publisher source now exactly matches all 52 bundled Book records and all nine compiled Author.demoProfiles. Publisher validation supports ending/editorialRevision and requires complete three-chapter/matching data for edition 4. Stable book IDs were verified against the previous publisher revision.
+- Validation: 158 shared-model tests, 50 presentation tests plus one temporary publisher compatibility test (51 total in the isolated harness), and five publisher tests passed. The compatibility test decoded the four actual generated packs through SyncedBookRepository.decode and compared their books/authors to the app. Editorial JSON and binary DAT freshness checks passed; iOS source/tests type-checked. No live GitHub upload or network delivery was performed.
+
+### Daily sentence practice and word exposure
+- DailyPracticeManagerTests: bundled-library eligibility, atomic reward/retry, persisted resume, one play per day, day rollover, guided scenario persistence and stable replenishing tiles.
+- DailyPracticeViewModelTests: access rejection, retryable save failure and correct-answer feedback.
+- StatsViewModelTests: rolling 30/365-day counts and chronological cumulative word exposure. These totals represent exposure, not mastery.
+- Three daily games award one coin in total. Sentence Trail follows validated source phrases; it is not a free-form grammar evaluator. Café and bus scenes use reviewed seed phrases.

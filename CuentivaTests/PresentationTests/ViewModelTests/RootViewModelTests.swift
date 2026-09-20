@@ -3,6 +3,30 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct RootViewModelTests {
+    @Test func automaticSyncSurvivesRelaunchAndChecksAgainNextDay() async throws {
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress()
+        let progress = ProgressManager(repository: repo, now: { now })
+        try await progress.load()
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let library = GatedLaunchLibrary(gated: false)
+        let root = makeRoot(purchases, library, progress); root.ready = true
+        await root.syncLibrary()
+        await root.syncLibrary()
+        #expect(library.syncs == 1)
+        let restored = ProgressManager(repository: repo, now: { now })
+        try await restored.load()
+        let relaunched = makeRoot(purchases, library, restored); relaunched.ready = true
+        await relaunched.syncLibrary()
+        #expect(library.syncs == 1)
+        now = now.addingTimeInterval(86400)
+        await relaunched.syncLibrary()
+        #expect(library.syncs == 2)
+        // Settings calls the feature directly, bypassing automatic scheduling.
+        await library.sync()
+        #expect(library.syncs == 3)
+    }
+
     @Test func storageStartsWhileEntitlementCheckIsStillPending() async throws {
         var entitlementWait: CheckedContinuation<Void, Never>?
         let purchases = PurchaseManager(readEntitlements: {

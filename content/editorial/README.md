@@ -36,7 +36,7 @@ Vocabulary counts are rebuilt from the text. `lemmas.json` preserves the existin
 
 Book IDs remain stable, preserving completed-book history and rewards. Rewritten passages receive revision-specific IDs so old answers cannot count as reading new prose. A reader with attempts from the old edition resumes the rewrite at its beginning; current-edition attempts resume normally. Saved practice history is retained. Revision 4 extends matching and vocabulary counts to all three chapters while retaining revision-2 passage IDs. Existing chapter-one attempts remain valid and saved completion/reward history is preserved. Older cached revisions are superseded by the bundled matching data.
 
-DAT version 2 adds ending/revision fields; the runtime still reads version 1. A newer bundled editorial revision supersedes older cached text without a launch-time database migration or write. Remote-only books and higher remote revisions remain available. These changes are local to this app project; no public GitHub dataset or server pack has been published.
+DAT version 2 adds ending/revision fields; the runtime still reads version 1. A newer bundled editorial revision supersedes older cached text without a launch-time database migration or write. Remote-only books and higher remote revisions remain available. The sibling publishing repository is now aligned with this edition, including all three chapters, matching data and current storyteller profiles. Its four release packs have been built and checked locally. No GitHub release has been published by this alignment step.
 
 ## Editing and rebuilding
 
@@ -47,6 +47,8 @@ python3 scripts/rebuild_editorial_library.py
 python3 scripts/build_library_dat.py
 python3 scripts/rebuild_editorial_library.py --check
 python3 scripts/build_library_dat.py --check
+python3 scripts/sync_publishing_library.py
+python3 scripts/sync_publishing_library.py --check
 ```
 
 `metadata.json` preserves level/format/palette/verb targets. The rebuild script maintains cover symbols, author IDs, fresh sentence IDs, vocabulary and glossaries. `Books.json`, `Library.dat` and the standalone `Introduction.dat` are generated together. No JSON parsing is introduced into app launch.

@@ -27,6 +27,9 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var availableThemes: [ColourThemeID] {
         [.library, .midnight] + ThemePack.allCases.filter(hasInstalled).flatMap(\.themes)
     }
+    var dailyPracticeSession: DailyPracticeSession? = nil
+    var wordExposureHistory: [String: Int]? = nil
+    var lastAutomaticLibraryCheckDay: String? = nil
     var lastWelcomeDay: String? = nil
     var schemaVersion = 1
     var selectedLearningLevel: LearningLevel? = nil

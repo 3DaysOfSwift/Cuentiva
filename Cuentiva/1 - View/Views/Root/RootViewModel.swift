@@ -13,7 +13,6 @@ import Observation
     @ObservationIgnored private var loadingTask: Task<Void, Never>?
     private var hasEnteredBackground = false
     private var starting = false
-    private var lastAutomaticSync: Date?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Launch")
     private let fantasy: any FantasyFeature
     private var checkedIntroduction = false
@@ -113,11 +112,15 @@ import Observation
     }
     func syncLibrary() async {
         guard hasAccess, !checkingAccess, ready, !library.syncing else { return }
-        // Initial appearance and scene activation can arrive together. Automatic
-        // checks are coalesced; Settings still offers an explicit retry.
-        let now = Date()
-        guard lastAutomaticSync.map({ now.timeIntervalSince($0) >= 3600 }) ?? true else { return }
-        lastAutomaticSync = now
+        // Persist the daily claim so relaunches and simultaneous activation events
+        // cannot repeat automatic checks. Settings remains an explicit retry.
+        do {
+            guard try await progress.claimAutomaticLibraryCheck() else { return }
+        } catch {
+            logger.error("Could not save the daily library check: \(error.localizedDescription, privacy: .public)")
+            return
+        }
+        guard hasAccess, !checkingAccess, ready else { return }
         await library.sync()
     }
     func load() async {
