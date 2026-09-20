@@ -74,6 +74,7 @@ extension PurchaseFeature {
     private var operationInProgress = false
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Purchases")
+    private let prepareForPurchase: @MainActor () async throws -> Void
     private let observesTransactions: Bool
     private let readEntitlements: @MainActor () async -> [VerificationResult<Transaction>]
     private let readLatest: @MainActor (String) async -> VerificationResult<Transaction>?
@@ -90,8 +91,10 @@ extension PurchaseFeature {
         loadProducts: @escaping @MainActor ([String]) async throws -> [Product] = {
             try await Product.products(for: $0)
         },
-        observesTransactions: Bool = true
+        observesTransactions: Bool = true,
+        prepareForPurchase: @escaping @MainActor () async throws -> Void = {}
     ) {
+        self.prepareForPurchase = prepareForPurchase
         self.observesTransactions = observesTransactions
         self.readEntitlements = readEntitlements
         self.readLatest = readLatest
@@ -220,6 +223,9 @@ extension PurchaseFeature {
         guard !operationInProgress else { return }
         operationInProgress = true
         defer { operationInProgress = false }
+        // Do not open the payment sheet until local storage can receive progress.
+        try await prepareForPurchase()
+        try Task.checkCancellation()
         await updateEntitlements()
         guard !hasAccess else { return }
         guard let offer = offer(for: plan) else {

@@ -45,25 +45,37 @@ struct ChatView: View {
                             ForEach(LearningLevel.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                         }.disabled(model.sending)
                         if model.messages.isEmpty && model.feature.unavailable == nil {
-                            Text("Tell me about your day, plan a journey, or step into a world of talking dragons. You can write in Spanish or ask for help in English.")
+                            Text("Start a conversation").font(.system(.title2, design: .serif)).accessibilityAddTraits(.isHeader)
                             ForEach(["¡Hola! ¿Cómo estás?", "Vamos a explorar un bosque mágico.", "Quiero hablar de mis viajes."], id: \.self) { prompt in
                                 Button(prompt) { model.draft = prompt; composing = true }
                             }
                         }
                         ForEach(model.messages) { turn in
-                            ChatTurnView(turn: turn, name: model.author.name,
+                            ChatTurnView(turn: turn,
                                 translated: model.translations.contains(turn.id),
                                 translate: { model.toggleTranslation(for: turn) }, listen: { model.listen(turn) })
                                 .id(turn.id)
                         }
                         if model.sending { ProgressView("\(model.author.name) is typing…") }
-                        if let suggestion = model.turns.last?.suggestion, !suggestion.isEmpty {
-                            Button { model.draft = suggestion; composing = true } label: {
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text("You could say…").font(.caption)
-                                    Text(suggestion)
+                        if let turn = model.suggestedTurn {
+                            VStack(alignment: .leading, spacing: 14) {
+                                Button { model.draft = turn.suggestion; composing = true } label: {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text("You could say…").font(.caption).foregroundStyle(theme.theme.muted)
+                                        Text(turn.suggestion).foregroundStyle(theme.theme.ink)
+                                    }.multilineTextAlignment(.leading)
+                                }.buttonStyle(.plain).disabled(model.sending)
+                                    .accessibilityHint("Use this suggested reply")
+                                if let english = turn.suggestionEnglish, !english.isEmpty {
+                                    Button(model.suggestionTranslations.contains(turn.id) ? "Hide English" : "Show English") {
+                                        model.toggleSuggestionTranslation(turn)
+                                    }.font(.subheadline.weight(.semibold)).buttonStyle(.bordered)
+                                        .tint(theme.theme.accent).foregroundStyle(theme.theme.accent)
+                                    if model.suggestionTranslations.contains(turn.id) {
+                                        Text(english).foregroundStyle(theme.theme.muted).textSelection(.enabled)
+                                    }
                                 }
-                            }.disabled(model.sending)
+                            }.padding(.top, 24).padding(.bottom, 12)
                         }
                         Text("AI can make mistakes. This topic stays on your device while the screen is open. Your storyteller remembers a short summary and recent messages.")
                             .font(.caption).foregroundStyle(theme.theme.muted)
@@ -95,7 +107,7 @@ struct ChatView: View {
             }
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
-        .navigationTitle("Storyteller Chat").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(model.author.name).navigationBarTitleDisplayMode(.inline)
         .toolbar {
             if model.unlocked && !model.messages.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {

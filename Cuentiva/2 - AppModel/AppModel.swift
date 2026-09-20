@@ -33,7 +33,7 @@ import Foundation
         let store = SwiftDataStore(url: directory.appending(path: "Cuentiva.store"))
         let progress = ProgressManager(
             repository: LocalProgressRepository(url: directory.appending(path: "progress.json"), store: store))
-        let purchases = PurchaseManager()
+        let purchases = PurchaseManager(prepareForPurchase: { try await progress.load() })
         let repository = SyncedBookRepository(
             bundled: BundledBookRepository(),
             transport: GitHubCatalogueTransport(

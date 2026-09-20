@@ -19,22 +19,31 @@ import Observation
     var error: String?
     var busy = false
     private(set) var showingReader = false
+    private(set) var receipt: CompletionReceipt?
+    var showingWholeBook = false
+    var showingCompletion = false
+    var chapter: Int { guard let book else { return 1 }; return index >= book.chapterThreeStart ? 3 : 1 }
     private(set) var showingChapterCelebration = false
     private var recordingTask: Task<Void, Never>?
     var sentence: Sentence? {
-        guard let book, book.sentences.indices.contains(index) else { return nil }
-        return book.sentences[index]
+        guard let book, book.fullText.indices.contains(index) else { return nil }
+        return book.fullText[index]
     }
     var positionLabel: String {
         guard let book else { return "" }
-        return "\(index + 1) OF \(book.sentences.count) \(book.unitName.uppercased())"
+        let start = chapter == 3 ? book.chapterThreeStart : 0
+        let count = chapter == 3 ? (book.ending ?? []).count : book.sentences.count
+        return "CHAPTER \(chapter) · \(index - start + 1) OF \(count) \(book.unitName.uppercased())"
     }
     var fraction: Double {
         guard let book else { return 0 }
-        return Double(index + 1) / Double(book.sentences.count)
+        let start = chapter == 3 ? book.chapterThreeStart : 0
+        let count = chapter == 3 ? (book.ending ?? []).count : book.sentences.count
+        return Double(index - start + 1) / Double(max(1, count))
     }
     var nextTitle: String {
         guard let book else { return "Next" }
+        if index == book.fullText.count - 1 { return "Complete chapter \(chapter)" }
         return index == book.sentences.count - 1
             ? "Complete chapter 1"
             : (book.kind == .movieScript ? "Next line" : "Next sentence")
@@ -51,7 +60,7 @@ import Observation
         guard self.book == nil else { return }
         self.book = book
         index = learning.position(book)
-        showingReader = index == book.sentences.count
+        showingReader = index >= book.sentences.count && index < book.chapterThreeStart
     }
     func listen() {
         guard allowed, let sentence else { return }
@@ -97,6 +106,9 @@ import Observation
         stop()
         do {
             switch try await learning.advance(book: book, from: index) {
+            case .bookFinished:
+                receipt = try await learning.finish(book)
+                return
             case .position(let next): index = next
             case .fullReading:
                 showingChapterCelebration = true
@@ -113,8 +125,19 @@ import Observation
         showingReader = true
     }
 
+    func chapterTwoFinished(at position: Int) async {
+        guard let book else { return }
+        index = position
+        feedback = nil; answer = ""; showSpanish = false; error = nil
+        showingReader = false
+        if position >= book.fullText.count {
+            do { receipt = try await learning.finish(book) }
+            catch { self.error = error.localizedDescription; showingReader = true }
+        }
+    }
+
     func back() async {
-        guard let book, index > 0, !busy else { return }
+        guard let book, index > (chapter == 3 ? book.chapterThreeStart : 0), !busy else { return }
         busy = true
         defer { busy = false }
         stop()

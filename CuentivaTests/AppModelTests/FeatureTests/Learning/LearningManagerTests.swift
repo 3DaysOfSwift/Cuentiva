@@ -7,6 +7,43 @@ import Testing
 #endif
 
 @Suite @MainActor struct LearningManagerTests {
+    @Test func threeChaptersResumeAndCannotCompleteBeforeTheEnding() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository); try await progress.load()
+        let purchases = TestPurchases()
+        let feature = LearningManager(purchases: purchases, progress: progress)
+        var book = sample()
+        book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "It continues.")]
+        book.ending = [.init(id: "end1", spanish: "Llega.", english: "Arrives."),
+                       .init(id: "end2", spanish: "Fin.", english: "End.")]
+        await #expect(throws: AppFailure.self) { try await feature.finishChapterTwo(book) }
+        let first = try await feature.advance(book: book, from: 0)
+        if case .fullReading = first {} else { Issue.record("Expected Chapter 2") }
+        #expect(feature.position(book) == 1)
+        await #expect(throws: AppFailure.self) { try await feature.finishReading(book) }
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await feature.finishChapterTwo(book) }
+        #expect(progress.snapshot.attempts[book.id] == ["s0"])
+        await repository.setFailure(false)
+        #expect(try await feature.finishChapterTwo(book) == 2)
+        let restored = ProgressManager(repository: repository); try await restored.load()
+        let resumed = LearningManager(purchases: purchases, progress: restored)
+        #expect(resumed.position(book) == 2)
+        #expect(restored.snapshot.completed.isEmpty)
+        _ = try await resumed.advance(book: book, from: 2)
+        await #expect(throws: AppFailure.self) { try await resumed.finishReading(book) }
+        let last = try await resumed.advance(book: book, from: 3)
+        if case .bookFinished = last {} else { Issue.record("Expected the whole-book invitation") }
+        let receipt = try await resumed.finish(book)
+        #expect(receipt.isNew)
+        #expect(restored.snapshot.doubloons == 1)
+        #expect(restored.snapshot.attempts[book.id] == Set(book.fullText.map(\.id)))
+        #expect(!resumed.canRead(book))
+        purchases.hasAccess = true
+        #expect(!(try await resumed.finish(book)).isNew)
+        #expect(restored.snapshot.doubloons == 1)
+    }
+
     @Test func rewrittenEditionRestartsOldAttemptsWithoutErasingCompletedHistory() async throws {
         let repository = MemoryProgress()
         var saved = LearnerProgress()

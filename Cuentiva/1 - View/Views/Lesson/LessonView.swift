@@ -7,7 +7,18 @@ struct LessonView: View {
     @Environment(ThemeManager.self) private var theme
     var body: some View {
         Group {
-            if viewModel.showingReader { BookReaderView(book: book) }
+            if let receipt = viewModel.receipt {
+                if viewModel.showingCompletion { CompletionView(receipt: receipt) }
+                else if viewModel.showingWholeBook {
+                    BookReaderView(book: book, onFinish: { viewModel.showingCompletion = true })
+                } else {
+                    WholeBookInvitationView(book: book,
+                        onRead: { viewModel.showingWholeBook = true },
+                        onFinish: { viewModel.showingCompletion = true })
+                }
+            } else if viewModel.showingReader {
+                BookReaderView(book: book, chapterTwo: true, onChapterFinished: viewModel.chapterTwoFinished)
+            }
             else if viewModel.showingChapterCelebration {
                 ChapterCompletedView(hasNextChapter: !(book.continuation ?? []).isEmpty, onContinue: viewModel.readMoreFluently)
             }
@@ -75,7 +86,7 @@ struct LessonView: View {
                         }
                         InlineError(message: viewModel.error ?? viewModel.audio.error)
                         HStack {
-                            Button("Previous") { Task { await viewModel.back() } }.disabled(viewModel.index == 0 || viewModel.busy)
+                            Button("Previous") { Task { await viewModel.back() } }.disabled(viewModel.index == (viewModel.chapter == 3 ? book.chapterThreeStart : 0) || viewModel.busy)
                         }.font(.footnote)
                     }.padding(25)
                 }

@@ -42,18 +42,27 @@ import Observation
         guard !starting else { return }
         starting = true
         defer { starting = false }
+        async let storage: Void = prepareProgress()
         async let onboarding: Void = loadIntroduction()
         await refreshPurchases()
         if hasAccess && !checkingAccess { await load() }
         await onboarding
+        await storage
         await syncLibrary()
+    }
+
+    private func prepareProgress() async {
+        // The shared repository opens SwiftData on its worker actor. Start now,
+        // independently of StoreKit; other readers await the same operation.
+        do { try await progress.load() }
+        catch { if !progress.loaded { self.error = error.localizedDescription } }
     }
 
     private func loadIntroduction() async {
         let started = Date()
         do {
             // Welcome content has no dependency on the user's database.
-            // Onboarding prepares progress after its first screen is mounted.
+            // Progress prepares independently, so the welcome need not wait for it.
             try await library.loadIntroduction()
             onboardingReady = true
             logger.info("Onboarding ready in \(Date().timeIntervalSince(started), privacy: .public) seconds")

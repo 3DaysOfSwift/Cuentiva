@@ -3,6 +3,7 @@ import Foundation
 enum LessonAdvance: Sendable {
     case position(Int)
     case fullReading
+    case bookFinished
 }
 @MainActor protocol LearningFeature: AnyObject, Sendable {
     func canRead(_ book: Book) -> Bool
@@ -10,6 +11,7 @@ enum LessonAdvance: Sendable {
     func check(book: Book, sentence: Sentence, answer: String) async throws -> AnswerFeedback
     func move(book: Book, position: Int) async throws
     func finish(_ book: Book) async throws -> CompletionReceipt
+    func finishChapterTwo(_ book: Book) async throws -> Int
     func finishReading(_ book: Book) async throws -> CompletionReceipt
     func advance(book: Book, from index: Int) async throws -> LessonAdvance
 }
@@ -23,12 +25,12 @@ enum LessonAdvance: Sendable {
         // A rewritten edition has new sentence IDs. Resume it at the beginning
         // instead of carrying an old edition's position into unrelated text.
         if book.editorialRevision != nil, !attempts.isEmpty,
-           attempts.isDisjoint(with: Set(book.sentences.map(\.id))) { return 0 }
-        return min(progress.snapshot.positions[book.id] ?? 0, book.sentences.count)
+           attempts.isDisjoint(with: Set(book.fullText.map(\.id))) { return 0 }
+        return min(progress.snapshot.positions[book.id] ?? 0, max(0, book.fullText.count - 1))
     }
     func check(book: Book, sentence: Sentence, answer: String) async throws -> AnswerFeedback {
         guard canRead(book) else { throw AppFailure.locked }
-        guard book.sentences.contains(sentence) else { throw AppFailure.invalidBook }
+        guard book.fullText.contains(sentence) else { throw AppFailure.invalidBook }
         guard !WordComparison.words(answer).isEmpty else { throw AppFailure.emptyAnswer }
         let feedback = WordComparison.compare(expected: sentence.spanish, received: answer)
         try await progress.recordEncounter(book: book, sentence: sentence)
@@ -41,6 +43,10 @@ enum LessonAdvance: Sendable {
     func finish(_ book: Book) async throws -> CompletionReceipt {
         guard canRead(book) else { throw AppFailure.locked }
         return try await progress.complete(book: book)
+    }
+    func finishChapterTwo(_ book: Book) async throws -> Int {
+        guard canRead(book) else { throw AppFailure.locked }
+        return try await progress.finishChapterTwo(book: book)
     }
     func finishReading(_ book: Book) async throws -> CompletionReceipt {
         guard canRead(book) else { throw AppFailure.locked }

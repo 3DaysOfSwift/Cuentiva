@@ -8,7 +8,12 @@ import SwiftUI
     private var preferredTheme: ColourThemeID
     var availableThemes: [ColourThemeID] { progress.snapshot.availableThemes }
     var selectedTheme: ColourThemeID {
-        get { availableThemes.contains(preferredTheme) ? preferredTheme : .midnight }
+        get {
+            // Restore the last selected palette immediately. An unloaded archive
+            // is not evidence that an installed theme is unavailable.
+            if !progress.loaded { return preferredTheme }
+            return availableThemes.contains(preferredTheme) ? preferredTheme : .midnight
+        }
         set {
             guard availableThemes.contains(newValue) else { return }
             preferredTheme = newValue

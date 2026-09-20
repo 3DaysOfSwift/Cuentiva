@@ -8,18 +8,21 @@ import Observation
     var streak: Int { get }
     var week: [WeekDay] { get }
     var dailyWelcome: DailyWelcome? { get }
+    var dailyChallenge: DailyMatchChallenge? { get }
+    @discardableResult func completeDailyGame(book: Book, day: String, words: Set<String>, elapsed: Double?) async throws -> MatchRewardReceipt?
     func acknowledgeWelcome(day: String) async throws
     func load() async throws
     func registerLibrary(_ books: [Book]) async throws
     func saveDailyReading(_ ids: [String], date: Date) async throws
     func recordEncounter(book: Book, sentence: Sentence) async throws
+    func finishChapterTwo(book: Book) async throws -> Int
     func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance
     func savePosition(book: Book, position: Int) async throws
     func complete(book: Book) async throws -> CompletionReceipt
     func completeReading(book: Book) async throws -> CompletionReceipt
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws
     func setLearningLevel(_ level: LearningLevel?) async throws
-    func recordPractice(book: Book, matches: Int) async throws
+    func recordPractice(book: Book, matches: Int, elapsed: Double?) async throws
     func installThemePack(_ pack: ThemePack) async throws
     func payForChat(deliver: @MainActor () -> Bool) async throws
     func reset() async throws
@@ -58,6 +61,40 @@ import Observation
             format: "%04d-%02d-%02d",
             calendar.component(.year, from: date), calendar.component(.month, from: date),
             calendar.component(.day, from: date))
+    }
+    var dailyChallenge: DailyMatchChallenge? {
+        guard let challenge = snapshot.dailyMatchChallenge, challenge.day == dayKey(now()),
+              challenge.bookIDs.count == 3,
+              Set(challenge.bookIDs).isSubset(of: snapshot.completed) else { return nil }
+        return challenge
+    }
+    @discardableResult func completeDailyGame(book: Book, day: String, words: Set<String>, elapsed: Double? = nil) async throws -> MatchRewardReceipt? {
+        try await commit { next in
+            guard var challenge = next.dailyMatchChallenge,
+                  day == dayKey(now()), challenge.day == day,
+                  challenge.bookIDs.count == 3, challenge.bookIDs.contains(book.id),
+                  Set(challenge.bookIDs).isSubset(of: next.completed),
+                  words.count == DailyMatchChallenge.pairCount,
+                  words.isSubset(of: Set(book.vocabulary.map(\.word))),
+                  words.allSatisfy({ !(book.matchGlossary?[$0]?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true) })
+            else { throw AppFailure.unavailable("This daily challenge is no longer available.") }
+            if let elapsed { try next.recordMatchTime(elapsed, bookID: book.id, daily: true) }
+            challenge.completedBookIDs.insert(book.id)
+            if next.bestMatches == nil { next.bestMatches = [:] }
+            let best = max(next.bestMatches?[book.id] ?? 0, words.count)
+            next.bestMatches?[book.id] = best
+            var receipt: MatchRewardReceipt?
+            var paid = challenge.paidBookIDs
+            if paid.insert(book.id).inserted {
+                let previousBalance = next.availableChatCoins
+                next.doubloons = (next.doubloons ?? 0) + 1
+                receipt = MatchRewardReceipt(previousBalance: previousBalance, balance: next.availableChatCoins)
+            }
+            challenge.rewardedBookIDs = paid
+            challenge.rewarded = Set(challenge.bookIDs).isSubset(of: paid)
+            next.dailyMatchChallenge = challenge
+            return receipt
+        }
     }
     var dailyWelcome: DailyWelcome? {
         let day = dayKey(now())
@@ -137,6 +174,10 @@ import Observation
         try await commit { next in
             next.dailyReadingIDs = ids
             next.dailyReadingDate = date
+            let day = dayKey(date)
+            if ids.count == 3 && next.dailyMatchChallenge?.day != day {
+                next.dailyMatchChallenge = DailyMatchChallenge(day: day, bookIDs: ids)
+            }
         }
     }
     private func addEncounter(book: Book, sentence: Sentence, to next: inout LearnerProgress) {
@@ -167,20 +208,32 @@ import Observation
     func recordEncounter(book: Book, sentence: Sentence) async throws {
         try await commit { addEncounter(book: book, sentence: sentence, to: &$0) }
     }
-    /// Reading is the core activity. One atomic write records the encounter,
-    /// next position. Every book enters the full-reader stage before completion.
-    func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance {
-        guard book.sentences.indices.contains(index) else { throw AppFailure.invalidBook }
-        let last = index == book.sentences.count - 1
+    /// Commit chapter-two exposure and its resume boundary together.
+    func finishChapterTwo(book: Book) async throws -> Int {
         try await commit { next in
-            addEncounter(book: book, sentence: book.sentences[index], to: &next)
+            guard Set(book.sentences.map(\.id)).isSubset(of: next.attempts[book.id, default: []]) else {
+                throw AppFailure.incomplete
+            }
+            for sentence in book.continuation ?? [] { addEncounter(book: book, sentence: sentence, to: &next) }
+            next.positions[book.id] = book.chapterThreeStart
+        }
+        return book.chapterThreeStart
+    }
+    /// Sentence encounters and resume position are committed together.
+    func advanceReading(book: Book, from index: Int) async throws -> LessonAdvance {
+        guard book.fullText.indices.contains(index),
+              index < book.sentences.count || index >= book.chapterThreeStart else { throw AppFailure.invalidBook }
+        let last = index == book.fullText.count - 1
+        try await commit { next in
+            addEncounter(book: book, sentence: book.fullText[index], to: &next)
             next.positions[book.id] = index + 1
         }
-        return last ? .fullReading : .position(index + 1)
+        if index == book.sentences.count - 1, !(book.continuation ?? []).isEmpty { return .fullReading }
+        return last ? .bookFinished : .position(index + 1)
     }
     func savePosition(book: Book, position: Int) async throws {
         try await commit {
-            $0.positions[book.id] = max(0, min(position, book.sentences.count - 1))
+            $0.positions[book.id] = max(0, min(position, book.fullText.count - 1))
             if $0.bookLastRead == nil { $0.bookLastRead = [:] }
             $0.bookLastRead?[book.id] = now()
         }
@@ -194,7 +247,7 @@ import Observation
     }
     private func finish(book: Book, includingContinuation: Bool) async throws -> CompletionReceipt {
         try await commit { next in
-            let required = includingContinuation ? book.sentences : book.fullText
+            let required = includingContinuation && (book.ending ?? []).isEmpty ? book.sentences : book.fullText
             guard Set(required.map(\.id)).isSubset(of: next.attempts[book.id, default: []]) else {
                 throw AppFailure.incomplete
             }
@@ -221,11 +274,15 @@ import Observation
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws {
         try await commit { $0.vocabulary[lemma] = state }
     }
-    func recordPractice(book: Book, matches: Int) async throws {
+    func recordPractice(book: Book, matches: Int, elapsed: Double? = nil) async throws {
         try await commit { next in
             guard next.completed.contains(book.id), matches > 0, matches <= Set(book.vocabulary.map(\.word)).count
             else { throw AppFailure.incomplete }
             if next.bestMatches == nil { next.bestMatches = [:] }
+            if let elapsed {
+                guard matches == Set(book.vocabulary.map(\.word)).count else { throw AppFailure.incomplete }
+                try next.recordMatchTime(elapsed, bookID: book.id, daily: false)
+            }
             let best = max(next.bestMatches?[book.id] ?? 0, matches)
             next.bestMatches?[book.id] = best
         }

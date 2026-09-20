@@ -6,13 +6,16 @@ import Testing
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
         let (_,_,_,learning,_) = try await makeViewModelTestGraph(); let vm = LessonViewModel(learning: learning, audio: TestAudio())
         vm.load(sample()); vm.mode = "Write"; vm.answer = "El cafe esta aqui"; await vm.check(); await vm.next()
-        #expect(vm.feedback?.matched == 1); #expect(vm.showingChapterCelebration); #expect(!vm.showingReader)
+        #expect(vm.feedback?.matched == 1); #expect(vm.receipt != nil); #expect(!vm.showingReader)
     }
 
     @Test func chapterCelebrationDoesNotCompleteBookOrGrantReward() async throws {
         let (_, progress, _, learning, _) = try await makeViewModelTestGraph()
         let vm = LessonViewModel(learning: learning, audio: TestAudio())
-        vm.load(sample())
+        var book = sample()
+        book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
+        book.ending = [.init(id: "ending", spanish: "Fin.", english: "End.")]
+        vm.load(book)
         vm.readMoreFluently()
         #expect(!vm.showingReader)
         await vm.next()
@@ -30,7 +33,9 @@ import Testing
         let purchases = TestPurchases()
         let learning = LearningManager(purchases: purchases, progress: progress)
         let vm = LessonViewModel(learning: learning, audio: TestAudio())
-        vm.load(sample())
+        var book = sample()
+        book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
+        vm.load(book)
         await repository.setFailure(true)
         await vm.next()
         #expect(vm.error != nil)
@@ -59,13 +64,24 @@ import Testing
     @Test func lessonCanFinishWithoutWritingOrSpeaking() async throws {
         let (_,_,_,learning,_) = try await makeViewModelTestGraph()
         let vm = LessonViewModel(learning: learning, audio: TestAudio())
-        let book = sample()
-        vm.load(book); #expect(vm.nextTitle == "First chapter completed"); await vm.next()
+        var book = sample()
+        book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
+        book.ending = [.init(id: "ending", spanish: "Fin.", english: "End.")]
+        vm.load(book); #expect(vm.nextTitle == "Complete chapter 1"); await vm.next()
         #expect(vm.showingChapterCelebration); #expect(!vm.showingReader); #expect(vm.error == nil)
         vm.readMoreFluently()
         #expect(vm.showingReader); #expect(!vm.showingChapterCelebration)
         let resumed = LessonViewModel(learning: learning, audio: TestAudio()); resumed.load(book)
         #expect(resumed.showingReader)
+        let next = try await learning.finishChapterTwo(book)
+        await resumed.chapterTwoFinished(at: next)
+        #expect(resumed.chapter == 3); #expect(resumed.sentence?.id == "ending")
+        #expect(!resumed.showingReader)
+        await resumed.next()
+        #expect(resumed.receipt?.isNew == true)
+        #expect(!resumed.showingWholeBook); #expect(!resumed.showingCompletion)
+        resumed.showingWholeBook = true
+        #expect(resumed.receipt != nil)
     }
 
     @Test func scriptRoleKeepsDraftAndManualCompletion() async throws {
@@ -79,12 +95,8 @@ import Testing
         #expect(vm.answer == "Hola"); #expect(!vm.isPartnerLine)
         #expect(vm.nextTitle == "Next line")
         await vm.next()
-        #expect(vm.isPartnerLine); #expect(vm.nextTitle == "First chapter completed")
+        #expect(vm.isPartnerLine); #expect(vm.nextTitle == "Complete chapter 1")
         await vm.next()
-        #expect(vm.showingChapterCelebration); #expect(!vm.showingReader); #expect(vm.error == nil)
-        vm.readMoreFluently()
-        #expect(vm.showingReader); #expect(!vm.showingChapterCelebration)
-        let resumed = LessonViewModel(learning: learning, audio: TestAudio()); resumed.load(book)
-        #expect(resumed.showingReader)
+        #expect(vm.receipt?.total == 1); #expect(!vm.showingReader); #expect(vm.error == nil)
     }
 }

@@ -7,7 +7,8 @@ import Testing
     var transcript = "El café está aquí"
     var recording = false
     var error: String?
-    func speak(_ text: String, slow: Bool) {}
+    var spokenRates: [Bool] = []
+    func speak(_ text: String, slow: Bool) { spokenRates.append(slow) }
     func speakAndWait(_ text: String, slow: Bool) async -> Bool { true }
     func startRecording() async { recording = true }
     func stopRecording() { recording = false }

@@ -62,6 +62,9 @@ enum ProgressRecords {
         if previous == nil || previous?.lastWelcomeDay != value.lastWelcomeDay {
             rows["lastWelcomeDay"] = try RecordCoding.encode(value.lastWelcomeDay)
         }
+        if previous == nil || previous?.dailyMatchChallenge != value.dailyMatchChallenge {
+            rows["dailyMatchChallenge"] = try RecordCoding.encode(value.dailyMatchChallenge)
+        }
         if previous == nil || previous?.dailyReadingDate != value.dailyReadingDate {
             rows["dailyReadingDate"] = try RecordCoding.encode(value.dailyReadingDate)
         }
@@ -98,6 +101,14 @@ enum ProgressRecords {
         if previous == nil || previous?.rewardedBooks != value.rewardedBooks {
             rows["rewardedBooks"] = try RecordCoding.encode(value.rewardedBooks != nil)
             try set("rewardedBooks", value.rewardedBooks ?? [], previous?.rewardedBooks ?? [], into: &rows)
+        }
+        if previous == nil || previous?.bestDailyMatchTimes != value.bestDailyMatchTimes {
+            rows["bestDailyMatchTimes"] = try RecordCoding.encode(value.bestDailyMatchTimes != nil)
+            try map("bestDailyMatchTimes", value.bestDailyMatchTimes ?? [:], previous?.bestDailyMatchTimes ?? [:], into: &rows)
+        }
+        if previous == nil || previous?.bestFullMatchTimes != value.bestFullMatchTimes {
+            rows["bestFullMatchTimes"] = try RecordCoding.encode(value.bestFullMatchTimes != nil)
+            try map("bestFullMatchTimes", value.bestFullMatchTimes ?? [:], previous?.bestFullMatchTimes ?? [:], into: &rows)
         }
         if previous == nil || previous?.bestMatches != value.bestMatches {
             rows["bestMatches"] = try RecordCoding.encode(value.bestMatches != nil)
@@ -159,6 +170,9 @@ enum ProgressRecords {
         if let data = rows["lastWelcomeDay"] {
             value.lastWelcomeDay = try RecordCoding.decode(type(of: value.lastWelcomeDay), data)
         }
+        if let data = rows["dailyMatchChallenge"] {
+            value.dailyMatchChallenge = try RecordCoding.decode(DailyMatchChallenge?.self, data)
+        }
         if let data = rows["dailyReadingDate"] {
             value.dailyReadingDate = try RecordCoding.decode(type(of: value.dailyReadingDate), data)
         }
@@ -198,6 +212,14 @@ enum ProgressRecords {
         if let marker = rows["rewardedBooks"], try RecordCoding.decode(Bool.self, marker) { value.rewardedBooks = [] }
         for (key, data) in rows where key.hasPrefix("rewardedBooks/") {
             if try RecordCoding.decode(Bool.self, data) { value.rewardedBooks?.insert(String(key.dropFirst(14))) }
+        }
+        if let marker = rows["bestDailyMatchTimes"], try RecordCoding.decode(Bool.self, marker) { value.bestDailyMatchTimes = [:] }
+        for (key, data) in rows where key.hasPrefix("bestDailyMatchTimes/") {
+            value.bestDailyMatchTimes?[String(key.dropFirst(20))] = try RecordCoding.decode(Double.self, data)
+        }
+        if let marker = rows["bestFullMatchTimes"], try RecordCoding.decode(Bool.self, marker) { value.bestFullMatchTimes = [:] }
+        for (key, data) in rows where key.hasPrefix("bestFullMatchTimes/") {
+            value.bestFullMatchTimes?[String(key.dropFirst(19))] = try RecordCoding.decode(Double.self, data)
         }
         if let marker = rows["bestMatches"], try RecordCoding.decode(Bool.self, marker) { value.bestMatches = [:] }
         for (key, data) in rows where key.hasPrefix("bestMatches/") {

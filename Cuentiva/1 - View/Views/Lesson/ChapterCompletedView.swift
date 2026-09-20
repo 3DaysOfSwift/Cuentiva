@@ -15,13 +15,13 @@ struct ChapterCompletedView: View {
                     .font(.system(.largeTitle, design: .serif, weight: .medium))
                 Text("Well done! You’ve welcomed new Spanish words into your vocabulary. Now let them flow together as you read the story.")
                     .font(.title3).foregroundStyle(theme.theme.muted)
-                Text(hasNextChapter ? "Revisit Chapter 1, then discover what happens next in Chapter 2." : "Read Chapter 1 again at your own pace, bringing each sentence together into a whole story.")
+                Text(hasNextChapter ? "Discover what happens next in Chapter 2. Follow the flow and let familiar words carry you forward." : "Read Chapter 1 again at your own pace, bringing each sentence together into a whole story.")
                     .font(.subheadline).foregroundStyle(theme.theme.muted)
             }.multilineTextAlignment(.center).padding(28).padding(.top, 50)
                 .frame(maxWidth: .infinity)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            Button("Practice fluency  →", action: onContinue).buttonStyle(PrimaryButton())
+            Button("Read Chapter 2  →", action: onContinue).buttonStyle(PrimaryButton())
                 .padding(25).background(theme.theme.paper).dockedAreaBorder()
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink)

@@ -4,6 +4,14 @@ import Observation
 @MainActor @Observable final class HomeViewModel {
     private let library: any LibraryFeature
     private let progress: any ProgressFeature
+    var practiceBook: Book?
+    var challengeDay: String?
+    var dailyChallenge: DailyMatchChallenge? { progress.dailyChallenge }
+    var challengeBooks: [Book] { dailyReads.filter { dailyChallenge?.bookIDs.contains($0.id) == true } }
+    func playDailyGame(_ book: Book) {
+        guard let challenge = dailyChallenge, challenge.bookIDs.contains(book.id) else { return }
+        challengeDay = challenge.day; practiceBook = book
+    }
     var selectedBook: Book? {
         didSet {
             guard let selectedBook else { return }

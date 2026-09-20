@@ -51,7 +51,8 @@ actor LocalProgressRepository: ProgressRepository {
             Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "LibraryLoading")
                 .info("Progress load including storage wait: \(String(describing: started.duration(to: .now)), privacy: .public)")
         }
-        if let rows = try await store.readIfPresent("progress") { return try remember(rows) }
+        // Opening progress also prepares a fresh database before any purchase.
+        if let rows = try await store.read("progress") { return try remember(rows) }
         guard FileManager.default.fileExists(atPath: url.path) else {
             let empty = LearnerProgress()
             savedProgress = empty

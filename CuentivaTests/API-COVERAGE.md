@@ -143,3 +143,48 @@ BinaryLibraryTests and the shared content integration test execute checks for 52
 ## Matching coverage — editorial revision 3
 
 All 52 bundled books now include exact vocabulary-to-English coverage (4,260 pairs across 1,651 distinct Spanish surface forms). `PracticeManagerTests.everyBundledBookSupportsMatchingAfterCompletion` exercises availability, glossary acceptance and score persistence for every real bundled book without minting coins; it also checks contextual meanings for envelope, fence and “I walk”. Binary round-trip tests require nonblank glossaries for every book. The editorial generator rejects missing, null and whitespace-only meanings. Revision-2 passage IDs remain unchanged to preserve reading attempts.
+
+
+## Three-chapter reading and daily matching — 2026-09-20
+
+- Editorial revision 4 exposes all three chapters and rebuilds vocabulary/glossaries across the entire book: 5,771 pairs, with at least 71 per book. Binary round trips require complete nonblank matching data for all 52 books.
+- `LearningManagerTests.threeChaptersResumeAndCannotCompleteBeforeTheEnding` covers the Chapter 2 boundary, failed saves and retries, resuming Chapter 3, rejecting premature completion, preserving the free introduction through its ending and awarding its reading coin once.
+- `PracticeManagerTests.dailyGamesRequireThirtyPairsAndAwardExactlyOnceWithRetryAndRelaunch` covers 30 distinct pairs, partial rejection, ordinary practice isolation, one coin per game with saved balance receipts, final-save rollback/retry, replay/relaunch protection, revoked access, midnight expiry and record round trips.
+- `LessonViewModelTests`, `BookReaderViewModelTests` and `PracticeViewModelTests` cover chapter presentation/resume, unaided three-chapter text, Chapter 2 audio without Chapter 1, interruption, five-pair board ambiguity protection, all 90 matches, each saved reward receipt, failed-save retry and repeat presentation protection. `MatchRewardViewModelTests` covers the balance reveal. Legacy group-reward saves and concurrent replay requests are covered in `PracticeManagerTests`.
+- Validation: 145 shared-model tests pass. An isolated temporary macOS harness also executes 12 presentation-model tests in four suites (including three book-format cases). The harness uses copies of the production view models with app-singleton defaults replaced by required injected dependencies and fake audio; it does not render SwiftUI. Full iOS application sources and tests type-check. No simulator/device UI, speech-engine or StoreKit runtime validation was performed.
+
+## Concurrent storage preparation — 2026-09-20
+
+- Root launch starts progress preparation alongside entitlement verification and introduction loading. `RootViewModelTests.storageStartsWhileEntitlementCheckIsStillPending` holds the entitlement lookup open and verifies progress is loaded without publishing the paid library. Unpaid launch also prepares storage.
+- A fresh local progress read opens the shared SwiftData database without seeding empty records; the persistence test retains first-write failure/retry checks. Existing progress-load overlap tests cover shared work and retry.
+- Production purchase preparation awaits the same progress feature. `LaunchAccessTests.purchaseWaitsForStorageAndFailureCanRetry` verifies that failed preparation stops purchase processing and can be retried, using injected dependencies without contacting the App Store.
+- Validation: 146 shared-model tests and 18 presentation-model tests passed. The temporary macOS presentation harness uses copied production view models with injected dependencies and substitutes an unsupported-device result for Apple Intelligence detection. It does not render SwiftUI. Physical-device launch duration and real payment-sheet presentation remain unmeasured for this change.
+
+## Saved theme at startup — 2026-09-20
+
+- ThemeManager restores a known saved palette before progress finishes loading, then checks installed-theme availability once the archive is known. An unloaded archive no longer temporarily rejects a previously selected reward theme.
+- Tests cover Lavender before/after installed-pack loading, unavailable-pack fallback after loading, base-theme relaunch and obsolete preferences. All 22 presentation-model tests pass in the temporary macOS harness. Device launch-screen rendering is not validated by these tests; the static iOS launch storyboard remains a fixed Midnight colour.
+
+## Match Pairs elapsed time — 2026-09-20
+
+- The monotonic clock starts when the countdown completes and stops on the final match. The game displays elapsed time and the book's fastest completed time; ready/results show the same record. Daily 30-pair and full-deck records are separate.
+- Fastest times persist atomically alongside scores/daily rewards, use the minimum valid positive finite duration, and can improve on replays without awarding another coin. Partial full-deck rounds cannot submit a completion time. Older progress without time records remains valid.
+- Tests cover countdown exclusion, elapsed display, final-time freezing during save retries, interruption, slower/faster replays, invalid durations, partial-deck rejection, record round trips and reload. All 147 shared-model tests and 23 presentation-model tests pass. The presentation harness uses injected dependencies and a controllable clock; device UI rendering remains unverified.
+
+## Optional whole-book reading guide — 2026-09-20
+
+- Full-book reading retains its cover, three chapters, tap-to-reveal English and end credits. Explicit Begin/Pause controls drive either slow spoken-word highlighting or a silent word guide at an adjustable 80–240 words per minute. Audio can be switched during playback; the current sentence restarts so words are not skipped. Scene exit stops the guide.
+- Chapter 2's existing automatic slow audio is preserved. Chat message playback now requests slow speech.
+- Added presentation tests cover silent highlighting through all chapters without translation/completion side effects, audio toggle/pause behavior and slow chat speech/access denial. All 32 presentation-model tests pass in the isolated macOS harness using fake audio and controlled word gates. Real speech timing, sound and device layout have not been exercised for this change.
+
+## Chat layout and suggested translations — 2026-09-20
+
+- Chat uses the recipient's name as its navigation title, removes repeated bubble names and the language-help block, highlights translation/listen controls with additional spacing, and separates the suggested reply from the last message.
+- Generated suggestions now include their own English translation, carried through reply delivery, conversation messages and legacy exchange projections. Optional decoding preserves older conversations without invented translations. The suggestion's English reveal is independent from message translation and resets on a new topic.
+- Validation: 148 shared-model tests and 33 presentation-model tests pass, covering translation delivery, persistence round trips, legacy decoding and reveal state. On-device model generation and device layout remain runtime-unverified.
+
+## Learner message translations — 2026-09-20
+
+- Tapping a learner's message toggles its English below the Spanish. On-device generation supplies that translation alongside the corresponding storyteller reply; pending/older untranslated messages show an explicit availability note instead of blank or invented English.
+- English is associated with the outgoing message ID and retained through conversation encoding and exchange projections. Tests verify delivery, JSON round trips, projection and independent per-message toggles/reset.
+- Quick-start choices now have the heading “Start a conversation.” Validation: 148 shared-model tests and 34 presentation-model tests pass; actual on-device generation and visual rendering remain unverified.

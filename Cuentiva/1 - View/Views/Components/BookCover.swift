@@ -13,6 +13,8 @@ struct BookCover: View {
     private var color: Color {
         theme.theme.coverColours[book.palette % theme.theme.coverColours.count]
     }
+    // Older downloaded/cached editions used an unavailable symbol name.
+    private var symbol: String { book.symbol == "train.side" ? "tram.fill" : book.symbol }
     var body: some View {
         ZStack(alignment: .topTrailing) {
             ZStack {
@@ -28,7 +30,7 @@ struct BookCover: View {
                     if book.kind == .verbs { Text("VERBS").font(.system(size: 9, weight: .bold, design: .monospaced)) }
                     Text(book.title).font(.system(compact ? .title3 : .largeTitle, design: .serif, weight: .medium)).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 4)
-                    Image(systemName: book.symbol).font(.system(size: compact ? 38 : 70, weight: .ultraLight)).frame(maxWidth: .infinity).padding(.vertical, compact ? 8 : 10)
+                    Image(systemName: symbol).font(.system(size: compact ? 38 : 70, weight: .ultraLight)).frame(maxWidth: .infinity).padding(.vertical, compact ? 8 : 10)
                     Spacer(minLength: 4)
                     Text(book.storytellerName.uppercased())
                         .font(.system(size: 9, weight: .semibold, design: .monospaced)).tracking(1)

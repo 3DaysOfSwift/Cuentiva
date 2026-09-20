@@ -31,7 +31,7 @@ import Testing
         let restored = ProgressManager(repository: repository); try await restored.load()
         #expect(restored.snapshot.positions[book.id] == 1)
         let result = try await learning.advance(book: book, from: 1)
-        if case .fullReading = result {} else { Issue.record("Expected the full reader") }
+        if case .bookFinished = result {} else { Issue.record("Expected the end of the single-chapter book") }
         #expect(progress.snapshot.completed.isEmpty)
         #expect(learning.canRead(book))
         let receipt = try await learning.finishReading(book)
@@ -41,7 +41,7 @@ import Testing
         #expect(!learning.canRead(book))
         purchases.hasAccess = true
         let reread = try await learning.advance(book: book, from: 1)
-        if case .fullReading = reread {} else { Issue.record("Expected the full reader on rereading") }
+        if case .bookFinished = reread {} else { Issue.record("Expected the end on rereading") }
         let again = try await learning.finishReading(book)
         #expect(!again.isNew); #expect(again.total == 1)
     }

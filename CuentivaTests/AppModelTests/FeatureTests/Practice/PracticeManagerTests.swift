@@ -7,6 +7,164 @@ import Testing
 #endif
 
 @Suite @MainActor struct PracticeManagerTests {
+    @Test func dailyGamesRequireThirtyPairsAndAwardExactlyOnceWithRetryAndRelaunch() async throws {
+        #if canImport(CuentivaAppModel)
+        let url = TestResources.repositoryRoot.appending(path: "Cuentiva/3 - App Resources/Library.dat")
+        #else
+        let url = try #require(Bundle.main.url(forResource: "Library", withExtension: "dat"))
+        #endif
+        let books = Array(try BinaryLibrary(url: url).books().prefix(3))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repository = MemoryProgress()
+        var saved = LearnerProgress(); saved.completed = Set(books.map(\.id)); saved.doubloons = 0
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository, now: { now }); try await progress.load()
+        try await progress.saveDailyReading(books.map(\.id), date: now)
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let feature = PracticeManager(progress: progress, purchases: purchases)
+        let challenge = try #require(feature.dailyChallenge)
+        let first = try #require(books.first), last = try #require(books.last)
+        let deck = try feature.dailyDeck(first, day: challenge.day)
+        #expect(deck.count == 30 && Set(deck).count == 30)
+        await #expect(throws: AppFailure.self) {
+            try await feature.finishDailyGame(first, day: challenge.day, words: Set(deck.dropLast()))
+        }
+        try await feature.recordScore(first, matches: 30)
+        #expect(feature.dailyChallenge?.completedBookIDs.isEmpty == true)
+        for (index, book) in books.dropLast().enumerated() {
+            let receipt = try #require(try await feature.finishDailyGame(book, day: challenge.day, words: Set(feature.dailyDeck(book, day: challenge.day))))
+            #expect(receipt.previousBalance == index)
+            #expect(receipt.balance == index + 1)
+        }
+        #expect(feature.coins == 2)
+        let lastWords = Set(try feature.dailyDeck(last, day: challenge.day))
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) {
+            try await feature.finishDailyGame(last, day: challenge.day, words: lastWords)
+        }
+        #expect(feature.coins == 2)
+        #expect(feature.dailyChallenge?.completedBookIDs.count == 2)
+        await repository.setFailure(false)
+        let receipt = try #require(try await feature.finishDailyGame(last, day: challenge.day, words: lastWords))
+        #expect(receipt.previousBalance == 2 && receipt.balance == 3)
+        #expect(feature.coins == 3)
+        #expect(feature.dailyChallenge?.rewarded == true)
+        let reloaded = ProgressManager(repository: repository, now: { now }); try await reloaded.load()
+        let restored = PracticeManager(progress: reloaded, purchases: purchases)
+        let replay = try await restored.finishDailyGame(last, day: challenge.day, words: lastWords)
+        #expect(replay == nil)
+        #expect(restored.coins == 3)
+        let records = try ProgressRecords.encode(reloaded.snapshot)
+        #expect(try ProgressRecords.decode(records) == reloaded.snapshot)
+        purchases.hasAccess = false
+        #expect(restored.dailyChallenge == nil)
+        #expect(throws: AppFailure.self) { try restored.dailyDeck(first, day: challenge.day) }
+        purchases.hasAccess = true
+        now = now.addingTimeInterval(86_400)
+        #expect(restored.dailyChallenge == nil)
+        await #expect(throws: AppFailure.self) {
+            try await restored.finishDailyGame(last, day: challenge.day, words: lastWords)
+        }
+        try await reloaded.saveDailyReading(books.map(\.id), date: now)
+        #expect(restored.dailyChallenge?.completedBookIDs.isEmpty == true)
+        #expect(restored.coins == 3)
+    }
+
+    @Test func legacyGroupRewardsRemainPaidAndConcurrentReplaysOnlyAwardOnce() async throws {
+        #if canImport(CuentivaAppModel)
+        let url = TestResources.repositoryRoot.appending(path: "Cuentiva/3 - App Resources/Library.dat")
+        #else
+        let url = try #require(Bundle.main.url(forResource: "Library", withExtension: "dat"))
+        #endif
+        let books = Array(try BinaryLibrary(url: url).books().prefix(3))
+        let book = try #require(books.first)
+        let repository = MemoryProgress()
+        let now = Date()
+        var saved = LearnerProgress(); saved.completed = Set(books.map(\.id)); saved.doubloons = 5
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository, now: { now }); try await progress.load()
+        try await progress.saveDailyReading(books.map(\.id), date: now)
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let feature = PracticeManager(progress: progress, purchases: purchases)
+        let day = try #require(feature.dailyChallenge?.day)
+        let words = Set(try feature.dailyDeck(book, day: day))
+        async let first = feature.finishDailyGame(book, day: day, words: words)
+        async let second = feature.finishDailyGame(book, day: day, words: words)
+        let receipts = try await [first, second].compactMap { $0 }
+        #expect(receipts.count == 1)
+        #expect(receipts.first?.previousBalance == 5 && receipts.first?.balance == 6)
+        #expect(feature.coins == 6)
+
+        let legacyJSON = try JSONSerialization.data(withJSONObject: [
+            "day": day, "bookIDs": books.map(\.id),
+            "completedBookIDs": books.map(\.id), "rewarded": true
+        ])
+        let legacy = try JSONDecoder().decode(DailyMatchChallenge.self, from: legacyJSON)
+        #expect(legacy.rewardedBookIDs == nil)
+        #expect(legacy.paidBookIDs == Set(books.map(\.id)))
+        saved.dailyMatchChallenge = legacy
+        try await repository.save(saved)
+        let reloaded = ProgressManager(repository: repository, now: { now }); try await reloaded.load()
+        let restored = PracticeManager(progress: reloaded, purchases: purchases)
+        let replay = try await restored.finishDailyGame(book, day: day, words: words)
+        #expect(replay == nil)
+        #expect(restored.coins == 5)
+    }
+
+    @Test func fastestTimesPersistAndOnlyImproveForCompletedComparableGames() async throws {
+        #if canImport(CuentivaAppModel)
+        let url = TestResources.repositoryRoot.appending(path: "Cuentiva/3 - App Resources/Library.dat")
+        #else
+        let url = try #require(Bundle.main.url(forResource: "Library", withExtension: "dat"))
+        #endif
+        let books = Array(try BinaryLibrary(url: url).books().prefix(3))
+        let book = try #require(books.first)
+        let repository = MemoryProgress()
+        var saved = LearnerProgress(); saved.completed = Set(books.map(\.id)); saved.doubloons = 0
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository); try await progress.load()
+        try await progress.saveDailyReading(books.map(\.id), date: Date())
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let feature = PracticeManager(progress: progress, purchases: purchases)
+        let day = try #require(feature.dailyChallenge?.day)
+        let words = Set(try feature.dailyDeck(book, day: day))
+        for invalid in [0.0, -1, .infinity, .nan] {
+            await #expect(throws: AppFailure.self) {
+                try await feature.finishDailyGame(book, day: day, words: words, elapsed: invalid)
+            }
+        }
+        #expect(feature.coins == 0)
+        #expect(feature.fastestTime(book, daily: true) == nil)
+        try await feature.finishDailyGame(book, day: day, words: words, elapsed: 80)
+        try await feature.finishDailyGame(book, day: day, words: words, elapsed: 100)
+        #expect(feature.fastestTime(book, daily: true) == 80)
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) {
+            try await feature.finishDailyGame(book, day: day, words: words, elapsed: 60)
+        }
+        #expect(feature.fastestTime(book, daily: true) == 80)
+        await repository.setFailure(false)
+        let replay = try await feature.finishDailyGame(book, day: day, words: words, elapsed: 60)
+        #expect(replay == nil && feature.coins == 1)
+        #expect(feature.fastestTime(book, daily: true) == 60)
+        await #expect(throws: AppFailure.self) {
+            try await feature.recordScore(book, matches: 10, elapsed: 5)
+        }
+        #expect(feature.fastestTime(book, daily: false) == nil)
+        try await feature.recordScore(book, matches: book.vocabulary.count, elapsed: 200)
+        try await feature.recordScore(book, matches: book.vocabulary.count, elapsed: 250)
+        #expect(feature.fastestTime(book, daily: false) == 200)
+        #expect(feature.fastestTime(book, daily: true) == 60)
+        let rows = try ProgressRecords.encode(progress.snapshot)
+        let decoded = try ProgressRecords.decode(rows)
+        #expect(decoded == progress.snapshot)
+        let reloaded = ProgressManager(repository: repository); try await reloaded.load()
+        let restored = PracticeManager(progress: reloaded, purchases: purchases)
+        #expect(restored.fastestTime(book, daily: true) == 60)
+        #expect(restored.fastestTime(book, daily: false) == 200)
+        #expect(restored.fastestTime(books[1], daily: true) == nil)
+    }
+
     @Test func everyBundledBookSupportsMatchingAfterCompletion() async throws {
         #if canImport(CuentivaAppModel)
         let url = TestResources.repositoryRoot.appending(path: "Cuentiva/3 - App Resources/Library.dat")

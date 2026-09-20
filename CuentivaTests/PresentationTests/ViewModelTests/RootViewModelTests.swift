@@ -3,6 +3,27 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct RootViewModelTests {
+    @Test func storageStartsWhileEntitlementCheckIsStillPending() async throws {
+        var entitlementWait: CheckedContinuation<Void, Never>?
+        let purchases = PurchaseManager(readEntitlements: {
+            await withCheckedContinuation { entitlementWait = $0 }
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, observesTransactions: false)
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = GatedLaunchLibrary(gated: false)
+        let root = makeRoot(purchases, library, progress)
+        let launch = Task { await root.start() }
+        defer { entitlementWait?.resume(); entitlementWait = nil; launch.cancel() }
+        try await waitUntil { entitlementWait != nil && progress.loaded && root.onboardingReady }
+        #expect(purchases.checking)
+        #expect(!root.ready)
+        #expect(library.loads == 0)
+        entitlementWait?.resume(); entitlementWait = nil
+        await launch.value
+        #expect(root.canShowContent)
+        #expect(!root.hasAccess)
+    }
+
     @Test func unpaidLaunchReadsOnlyIntroductionAndDoesNotSync() async throws {
         let purchases = TestPurchases()
         let progress = ProgressManager(repository: MemoryProgress())
@@ -12,7 +33,7 @@ import Testing
         #expect(root.dailyWelcome == nil)
         #expect(root.onboardingReady)
         #expect(root.canShowContent)
-        #expect(!progress.loaded) // The welcome does not open or wait for the database.
+        #expect(progress.loaded) // Storage prepares even when access is not purchased.
         #expect(!root.ready)
         #expect(library.loads == 0)
         #expect(library.syncs == 0)
@@ -116,7 +137,7 @@ import Testing
         #expect(!root.canShowContent)
     }
 
-    private func makeRoot(_ purchases: TestPurchases, _ library: GatedLaunchLibrary,
+    private func makeRoot(_ purchases: any PurchaseFeature, _ library: GatedLaunchLibrary,
                           _ progress: ProgressManager) -> RootViewModel {
         RootViewModel(purchases: purchases, library: library, progress: progress,
             fantasy: FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator()))

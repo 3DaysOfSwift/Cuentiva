@@ -7,6 +7,36 @@ import Testing
 #endif
 
 @Suite @MainActor struct LaunchAccessTests {
+    @Test func purchaseWaitsForStorageAndFailureCanRetry() async throws {
+        let gate = PurchasePreparationGate()
+        var entitlementReads = 0
+        let purchases = PurchaseManager(readEntitlements: {
+            entitlementReads += 1
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, observesTransactions: false,
+            prepareForPurchase: { try await gate.prepare() })
+        let purchase = Task { try await purchases.purchase() }
+        defer { gate.finish(); purchase.cancel() }
+        let deadline = ContinuousClock.now.advanced(by: .seconds(3))
+        while gate.pending == nil {
+            guard ContinuousClock.now < deadline else { throw AppFailure.unavailable("Purchase did not reach storage gate.") }
+            await Task.yield()
+        }
+        #expect(entitlementReads == 0)
+        #expect(!purchases.hasAccess)
+        gate.failure = .unavailable("Storage unavailable")
+        gate.finish()
+        await #expect(throws: AppFailure.self) { try await purchase.value }
+        #expect(entitlementReads == 0)
+        gate.failure = nil
+        // No product is injected: reaching offer validation proves preparation
+        // succeeded without contacting StoreKit or pretending a payment occurred.
+        await #expect(throws: AppFailure.self) { try await purchases.purchase() }
+        #expect(gate.calls == 2)
+        #expect(entitlementReads == 1)
+        #expect(!purchases.hasAccess)
+    }
+
     @Test func fullCatalogueIsNotReadOrSyncedUntilAccessIsConfirmed() async throws {
         let purchases = TestPurchases(); purchases.checking = true
         let progress = ProgressManager(repository: MemoryProgress())
@@ -80,4 +110,17 @@ private actor AccessBookProbe: SyncingBookRepository {
     }
     func finish() { gated = false; let pending = continuation; continuation = nil; pending?.resume() }
     func sync() async throws -> [Book] { syncs += 1; return [sample()] }
+}
+
+@MainActor private final class PurchasePreparationGate {
+    var pending: CheckedContinuation<Void, Never>?
+    var failure: AppFailure?
+    var calls = 0
+    private var released = false
+    func prepare() async throws {
+        calls += 1
+        if !released { await withCheckedContinuation { pending = $0 } }
+        if let failure { throw failure }
+    }
+    func finish() { released = true; pending?.resume(); pending = nil }
 }

@@ -15,16 +15,20 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 22) {
                 StreakBar(days: viewModel.week)
                 Divider()
+                if let challenge = viewModel.dailyChallenge, viewModel.challengeBooks.count == 3 {
+                    DailyMatchSection(books: viewModel.challengeBooks, challenge: challenge, onPlay: viewModel.playDailyGame)
+                    Divider()
+                }
                 if !viewModel.dailyReads.isEmpty {
                     HStack(alignment: .top, spacing: 16) {
                         HStack {
                             if viewModel.dailyReadsCompleted {
                                 Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.theme.accent)
                             }
-                            Text("Your next book")
+                            Text(viewModel.dailyReadsCompleted ? "Today completed" : "Your next book")
                         }.font(.system(.largeTitle, design: .serif, weight: .medium))
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(viewModel.dailyReadsCompleted ? "Your next book, selection completed" : "Your next book")
+                            .accessibilityLabel(viewModel.dailyReadsCompleted ? "Today completed" : "Your next book")
                         Spacer(minLength: 0)
                         VStack(spacing: 2) {
                             Text("\(viewModel.total)")
@@ -45,17 +49,8 @@ struct HomeView: View {
                     Text("\(book.level) · \(book.fullText.count) \(book.unitName)")
                         .font(.caption).foregroundStyle(theme.theme.muted)
                     if viewModel.dailyReadsCompleted {
-                        Button {
-                            Task { await viewModel.performReadingAction() }
-                        } label: {
-                            Label(viewModel.readButtonTitle, systemImage: "arrow.right")
-                                .font(.headline).frame(maxWidth: .infinity).padding(.vertical, 16)
-                                .foregroundStyle(theme.theme.accent)
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 18)
-                                        .strokeBorder(theme.theme.accent, lineWidth: 1.5)
-                                }
-                        }.buttonStyle(.plain).disabled(viewModel.preparingDailyReads)
+                        Text("Today’s reading is complete. Explore the Bookstore whenever you’re ready for another adventure.")
+                            .font(.subheadline).foregroundStyle(theme.theme.muted)
                     }
                 } else {
                     Text("New stories will appear here as the library grows.")
@@ -109,7 +104,8 @@ struct HomeView: View {
                                 }.buttonStyle(.plain)
                             }
                         }.padding(.vertical, 12)
-                    }.scrollIndicators(.hidden)
+                    }.contentMargins(.horizontal, 23, for: .scrollContent)
+                        .scrollIndicators(.hidden).padding(.horizontal, -23)
                 }
                 Text(
                     "DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary."
@@ -153,6 +149,9 @@ struct HomeView: View {
             .task(id: viewModel.refreshID) { await viewModel.refresh() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }
+            }
+            .fullScreenCover(item: $viewModel.practiceBook) { book in
+                NavigationStack { PracticeView(book: book, match: true, challengeDay: viewModel.challengeDay) }
             }
             .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { Task { await viewModel.readingDismissed() } }) { book in
                 NavigationStack { LessonView(book: book) }

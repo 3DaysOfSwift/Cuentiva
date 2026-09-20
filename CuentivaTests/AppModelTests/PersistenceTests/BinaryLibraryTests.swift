@@ -51,16 +51,16 @@ import Testing
         #expect(throws: AppFailure.self) { try BinaryLibrary.encode([invalid]) }
     }
 
-    @Test func editorialLibraryHasThreeChaptersWithAnUnchangedTwoChapterReader() throws {
+    @Test func editorialLibraryExposesThreeChaptersAndCompleteMatchingData() throws {
         let books = try BinaryLibrary(url: resource("Library.dat")).books()
         var allSentenceIDs: Set<String> = []
         for book in books {
             let middle = try #require(book.continuation)
             let ending = try #require(book.ending)
-            #expect(book.editorialRevision == 3)
+            #expect(book.editorialRevision == 4)
             #expect(book.sentences.count >= 4 && middle.count >= 4 && ending.count >= 4)
-            #expect(book.fullText == book.sentences + middle)
-            #expect(book.completeText == book.fullText + ending)
+            #expect(book.fullText == book.sentences + middle + ending)
+            #expect(book.completeText == book.fullText)
             #expect(Author.demoProfiles.contains { $0.id == book.authorID && $0.name == book.author })
             for sentence in book.completeText {
                 #expect(allSentenceIDs.insert(sentence.id).inserted)
@@ -74,6 +74,7 @@ import Testing
             if let focus = book.verbFocus { #expect(Set(focus.forms).isSubset(of: Set(words))) }
             let glossary = try #require(book.matchGlossary)
             #expect(Set(glossary.keys) == Set(words))
+            #expect(glossary.count >= 30)
             #expect(glossary.values.allSatisfy { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
         }
         #expect(Set(books.map(\.authorID)).count == 9)
@@ -149,7 +150,7 @@ import Testing
         #expect(!FileManager.default.fileExists(atPath: directory.path))
     }
 
-    @Test func freshProgressIsReadOnlyAndFirstSaveSurvivesReopening() async throws {
+    @Test func freshProgressOpensDatabaseWithoutSeedingRecordsAndFirstSaveSurvivesReopening() async throws {
         let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
         let store = SwiftDataStore(url: directory.appending(path: "app.store"))
@@ -157,7 +158,8 @@ import Testing
         let repository = LocalProgressRepository(url: url, store: store)
         var progress = try await repository.load()
         #expect(progress.completed.isEmpty)
-        #expect(!FileManager.default.fileExists(atPath: directory.path))
+        #expect(FileManager.default.fileExists(atPath: directory.appending(path: "app.store").path))
+        #expect(try await store.read("progress") == nil)
         progress.completed.insert("cafe")
         #if DEBUG
         try await store.failNextCommitForTesting()

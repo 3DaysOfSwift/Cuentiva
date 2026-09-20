@@ -32,7 +32,6 @@ import Observation
         if receipt.unlocksWriting { presentWritingMilestone(receipt) }
         else if offersChatGift(receipt) { showingChatGift = true }
         else if let pack = receipt.themePackGift { showingThemePack = pack }
-        else if receipt.streakCelebration != nil && practiceAllowed { showingPractice = true }
         else { return true }
         return false
     }

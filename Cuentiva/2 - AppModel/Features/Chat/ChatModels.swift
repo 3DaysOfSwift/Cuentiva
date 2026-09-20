@@ -23,6 +23,8 @@ enum ChatLimits {
         !normalizedMessage(reply.spanish).isEmpty && !normalizedMessage(reply.english).isEmpty
             && reply.spanish.count <= replyText && reply.english.count <= replyText
             && reply.correction.count <= correction && reply.suggestion.count <= suggestion
+            && (reply.suggestionEnglish.map { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && $0.count <= suggestion } ?? true)
+            && (reply.learnerEnglish.map { !normalizedMessage($0).isEmpty && $0.count <= replyText } ?? true)
             && reply.memory.count <= generatedMemory
             && reply.additionalMessages.count <= 2
             && reply.additionalMessages.allSatisfy {
@@ -36,10 +38,12 @@ enum ChatLimits {
 struct ChatTurn: Codable, Identifiable, Sendable {
     var id = UUID()
     var question: String
+    var questionEnglish: String? = nil
     var spanish: String
     var english: String
     var correction: String
     var suggestion: String
+    var suggestionEnglish: String? = nil
 }
 enum ChatRole: String, Codable, Sendable { case learner, storyteller }
 enum ChatDelivery: String, Codable, Sendable { case pending, delivered, failed }
@@ -52,6 +56,7 @@ struct ChatMessage: Codable, Identifiable, Sendable {
     var english = ""
     var correction = ""
     var suggestion = ""
+    var suggestionEnglish: String? = nil
 }
 struct ChatConversation: Codable, Sendable {
     var messages: [ChatMessage] = []
@@ -63,17 +68,17 @@ struct ChatConversation: Codable, Sendable {
         messages.compactMap { message in
             guard message.role == .storyteller, let replyID = message.inReplyTo,
                   let question = messages.first(where: { $0.id == replyID }) else { return nil }
-            return ChatTurn(id: message.id, question: question.text, spanish: message.text,
-                english: message.english, correction: message.correction, suggestion: message.suggestion)
+            return ChatTurn(id: message.id, question: question.text, questionEnglish: question.english.isEmpty ? nil : question.english, spanish: message.text,
+                english: message.english, correction: message.correction, suggestion: message.suggestion, suggestionEnglish: message.suggestionEnglish)
         }
     }
     init(turns: [ChatTurn] = [], memory: String = "") {
         self.memory = memory
         for turn in turns {
-            let question = ChatMessage(role: .learner, text: turn.question)
+            let question = ChatMessage(role: .learner, text: turn.question, english: turn.questionEnglish ?? "")
             messages.append(question)
             messages.append(ChatMessage(id: turn.id, role: .storyteller, text: turn.spanish,
-                inReplyTo: question.id, english: turn.english, correction: turn.correction, suggestion: turn.suggestion))
+                inReplyTo: question.id, english: turn.english, correction: turn.correction, suggestion: turn.suggestion, suggestionEnglish: turn.suggestionEnglish))
         }
     }
     private enum CodingKeys: String, CodingKey { case messages, turns, memory }
@@ -104,6 +109,8 @@ struct ChatReply: Sendable {
     var suggestion: String
     var memory: String
     var additionalMessages: [ChatReplyMessage] = []
+    var suggestionEnglish: String? = nil
+    var learnerEnglish: String? = nil
 }
 struct ChatRequest: Sendable {
     let name: String

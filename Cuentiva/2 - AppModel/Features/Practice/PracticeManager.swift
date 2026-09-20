@@ -11,10 +11,14 @@ struct PracticeStats {
     func allowed(_ book: Book) -> Bool
     func stats(_ book: Book) -> PracticeStats
     func glossary(_ book: Book) -> [String: String]?
-    func recordScore(_ book: Book, matches: Int) async throws
+    func recordScore(_ book: Book, matches: Int, elapsed: Double?) async throws
     func best(_ book: Book) -> Int
+    func fastestTime(_ book: Book, daily: Bool) -> Double?
     var coins: Int { get }
     var week: [WeekDay] { get }
+    var dailyChallenge: DailyMatchChallenge? { get }
+    func dailyDeck(_ book: Book, day: String) throws -> [String]
+    @discardableResult func finishDailyGame(_ book: Book, day: String, words: Set<String>, elapsed: Double?) async throws -> MatchRewardReceipt?
 }
 @MainActor final class PracticeManager: PracticeFeature {
     private let progress: any ProgressFeature
@@ -31,11 +35,25 @@ struct PracticeStats {
               Set(glossary.keys) == Set(book.vocabulary.map(\.word)), glossary.values.allSatisfy({ !$0.isEmpty }) else { return nil }
         return glossary
     }
-    func recordScore(_ book: Book, matches: Int) async throws {
+    func recordScore(_ book: Book, matches: Int, elapsed: Double? = nil) async throws {
         guard allowed(book), glossary(book) != nil else { throw AppFailure.locked }
-        try await progress.recordPractice(book: book, matches: matches)
+        try await progress.recordPractice(book: book, matches: matches, elapsed: elapsed)
+    }
+    var dailyChallenge: DailyMatchChallenge? { purchases.hasAccess ? progress.dailyChallenge : nil }
+    func dailyDeck(_ book: Book, day: String) throws -> [String] {
+        guard allowed(book), let challenge = dailyChallenge, challenge.day == day,
+              challenge.bookIDs.contains(book.id), let glossary = glossary(book),
+              glossary.count >= DailyMatchChallenge.pairCount else { throw AppFailure.locked }
+        return Array(glossary.keys.sorted().shuffled().prefix(DailyMatchChallenge.pairCount))
+    }
+    @discardableResult func finishDailyGame(_ book: Book, day: String, words: Set<String>, elapsed: Double? = nil) async throws -> MatchRewardReceipt? {
+        guard allowed(book), glossary(book) != nil else { throw AppFailure.locked }
+        return try await progress.completeDailyGame(book: book, day: day, words: words, elapsed: elapsed)
     }
     func best(_ book: Book) -> Int { progress.snapshot.bestMatches?[book.id] ?? 0 }
+    func fastestTime(_ book: Book, daily: Bool) -> Double? {
+        daily ? progress.snapshot.bestDailyMatchTimes?[book.id] : progress.snapshot.bestFullMatchTimes?[book.id]
+    }
     var coins: Int { progress.snapshot.availableChatCoins }
     var week: [WeekDay] { progress.week }
 }

@@ -89,7 +89,8 @@
     "todavía": "still",
     "tu": "your",
     "uno": "one",
-    "vacío": "empty"
+    "vacío": "empty",
+    "mañana": "morning / tomorrow"
   },
   "garden": {
     "de": "of / from",
@@ -167,7 +168,8 @@
     "viene": "comes (que viene: next)"
   },
   "sea": {
-    "vela": "sail"
+    "vela": "sail",
+    "mañana": "tomorrow"
   },
   "repair": {
     "llevaba": "had been (duration)"
@@ -181,7 +183,8 @@
   },
   "three-paths": {
     "llevaba": "was carrying / led",
-    "hizo": "made (hizo señas: beckoned)"
+    "hizo": "made (hizo señas: beckoned)",
+    "depósitos": "water tanks"
   },
   "three-envelopes": {
     "pluma": "feather / quill",
@@ -193,7 +196,8 @@
     "llevaba": "was carrying / had been"
   },
   "first-stitch": {
-    "llevaba": "had been (duration)"
+    "llevaba": "had been (duration)",
+    "fue": "was"
   },
   "different-door": {
     "encantado": "delighted",
@@ -208,7 +212,8 @@
   },
   "honest-change": {
     "encantado": "enchanted",
-    "letra": "letter (written symbol)"
+    "letra": "letter (written symbol)",
+    "encantada": "enchanted"
   },
   "sunday-pot": {
     "puesto": "put (past participle)",
@@ -218,7 +223,7 @@
     "salida": "exit"
   },
   "thoughtful-yes": {
-    "papel": "role / part"
+    "papel": "role / paper"
   },
   "enough-on-paper": {
     "recuerdo": "souvenir",
@@ -270,7 +275,9 @@
     "velas": "sails",
     "llevaban": "had been (duration)",
     "mismos": "themselves",
-    "salvo": "safe (a salvo)"
+    "salvo": "safe (a salvo)",
+    "tiempo": "time / weather",
+    "muelle": "jetty"
   },
   "table-for-three": {
     "baja": "comes down"
@@ -280,7 +287,8 @@
   },
   "verb-ser": {
     "camino": "I walk",
-    "baja": "lowers"
+    "baja": "lowers",
+    "enseña": "shows"
   },
   "verb-estar": {
     "hace": "for (desde hace: duration)",
@@ -289,5 +297,15 @@
   },
   "nearby-pattaya": {
     "llevaba": "contained"
+  },
+  "repair-hour": {
+    "paso": "I pass",
+    "tiro": "I pull"
+  },
+  "rainy-roof": {
+    "cubo": "bucket"
+  },
+  "potato-basket": {
+    "vela": "candle"
   }
 }

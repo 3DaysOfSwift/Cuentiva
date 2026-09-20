@@ -21,10 +21,12 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     var scene: String? = nil
     var continuation: [Sentence]? = nil
     var verbFocus: VerbFocus? = nil
-    /// Chapter three is retained for the next reader release, not displayed yet.
+    /// Final chapter, read sentence by sentence before book completion.
     var ending: [Sentence]? = nil
     var editorialRevision: Int? = nil
-    var completeText: [Sentence] { fullText + (ending ?? []) }
+    var completeText: [Sentence] { fullText }
+    var chapterThreeStart: Int { sentences.count + (continuation ?? []).count }
+    var chapters: [[Sentence]] { [sentences, continuation ?? [], ending ?? []] }
     var storytellerName: String {
         personalAuthor?.name ?? Author.demoProfiles.first(where: { $0.id == authorID })?.name
             ?? author.split(whereSeparator: { $0.isWhitespace }).first.map(String.init) ?? author
@@ -35,7 +37,7 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
                       introduction: "A storyteller from our shared library.",
                       note: "Explore this storyteller’s books below.")
     }
-    var fullText: [Sentence] { sentences + (continuation ?? []) }
+    var fullText: [Sentence] { sentences + (continuation ?? []) + (ending ?? []) }
     var kind: BookFormat { format ?? .story }
     var unitName: String { kind == .movieScript ? "lines" : "sentences" }
     var cast: [String] { fullText.compactMap(\.speaker).reduce(into: []) { if !$0.contains($1) { $0.append($1) } } }

@@ -190,6 +190,13 @@
 		5AEE89A8C6168733D76A755A /* Books.json in Test Resources */ = {isa = PBXBuildFile; fileRef = 432D7CF1733771C78DFAAC9E; };
 		AB0000000000000000000001 /* BookDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000002 /* BookDetailsView.swift */; };
 		AB0000000000000000000003 /* ChapterCompletedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000004 /* ChapterCompletedView.swift */; };
+		EB2296B6B8EF481A961AEDDB /* WholeBookInvitationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9307CF0E2F848D68C451CAA /* WholeBookInvitationView.swift */; };
+		FE06D8579EF74DCD873EC194 /* DailyMatchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DC90D361234FA6BDE655F1 /* DailyMatchSection.swift */; };
+		35862F61E70C4F3F91E3C547 /* DailyMatchChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38FB2C21BA244122A82EE297 /* DailyMatchChallenge.swift */; };
+		CFFBEFEEDCC84B6C886271CE /* MatchRewardReceipt.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7B207CDE3CF48448E6F5B6C /* MatchRewardReceipt.swift */; };
+		C6A720189DEE4E9AA340F8D8 /* MatchRewardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4830370E0ABA4FB084574CEC /* MatchRewardView.swift */; };
+		9674B96ADAFE4D14B8AA9ED9 /* MatchRewardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE0EB764DBCC4D9AB514550D /* MatchRewardViewModel.swift */; };
+		649F03CC4FA247648C8F5D9D /* MatchRewardViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF4F6365C51B488F8A37BEBF /* MatchRewardViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -390,6 +397,13 @@
 		C448A737281986EF3AC86AB4 /* Introduction.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Introduction.dat"; sourceTree = "DERIVED_FILE_DIR"; };
 		AB0000000000000000000002 /* BookDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookDetailsView.swift; sourceTree = "<group>"; };
 		AB0000000000000000000004 /* ChapterCompletedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterCompletedView.swift; sourceTree = "<group>"; };
+		C9307CF0E2F848D68C451CAA /* WholeBookInvitationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WholeBookInvitationView.swift; sourceTree = "<group>"; };
+		14DC90D361234FA6BDE655F1 /* DailyMatchSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyMatchSection.swift; sourceTree = "<group>"; };
+		38FB2C21BA244122A82EE297 /* DailyMatchChallenge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyMatchChallenge.swift; sourceTree = "<group>"; };
+		B7B207CDE3CF48448E6F5B6C /* MatchRewardReceipt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRewardReceipt.swift; sourceTree = "<group>"; };
+		4830370E0ABA4FB084574CEC /* MatchRewardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRewardView.swift; sourceTree = "<group>"; };
+		BE0EB764DBCC4D9AB514550D /* MatchRewardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRewardViewModel.swift; sourceTree = "<group>"; };
+		DF4F6365C51B488F8A37BEBF /* MatchRewardViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchRewardViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -666,6 +680,7 @@
 			children = (
 				734A659B6A2F3267B4D99EE9 /* LessonView.swift */,
 				AB0000000000000000000004 /* ChapterCompletedView.swift */,
+				C9307CF0E2F848D68C451CAA /* WholeBookInvitationView.swift */,
 				390812B685A815AEE53C1F05 /* LessonViewModel.swift */,
 			);
 			path = Lesson;
@@ -730,6 +745,7 @@
 				7A9B043E1F5C7FE14B2C39DC /* OnboardingViewModelTests.swift */,
 				C00A1860DD06791E17130B94 /* PaywallViewModelTests.swift */,
 				7F3CB7C286DE1DD2462FD72F /* PracticeViewModelTests.swift */,
+				DF4F6365C51B488F8A37BEBF /* MatchRewardViewModelTests.swift */,
 				F45B58F0C983E6C85E4B55A5 /* RootViewModelTests.swift */,
 				151422DB4C3540E4A7E2DB0E /* DailyWelcomeViewModelTests.swift */,
 				DD365B70E239B51ABC2F2C2A /* SettingsViewModelTests.swift */,
@@ -778,6 +794,8 @@
 			isa = PBXGroup;
 			children = (
 				B5DA4638FF9F9A10560C6EFD /* LearnerProgress.swift */,
+				38FB2C21BA244122A82EE297 /* DailyMatchChallenge.swift */,
+				B7B207CDE3CF48448E6F5B6C /* MatchRewardReceipt.swift */,
 				7D3FBC5E5F774282B36E1BBC /* DailyWelcome.swift */,
 				976D6F0F84C748D88E105C86 /* ReadingMilestones.swift */,
 				CB7154FC359F46ED94AABAAB /* ThemePack.swift */,
@@ -964,7 +982,9 @@
 			isa = PBXGroup;
 			children = (
 				258DC6C961F8CAA5DDC21289 /* PracticeView.swift */,
+				4830370E0ABA4FB084574CEC /* MatchRewardView.swift */,
 				748CE711EFE7D919B33B7A18 /* PracticeViewModel.swift */,
+				BE0EB764DBCC4D9AB514550D /* MatchRewardViewModel.swift */,
 			);
 			path = Practice;
 			sourceTree = "<group>";
@@ -1039,6 +1059,7 @@
 			isa = PBXGroup;
 			children = (
 				E2DEB3433C4D8CD26C00907C /* HomeView.swift */,
+				14DC90D361234FA6BDE655F1 /* DailyMatchSection.swift */,
 				BBB000000000000000000002 /* BookstoreView.swift */,
 				0584177BD1045C9A97E03353 /* HomeViewModel.swift */,
 				BBB000000000000000000004 /* BookstoreViewModel.swift */,
@@ -1253,6 +1274,7 @@
 				951586A985BD235FD7EAE295 /* OnboardingViewModelTests.swift in Sources */,
 				EC54732D0CA0D0AAB5662FC6 /* PaywallViewModelTests.swift in Sources */,
 				576EDC21822B2E43A3454A58 /* PracticeViewModelTests.swift in Sources */,
+				649F03CC4FA247648C8F5D9D /* MatchRewardViewModelTests.swift in Sources */,
 				E6B8B21AB9A38A61386586D9 /* RootViewModelTests.swift in Sources */,
 				C1F595A5122844E8BFC6F738 /* DailyWelcomeViewModelTests.swift in Sources */,
 				D564166A0EC402FFCDE49C8C /* SettingsViewModelTests.swift in Sources */,
@@ -1286,11 +1308,13 @@
 				D6E0B5188572D9C864545816 /* BookCover.swift in Sources */,
 				AB0000000000000000000001 /* BookDetailsView.swift in Sources */,
 				7840A82AB8F3F5593D0C6763 /* HomeView.swift in Sources */,
+				FE06D8579EF74DCD873EC194 /* DailyMatchSection.swift in Sources */,
 				BBB000000000000000000001 /* BookstoreView.swift in Sources */,
 				B38A0F702B9FD1C6D4103978 /* HomeViewModel.swift in Sources */,
 				BBB000000000000000000003 /* BookstoreViewModel.swift in Sources */,
 				157D28D345E8DC4D4A4E49C3 /* LessonView.swift in Sources */,
 				AB0000000000000000000003 /* ChapterCompletedView.swift in Sources */,
+				EB2296B6B8EF481A961AEDDB /* WholeBookInvitationView.swift in Sources */,
 				2388717427E57ED34732DED7 /* LessonViewModel.swift in Sources */,
 				E8EDD9B19EE1F4EF5D227F92 /* OnboardingView.swift in Sources */,
 				5E658B677197724D8CCE5EED /* OnboardingViewModel.swift in Sources */,
@@ -1312,6 +1336,8 @@
 				C4DC2CA1A5A213FB548AA23B /* LibraryManager.swift in Sources */,
 				C230A0A1F4E94E01991B623A /* LibraryRecommendationOrder.swift in Sources */,
 				A59FEF3F80B294E1CDCDC1BC /* LearnerProgress.swift in Sources */,
+				35862F61E70C4F3F91E3C547 /* DailyMatchChallenge.swift in Sources */,
+				CFFBEFEEDCC84B6C886271CE /* MatchRewardReceipt.swift in Sources */,
 				2BB1424B504A4DEA884F6583 /* DailyWelcome.swift in Sources */,
 				C4671B8D44A74C6D830E3F6F /* ReadingMilestones.swift in Sources */,
 				C01125D8622C42F3ACEB5B5B /* ThemePack.swift in Sources */,
@@ -1340,7 +1366,9 @@
 				8C98D6EF87D47BE061AD3FCF /* StoryLocation.swift in Sources */,
 				70B60559C4F02D647DB559CA /* PracticeManager.swift in Sources */,
 				60C72F95CEC2878AE157EDB7 /* PracticeView.swift in Sources */,
+				C6A720189DEE4E9AA340F8D8 /* MatchRewardView.swift in Sources */,
 				2B6F16D0EDD44BE054C8C750 /* PracticeViewModel.swift in Sources */,
+				9674B96ADAFE4D14B8AA9ED9 /* MatchRewardViewModel.swift in Sources */,
 				530B0C9BCF206BC63417DB57 /* LanguageTerm.swift in Sources */,
 				1A5AA0E75E8024458D0ACF51 /* LanguageTermsManager.swift in Sources */,
 				162547B1BF8B743478294FEC /* LanguageTermsView.swift in Sources */,

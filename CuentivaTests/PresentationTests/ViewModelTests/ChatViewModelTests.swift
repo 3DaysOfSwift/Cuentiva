@@ -3,6 +3,48 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct ChatViewModelTests {
+    @Test func suggestedEnglishIsIndependentAndResetsForANewTopic() async throws {
+        let feature = ChatViewModelFeature()
+        let turn = ChatTurn(question: "Hola", spanish: "Hola", english: "Hello", correction: "",
+            suggestion: "Estoy en casa.", suggestionEnglish: "I am at home.")
+        feature.savedConversation = ChatConversation(turns: [turn])
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        #expect(model.suggestedTurn?.suggestionEnglish == "I am at home.")
+        #expect(model.suggestionTranslations.isEmpty)
+        model.toggleSuggestionTranslation(turn)
+        #expect(model.suggestionTranslations.contains(turn.id))
+        #expect(model.translations.isEmpty)
+        model.toggleSuggestionTranslation(turn)
+        #expect(model.suggestionTranslations.isEmpty)
+        model.toggleSuggestionTranslation(turn)
+        await model.clear()
+        #expect(model.suggestionTranslations.isEmpty)
+    }
+
+    @Test func ownMessageEnglishTogglesIndependently() {
+        let feature = ChatViewModelFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        let first = ChatMessage(role: .learner, text: "Estoy en casa.", english: "I am at home.")
+        let second = ChatMessage(role: .learner, text: "Tengo un libro.", english: "I have a book.")
+        model.toggleTranslation(for: first)
+        #expect(model.translations == [first.id])
+        model.toggleTranslation(for: second)
+        model.toggleTranslation(for: first)
+        #expect(model.translations == [second.id])
+        model.endSession()
+        #expect(model.translations.isEmpty)
+    }
+
+    @Test func chatPlaybackUsesSlowSpeech() {
+        let feature = ChatViewModelFeature(), audio = TestAudio()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: audio)
+        model.listen(ChatMessage(role: .storyteller, text: "Hola."))
+        #expect(audio.spokenRates == [true])
+        feature.hasAccess = false
+        model.listen(ChatMessage(role: .storyteller, text: "Adiós."))
+        #expect(audio.spokenRates == [true])
+    }
+
     @Test func composerRequiresCostConfirmationForEachNewTopic() async throws {
         let feature = ChatViewModelFeature()
         let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
@@ -150,7 +192,8 @@ import Testing
     }
     func beginSession(id: UUID, author: Author) { session = id }
     func endSession(id: UUID) { ended.append(id); session = nil; sessionAuthorized = false }
-    func conversation(for author: Author) -> ChatConversation { .init() }
+    var savedConversation = ChatConversation()
+    func conversation(for author: Author) -> ChatConversation { savedConversation }
     func send(_ message: String, to author: Author, level: String) async throws {
         messages.append(message)
         try await withCheckedThrowingContinuation { replies.append($0) }

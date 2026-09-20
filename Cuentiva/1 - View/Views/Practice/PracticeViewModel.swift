@@ -4,9 +4,28 @@ import Observation
 @MainActor @Observable final class PracticeViewModel {
     enum Stage { case invitation, reading, statistics, ready, countdown, playing, result }
     let book: Book
+    let challengeDay: String?
+    private(set) var matchedWords: Set<String> = []
+    var isDailyGame: Bool { challengeDay != nil }
+    var dailyRewarded: Bool { feature.dailyChallenge?.day == challengeDay && feature.dailyChallenge?.paidBookIDs.contains(book.id) == true }
     private let feature: any PracticeFeature
+    var rewardReceipt: MatchRewardReceipt?
+    private var scoreSaved = false
     var stage = Stage.invitation
     var timed = true
+    private(set) var elapsed = 0.0
+    private var roundStarted: ContinuousClock.Instant?
+    var elapsedText: String { Self.clockText(elapsed) }
+    var fastestTimeText: String? { feature.fastestTime(book, daily: isDailyGame).map(Self.clockText) }
+    private static func clockText(_ seconds: Double) -> String {
+        let tenths = (seconds * 10).rounded()
+        return String(format: "%02.0f:%04.1f", floor(tenths / 600), tenths.truncatingRemainder(dividingBy: 600) / 10)
+    }
+    private func updateElapsed() {
+        guard let roundStarted else { return }
+        let parts = roundStarted.duration(to: now()).components
+        elapsed = max(0, Double(parts.seconds) + Double(parts.attoseconds) / 1e18)
+    }
     var seconds = 30
     var countdown = 3
     var matches = 0
@@ -28,7 +47,7 @@ import Observation
     private let now: () -> ContinuousClock.Instant
     private var deadline: ContinuousClock.Instant?
     private var nextWord: ContinuousClock.Instant?
-    init(book: Book, feature: any PracticeFeature = AppModel.shared.practice, now: @escaping () -> ContinuousClock.Instant = { ContinuousClock().now }) { self.book = book; self.feature = feature; self.now = now }
+    init(book: Book, challengeDay: String? = nil, feature: any PracticeFeature = AppModel.shared.practice, now: @escaping () -> ContinuousClock.Instant = { ContinuousClock().now }) { self.book = book; self.challengeDay = challengeDay; self.feature = feature; if challengeDay != nil { self.timed = false }; self.now = now }
     var allowed: Bool { feature.allowed(book) }
     var stats: PracticeStats { feature.stats(book) }
     var glossary: [String: String]? { feature.glossary(book) }
@@ -42,7 +61,12 @@ import Observation
     func startGame() {
         guard allowed, let glossary else { return }
         matches = 0; mistakes = 0; missed = []; seconds = 30; countdown = 3; error = nil
-        remaining = glossary.keys.sorted().shuffled(); board = []; selectedSpanish = nil; selectedEnglish = nil; feedback = ""
+        matchedWords = []; scoreSaved = false; rewardReceipt = nil; elapsed = 0; roundStarted = nil
+        if let challengeDay {
+            do { remaining = try feature.dailyDeck(book, day: challengeDay); timed = false }
+            catch { self.error = error.localizedDescription; return }
+        } else { remaining = glossary.keys.sorted().shuffled() }
+        board = []; selectedSpanish = nil; selectedEnglish = nil; feedback = ""
         fillBoard(); stage = .countdown; deadline = now().advanced(by: .seconds(3))
     }
     private func fillBoard() {
@@ -59,6 +83,7 @@ import Observation
         guard let spanish = selectedSpanish, let english = selectedEnglish else { return }
         selectedSpanish = nil; selectedEnglish = nil
         if spanish == english {
+            matchedWords.insert(spanish)
             matches += 1; feedback = "Correct: \(spanish) — \(glossary?[spanish] ?? "")"
             board.removeAll { $0 == spanish }; fillBoard()
             if board.isEmpty { await finishGame() }
@@ -75,8 +100,10 @@ import Observation
         }
         if stage == .countdown, let deadline {
             countdown = max(1, Int(ceil(secondsUntil(deadline))))
-            if now() >= deadline { stage = .playing; self.deadline = now().advanced(by: .seconds(30)) }
-        } else if stage == .playing, timed, let deadline {
+            if now() >= deadline { stage = .playing; roundStarted = now(); self.deadline = now().advanced(by: .seconds(30)) }
+        }
+        if stage == .playing { updateElapsed() }
+        if stage == .playing, timed, let deadline {
             seconds = max(0, Int(ceil(secondsUntil(deadline))))
             if now() >= deadline { await finishGame() }
         }
@@ -87,17 +114,25 @@ import Observation
     }
     private func finishGame() async {
         guard stage == .playing else { return }
+        updateElapsed()
+        roundStarted = nil
         stage = .result
         await saveScore()
     }
     func saveScore() async {
-        guard !saving, matches > 0 else { return }
+        guard !saving, !scoreSaved, matches > 0 else { return }
         saving = true; defer { saving = false }; error = nil
-        do { try await feature.recordScore(book, matches: matches) }
+        do {
+            if let challengeDay {
+                guard matchedWords.count == DailyMatchChallenge.pairCount else { throw AppFailure.incomplete }
+                rewardReceipt = try await feature.finishDailyGame(book, day: challengeDay, words: matchedWords, elapsed: elapsed > 0 ? elapsed : nil)
+            } else { try await feature.recordScore(book, matches: matches, elapsed: board.isEmpty && remaining.isEmpty && elapsed > 0 ? elapsed : nil) }
+            scoreSaved = true
+        }
         catch { self.error = error.localizedDescription }
     }
     func suspend() {
         pacing = false
-        if stage == .playing || stage == .countdown { stage = .ready; feedback = "Round interrupted. Start again when you are ready." }
+        if stage == .playing || stage == .countdown { roundStarted = nil; stage = .ready; feedback = "Round interrupted. Start again when you are ready." }
     }
 }

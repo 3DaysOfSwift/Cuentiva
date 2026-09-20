@@ -127,9 +127,10 @@ import Observation
                 self.sessionPaid = true
                 if let index = self.sessionConversation.messages.firstIndex(where: { $0.id == outgoing.id }) {
                     self.sessionConversation.messages[index].delivery = .delivered
+                    self.sessionConversation.messages[index].english = reply.learnerEnglish ?? ""
                 }
                 self.sessionConversation.messages.append(ChatMessage(role: .storyteller, text: reply.spanish,
-                    inReplyTo: outgoing.id, english: reply.english, correction: reply.correction, suggestion: reply.suggestion))
+                    inReplyTo: outgoing.id, english: reply.english, correction: reply.correction, suggestion: reply.suggestion, suggestionEnglish: reply.suggestionEnglish))
                 for message in reply.additionalMessages {
                     self.sessionConversation.messages.append(ChatMessage(role: .storyteller, text: message.spanish,
                         inReplyTo: outgoing.id, english: message.english))

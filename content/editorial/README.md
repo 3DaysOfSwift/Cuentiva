@@ -1,4 +1,4 @@
-# Library editorial edition 3
+# Library editorial edition 4
 
 All 52 existing book slots have been rewritten: 46 stories, three scripts and three verb stories. Each has three chapters with a setup, complication and resolution. The collection contains 792 bilingual passages across 156 chapters.
 
@@ -26,13 +26,15 @@ Existing A1/A2/B1 labels and book IDs are retained. A1 uses mainly present-tense
 
 Each verb book contains all six present-indicative forms in **each** of its three chapters. Scripts carry named speakers and narrator/stage directions. Spanish passages have complete English translations.
 
-`sentences` is chapter one, `continuation` chapter two, and `ending` chapter three. **The current UI still reads only the first two chapters**, as requested. Therefore readers will not yet see these new endings. `Book.completeText` includes the ending for validation and future reader work; `Book.fullText`, completion requirements, sentence counts, vocabulary and matching glossaries for all 52 books still cover the currently visible two chapters. Do not release this as a complete three-chapter reading experience until the reader exposes the ending.
+`sentences` is chapter one, `continuation` chapter two, and `ending` chapter three. The reading flow presents Chapter 1 sentence by sentence, Chapter 2 alone with the flowing reading guide, then Chapter 3 sentence by sentence. Completion requires all three chapters. An optional unaided reread starts with the cover, includes every chapter, hides English until tapped and ends with storyteller credits. `Book.fullText` and `Book.completeText` both include all three chapters.
+
+All 52 books have at least 30 pairs (the smallest has 71). The complete library contains 5,771 pairs across 2,072 distinct surface forms. Today offers three untimed 30-pair games after the three selected books are completed. Each completed game earns one additional doubloon, persisted once per book per day (three daily rewards). A dedicated reward screen shows the saved balance increase. Replays do not duplicate rewards. Legacy days whose group reward was already collected remain paid. The full-deck and timed practice options remain under Completed → Book activities.
 
 Vocabulary counts are rebuilt from the text. `lemmas.json` preserves the existing curated mappings, with literal surface-word fallback for unmapped forms; it is not a complete morphological dictionary. Every book now has a complete English matching glossary for its playable vocabulary, including all scripts and verb stories. `word-meanings.json` supplies surface-form meanings; `glossaries.json` supplies story-specific overrides for ambiguous words. Rebuilding fails if any required meaning is missing or blank. Location-demo metadata is removed; the travel fiction is not represented as a real user submission.
 
 ## Updates and saved progress
 
-Book IDs remain stable, preserving completed-book history and rewards. Rewritten passages receive revision-specific IDs so old answers cannot count as reading new prose. A reader with attempts from the old edition resumes the rewrite at its beginning; current-edition attempts resume normally. Saved practice history is retained. Revision 3 adds matching data while retaining revision-2 passage IDs, so this glossary update does not reset current reading attempts. Older cached revisions are superseded by the bundled matching data.
+Book IDs remain stable, preserving completed-book history and rewards. Rewritten passages receive revision-specific IDs so old answers cannot count as reading new prose. A reader with attempts from the old edition resumes the rewrite at its beginning; current-edition attempts resume normally. Saved practice history is retained. Revision 4 extends matching and vocabulary counts to all three chapters while retaining revision-2 passage IDs. Existing chapter-one attempts remain valid and saved completion/reward history is preserved. Older cached revisions are superseded by the bundled matching data.
 
 DAT version 2 adds ending/revision fields; the runtime still reads version 1. A newer bundled editorial revision supersedes older cached text without a launch-time database migration or write. Remote-only books and higher remote revisions remain available. These changes are local to this app project; no public GitHub dataset or server pack has been published.
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build Books.json from the bilingual, three-chapter editorial manuscripts.
 
-Chapter three is stored as `ending`; vocabulary/glossaries cover the two chapters
-currently exposed by Book.fullText. Run build_library_dat.py after this command.
+Chapter three is stored as `ending`; vocabulary/glossaries cover all three chapters
+exposed by Book.fullText. Run build_library_dat.py after this command.
 """
 import argparse
 from collections import Counter
@@ -20,7 +20,7 @@ AUTHORS = {'Pipa': 'marta', 'Brasa': 'ana', 'Musgo': 'luis',
            'Mora': 'credit-0047224f3651', 'Faro': 'credit-5f7d24711b1b'}
 SYMBOLS = dict(zip(
     'cafe garden train sea repair repair-hour loan-notebook small-guide three-paths three-envelopes rainy-roof patient-investor first-stitch different-door empty-wallet shared-table honest-change sunday-pot film-conversation beans-question first-invitation thoughtful-yes enough-on-paper useful-service travelling-seed tomato-question garden-colours potato-basket two-carrots body-care water-toast pause-before-plan ten-pages metaphor-not-law world-in-backpack brand-from-within four-years-road calendar-of-later cow-two-names cube-among-stars feet-on-earth travelling-sun no-place-to-land wrong-suitcase table-for-three last-train-scene verb-ser verb-estar verb-querer nearby-bangkok nearby-pattaya nearby-thailand'.split(),
-    'airplane key train.side sailboat lightbulb bell book.closed map signpost.right.and.left envelope cloud.rain eye scissors door.left.hand.open book person.2 dollarsign.circle fork.knife film leaf lightbulb theatermasks backpack books.vertical leaf clock paintpalette basket leaf figure.run lightbulb questionmark.circle book.closed bell backpack tshirt house calendar bell shippingbox moon.stars sun.max sailboat suitcase moon theatermasks person.crop.rectangle key signpost.right.and.left fork.knife lightbulb train.side'.split()))
+    'airplane key tram.fill sailboat lightbulb bell book.closed map signpost.right.and.left envelope cloud.rain eye scissors door.left.hand.open book person.2 dollarsign.circle fork.knife film leaf lightbulb theatermasks backpack books.vertical leaf clock paintpalette basket leaf figure.run lightbulb questionmark.circle book.closed bell backpack tshirt house calendar bell shippingbox moon.stars sun.max sailboat suitcase moon theatermasks person.crop.rectangle key signpost.right.and.left fork.knife lightbulb tram.fill'.split()))
 
 
 def words(text):
@@ -72,13 +72,13 @@ def build():
         if len(chapters) != 3 or any(len(c) < 4 for c in chapters):
             raise ValueError(f"{draft['id']} must have three substantial chapters")
         book = {**draft, **metadata[draft['id']], 'authorID': AUTHORS[draft['author']],
-                'symbol': SYMBOLS[draft['id']], 'editorialRevision': 3,
+                'symbol': SYMBOLS[draft['id']], 'editorialRevision': 4,
                 'license': 'Original fictional Cuentiva editorial edition. Native-speaker editorial review pending.'}
-        # Glossary revision 3 leaves revision-2 passage IDs intact for saved reading progress.
+        # Three-chapter revision 4 leaves revision-2 passage IDs intact for saved reading progress.
         for chapter_number, (key, chapter) in enumerate(zip(('sentences', 'continuation', 'ending'), chapters), 1):
             book[key] = [dict(id=f"{book['id']}-r2-c{chapter_number}-{i}", **sentence)
                          for i, sentence in enumerate(chapter, 1)]
-        visible = book['sentences'] + book['continuation']
+        visible = book['sentences'] + book['continuation'] + book['ending']
         counts = Counter(word for sentence in visible for word in words(sentence['spanish']))
         book['vocabulary'] = [dict(word=w, lemma=lemmas.get(w, w), occurrences=n) for w, n in sorted(counts.items())]
         contextual = {**meanings, **glossaries.get(book['id'], {})}

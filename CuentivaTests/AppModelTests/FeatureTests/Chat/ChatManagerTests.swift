@@ -52,6 +52,37 @@ private actor ChatTestGenerator: ChatGenerator {
         try await progress.load()
         return progress
     }
+    @Test func suggestedReplyTranslationSurvivesDeliveryAndLegacyDecoding() async throws {
+        let generator = ChatTestGenerator()
+        await generator.setReply(.init(spanish: "¿Dónde estás?", english: "Where are you?", correction: "",
+            suggestion: "Estoy en casa.", memory: "Home", suggestionEnglish: "I am at home.", learnerEnglish: "Hello"))
+        let chat = ChatManager(generator: generator, progress: try await wallet())
+        try await chat.prepare()
+        chat.beginSession(id: UUID(), author: author)
+        try chat.authorizeSession()
+        try await chat.send("Hola", to: author, level: "A1")
+        let conversation = chat.conversation(for: author)
+        #expect(conversation.messages.first?.role == .learner)
+        #expect(conversation.messages.first?.english == "Hello")
+        #expect(conversation.turns.first?.questionEnglish == "Hello")
+        #expect(conversation.messages.last?.suggestionEnglish == "I am at home.")
+        #expect(conversation.turns.last?.suggestionEnglish == "I am at home.")
+        let data = try JSONEncoder().encode(conversation)
+        let decoded = try JSONDecoder().decode(ChatConversation.self, from: data)
+        #expect(decoded.turns.last?.suggestionEnglish == "I am at home.")
+        #expect(decoded.messages.first?.english == "Hello")
+        let projected = ChatConversation(turns: decoded.turns)
+        #expect(projected.messages.first?.english == "Hello")
+        var legacy = try #require(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var messages = try #require(legacy["messages"] as? [[String: Any]])
+        for index in messages.indices { messages[index].removeValue(forKey: "suggestionEnglish") }
+        legacy["messages"] = messages
+        let oldData = try JSONSerialization.data(withJSONObject: legacy)
+        let restored = try JSONDecoder().decode(ChatConversation.self, from: oldData)
+        #expect(restored.turns.last?.suggestion == "Estoy en casa.")
+        #expect(restored.turns.last?.suggestionEnglish == nil)
+    }
+
     @Test func chatPromotionRequiresBothReadingMilestoneAndDeviceSupport() {
         var progress = LearnerProgress()
         progress.completed = Set((0..<11).map { "book-\($0)" })

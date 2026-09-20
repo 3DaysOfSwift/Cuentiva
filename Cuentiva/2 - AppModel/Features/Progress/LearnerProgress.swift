@@ -36,6 +36,7 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     // Optional for backward-compatible decoding of existing learner files.
     var bookArrivals: [String: Date]? = nil
     var bookLastRead: [String: Date]? = nil
+    var dailyMatchChallenge: DailyMatchChallenge? = nil
     var dailyReadingDate: Date? = nil
     var dailyReadingIDs: [String]? = nil
     var positions: [String: Int] = [:]
@@ -47,6 +48,21 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var celebratedCompletionDays: Set<String>? = nil
     var rewardedBooks: Set<String>? = nil
     var bestMatches: [String: Int]? = nil
+    var bestDailyMatchTimes: [String: Double]?
+    var bestFullMatchTimes: [String: Double]?
+
+    mutating func recordMatchTime(_ seconds: Double, bookID: String, daily: Bool) throws {
+        guard seconds.isFinite, seconds > 0 else { throw AppFailure.incomplete }
+        if daily {
+            let best = min(bestDailyMatchTimes?[bookID] ?? seconds, seconds)
+            if bestDailyMatchTimes == nil { bestDailyMatchTimes = [:] }
+            bestDailyMatchTimes?[bookID] = best
+        } else {
+            let best = min(bestFullMatchTimes?[bookID] ?? seconds, seconds)
+            if bestFullMatchTimes == nil { bestFullMatchTimes = [:] }
+            bestFullMatchTimes?[bookID] = best
+        }
+    }
     var doubloons: Int? = nil
     /// A paid first reply that has not yet been delivered. Counts as one usable coin.
     var pendingChatAdmission: Bool? = nil

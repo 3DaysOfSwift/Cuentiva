@@ -8,8 +8,8 @@ struct PracticeView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    init(book: Book, match: Bool = false, streak: Int? = nil) {
-        let model = PracticeViewModel(book: book)
+    init(book: Book, match: Bool = false, streak: Int? = nil, challengeDay: String? = nil) {
+        let model = PracticeViewModel(book: book, challengeDay: challengeDay)
         if match { model.prepareGame() }
         _model = State(initialValue: model); self.streak = streak
     }
@@ -46,6 +46,9 @@ struct PracticeView: View {
                 await model.tick()
                 do { try await Task.sleep(for: .milliseconds(75)) } catch { return }
             }
+        }
+        .fullScreenCover(item: $model.rewardReceipt) { receipt in
+            MatchRewardView(receipt: receipt) { model.rewardReceipt = nil }
         }
         .onDisappear { model.suspend() }
         .onChange(of: scenePhase) { _, value in if value != .active { model.suspend() } }
@@ -117,7 +120,7 @@ struct PracticeView: View {
                 Text("\(newWords) first encountered in this book").font(.title2)
             } else { Text("Earlier exposure wasn’t recorded for this book. We won’t guess which words were new.") }
             Text("Reading counts as exposure, not mastery. Different verb forms count as distinct written words.").font(.caption)
-            Button("Match pairs") { model.prepareGame() }.buttonStyle(PrimaryButton())
+
             Button("Finish for today") { dismiss() }
         }
     }
@@ -125,10 +128,14 @@ struct PracticeView: View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Match pairs").font(.system(.largeTitle, design: .serif))
             if model.glossary != nil {
-                Text("Tap a Spanish word and its English meaning. Five pairs at a time, with every distinct word in this book waiting in the deck.")
-                Toggle("30-second challenge", isOn: $model.timed)
-                Text(model.timed ? "The timer starts after a three-second countdown." : "Untimed practice: work through the whole deck.")
+                Text(model.isDailyGame ? "Join 30 Spanish words with their English meanings. Five pairs at a time, with no time limit. Mistakes are welcome—keep trying." : "Tap a Spanish word and its English meaning. Five pairs at a time, with every distinct word in this book waiting in the deck.")
+                if !model.isDailyGame { Toggle("30-second challenge", isOn: $model.timed) }
+                Text(model.isDailyGame ? (model.dailyRewarded ? "You’ve collected this game’s doubloon today. Play again to practise—your balance will stay the same." : "Complete this daily game to earn 1 doubloon. Each of today’s three games has its own reward.") : model.timed ? "The timer starts after a three-second countdown." : "Untimed practice: work through the whole deck.")
                 Text("Earn one doubloon when you complete a new story. Spend it on a topic chat. This practice helps improve your score.").font(.caption)
+                if let best = model.fastestTimeText {
+                    Label("Fastest \(model.isDailyGame ? "30 pairs" : "full deck"): \(best)", systemImage: "stopwatch")
+                        .monospacedDigit().foregroundStyle(theme.theme.accent)
+                }
                 Button("Ready") { model.startGame() }.buttonStyle(PrimaryButton())
                 Text(model.feedback).font(.caption)
             } else {
@@ -138,7 +145,13 @@ struct PracticeView: View {
     }
     private var game: some View {
         VStack(spacing: 18) {
-            HStack { Text(model.timed ? "\(model.seconds)s" : "Untimed"); Spacer(); Text(model.matches == 1 ? "1 match" : "\(model.matches) matches") }.font(.title2)
+            Label(model.elapsedText, systemImage: "stopwatch")
+                .font(.title.monospacedDigit()).foregroundStyle(theme.theme.accent)
+                .accessibilityLabel("Elapsed time: \(model.elapsedText)")
+            if let best = model.fastestTimeText {
+                Text("Fastest: \(best)").font(.subheadline.monospacedDigit())
+            }
+            HStack { Text(model.isDailyGame ? "\(model.matches) / 30 pairs" : model.timed ? "\(model.seconds)s" : "Untimed"); Spacer(); Text(model.matches == 1 ? "1 match" : "\(model.matches) matches") }.font(.title2)
             HStack(alignment: .top, spacing: 14) {
                 VStack(spacing: 12) {
                     ForEach(model.board, id: \.self) { word in
@@ -163,7 +176,15 @@ struct PracticeView: View {
     }
     private var result: some View {
         VStack(alignment: .leading, spacing: 20) {
+            if model.isDailyGame && model.error == nil && !model.saving {
+                Label(model.dailyRewarded ? "Daily reward collected" : "Daily game completed", systemImage: "checkmark.seal.fill")
+                    .foregroundStyle(theme.theme.accent)
+            }
             Text("Well played.").font(.system(.largeTitle, design: .serif))
+            Label("Your time: \(model.elapsedText)", systemImage: "stopwatch").font(.title2.monospacedDigit())
+            if let best = model.fastestTimeText {
+                Text("Fastest \(model.isDailyGame ? "30 pairs" : "full deck"): \(best)").font(.headline.monospacedDigit())
+            }
             Text("\(model.matches == 1 ? "1 match" : "\(model.matches) matches") · \(model.accuracy)% accuracy")
             Text("Personal best: \(model.best == 1 ? "1 match" : "\(model.best) matches")")
             if !model.missed.isEmpty {

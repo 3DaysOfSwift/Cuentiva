@@ -13,6 +13,12 @@ import Observation
     private var preparedSession = false
     var confirmingClear = false
     var translations: Set<UUID> = []
+    var suggestionTranslations: Set<UUID> = []
+    var suggestedTurn: ChatTurn? { turns.last { !$0.suggestion.isEmpty } }
+    func toggleSuggestionTranslation(_ turn: ChatTurn) {
+        if suggestionTranslations.contains(turn.id) { suggestionTranslations.remove(turn.id) }
+        else { suggestionTranslations.insert(turn.id) }
+    }
     private var sessionID = UUID()
     private var replyTasks: [UUID: Task<Void, Never>] = [:]
     init(author: Author, feature: any ChatFeature, audio: any LessonAudio, level: String = "A2") {
@@ -89,16 +95,16 @@ import Observation
         preparedSession = false
         draft = ""
         error = nil
-        translations = []
+        translations = []; suggestionTranslations = []
     }
-    func listen(_ turn: ChatMessage) { if unlocked { audio.speak(turn.text, slow: false) } }
+    func listen(_ turn: ChatMessage) { if unlocked { audio.speak(turn.text, slow: true) } }
     var audioError: String? { audio.error }
     func clear() async {
         audio.stop()
         error = nil
         do {
             try await feature.clear(author: author)
-            translations = []
+            translations = []; suggestionTranslations = []
         } catch { self.error = error.localizedDescription }
     }
 }
