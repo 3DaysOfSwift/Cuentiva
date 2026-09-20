@@ -3,6 +3,72 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct ChatViewModelTests {
+    @Test func admissionCelebratesThenReservesTheLastCoinWithoutChargingItTwice() async throws {
+        let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio(),
+            admissionPause: { _ in try await gate.pause() })
+        defer { model.endSession(); gate.release() }
+        await model.prepare()
+        #expect(model.celebrateAdmission())
+        #expect(!model.celebrateAdmission())
+        #expect(model.admissionSuccess == 1)
+        #expect(model.admissionVisible)
+        #expect(model.displayedCoins == 1)
+        try await waitUntil { gate.waiting }
+        gate.release()
+        try await waitUntil { model.admissionPhase == .celebrating && gate.waiting }
+        #expect(model.displayedCoins == 1)
+        gate.release()
+        try await waitUntil { model.admissionPhase == .balanceUpdated && gate.waiting }
+        #expect(model.displayedCoins == 0)
+        #expect(feature.coins == 1)
+        #expect(!feature.sessionPaid)
+        #expect(model.unlocked)
+        gate.release()
+        try await waitUntil { model.admissionPhase == .dismissing && gate.waiting }
+        #expect(!model.admissionVisible)
+        model.draft = "Hola"
+        #expect(model.canSend)
+        gate.release()
+        try await waitUntil { model.admissionPhase == .finished }
+        feature.coins = 0
+        feature.sessionPaid = true
+        #expect(model.displayedCoins == 0)
+    }
+
+    @Test func endingDuringCelebrationReleasesReservationAndRejectsLateFocus() async throws {
+        let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio(),
+            admissionPause: { _ in try await gate.pause() })
+        defer { model.endSession(); gate.release() }
+        await model.prepare()
+        #expect(model.celebrateAdmission())
+        try await waitUntil { gate.waiting }
+        gate.release()
+        try await waitUntil { model.admissionPhase == .celebrating && gate.waiting }
+        model.endSession()
+        gate.release()
+        await model.prepare()
+        #expect(model.admissionPhase == .ready)
+        #expect(model.admissionVisible)
+        #expect(model.displayedCoins == 1)
+        #expect(!feature.sessionAuthorized)
+        #expect(!feature.sessionPaid)
+    }
+
+    @Test func rejectedAdmissionDoesNotCelebrateOrReserve() async {
+        let feature = ChatViewModelFeature()
+        feature.authorizationFailure = .unavailable("Please try again")
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        #expect(!model.celebrateAdmission())
+        #expect(model.error != nil)
+        #expect(model.admissionPhase == .ready)
+        #expect(model.admissionSuccess == 0)
+        #expect(model.displayedCoins == 1)
+        model.endSession()
+    }
+
     @Test func suggestedEnglishIsIndependentAndResetsForANewTopic() async throws {
         let feature = ChatViewModelFeature()
         let turn = ChatTurn(question: "Hola", spanish: "Hola", english: "Hello", correction: "",
@@ -175,7 +241,11 @@ import Testing
     var coins = 1
     var sessionPaid = false
     var sessionAuthorized = false
-    func authorizeSession() throws { sessionAuthorized = true }
+    var authorizationFailure: AppFailure?
+    func authorizeSession() throws {
+        if let authorizationFailure { throw authorizationFailure }
+        sessionAuthorized = true
+    }
     var preparing = false
     var unavailable: String?
     var ready = false
@@ -206,4 +276,18 @@ import Testing
         else { pending.resume() }
     }
     func clear(author: Author) async throws { sessionAuthorized = false }
+}
+
+@MainActor private final class AdmissionPauseGate {
+    private var continuation: CheckedContinuation<Void, Error>?
+    var waiting: Bool { continuation != nil }
+    func pause() async throws {
+        try await withCheckedThrowingContinuation { continuation = $0 }
+        try Task.checkCancellation()
+    }
+    func release() {
+        let pending = continuation
+        continuation = nil
+        pending?.resume()
+    }
 }

@@ -22,13 +22,13 @@ struct RootView: View {
                         Tab("Bookstore", systemImage: "books.vertical", value: LibraryTab.bookstore) {
                             NavigationStack { BookstoreView() }
                         }
+                        Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) {
+                            NavigationStack { CompletedView() }
+                        }
                         if viewModel.chatUnlocked {
                             Tab("WhosApp", systemImage: "bubble.left.and.bubble.right", value: LibraryTab.whosApp) {
                                 NavigationStack { WhosAppView() }
                             }
-                        }
-                        Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) {
-                            NavigationStack { CompletedView() }
                         }
                     }
                 } else {

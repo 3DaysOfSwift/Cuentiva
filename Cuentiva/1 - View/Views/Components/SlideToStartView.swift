@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct SlideToStartView: View {
-    let confirm: () -> Void
+    let confirm: () -> Bool
+    let coinAnimation: Namespace.ID
     @State private var model = SlideToStartViewModel()
     @GestureState private var translation: CGFloat = 0
     @Environment(ThemeManager.self) private var theme
@@ -26,6 +27,7 @@ struct SlideToStartView: View {
                 .foregroundStyle(theme.theme.ink)
                 .opacity(model.confirmed ? 0 : 1 - Double(distance / max(1, travel)))
                 DoubloonIcon(size: handleSize)
+                    .matchedGeometryEffect(id: "admission-coin", in: coinAnimation, properties: reduceMotion ? [] : .frame)
                     .padding(6)
                     .offset(x: (reverse ? -1 : 1) * (model.confirmed ? travel : distance))
                     .gesture(DragGesture(minimumDistance: 8)
@@ -43,6 +45,6 @@ struct SlideToStartView: View {
             .accessibilityAction { model.activate(confirm: confirm) }
         }
         .frame(height: handleSize + 12)
-        .sensoryFeedback(.success, trigger: model.confirmed)
+
     }
 }

@@ -8,7 +8,7 @@ struct WhosAppView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 if model.unlocked {
-                    Text("Who will you tell your story to?")
+                    Text("WhosApp · Chat")
                         .font(.system(.largeTitle, design: .serif))
                     Text("Practise messaging your future Spanish-speaking friends. Start with a real moment from your life.")
                         .foregroundStyle(theme.theme.muted)
@@ -43,7 +43,16 @@ struct WhosAppView: View {
             }.padding(24)
         }
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
-        .navigationTitle("WhosApp").navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("WhosApp · Chat").navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 8) {
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .foregroundStyle(theme.theme.accent).accessibilityHidden(true)
+                    Text("WhosApp · Chat")
+                }.font(.headline).accessibilityAddTraits(.isHeader)
+            }
+        }
         .task(id: model.revision) { await model.refresh() }
     }
 }

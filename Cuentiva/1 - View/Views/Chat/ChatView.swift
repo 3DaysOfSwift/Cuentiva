@@ -4,6 +4,7 @@ struct ChatView: View {
     @State private var model: ChatViewModel
     @Environment(ThemeManager.self) private var theme
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var composing: Bool
     init(author: Author = Author.demoProfiles[0]) {
         let app = AppModel.shared
@@ -21,7 +22,7 @@ struct ChatView: View {
                             Text("A little Spanish. A conversation of your own.").font(.subheadline).foregroundStyle(theme.theme.muted)
                         }
                     }
-                    DoubloonBalance(count: model.feature.coins)
+                    DoubloonBalance(count: model.displayedCoins)
                     Text(model.sessionMessage).font(.subheadline).foregroundStyle(theme.theme.accent)
                     if let unavailable = model.feature.unavailable {
                         VStack(alignment: .leading, spacing: 12) {
@@ -40,7 +41,7 @@ struct ChatView: View {
                             Text("Chat couldn’t load. Please try again.")
                             Button("Try again") { Task { await model.prepare() } }
                         }
-                    } else if model.unlocked && model.feature.sessionAuthorized {
+                    } else if model.unlocked && model.feature.sessionAuthorized && !model.admissionVisible {
                         Picker("Spanish level", selection: $model.level) {
                             ForEach(LearningLevel.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                         }.disabled(model.sending)
@@ -56,7 +57,7 @@ struct ChatView: View {
                                 translate: { model.toggleTranslation(for: turn) }, listen: { model.listen(turn) })
                                 .id(turn.id)
                         }
-                        if model.sending { ProgressView("\(model.author.name) is typing…") }
+                        if model.sending { ChatTypingIndicator(storyteller: model.author.name) }
                         if let turn = model.suggestedTurn {
                             VStack(alignment: .leading, spacing: 14) {
                                 Button { model.draft = turn.suggestion; composing = true } label: {
@@ -97,18 +98,31 @@ struct ChatView: View {
                 withAnimation { proxy.scrollTo("chat-bottom", anchor: .bottom) }
             }
             .safeAreaInset(edge: .bottom) {
-                if model.canStart && !model.feature.sessionAuthorized {
-                    ChatAdmissionView(coins: model.feature.coins, confirm: model.authorizeSession)
+                if model.canStart && model.admissionVisible {
+                    ChatAdmissionView(coins: model.displayedCoins, celebrating: model.admissionCelebrating,
+                        confirm: model.celebrateAdmission)
+                        .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
                 } else if model.canStart && model.feature.sessionAuthorized {
                     ChatComposerView(draft: $model.draft, composing: $composing,
                         sending: model.sending, notice: model.composerNotice, canSend: model.canSend,
                         send: model.send, cancel: model.cancel)
+                        .onAppear { composing = true }
                 }
             }
         }
+        .animation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.5, dampingFraction: 0.85),
+            value: model.admissionPhase)
+        .sensoryFeedback(.success, trigger: model.admissionSuccess)
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
         .navigationTitle(model.author.name).navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: 8) {
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .foregroundStyle(theme.theme.accent).accessibilityHidden(true)
+                    Text(model.author.name)
+                }.font(.headline).accessibilityAddTraits(.isHeader)
+            }
             if model.unlocked && !model.messages.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("New chat", systemImage: "square.and.pencil") { model.confirmingClear = true }
@@ -119,10 +133,10 @@ struct ChatView: View {
         .confirmationDialog("Start a new topic? This ends the current session. The next topic costs 1 doubloon.", isPresented: $model.confirmingClear, titleVisibility: .visible) {
             Button("Start new topic", role: .destructive) { Task { await model.clear() } }
         }
-        .onDisappear { model.endSession() }
+        .onDisappear { composing = false; model.endSession() }
         .onChange(of: model.unlocked) { _, access in if !access { model.cancel() } }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .background { model.endSession() }
+            if phase == .background { composing = false; model.endSession() }
             else if phase != .active { model.cancel() }
             else { Task { await model.prepare() } }
         }

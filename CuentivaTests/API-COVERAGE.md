@@ -188,3 +188,9 @@ All 52 bundled books now include exact vocabulary-to-English coverage (4,260 pai
 - Tapping a learner's message toggles its English below the Spanish. On-device generation supplies that translation alongside the corresponding storyteller reply; pending/older untranslated messages show an explicit availability note instead of blank or invented English.
 - English is associated with the outgoing message ID and retained through conversation encoding and exchange projections. Tests verify delivery, JSON round trips, projection and independent per-message toggles/reset.
 - Quick-start choices now have the heading “Start a conversation.” Validation: 148 shared-model tests and 34 presentation-model tests pass; actual on-device generation and visual rendering remain unverified.
+
+## Chat admission celebration — 2026-09-20
+
+- A valid released slide (or accessible activation) authorizes once and immediately triggers success feedback. The panel fades its copy, moves the coin into a centred green check, then reduces the displayed available balance before exiting downward and focusing the composer. Reduce Motion uses a fade without coin travel/bounce; the panel retains its layout during celebration.
+- This is an optimistic reservation: the actual wallet still commits exactly once with the first successful reply. Displayed balance reconciles to the committed wallet without subtracting twice; ending an unpaid topic cancels the presentation and releases the displayed reservation.
+- Controlled-gate tests cover phase order, repeated admission, the last coin remaining usable, authorization rejection/retry, cancellation and late continuations. Validation: 148 shared-model tests and 40 presentation-model tests passed; full iOS sources/tests type-checked. Simulator services were unavailable, so animation, physical haptics and keyboard transition are not visually/device verified.

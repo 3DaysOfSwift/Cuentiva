@@ -21,7 +21,55 @@ import Observation
     }
     private var sessionID = UUID()
     private var replyTasks: [UUID: Task<Void, Never>] = [:]
-    init(author: Author, feature: any ChatFeature, audio: any LessonAudio, level: String = "A2") {
+    enum AdmissionPhase { case ready, accepted, celebrating, balanceUpdated, dismissing, finished }
+    private(set) var admissionPhase: AdmissionPhase = .ready
+    private(set) var admissionSuccess = 0
+    private var admissionTask: Task<Void, Never>?
+    private let admissionPause: @MainActor (Duration) async throws -> Void
+    var admissionVisible: Bool { admissionPhase != .dismissing && admissionPhase != .finished }
+    var admissionCelebrating: Bool {
+        admissionPhase == .celebrating || admissionPhase == .balanceUpdated
+    }
+    var displayedCoins: Int {
+        let reserved = feature.sessionAuthorized && !feature.sessionPaid
+            && admissionPhase != .ready && admissionPhase != .accepted && admissionPhase != .celebrating
+        return max(0, feature.coins - (reserved ? 1 : 0))
+    }
+    // Optimistic reservation only. The feature still commits the charge with the first reply.
+    @discardableResult func celebrateAdmission() -> Bool {
+        guard admissionPhase == .ready, authorizeSession() else { return false }
+        admissionSuccess += 1
+        admissionPhase = .accepted
+        let admittingSession = sessionID
+        admissionTask = Task {
+            do {
+                try await admissionPause(.milliseconds(80))
+                guard !Task.isCancelled, sessionID == admittingSession else { return }
+                admissionPhase = .celebrating
+                try await admissionPause(.milliseconds(850))
+                guard !Task.isCancelled, sessionID == admittingSession else { return }
+                admissionPhase = .balanceUpdated
+                try await admissionPause(.milliseconds(650))
+                guard !Task.isCancelled, sessionID == admittingSession else { return }
+                admissionPhase = .dismissing
+                try await admissionPause(.milliseconds(450))
+                guard !Task.isCancelled, sessionID == admittingSession else { return }
+                admissionPhase = .finished
+                admissionTask = nil
+            } catch {
+                // Ending a topic cancels the presentation and releases its reservation.
+            }
+        }
+        return true
+    }
+    private func resetAdmission() {
+        admissionTask?.cancel()
+        admissionTask = nil
+        admissionPhase = .ready
+    }
+    init(author: Author, feature: any ChatFeature, audio: any LessonAudio, level: String = "A2",
+         admissionPause: @escaping @MainActor (Duration) async throws -> Void = { try await Task.sleep(for: $0) }) {
+        self.admissionPause = admissionPause
         self.author = author
         self.feature = feature
         self.audio = audio
@@ -29,14 +77,15 @@ import Observation
     }
     var unlocked: Bool { feature.hasAccess }
     var canStart: Bool { unlocked && preparedSession && feature.ready && feature.unavailable == nil }
-    func authorizeSession() {
-        guard canStart else { return }
+    @discardableResult func authorizeSession() -> Bool {
+        guard canStart else { return false }
         error = nil
-        do { try feature.authorizeSession() }
-        catch { self.error = error.localizedDescription }
+        do { try feature.authorizeSession(); return feature.sessionAuthorized }
+        catch { self.error = error.localizedDescription; return false }
     }
     var sessionMessage: String {
         if feature.sessionPaid { return "This topic is paid for. Keep chatting while this screen stays open." }
+        if feature.sessionAuthorized { return "1 doubloon reserved. Charged after your first successful reply." }
         return "One doubloon covers this topic. Charged after your first successful reply."
     }
     var turns: [ChatTurn] { feature.conversation(for: author).turns }
@@ -89,6 +138,7 @@ import Observation
         audio.stop()
     }
     func endSession() {
+        resetAdmission()
         cancel()
         feature.endSession(id: sessionID)
         sessionID = UUID()
@@ -104,6 +154,7 @@ import Observation
         error = nil
         do {
             try await feature.clear(author: author)
+            resetAdmission()
             translations = []; suggestionTranslations = []
         } catch { self.error = error.localizedDescription }
     }
