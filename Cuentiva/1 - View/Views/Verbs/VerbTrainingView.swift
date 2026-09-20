@@ -2,6 +2,7 @@ import SwiftUI
 
 struct VerbTrainingView: View {
     @State private var model: VerbTrainingViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(ThemeManager.self) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     init(model: VerbTrainingViewModel = VerbTrainingViewModel()) { _model = State(initialValue: model) }
@@ -15,6 +16,40 @@ struct VerbTrainingView: View {
                         Text("\(model.days) of 20 practice days")
                     } else if !model.claimed || model.giftCelebrated {
                         gift
+                    } else if model.awaitingCompletion {
+                        VStack(spacing: 24) {
+                            Text("12 of 12 reps finished").font(.system(.largeTitle, design: .serif))
+                            Text("Your last sentence is complete. Time to celebrate your practice.")
+                                .foregroundStyle(theme.theme.muted)
+                            Button("Complete Verb Training", action: model.completeTraining)
+                                .buttonStyle(PrimaryButton()).disabled(model.busy)
+                        }.frame(maxWidth: .infinity).multilineTextAlignment(.center).id("workout-summary")
+                        if let phrase = model.state.phrase {
+                            VerbSolutionView(phrase: phrase, showsCharts: false)
+                        }
+                    } else if model.state.setComplete {
+                        VStack(spacing: 18) {
+                            Image(systemName: "checkmark.seal.fill")
+                                .font(.system(size: 88)).foregroundStyle(theme.theme.rewardGold)
+                            Text("Workout completed!").font(.system(.largeTitle, design: .serif))
+                            Text("12 sentences. A little more confidence.").foregroundStyle(theme.theme.muted)
+                            Button("Practise more") { Task { await model.next() } }
+                                .buttonStyle(PrimaryButton()).disabled(model.busy)
+                                .padding(.vertical, 24)
+                        }.frame(maxWidth: .infinity).multilineTextAlignment(.center).id("workout-summary")
+                        Text("Your last 12 sentences").font(.title2.bold())
+                        ForEach(Array(model.summary.enumerated()), id: \.offset) { _, id in
+                            if let phrase = VerbCatalogue.phrase(id: id) {
+                                VerbSolutionView(phrase: phrase, showsCharts: false)
+                            }
+                        }
+                    } else if model.state.phrase == nil {
+                        VStack(spacing: 24) {
+                            Text("A little verb practice, every day.")
+                                .font(.system(.title, design: .serif))
+                            Button("Start today’s Verb workout") { Task { await model.start() } }
+                                .buttonStyle(PrimaryButton()).disabled(model.busy)
+                        }.frame(maxWidth: .infinity).padding(.vertical, 40)
                     } else {
                         Text(model.state.workoutTitle).font(.system(.largeTitle, design: .serif))
                         Text(model.state.isFocused ? "12 quick reps. One verb, one tense. Repeat the same form, then change the subject." : "12 reps. Build each sentence, explore its verbs, then move to the next.")
@@ -23,8 +58,6 @@ struct VerbTrainingView: View {
                             VStack(alignment: .leading, spacing: 18) {
                                 HStack {
                                     Text("Rep \(model.state.rep) of 12").font(.headline)
-                                    Spacer()
-                                    Text("\(model.state.total) constructed").font(.caption).monospacedDigit()
                                 }
                                 ProgressView(value: Double(model.state.rep - (model.state.finished ? 0 : 1)), total: 12)
                                 Text(phrase.english).font(.title2.bold())
@@ -32,10 +65,7 @@ struct VerbTrainingView: View {
                             if model.state.finished {
                                 VerbSolutionView(phrase: phrase, showsCharts: !model.state.isFocused || model.state.setComplete)
                                     .transition(.move(edge: .top).combined(with: .opacity))
-                                if model.state.setComplete {
-                                    Label("12 reps complete. Nice work!", systemImage: "checkmark.seal.fill").font(.title2.bold())
-                                }
-                                Button(model.state.setComplete ? "Reset 12 reps" : "Next rep") {
+                                Button("Next rep") {
                                     Task { await model.next() }
                                 }.buttonStyle(PrimaryButton()).disabled(model.busy)
                             } else {
@@ -70,13 +100,25 @@ struct VerbTrainingView: View {
                     InlineError(message: model.error)
                 }.padding(24)
             }
+            .onChange(of: model.state.setComplete) { _, complete in
+                if complete { reader.scrollTo("workout-summary", anchor: .top) }
+            }
             .onChange(of: model.state.roundID) { _, _ in
                 if !reduceMotion { withAnimation { reader.scrollTo("current-rep", anchor: .top) } }
                 else { reader.scrollTo("current-rep", anchor: .top) }
             }
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
             .navigationTitle("Verb Training").navigationBarTitleDisplayMode(.inline)
+            .fullScreenCover(isPresented: Binding(get: { model.showingCelebration }, set: { _ in })) {
+                VerbWorkoutCelebration(summary: model.workoutSummary, busy: model.busy, error: model.error) {
+                    Task { await model.continueFromCelebration() }
+                }
+            }
+            .sensoryFeedback(.success, trigger: model.showingCelebration)
             .task { await model.prepare() }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active { Task { await model.prepare() } }
+            }
             .sensoryFeedback(.success, trigger: model.giftCelebrated)
             .sensoryFeedback(.success, trigger: model.state.total)
             .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: model.state.finished)

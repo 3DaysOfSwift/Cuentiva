@@ -3,7 +3,7 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct VerbTrainingViewModelTests {
-    @Test func workoutStartsAutomaticallyAndAdvancesOnlyAfterCompletion() async throws {
+    @Test func workoutWaitsForStartAndAdvancesOnlyAfterCompletion() async throws {
         let repo = MemoryProgress()
         var saved = LearnerProgress(); saved.claimedVerbGift = true
         try await repo.save(saved)
@@ -11,6 +11,8 @@ import Testing
         let purchases = TestPurchases(); purchases.hasAccess = true
         let model = VerbTrainingViewModel(feature: VerbTrainingManager(progress: progress, purchases: purchases))
         await model.prepare()
+        #expect(model.state.phrase == nil)
+        await model.start()
         let original = model.state
         let phrase = try #require(original.phrase)
         await model.next()
@@ -31,6 +33,47 @@ import Testing
         let resumed = VerbTrainingViewModel(feature: VerbTrainingManager(progress: progress, purchases: purchases))
         await resumed.prepare()
         #expect(resumed.state == model.state)
+    }
+    @Test func completedWorkoutReturnsToSummaryUntilNextDay() async throws {
+        let repo = MemoryProgress()
+        var saved = LearnerProgress(); saved.claimedVerbGift = true
+        try await repo.save(saved)
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let progress = ProgressManager(repository: repo, now: { now }); try await progress.load()
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let feature = VerbTrainingManager(progress: progress, purchases: purchases)
+        let model = VerbTrainingViewModel(feature: feature)
+        await model.prepare(); await model.start()
+        for rep in 0..<12 {
+            let phrase = try #require(model.state.phrase)
+            for word in phrase.words { await model.choose(word) }
+            if rep < 11 { await model.next() }
+        }
+        #expect(model.state.setComplete && model.summary.count == 12)
+        #expect(model.awaitingCompletion)
+        model.completeTraining()
+        #expect(model.showingCelebration)
+        await repo.setFailure(true)
+        await model.continueFromCelebration()
+        #expect(model.showingCelebration && model.error != nil && model.awaitingCompletion)
+        await repo.setFailure(false)
+        await model.continueFromCelebration()
+        #expect(!model.showingCelebration && !model.awaitingCompletion)
+        let reopened = VerbTrainingViewModel(feature: feature)
+        await reopened.prepare()
+        #expect(reopened.state.setComplete && reopened.summary == model.summary)
+        #expect(!reopened.awaitingCompletion)
+        now = now.addingTimeInterval(86400)
+        await reopened.prepare()
+        #expect(reopened.state.phrase == nil && !reopened.state.setComplete)
+        #expect(reopened.state.total == 12)
+        await repo.setFailure(true)
+        await reopened.start()
+        #expect(reopened.error != nil && reopened.state.phrase == nil)
+        await repo.setFailure(false)
+        await reopened.start()
+        #expect(reopened.state.phrase != nil && reopened.state.rep == 1)
+        #expect(!reopened.state.isFocused)
     }
     @Test func trailShowsOnlyTwelvePreviousSentencesNewestFirst() async throws {
         let repo = MemoryProgress()

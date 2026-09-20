@@ -15,10 +15,14 @@ struct DailyPracticeCard: View {
                     Spacer()
                     DoubloonBalance(count: 1, earned: rewarded)
                 }
-                Text(rewarded ? "Today’s doubloon earned · Come back tomorrow" : "From today’s three books · One play-through each · Earn 1 doubloon")
+                Text(rewarded ? "Today’s rewards earned · Come back tomorrow" : "From today’s three books · One play-through each · Earn 1 doubloon per game")
                     .font(.caption).foregroundStyle(theme.theme.muted)
             }.padding(20).frame(maxWidth: .infinity, alignment: .leading)
                 .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 24))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 24)
+                        .strokeBorder(rewarded ? theme.theme.rewardGold : theme.theme.accent.opacity(0.2), lineWidth: rewarded ? 2 : 1)
+                }
         }.buttonStyle(.plain)
     }
 }

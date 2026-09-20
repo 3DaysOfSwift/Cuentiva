@@ -7,6 +7,17 @@ import Testing
 #endif
 
 @Suite struct VerbCatalogueTests {
+    @Test func celebrationCountsOnlyLastTwelveAndCountsCompoundExpressionsOnce() {
+        let ids = ["ir/future/yo"] + Array(repeating: "comer/perfect/yo", count: 6)
+            + Array(repeating: "comer/goingTo/yo", count: 4) + ["comer/present/yo", "scene/code"]
+        let summary = VerbWorkoutSummary(phraseIDs: ids)
+        #expect(summary.past == 7)
+        #expect(summary.future == 4)
+        #expect(summary.verbs == ["comer", "escribir", "haber", "ir", "trabajar"])
+        let focused = VerbWorkoutSummary(phraseIDs: (0..<12).map { "focus/comer/preterite/\($0)" })
+        #expect(focused.verbs == ["comer"] && focused.past == 12 && focused.future == 0)
+    }
+
     @Test func focusedSetsAlternateOnlyAfterTwelveCompletedRepsAndResume() throws {
         var state = VerbTrainingState()
         try state.prepare()

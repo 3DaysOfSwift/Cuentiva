@@ -58,8 +58,11 @@ import Observation
             }
             guard next.verbTrainingGiftOpened else { throw AppFailure.unavailable("Open your Verb Training gift first.") }
             var state = next.verbTraining ?? VerbTrainingState()
+            state.refreshDay(dayKey(now()))
             switch action {
             case .claimGift: break
+            case .refreshDay: break
+            case .reviewCompletion(let round): try state.reviewCompletion(round: round)
             case .prepare: try state.prepare()
             case .next(let round): try state.next(after: round)
             case .select(let id): try state.select(id)
@@ -81,8 +84,13 @@ import Observation
     func prepareDailyPractice(books: [Book]) async throws {
         try await commit { next in
             let day = dayKey(now())
-            if let existing = next.dailyPracticeSession, existing.day == day {
-                guard existing.valid else { throw AppFailure.invalidBook }; return
+            if var existing = next.dailyPracticeSession, existing.day == day {
+                guard existing.valid else { throw AppFailure.invalidBook }
+                // Sessions from the old bundle-reward policy can have completed,
+                // unpaid games. Reconcile them atomically when practice is opened.
+                creditPracticeRewards(&existing, to: &next)
+                next.dailyPracticeSession = existing
+                return
             }
             guard next.dailyReadingDate.map({ calendar.isDate($0, inSameDayAs: now()) }) == true,
                   next.dailyReadingIDs == books.map(\.id) else { throw AppFailure.incomplete }
@@ -92,11 +100,15 @@ import Observation
     private func savePractice(_ session: inout DailyPracticeSession, to next: inout LearnerProgress) {
         if next.streakDays == nil { next.streakDays = next.practiceDays }
         next.practiceDays.insert(dayKey(now()))
-        if session.completed.count == DailyPracticeGame.allCases.count && !session.rewarded {
-            next.doubloons = (next.doubloons ?? 0) + 1
-            session.rewarded = true
-        }
+        creditPracticeRewards(&session, to: &next)
         next.dailyPracticeSession = session
+    }
+    private func creditPracticeRewards(_ session: inout DailyPracticeSession, to next: inout LearnerProgress) {
+        let credited = session.creditedGames
+        let newlyEarned = session.completed.subtracting(credited)
+        next.doubloons = (next.doubloons ?? 0) + newlyEarned.count
+        session.rewardedGames = credited.union(newlyEarned)
+        session.rewarded = session.creditedGames.count == DailyPracticeGame.allCases.count
     }
     func answerDailyPractice(_ choice: String, game: DailyPracticeGame, day: String) async throws -> Bool {
         try await commit { next in

@@ -5,6 +5,7 @@ struct DailyMatchSection: View {
     let challenge: DailyMatchChallenge
     let onPlay: (Book) -> Void
     @Environment(ThemeManager.self) private var theme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 12) {
@@ -16,16 +17,21 @@ struct DailyMatchSection: View {
                 .foregroundStyle(theme.theme.muted)
             Text("\(challenge.completedBookIDs.count) of 3 games completed").font(.headline)
             ForEach(books) { book in
+                let completed = challenge.completedBookIDs.contains(book.id)
                 Button { onPlay(book) } label: {
                     HStack(spacing: 16) {
                         BookCover(book: book, compact: true).frame(width: 140)
                             .scaleEffect(0.5).frame(width: 70, height: 110).accessibilityHidden(true)
                         VStack(alignment: .leading, spacing: 6) {
                             Text(book.englishTitle).font(.headline)
+                            if completed {
+                                Label("COMPLETED", systemImage: "checkmark.seal.fill")
+                                    .font(.caption.bold()).foregroundStyle(theme.theme.rewardGold)
+                            }
                             if challenge.paidBookIDs.contains(book.id) {
                                 HStack(spacing: 6) {
-                                    DoubloonIcon(size: 24).accessibilityHidden(true)
-                                    Text(challenge.rewardedBookIDs?.contains(book.id) == true ? "1 doubloon earned" : "Reward collected")
+                                    DoubloonIcon(size: 36).accessibilityHidden(true)
+                                    Text(challenge.rewardedBookIDs?.contains(book.id) == true ? "+1 doubloon earned" : "Reward collected")
                                         .font(.subheadline.weight(.semibold))
                                         .fixedSize(horizontal: false, vertical: true)
                                 }.foregroundStyle(theme.theme.rewardGold)
@@ -36,11 +42,27 @@ struct DailyMatchSection: View {
                             }
                         }
                         Spacer(minLength: 0)
-                        Image(systemName: challenge.completedBookIDs.contains(book.id) ? "checkmark.circle.fill" : "play.circle.fill")
-                            .font(.title).foregroundStyle(theme.theme.accent)
-                    }.padding(16).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
+                        if !completed {
+                            Image(systemName: "play.circle.fill")
+                                .font(.title).foregroundStyle(theme.theme.accent)
+                        }
+                    }.padding(16)
+                        .background {
+                            RoundedRectangle(cornerRadius: 20).fill(theme.theme.surface)
+                                .overlay {
+                                    if completed {
+                                        RoundedRectangle(cornerRadius: 20).fill(theme.theme.rewardGold.opacity(0.12))
+                                    }
+                                }
+                        }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 20)
+                                .strokeBorder(completed ? theme.theme.rewardGold : theme.theme.accent.opacity(0.2), lineWidth: completed ? 2 : 1)
+                        }
                 }.buttonStyle(.plain)
+                    .accessibilityHint(completed ? "Play again without earning another daily reward" : "Complete 30 pairs to earn one doubloon")
             }
         }.padding(.vertical, 12)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: challenge.completedBookIDs)
     }
 }

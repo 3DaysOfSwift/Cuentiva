@@ -60,6 +60,9 @@ struct DailyPracticeSession: Codable, Equatable, Sendable {
     var trailScore = 0
     var trailBroken = false
     var rewarded = false
+    var rewardedGames: Set<DailyPracticeGame>?
+    // Old daily bundles were already paid; never pay them again on migration.
+    var creditedGames: Set<DailyPracticeGame> { rewardedGames ?? (rewarded ? completed : []) }
     var rounds: Int { min(5, phrases.count) }
     var missingPhrase: PracticePhrase { phrases[min(missingIndex, phrases.count - 1)] }
     var builderPhrase: PracticePhrase { phrases[min(builderIndex + rounds, phrases.count - 1)] }

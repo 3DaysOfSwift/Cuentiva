@@ -10,6 +10,22 @@ struct VerbTrainingState: Codable, Equatable, Sendable {
     // Optional fields let an interrupted pre-workout exercise migrate safely.
     var usedTiles: [Int]?
     var workoutStart: Int?
+    var workoutDay: String?
+    var completionReviewed: Bool?
+    mutating func reviewCompletion(round: UUID) throws {
+        guard round == roundID, setComplete else { throw AppFailure.incomplete }
+        completionReviewed = true
+    }
+    mutating func refreshDay(_ day: String) {
+        if let previous = workoutDay, previous != day {
+            let completedSet = setComplete
+            phraseID = nil; position = 0; cloud = []; usedTiles = []
+            roundID = UUID()
+            workoutStart = completedSet ? nil : total
+        }
+        // Preserve existing workouts when upgrading from versions without dates.
+        workoutDay = day
+    }
     var focusedSet: FocusedVerbSet?
     var isFocused: Bool { focusedSet != nil }
     var workoutTitle: String {
@@ -72,12 +88,15 @@ struct VerbTrainingState: Codable, Equatable, Sendable {
         if finished {
             repetitions[phrase.id, default: 0] += 1
             history.append(phrase.id)
+            if setComplete { completionReviewed = false }
         }
         return true
     }
 }
 enum VerbTrainingAction: Sendable {
     case claimGift
+    case reviewCompletion(round: UUID)
+    case refreshDay
     case prepare
     case next(after: UUID?)
     // Targeted selection remains an internal content/testing operation; the screen

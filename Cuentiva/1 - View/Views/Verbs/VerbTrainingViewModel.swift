@@ -7,10 +7,25 @@ import Observation
     private(set) var error: String?
     private(set) var feedback: String?
     private(set) var giftCelebrated = false
+    private(set) var showingCelebration = false
+    private var celebrationRound: UUID?
+    var workoutSummary: VerbWorkoutSummary { VerbWorkoutSummary(phraseIDs: state.history) }
+    var awaitingCompletion: Bool { state.setComplete && state.completionReviewed != true }
+    func completeTraining() {
+        guard !busy, state.setComplete else { return }
+        celebrationRound = state.roundID
+        showingCelebration = true
+    }
+    func continueFromCelebration() async {
+        guard !busy, let round = celebrationRound else { return }
+        await perform(.reviewCompletion(round: round))
+        if error == nil { showingCelebration = false; celebrationRound = nil }
+    }
     var eligible: Bool { feature.eligible }
     var claimed: Bool { feature.claimed }
     var days: Int { feature.practiceDays }
     var state: VerbTrainingState { feature.state }
+    var summary: [String] { Array(state.history.suffix(12).reversed()) }
     var trail: [String] {
         let previous = state.finished ? Array(state.history.dropLast()) : state.history
         return Array(previous.suffix(12).reversed())
@@ -23,11 +38,15 @@ import Observation
         do { try await feature.perform(.claimGift); giftCelebrated = true }
         catch { self.error = error.localizedDescription }
     }
-    func enterGift() async { giftCelebrated = false; await prepare() }
+    func enterGift() async { giftCelebrated = false; await start() }
     func prepare() async {
         guard eligible, claimed, !giftCelebrated else { return }
-        await perform(.prepare)
+        await perform(.refreshDay)
+        if showingCelebration && !state.setComplete {
+            showingCelebration = false; celebrationRound = nil
+        }
     }
+    func start() async { await perform(.prepare) }
     func next() async { await perform(.next(after: state.phraseID == nil ? nil : state.roundID)) }
     private func perform(_ action: VerbTrainingAction) async {
         guard !busy else { return }

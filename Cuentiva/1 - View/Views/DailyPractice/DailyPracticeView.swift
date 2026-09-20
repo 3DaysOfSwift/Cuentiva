@@ -11,33 +11,18 @@ struct DailyPracticeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                if let session = model.session {
+                if let session = model.displayedSession {
                     if let game = model.selected {
                         if session.completed.contains(game) {
                             result(session, game: game)
                         } else {
-                            Text(game.title).font(.largeTitle.bold())
+                            if game != .sentenceBuilder {
+                                Text(game.title).font(.largeTitle.bold())
+                            }
                             exercise(session, game: game)
                         }
                     } else {
-                        Text("A little practice, a stronger sentence.").font(.system(.largeTitle, design: .serif))
-                        Text("One daily set from your three selected books. You can leave and resume unfinished games.")
-                            .foregroundStyle(theme.theme.muted)
-                        ForEach(DailyPracticeGame.allCases) { game in
-                            Button { model.select(game) } label: {
-                                HStack(spacing: 14) {
-                                    Image(systemName: game.symbol).font(.title)
-                                    Text(game.title).font(.title3.bold())
-                                    Spacer()
-                                    Image(systemName: session.completed.contains(game) ? "checkmark.circle.fill" : "play.circle.fill")
-                                }.padding(20).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
-                            }.buttonStyle(.plain).disabled(session.completed.contains(game))
-                        }
-                        if session.rewarded {
-                            Label("All three finished. 1 doubloon earned!", systemImage: "checkmark.seal.fill")
-                            DoubloonBalance(count: 1, earned: true, size: 48)
-                            Text("New games tomorrow. Your reward has been saved.").foregroundStyle(theme.theme.muted)
-                        } else { Text("Finish all three to earn 1 doubloon.") }
+                        DailyPracticeOverview(session: session, select: model.select)
                     }
                 } else if model.busy { ProgressView("Preparing practice…") }
                 else { Button("Prepare today’s practice") { Task { await model.prepare() } } }
@@ -45,9 +30,40 @@ struct DailyPracticeView: View {
                 InlineError(message: model.error)
             }.padding(24)
         }
+        .disabled(model.celebrationID != nil)
+        .overlay {
+            if model.celebrationID != nil {
+                VStack(spacing: 24) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 110))
+                        .foregroundStyle(theme.theme.accent)
+                        .symbolEffect(.bounce, options: .nonRepeating, isActive: !reduceMotion)
+                    Text("Round completed").font(.largeTitle.bold())
+                }
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(theme.theme.paper)
+                .transition(reduceMotion ? .opacity : .scale(scale: 0.9).combined(with: .opacity))
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: model.celebrationID)
+        .task(id: model.celebrationID) { await model.celebrateRound() }
+        .sensoryFeedback(.success, trigger: model.celebrationID)
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
         .navigationTitle("Daily practice").navigationBarTitleDisplayMode(.inline)
-        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } } }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                if model.selected != nil {
+                    Text("\(model.completedRounds)")
+                        .font(.headline).monospacedDigit()
+                        .contentTransition(.numericText())
+                        .animation(.easeInOut(duration: 0.25), value: model.completedRounds)
+                        .accessibilityLabel("\(model.completedRounds) rounds completed")
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
+        }
         .task { await model.prepare() }
         .sensoryFeedback(.success, trigger: model.session?.rewarded ?? false)
     }
@@ -64,7 +80,6 @@ struct DailyPracticeView: View {
             tiles(session.missingOptions)
             Text(session.missingPhrase.source).font(.caption).foregroundStyle(theme.theme.muted)
         case .sentenceBuilder:
-            Text("Sentence \(session.builderIndex + 1) of \(session.rounds)").font(.caption)
             Text(session.builderPhrase.english).font(.title3)
             Text(session.builderTokens.isEmpty ? "Tap words to rebuild the book’s sentence…" : session.builderTokens.map { session.builderPhrase.words[$0] }.joined(separator: " "))
                 .font(.title).padding().frame(maxWidth: .infinity, alignment: .leading)
@@ -75,8 +90,6 @@ struct DailyPracticeView: View {
                         .buttonStyle(.bordered).disabled(model.busy || session.builderTokens.contains(index))
                 }
             }
-            Text("Recreate the original wording. Other Spanish phrasings may also be valid.").font(.caption).foregroundStyle(theme.theme.muted)
-            Text(session.builderPhrase.source).font(.caption)
         case .sentenceTrail:
             if session.trailScore == 0 {
                 Menu("Scene: \(session.scenario.title)") {
@@ -111,17 +124,23 @@ struct DailyPracticeView: View {
             Image(systemName: "checkmark.circle.fill").font(.system(size: 72)).foregroundStyle(theme.theme.accent)
                 .symbolEffect(.bounce, options: .nonRepeating, isActive: !reduceMotion)
             Text(game == .sentenceTrail ? "\(session.trailScore) words in a row" : "\(game.title) finished!").font(.largeTitle.bold())
-            if game == .sentenceTrail, session.trailBroken {
+            if !model.showingReward, game == .sentenceTrail, session.trailBroken {
                 Text("The next word was “\(session.currentTrail.words[session.trailWord])”.")
                 Text(session.currentTrail.spanish).font(.title3)
             }
-            if session.rewarded {
+            if model.showingReward {
                 DoubloonIcon(size: 100)
                 Text("You earned 1 doubloon!").font(.title.bold())
-                Text("All three games finished. Your coin is saved to your balance.")
+                Text("Practice completed. Your coin is saved to your balance.")
             }
             Text("One play-through per day. Come back tomorrow for another set.").foregroundStyle(theme.theme.muted)
-            Button("Back to daily practice") { model.selected = nil }.buttonStyle(PrimaryButton())
+            if model.showingReward {
+                Button("Back to daily practice") { model.selected = nil }.buttonStyle(PrimaryButton())
+            } else {
+                Button("Complete practice", action: model.completePractice).buttonStyle(PrimaryButton())
+            }
         }.multilineTextAlignment(.center).frame(maxWidth: .infinity)
+            .animation(reduceMotion ? nil : .easeInOut(duration: 0.3), value: model.showingReward)
+            .sensoryFeedback(.success, trigger: model.showingReward)
     }
 }

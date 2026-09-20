@@ -168,7 +168,7 @@ struct HomeView: View {
                         .scrollIndicators(.hidden).padding(.horizontal, -23)
                 }
                 Text(
-                    "DEMO EDITION • Original illustrative stories, not verified memoirs. Difficulty is approximate and considers more than vocabulary."
+                    "Open source • Original illustrative stories • Lightweight local AI-enabled library of Spanish stories & tales."
                 ).font(.caption2).foregroundStyle(theme.theme.muted).padding(.top, 8)
             }.padding(.horizontal, 23).padding(.bottom, 30)
                 .overlay(alignment: .top) {

@@ -7,6 +7,37 @@ import Testing
 #endif
 
 @Suite @MainActor struct DailyPracticeManagerTests {
+    @Test func openingOldPartialPracticeCreditsMissingCoinExactlyOnce() async throws {
+        let repo = MemoryProgress()
+        let books = (0..<3).map { sample("old\($0)", sentences: 4) }
+        let manager = ProgressManager(repository: repo)
+        try await manager.load()
+        try await manager.saveDailyReading(books.map(\.id), date: .now)
+        try await manager.prepareDailyPractice(books: books)
+        var saved = manager.snapshot
+        var session = try #require(saved.dailyPracticeSession)
+        session.missingIndex = session.rounds
+        session.completed = [.missingWord]
+        session.rewardedGames = nil
+        session.rewarded = false
+        saved.dailyPracticeSession = session
+        saved.doubloons = 7
+        try await repo.save(saved)
+        let restored = ProgressManager(repository: repo); try await restored.load()
+        await repo.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await restored.prepareDailyPractice(books: books) }
+        #expect(restored.snapshot.doubloons == 7)
+        #expect(restored.dailyPractice?.creditedGames.isEmpty == true)
+        await repo.setFailure(false)
+        try await restored.prepareDailyPractice(books: books)
+        #expect(restored.snapshot.doubloons == 8)
+        #expect(restored.dailyPractice?.rewardedGames == [.missingWord])
+        let reopened = ProgressManager(repository: repo); try await reopened.load()
+        try await reopened.prepareDailyPractice(books: books)
+        #expect(reopened.snapshot.doubloons == 8)
+        #expect(reopened.dailyPractice?.rewardedGames?.count == 1)
+    }
+
     @Test func everyBookCanSupplyDailyPractice() throws {
         #if canImport(CuentivaAppModel)
         let url = TestResources.repositoryRoot.appending(path: "Cuentiva/3 - App Resources/Library.dat")
@@ -34,6 +65,8 @@ import Testing
         while let session = progress.dailyPractice, !session.completed.contains(.missingWord) {
             #expect(try await progress.answerDailyPractice(session.missingAnswer, game: .missingWord, day: day))
         }
+        #expect(progress.snapshot.doubloons == 1)
+        #expect(progress.dailyPractice?.creditedGames == [.missingWord])
         let restored = ProgressManager(repository: repo, now: { now })
         try await restored.load()
         #expect(restored.dailyPractice?.completed.contains(.missingWord) == true)
@@ -44,10 +77,11 @@ import Testing
         #expect(try await restored.answerDailyPractice(session.currentTrail.words[0], game: .sentenceTrail, day: day))
         await repo.setFailure(true)
         await #expect(throws: AppFailure.self) { try await restored.stopDailyTrail(day: day) }
-        #expect(restored.snapshot.doubloons ?? 0 == 0)
+        #expect(restored.snapshot.doubloons == 2)
         await repo.setFailure(false)
         try await restored.stopDailyTrail(day: day)
-        #expect(restored.snapshot.doubloons == 1)
+        #expect(restored.snapshot.doubloons == 3)
+        #expect(restored.dailyPractice?.creditedGames == Set(DailyPracticeGame.allCases))
         #expect(restored.streak == 0)
         #expect(restored.snapshot.practiceDays.count == 1)
         #expect(restored.snapshot.wordExposureHistory?.count == 1)

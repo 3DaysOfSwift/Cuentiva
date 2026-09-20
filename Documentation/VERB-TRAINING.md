@@ -49,3 +49,11 @@ In a Debug build, open Settings → Developer testing → Enable Verb Training n
 New workouts begin with a focused set; each completed 12-rep set switches between focused drills and the existing sentence generator. Existing interrupted sentence sets finish before switching. The selected mode, verb and tense persist with the workout.
 
 Focused sets use seven core verbs (comer, beber, ir, pedir, pagar, comprar, querer), with present, past and future sets. Querer uses the imperfect for its past practice. Six first-person reps establish one form, followed by six reps varying the subject. Short authored complements keep sentences within five words. The cloud contains all answer words plus two distractors. Feedback stays compact until the final rep reveals the conjugation chart; focused history entries stay compact. There is no new picker, tab, price or reward rule.
+
+### Daily workout presentation
+
+Opening Verbs refreshes the local calendar day without generating a sentence. A fresh day shows “Start today’s Verb workout”; pressing it starts the set. Same-day unfinished sets resume, and completed sets show a completion summary of the latest 12 sentences, newest first. “Practise more” explicitly starts the next alternating set. The lifetime constructed count remains stored but is no longer shown. A new day clears the current exercise while preserving all history and totals; undated existing workouts retain their current state on upgrade.
+
+### Completion celebration
+
+After rep 12, “Complete Verb Training” opens a dedicated celebration. It lists distinct verbs from the latest 12 sentences and counts past/future expressions, including repeats. Compound forms count once; ir + a counts as future. Continue persists acknowledgement before returning to the completed-day summary, with retry on save failure. Completed sessions awaiting acknowledgement retain the completion button after relaunch.
