@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
     @State private var carouselWidth: CGFloat = 0
+    @Namespace private var revivalCoinAnimation
 
     init(viewModel: HomeViewModel = HomeViewModel()) {
         _viewModel = State(initialValue: viewModel)
@@ -14,19 +15,46 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 StreakBar(days: viewModel.week)
-                if viewModel.canReviveStreak {
+                if viewModel.showingRevival {
                     VStack(alignment: .leading, spacing: 12) {
-                        Label("Keep your streak going", systemImage: "flame.fill").font(.title2.bold())
-                        Text("Missed yesterday? Revive your streak for 4 doubloons before today ends. You must also complete a book today.")
-                            .foregroundStyle(theme.theme.muted)
-                        DoubloonBalance(count: viewModel.revivalBalance)
-                        Button("Revive streak · 4 doubloons") { Task { await viewModel.reviveStreak() } }
-                            .buttonStyle(PrimaryButton())
-                            .disabled(viewModel.reviving || viewModel.revivalBalance < 4)
-                        if viewModel.revivalBalance < 4 {
-                            Text("You need 4 doubloons. Earn more by reading or playing Match Pairs.").font(.caption)
+                        if viewModel.revivalPhase == .success {
+                            VStack(spacing: 16) {
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 34, weight: .bold))
+                                    .foregroundStyle(theme.theme.checkButtonForeground)
+                                    .frame(width: 80, height: 80)
+                                    .background(theme.theme.checkButtonBackground, in: Circle())
+                                    .matchedGeometryEffect(id: "admission-coin", in: revivalCoinAnimation,
+                                        properties: reduceMotion ? [] : .frame)
+                                    .symbolEffect(.bounce, options: .nonRepeating, isActive: !reduceMotion)
+                                Text("Revival paid").font(.headline)
+                                DoubloonBalance(count: viewModel.revivalBalance)
+                                    .contentTransition(.numericText())
+                            }.frame(maxWidth: .infinity).accessibilityElement(children: .combine)
+                        } else {
+                            Label("Keep your streak going", systemImage: "flame.fill").font(.title2.bold())
+                            Text("Missed yesterday? Revive your streak for 4 doubloons before today ends. You must also complete a book today.")
+                                .foregroundStyle(theme.theme.muted)
+                            DoubloonBalance(count: viewModel.revivalBalance)
+                            if viewModel.revivalPhase == .slide || viewModel.revivalPhase == .paying {
+                                SlideToStartView(confirm: viewModel.confirmRevivalPayment,
+                                    coinAnimation: revivalCoinAnimation, title: "Slide to revive", cost: 4,
+                                    paymentHint: "Pay 4 doubloons to revive yesterday. Complete a book today to keep your streak.")
+                                    .id(viewModel.revivalAttempt)
+                                    .disabled(viewModel.revivalPhase == .paying)
+                                if viewModel.reviving { Text("Saving payment…").font(.caption) }
+                            } else {
+                                Button("Revive streak · 4 doubloons", action: viewModel.offerRevivalPayment)
+                                    .buttonStyle(PrimaryButton())
+                                    .disabled(viewModel.revivalBalance < 4)
+                            }
+                            if viewModel.revivalBalance < 4 {
+                                Text("You need 4 doubloons. Earn more by reading or playing Match Pairs.").font(.caption)
+                            }
                         }
                     }.padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
+                    .animation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.5, dampingFraction: 0.85), value: viewModel.revivalPhase)
+                    .sensoryFeedback(.success, trigger: viewModel.revivalSuccess)
                 } else if viewModel.revivalNeedsBook {
                     Label("Complete a book today to restore your streak.", systemImage: "flame.fill")
                 }

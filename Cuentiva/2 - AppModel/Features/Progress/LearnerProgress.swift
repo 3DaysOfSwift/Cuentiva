@@ -93,4 +93,4 @@ struct CompletionReceipt: Identifiable, Sendable {
     }
     var requestsReview: Bool { isNew && total == ReadingMilestones.reviewBookCount && streakThemeGift == nil }
 }
-struct WeekDay: Identifiable { let id: String; let label: String; let practiced: Bool; let today: Bool }
+struct WeekDay: Identifiable { let id: String; let label: String; let practiced: Bool; let today: Bool; var revived = false }

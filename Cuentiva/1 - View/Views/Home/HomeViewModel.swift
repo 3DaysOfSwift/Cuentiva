@@ -7,6 +7,29 @@ import Observation
     var canReviveStreak: Bool { progress.canReviveStreak }
     var revivalNeedsBook: Bool { progress.revivalNeedsBook }
     var revivalBalance: Int { progress.snapshot.doubloons ?? 0 }
+    enum RevivalPhase { case button, slide, paying, success, finished }
+    private(set) var revivalPhase: RevivalPhase = .button
+    private(set) var revivalSuccess = 0
+    private(set) var revivalAttempt = UUID()
+    private var revivalTask: Task<Void, Never>?
+    var showingRevival: Bool { canReviveStreak || revivalPhase == .paying || revivalPhase == .success }
+    func offerRevivalPayment() {
+        guard canReviveStreak, revivalBalance >= 4, !reviving else { return }
+        revivalPhase = .slide
+    }
+    @discardableResult func confirmRevivalPayment() -> Bool {
+        guard revivalPhase == .slide, canReviveStreak, revivalBalance >= 4, revivalTask == nil else { return false }
+        revivalPhase = .paying
+        revivalTask = Task {
+            await reviveStreak()
+            if revivalPhase == .success {
+                do { try await Task.sleep(for: .milliseconds(1500)) } catch { return }
+                revivalPhase = .finished
+            }
+            revivalTask = nil
+        }
+        return true
+    }
     private(set) var reviving = false
     var revivalError: String?
     var revivalNotice: String?
@@ -17,10 +40,16 @@ import Observation
         defer { reviving = false }
         do {
             try await progress.reviveStreak()
+            revivalPhase = .success
+            revivalSuccess += 1
             revivalNotice = progress.revivalNeedsBook
                 ? "4 doubloons paid. Complete a book today to restore your streak."
                 : "Streak restored. You also earned today’s 1-doubloon streak bonus."
-        } catch { revivalError = error.localizedDescription }
+        } catch {
+            revivalError = error.localizedDescription
+            revivalPhase = .slide
+            revivalAttempt = UUID()
+        }
     }
     var practiceBook: Book?
     var challengeDay: String?

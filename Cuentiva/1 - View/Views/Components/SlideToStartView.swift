@@ -4,6 +4,8 @@ struct SlideToStartView: View {
     let confirm: () -> Bool
     let coinAnimation: Namespace.ID
     var title = "Slide to start"
+    var cost = 1
+    var paymentHint = "One doubloon covers up to 100 sent messages. Charged after the first successful reply."
     @State private var model = SlideToStartViewModel()
     @GestureState private var translation: CGFloat = 0
     @Environment(ThemeManager.self) private var theme
@@ -40,8 +42,8 @@ struct SlideToStartView: View {
             }
             .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8), value: translation)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(title) for 1 doubloon")
-            .accessibilityHint("One doubloon covers up to 100 sent messages. Charged after the first successful reply.")
+            .accessibilityLabel("\(title) for \(cost) \(cost == 1 ? "doubloon" : "doubloons")")
+            .accessibilityHint(paymentHint)
             .accessibilityAddTraits(.isButton)
             .accessibilityAction { model.activate(confirm: confirm) }
         }

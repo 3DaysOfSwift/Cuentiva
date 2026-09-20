@@ -175,7 +175,8 @@ import Observation
             return WeekDay(
                 id: dayKey(date), label: date.formatted(.dateTime.weekday(.narrow)),
                 practiced: snapshot.qualifyingStreakDays.contains(dayKey(date)),
-                today: calendar.isDate(date, inSameDayAs: today))
+                today: calendar.isDate(date, inSameDayAs: today),
+                revived: (snapshot.revivedStreakDays ?? []).contains(dayKey(date)))
         }
     }
     /// Launch and member activation share one read. Cancelling a caller does

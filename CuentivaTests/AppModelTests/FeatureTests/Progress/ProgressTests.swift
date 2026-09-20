@@ -38,6 +38,7 @@ import Testing
 
     @Test(arguments: [false, true]) func revivalCostsFourRequiresTodaysBookAndCannotRepeat(readFirst: Bool) async throws {
         var calendar = Calendar(identifier: .gregorian)
+        calendar.firstWeekday = 2
         calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
         var now = Date(timeIntervalSince1970: 1_800_000_000)
         let repo = MemoryProgress(), book = sample()
@@ -57,6 +58,9 @@ import Testing
         await repo.setFailure(false)
         try await progress.reviveStreak()
         #expect(!progress.canReviveStreak)
+        let revived = try #require(progress.week.first { $0.revived })
+        #expect(!revived.practiced)
+        #expect(!revived.today)
         #expect(progress.revivalNeedsBook == !readFirst)
         #expect(progress.streak == (readFirst ? 2 : 0))
         #expect(progress.snapshot.doubloons == (readFirst ? 8 : 7))

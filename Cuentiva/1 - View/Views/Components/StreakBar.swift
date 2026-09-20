@@ -8,12 +8,12 @@ struct StreakBar: View {
             ForEach(days) { day in
                 VStack(spacing: 5) {
                     Text(day.label).font(.caption2.weight(.semibold))
-                    Image(systemName: day.practiced ? "checkmark.circle.fill" : day.today ? "circle.inset.filled" : "circle")
-                        .font(.title3).opacity(day.practiced || day.today ? 1 : 0.35)
+                    Image(systemName: day.revived ? "arrow.counterclockwise.circle.fill" : day.practiced ? "checkmark.circle.fill" : day.today ? "circle.inset.filled" : "circle")
+                        .font(.title3).opacity(day.revived || day.practiced || day.today ? 1 : 0.35)
                 }
                 .frame(maxWidth: .infinity)
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel("\(day.id): \(day.practiced ? "practiced" : "not practiced")")
+                .accessibilityLabel("\(day.id): \(day.revived ? "streak revived" : day.practiced ? "practiced" : "not practiced")")
             }
         }.foregroundStyle(theme.theme.accent).padding(.vertical, 4)
     }
