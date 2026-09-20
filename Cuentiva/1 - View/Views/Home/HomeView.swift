@@ -214,14 +214,13 @@ struct HomeView: View {
             .scrollPosition(id: $viewModel.focusedBookID, anchor: .leading)
             .animation(reduceMotion ? nil : .snappy(duration: 0.35), value: viewModel.focusedBookID)
             .padding(.horizontal, -23)
-            .onAppear {
-                if let id = viewModel.focusedRead?.id { carousel.scrollTo(id, anchor: .leading) }
-            }
-            .onChange(of: carouselWidth) { _, width in
-                // Reapply after measuring the viewport and its final trailing margin.
-                if width > 0, let id = viewModel.focusedRead?.id {
-                    carousel.scrollTo(id, anchor: .leading)
-                }
+            .task(id: carouselWidth) {
+                // Let the measured trailing margin settle before changing scroll position.
+                // A newer size cancels this alignment instead of scrolling during layout.
+                guard carouselWidth > 0 else { return }
+                await Task.yield()
+                guard !Task.isCancelled, let id = viewModel.focusedRead?.id else { return }
+                carousel.scrollTo(id, anchor: .leading)
             }
         }
     }
