@@ -21,10 +21,14 @@ import Testing
         #expect(app.languageTerms.term("noun") != nil)
         let book = sample()
         #expect(!app.practice.allowed(book))
+        #expect(!app.verbs.eligible)
+        #expect(app.verbs.practiceDays == 0)
+        await #expect(throws: AppFailure.self) { try await app.verbs.perform(.claimGift) }
         purchases.hasAccess = true
         try await app.progress.recordEncounter(book: book, sentence: book.sentences[0])
         _ = try await app.learning.finishReading(book)
         #expect(app.practice.allowed(book))
+        #expect(app.verbs.practiceDays == 1)
         #expect(app.practice.coins == app.chat.coins)
         #expect(app.chat.coins == 1)
         purchases.hasAccess = false

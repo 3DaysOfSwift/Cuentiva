@@ -7,6 +7,7 @@ import Observation
     let today: HomeViewModel
     private let progress: any ProgressFeature
     var chatUnlocked: Bool { progress.snapshot.canOfferChat(onSupportedDevice: AppleChatGenerator.supportsDevice) }
+    var verbsUnlocked: Bool { progress.snapshot.verbTrainingUnlocked }
     var writingUnlocked: Bool { progress.snapshot.writingUnlocked }
     private let purchases: any PurchaseFeature
     private let library: any LibraryFeature

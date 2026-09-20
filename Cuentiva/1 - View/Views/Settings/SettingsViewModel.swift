@@ -1,6 +1,17 @@
 import Foundation
 import Observation
 @MainActor @Observable final class SettingsViewModel {
+    #if DEBUG
+    var verbTrainingPreview: Bool { progress.snapshot.verbTrainingPreview }
+    private(set) var changingVerbPreview = false
+    func toggleVerbTrainingPreview() async {
+        guard !changingVerbPreview else { return }
+        changingVerbPreview = true; error = nil
+        defer { changingVerbPreview = false }
+        do { try await progress.setVerbTrainingPreview(!verbTrainingPreview) }
+        catch { self.error = error.localizedDescription }
+    }
+    #endif
     private let library: any LibraryFeature
     var syncing: Bool { library.syncing }
     var syncMessage: String? { library.syncMessage }

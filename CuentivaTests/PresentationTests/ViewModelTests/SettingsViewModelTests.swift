@@ -3,6 +3,20 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct SettingsViewModelTests {
+    #if DEBUG
+    @Test func verbPreviewCanBeEnabledAndDisabledWithoutAddingDays() async throws {
+        let (p, s, l, _, _) = try await makeViewModelTestGraph()
+        let model = SettingsViewModel(library: l, progress: s, purchases: p)
+        #expect(!model.verbTrainingPreview)
+        await model.toggleVerbTrainingPreview()
+        #expect(model.verbTrainingPreview)
+        #expect(s.snapshot.verbTrainingUnlocked)
+        #expect(s.snapshot.practiceDays.isEmpty)
+        await model.toggleVerbTrainingPreview()
+        #expect(!model.verbTrainingPreview)
+        #expect(!s.snapshot.verbTrainingUnlocked)
+    }
+    #endif
     @Test func settingsRestoreExplainsExistingAndRecoveredAccess() async throws {
         let (p,s,l,_,_) = try await makeViewModelTestGraph()
         let vm = SettingsViewModel(library: l, progress: s, purchases: p)

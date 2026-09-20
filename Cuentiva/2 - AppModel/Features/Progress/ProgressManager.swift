@@ -18,6 +18,10 @@ import Observation
     func stopDailyTrail(day: String) async throws
     func selectPracticeScenario(_ scenario: PracticeScenario, day: String) async throws
     @discardableResult func completeDailyGame(book: Book, day: String, words: Set<String>, elapsed: Double?) async throws -> MatchRewardReceipt?
+    #if DEBUG
+    func setVerbTrainingPreview(_ enabled: Bool) async throws
+    #endif
+    @discardableResult func performVerbTraining(_ action: VerbTrainingAction) async throws -> Bool
     func claimAutomaticLibraryCheck() async throws -> Bool
     func acknowledgeWelcome(day: String) async throws
     func load() async throws
@@ -40,6 +44,36 @@ import Observation
     func reset() async throws
 }
 @MainActor @Observable final class ProgressManager: ProgressFeature {
+    #if DEBUG
+    func setVerbTrainingPreview(_ enabled: Bool) async throws {
+        try await commit { $0.debugVerbTrainingEnabled = enabled }
+    }
+    #endif
+    @discardableResult func performVerbTraining(_ action: VerbTrainingAction) async throws -> Bool {
+        try await commit { next in
+            guard next.verbTrainingUnlocked else { throw AppFailure.unavailable("Your Verb Training gift opens after 20 practice days.") }
+            if case .claimGift = action {
+                if next.practiceDays.count >= 20 { next.claimedVerbGift = true }
+                return true
+            }
+            guard next.verbTrainingGiftOpened else { throw AppFailure.unavailable("Open your Verb Training gift first.") }
+            var state = next.verbTraining ?? VerbTrainingState()
+            switch action {
+            case .claimGift: break
+            case .prepare: try state.prepare()
+            case .next(let round): try state.next(after: round)
+            case .select(let id): try state.select(id)
+            case .choose(let word, let round, let index):
+                guard try state.choose(word, round: round, index: index) else { return false }
+                // Verb practice contributes to active days, not the book-completion streak.
+                if next.streakDays == nil { next.streakDays = next.practiceDays }
+                next.practiceDays.insert(dayKey(now()))
+                recordExposure(word, to: &next)
+            }
+            next.verbTraining = state
+            return true
+        }
+    }
     var dailyPractice: DailyPracticeSession? {
         guard let value = snapshot.dailyPracticeSession, value.day == dayKey(now()), value.valid else { return nil }
         return value

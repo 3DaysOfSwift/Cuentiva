@@ -15,9 +15,12 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 StreakBar(days: viewModel.week)
-                if viewModel.dailyReads.count == 3 {
-                    DailyPracticeCard(completed: viewModel.dailyPracticeSession?.completed.count ?? 0,
-                        rewarded: viewModel.dailyPracticeSession?.rewarded ?? false) { viewModel.showingDailyPractice = true }
+                if viewModel.hasVerbGift {
+                    Button { viewModel.showingVerbGift = true } label: {
+                        Label("Your day-20 gift · Verb Training", systemImage: "gift.fill")
+                            .font(.title3.bold()).padding(20).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
+                    }.buttonStyle(.plain)
                 }
                 if viewModel.showingRevival {
                     VStack(alignment: .leading, spacing: 12) {
@@ -65,6 +68,13 @@ struct HomeView: View {
                 InlineError(message: viewModel.revivalError)
                 if let notice = viewModel.revivalNotice { Text(notice).foregroundStyle(theme.theme.accent) }
                 Divider()
+                if viewModel.dailyReads.count == 3 {
+                    Label("Missing Words", systemImage: "puzzlepiece.extension.fill")
+                        .font(.system(.largeTitle, design: .serif, weight: .medium))
+                    DailyPracticeCard(completed: viewModel.dailyPracticeSession?.completed.count ?? 0,
+                        rewarded: viewModel.dailyPracticeSession?.rewarded ?? false) { viewModel.showingDailyPractice = true }
+                    Divider()
+                }
                 if let challenge = viewModel.dailyChallenge, viewModel.challengeBooks.count == 3 {
                     DailyMatchSection(books: viewModel.challengeBooks, challenge: challenge, onPlay: viewModel.playDailyGame)
                     Divider()
@@ -164,7 +174,7 @@ struct HomeView: View {
                 .overlay(alignment: .top) {
                     HiddenProgressView()
                         .fixedSize(horizontal: false, vertical: true)
-                        .alignmentGuide(.top) { dimensions in dimensions[.bottom] + 90 }
+                        .alignmentGuide(.top) { dimensions in dimensions[.bottom] + 110 }
                 }
         }.scrollBounceBehavior(.always, axes: .vertical)
             .background(theme.theme.paper).foregroundStyle(theme.theme.ink).navigationTitle("")
@@ -199,6 +209,12 @@ struct HomeView: View {
             .task(id: viewModel.refreshID) { await viewModel.refresh() }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await viewModel.prepareDailyReads() } }
+            }
+            .fullScreenCover(isPresented: $viewModel.showingVerbGift) {
+                NavigationStack {
+                    VerbTrainingView()
+                        .toolbar { ToolbarItem(placement: .topBarTrailing) { Button("Done") { viewModel.showingVerbGift = false } } }
+                }
             }
             .fullScreenCover(isPresented: $viewModel.showingDailyPractice) {
                 NavigationStack { DailyPracticeView(books: viewModel.dailyReads, feature: AppModel.shared.dailyPractice) }

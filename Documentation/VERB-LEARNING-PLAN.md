@@ -1,6 +1,6 @@
 # Next feature: Yesterday, today, tomorrow
 
-Plan only. No verb game or additional purchases are implemented by this work.
+The day-20 Verb Training gift is now implemented; see [VERB-TRAINING.md](VERB-TRAINING.md) for actual coverage and behaviour. This document retains the original planning rationale. Additional purchases remain out of scope.
 
 Build short, character-led situations around the same action in three time frames: today I order a coffee, yesterday I ordered one, tomorrow I will order one. Begin with present, preterite and ir a + infinitive; introduce imperfect and simple future separately, with context that makes the intended meaning clear.
 

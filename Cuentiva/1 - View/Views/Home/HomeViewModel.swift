@@ -51,6 +51,8 @@ import Observation
             revivalAttempt = UUID()
         }
     }
+    var showingVerbGift = false
+    var hasVerbGift: Bool { progress.snapshot.verbTrainingUnlocked && !progress.snapshot.verbTrainingGiftOpened }
     var showingDailyPractice = false
     var dailyPracticeSession: DailyPracticeSession? { progress.dailyPractice }
     var practiceBook: Book?

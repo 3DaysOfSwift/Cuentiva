@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RootView: View {
-    private enum LibraryTab { case today, bookstore, completed, whosApp }
+    private enum LibraryTab { case today, bookstore, completed, verbs, whosApp }
     @State private var selectedTab: LibraryTab = .today
     @State private var viewModel = RootViewModel()
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -24,6 +24,11 @@ struct RootView: View {
                         }
                         Tab("Completed", systemImage: "checkmark.seal", value: LibraryTab.completed) {
                             NavigationStack { CompletedView() }
+                        }
+                        if viewModel.verbsUnlocked {
+                            Tab("Verbs", systemImage: "text.word.spacing", value: LibraryTab.verbs) {
+                                NavigationStack { VerbTrainingView() }
+                            }
                         }
                         if viewModel.chatUnlocked {
                             Tab("WhosApp", systemImage: "bubble.left.and.bubble.right", value: LibraryTab.whosApp) {
@@ -58,6 +63,9 @@ struct RootView: View {
             .task { await viewModel.start() }
             .task(id: viewModel.hasAccess && !viewModel.checkingAccess) {
                 await viewModel.accessChanged()
+            }
+            .onChange(of: viewModel.verbsUnlocked) { _, unlocked in
+                if !unlocked && selectedTab == .verbs { selectedTab = .today }
             }
             .onChange(of: viewModel.chatUnlocked) { _, unlocked in
                 if !unlocked && selectedTab == .whosApp { selectedTab = .today }

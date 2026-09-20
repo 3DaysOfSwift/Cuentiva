@@ -7,6 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1F0DBE0B2AD5412183BD1516 /* FocusedVerbSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6F93DB0C0BA401AB220CB61; };
+		D1BEACC6E96E4AB4B045A058 /* WordTileLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED1A5EE2C0B449119631DEA2; };
+		1022880682324A8C9EA75D3E /* VerbSolutionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F226DEEB7A4D5FB69749C0; };
+		288069C3D6644171B95AEAA6 /* VerbAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 842873D07C12418592249CAB; };
+		33A7FB3DF92747AFBFF49152 /* VerbTrainingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8C5A1C77BE64D5FA1F942FD; };
+		37314FAAFDAB470DB5F82070 /* VerbCatalogueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A820C14890348F4B0414FF0; };
+		00FDA7A5557149E9AC23BC5F /* VerbTrainingManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A69C3E1937492C9746BA3C; };
+		031561F6CE644E96B1AAA74E /* VerbTrainingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F422FE9225498792468820; };
+		347F1BD20D3B4B2190D95FEF /* VerbTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26D56308010A42929F25F792; };
+		64A9DD6195C94D60ADB1FFC5 /* VerbTrainingState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D3574E87884B8A816981DF; };
+		70668BE1BA9F4B74BB63817D /* VerbCatalogue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14085E40F89B463A90524186; };
+		67D35CED43A94B519BDBE69D /* VerbFormsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B052D3CDEB9D460C95943EC8; };
+		267E79786F3B4D2F83353CF9 /* VerbTrainingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A507A61AA13A4B4FB159D9AA; };
+		51DC56B30B7F4765A72468BC /* VerbTrainingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2EA374822134759AA56C3B6; };
 		E1E63EC82076481C8173C91E /* DailyPracticeViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F425F728FC546419FC82CF3; };
 		19E8900880EB45188E3CEFB5 /* DailyPracticeManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0494EE5CDF040AA92E0C2A7; };
 		C12378A903364475AAA4726C /* DailyPracticeSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8C7D6F8D104FFB9B3704B7; };
@@ -221,6 +235,20 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D6F93DB0C0BA401AB220CB61 /* FocusedVerbSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Verbs/FocusedVerbSet.swift"; sourceTree = SOURCE_ROOT; };
+		ED1A5EE2C0B449119631DEA2 /* WordTileLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Verbs/WordTileLayout.swift"; sourceTree = SOURCE_ROOT; };
+		11F226DEEB7A4D5FB69749C0 /* VerbSolutionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Verbs/VerbSolutionView.swift"; sourceTree = SOURCE_ROOT; };
+		842873D07C12418592249CAB /* VerbAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Verbs/VerbAnalysis.swift"; sourceTree = SOURCE_ROOT; };
+		D8C5A1C77BE64D5FA1F942FD /* VerbTrainingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/PresentationTests/ViewModelTests/VerbTrainingViewModelTests.swift"; sourceTree = SOURCE_ROOT; };
+		7A820C14890348F4B0414FF0 /* VerbCatalogueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/AppModelTests/FeatureTests/Verbs/VerbCatalogueTests.swift"; sourceTree = SOURCE_ROOT; };
+		A7A69C3E1937492C9746BA3C /* VerbTrainingManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/AppModelTests/FeatureTests/Verbs/VerbTrainingManagerTests.swift"; sourceTree = SOURCE_ROOT; };
+		83F422FE9225498792468820 /* VerbTrainingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Verbs/VerbTrainingManager.swift"; sourceTree = SOURCE_ROOT; };
+		26D56308010A42929F25F792 /* VerbTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Verbs/VerbTables.swift"; sourceTree = SOURCE_ROOT; };
+		33D3574E87884B8A816981DF /* VerbTrainingState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Verbs/VerbTrainingState.swift"; sourceTree = SOURCE_ROOT; };
+		14085E40F89B463A90524186 /* VerbCatalogue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Verbs/VerbCatalogue.swift"; sourceTree = SOURCE_ROOT; };
+		B052D3CDEB9D460C95943EC8 /* VerbFormsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Verbs/VerbFormsView.swift"; sourceTree = SOURCE_ROOT; };
+		A507A61AA13A4B4FB159D9AA /* VerbTrainingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Verbs/VerbTrainingViewModel.swift"; sourceTree = SOURCE_ROOT; };
+		E2EA374822134759AA56C3B6 /* VerbTrainingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Verbs/VerbTrainingView.swift"; sourceTree = SOURCE_ROOT; };
 		3F425F728FC546419FC82CF3 /* DailyPracticeViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/PresentationTests/ViewModelTests/DailyPracticeViewModelTests.swift"; sourceTree = SOURCE_ROOT; };
 		B0494EE5CDF040AA92E0C2A7 /* DailyPracticeManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CuentivaTests/AppModelTests/FeatureTests/Practice/DailyPracticeManagerTests.swift"; sourceTree = SOURCE_ROOT; };
 		EA8C7D6F8D104FFB9B3704B7 /* DailyPracticeSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/Practice/DailyPracticeSession.swift"; sourceTree = SOURCE_ROOT; };
@@ -449,6 +477,20 @@
 		00AAA2D68ABF2349C21D9466 /* PresentationTests */ = {
 			isa = PBXGroup;
 			children = (
+				D6F93DB0C0BA401AB220CB61 /* FocusedVerbSet.swift */,
+				ED1A5EE2C0B449119631DEA2 /* WordTileLayout.swift */,
+				11F226DEEB7A4D5FB69749C0 /* VerbSolutionView.swift */,
+				842873D07C12418592249CAB /* VerbAnalysis.swift */,
+				D8C5A1C77BE64D5FA1F942FD /* VerbTrainingViewModelTests.swift */,
+				7A820C14890348F4B0414FF0 /* VerbCatalogueTests.swift */,
+				A7A69C3E1937492C9746BA3C /* VerbTrainingManagerTests.swift */,
+				83F422FE9225498792468820 /* VerbTrainingManager.swift */,
+				26D56308010A42929F25F792 /* VerbTables.swift */,
+				33D3574E87884B8A816981DF /* VerbTrainingState.swift */,
+				14085E40F89B463A90524186 /* VerbCatalogue.swift */,
+				B052D3CDEB9D460C95943EC8 /* VerbFormsView.swift */,
+				A507A61AA13A4B4FB159D9AA /* VerbTrainingViewModel.swift */,
+				E2EA374822134759AA56C3B6 /* VerbTrainingView.swift */,
 				3F425F728FC546419FC82CF3 /* DailyPracticeViewModelTests.swift */,
 				B0494EE5CDF040AA92E0C2A7 /* DailyPracticeManagerTests.swift */,
 				EA8C7D6F8D104FFB9B3704B7 /* DailyPracticeSession.swift */,
@@ -1250,6 +1292,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33A7FB3DF92747AFBFF49152 /* VerbTrainingViewModelTests.swift in Sources */,
+				37314FAAFDAB470DB5F82070 /* VerbCatalogueTests.swift in Sources */,
+				00FDA7A5557149E9AC23BC5F /* VerbTrainingManagerTests.swift in Sources */,
 				E1E63EC82076481C8173C91E /* DailyPracticeViewModelTests.swift in Sources */,
 				19E8900880EB45188E3CEFB5 /* DailyPracticeManagerTests.swift in Sources */,
 				ACEC85513695A4C930AC65E0 /* BinaryLibraryTests.swift */,
@@ -1325,6 +1370,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F0DBE0B2AD5412183BD1516 /* FocusedVerbSet.swift in Sources */,
+				D1BEACC6E96E4AB4B045A058 /* WordTileLayout.swift in Sources */,
+				1022880682324A8C9EA75D3E /* VerbSolutionView.swift in Sources */,
+				288069C3D6644171B95AEAA6 /* VerbAnalysis.swift in Sources */,
+				031561F6CE644E96B1AAA74E /* VerbTrainingManager.swift in Sources */,
+				347F1BD20D3B4B2190D95FEF /* VerbTables.swift in Sources */,
+				64A9DD6195C94D60ADB1FFC5 /* VerbTrainingState.swift in Sources */,
+				70668BE1BA9F4B74BB63817D /* VerbCatalogue.swift in Sources */,
+				67D35CED43A94B519BDBE69D /* VerbFormsView.swift in Sources */,
+				267E79786F3B4D2F83353CF9 /* VerbTrainingViewModel.swift in Sources */,
+				51DC56B30B7F4765A72468BC /* VerbTrainingView.swift in Sources */,
 				C12378A903364475AAA4726C /* DailyPracticeSession.swift in Sources */,
 				DCBB8A2B631049ADA2DB1440 /* DailyPracticeManager.swift in Sources */,
 				FB4DA9F35C76452DA7A030DB /* DailyPracticeViewModel.swift in Sources */,

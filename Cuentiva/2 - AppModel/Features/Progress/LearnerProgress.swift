@@ -27,6 +27,18 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var availableThemes: [ColourThemeID] {
         [.library, .midnight] + ThemePack.allCases.filter(hasInstalled).flatMap(\.themes)
     }
+    var claimedVerbGift: Bool? = nil
+    var verbTraining: VerbTrainingState? = nil
+    var debugVerbTrainingEnabled: Bool? = nil
+    var verbTrainingPreview: Bool {
+        #if DEBUG
+        debugVerbTrainingEnabled == true
+        #else
+        false
+        #endif
+    }
+    var verbTrainingGiftOpened: Bool { claimedVerbGift == true || verbTrainingPreview }
+    var verbTrainingUnlocked: Bool { verbTrainingGiftOpened || practiceDays.count >= 20 }
     var dailyPracticeSession: DailyPracticeSession? = nil
     var wordExposureHistory: [String: Int]? = nil
     var lastAutomaticLibraryCheckDay: String? = nil

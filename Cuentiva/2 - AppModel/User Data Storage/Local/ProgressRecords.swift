@@ -30,6 +30,15 @@ enum ProgressRecords {
     /// Encode only changed fields and explicitly removed keys, never the full archive.
     static func changes(_ value: LearnerProgress, previous: LearnerProgress?) throws -> RecordChanges {
         var rows = RecordChanges()
+        if previous == nil || previous?.debugVerbTrainingEnabled != value.debugVerbTrainingEnabled {
+            rows["debugVerbTrainingEnabled"] = try RecordCoding.encode(value.debugVerbTrainingEnabled)
+        }
+        if previous == nil || previous?.claimedVerbGift != value.claimedVerbGift {
+            rows["claimedVerbGift"] = try RecordCoding.encode(value.claimedVerbGift)
+        }
+        if previous == nil || previous?.verbTraining != value.verbTraining {
+            rows["verbTraining"] = try RecordCoding.encode(value.verbTraining)
+        }
         if previous == nil || previous?.dailyPracticeSession != value.dailyPracticeSession {
             rows["dailyPracticeSession"] = try RecordCoding.encode(value.dailyPracticeSession)
         }
@@ -165,6 +174,9 @@ enum ProgressRecords {
             throw AppFailure.unavailable("Your progress records are incomplete.")
         }
         var value = LearnerProgress()
+        if let data = rows["debugVerbTrainingEnabled"] { value.debugVerbTrainingEnabled = try RecordCoding.decode(Bool?.self, data) }
+        if let data = rows["claimedVerbGift"] { value.claimedVerbGift = try RecordCoding.decode(Bool?.self, data) }
+        if let data = rows["verbTraining"] { value.verbTraining = try RecordCoding.decode(VerbTrainingState?.self, data) }
         if let data = rows["dailyPracticeSession"] { value.dailyPracticeSession = try RecordCoding.decode(DailyPracticeSession?.self, data) }
         if let data = rows["wordExposureHistory"] { value.wordExposureHistory = try RecordCoding.decode([String: Int]?.self, data) }
 

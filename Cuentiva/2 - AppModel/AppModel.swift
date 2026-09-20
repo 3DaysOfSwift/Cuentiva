@@ -8,6 +8,7 @@ import Foundation
     let learning: any LearningFeature
     let contributions: any ContributionFeature
     let languageTerms: any LanguageTermsFeature = LanguageTermsManager()
+    let verbs: any VerbTrainingFeature
     let dailyPractice: any DailyPracticeFeature
     let practice: any PracticeFeature
     let chat: any ChatFeature
@@ -18,6 +19,7 @@ import Foundation
         learning: any LearningFeature, contributions: any ContributionFeature, fantasy: any FantasyFeature,
         chat: any ChatFeature, makeAudio: @escaping () -> any LessonAudio
     ) {
+        self.verbs = VerbTrainingManager(progress: progress, purchases: purchases)
         self.chat = chat
         self.fantasy = fantasy
         self.dailyPractice = DailyPracticeManager(progress: progress, purchases: purchases)

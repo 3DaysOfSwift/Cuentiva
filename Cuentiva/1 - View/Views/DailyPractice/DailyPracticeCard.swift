@@ -8,8 +8,6 @@ struct DailyPracticeCard: View {
     var body: some View {
         Button(action: open) {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Your five-minute practice", systemImage: "puzzlepiece.extension.fill")
-                    .font(.system(.title2, design: .serif, weight: .medium))
                 Text("Find the missing word. Build a sentence. Keep the word trail going.")
                     .foregroundStyle(theme.theme.muted)
                 HStack {

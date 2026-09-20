@@ -234,3 +234,16 @@ All 52 bundled books now include exact vocabulary-to-English coverage (4,260 pai
 - DailyPracticeViewModelTests: access rejection, retryable save failure and correct-answer feedback.
 - StatsViewModelTests: rolling 30/365-day counts and chronological cumulative word exposure. These totals represent exposure, not mastery.
 - Three daily games award one coin in total. Sentence Trail follows validated source phrases; it is not a free-form grammar evaluator. Café and bus scenes use reviewed seed phrases.
+
+### Verb Training gift and catalogue (20 September 2026)
+- VerbTrainingManagerTests: day-19/20 boundary, entitlement enforcement, claim persistence/failure/retry, resume, stale taps, repeat counts, no coin charges, practice/streak separation and explicit reset.
+- VerbCatalogueTests: 29 verbs, six reference slots across 18 time/mood constructions, all 2,088 generated training sentences and eight authored scenes playable, independently specified irregular/reflexive golden forms.
+- VerbTrainingViewModelTests: gift celebration only after save, visible errors, retained draft, selected verb/time restored, repeat and stop presentation.
+- Full linguistic/editorial review and physical-device visual testing remain release checks; automated coverage does not establish native-language quality or CEFR attainment.
+
+### Verb workout redesign
+- Full-cloud tests check answer multiplicities, equal distractor count and unchanged tile positions/content after every answer.
+- Set tests check reps 1–12, Next starting a fresh set, rejection of premature/duplicate Next, and preservation of a 100+ sentence trail.
+- Analysis tests check explicit ir/ser disambiguation, auxiliary haber, infinitive/gerund coverage and all multi-verb scene annotations; all generated practice sentences have valid chart ranges.
+- ViewModel tests cover automatic preparation, next-rep flow, no completion save/repeat messaging, persistence failure/retry and returning to the same unfinished rep.
+- Validation: 171 shared-model tests and 59 presentation-harness tests passed; Debug iOS source/type checks passed. The full simulator build is blocked by unavailable CoreSimulator runtimes, so on-device layout/animation remains unverified.

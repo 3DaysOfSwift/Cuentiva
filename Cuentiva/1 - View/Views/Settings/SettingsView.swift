@@ -88,6 +88,18 @@ struct SettingsView: View {
                 }
                 InlineError(message: viewModel.restoreError)
             }.listRowBackground(themeManager.theme.surface)
+            #if DEBUG
+            Section("Developer testing") {
+                Button(viewModel.verbTrainingPreview ? "Disable Verb Training preview" : "Enable Verb Training now") {
+                    Task { await viewModel.toggleVerbTrainingPreview() }
+                }.disabled(viewModel.changingVerbPreview)
+                if viewModel.verbTrainingPreview {
+                    NavigationLink("Open Verb Training") { VerbTrainingView() }
+                }
+                Text("Shows the Verbs tab immediately. Your practice days and earned gifts stay unchanged. This override is ignored in release builds.")
+                    .font(.footnote).foregroundStyle(themeManager.theme.muted)
+            }.listRowBackground(themeManager.theme.surface)
+            #endif
             Section("Your learning") {
                 NavigationLink { VocabularyView() } label: {
                     Label("Your vocabulary", systemImage: "character.book.closed")
