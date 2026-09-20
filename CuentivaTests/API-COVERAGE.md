@@ -194,3 +194,23 @@ All 52 bundled books now include exact vocabulary-to-English coverage (4,260 pai
 - A valid released slide (or accessible activation) authorizes once and immediately triggers success feedback. The panel fades its copy, moves the coin into a centred green check, then reduces the displayed available balance before exiting downward and focusing the composer. Reduce Motion uses a fade without coin travel/bounce; the panel retains its layout during celebration.
 - This is an optimistic reservation: the actual wallet still commits exactly once with the first successful reply. Displayed balance reconciles to the committed wallet without subtracting twice; ending an unpaid topic cancels the presentation and releases the displayed reservation.
 - Controlled-gate tests cover phase order, repeated admission, the last coin remaining usable, authorization rejection/retry, cancellation and late continuations. Validation: 148 shared-model tests and 40 presentation-model tests passed; full iOS sources/tests type-checked. Simulator services were unavailable, so animation, physical haptics and keyboard transition are not visually/device verified.
+
+## Chat spoken-word highlighting — 2026-09-20
+
+- Listen uses the speech adapter's current UTF-16 word range to highlight only the active storyteller message, preserving the existing slow rate. Finishing speech clears the range; cancellation, leaving chat and clearing the topic also clear message ownership.
+- The focused presentation test covers word-range ownership, speech completion, switching messages, cancellation and clearing. All 41 tests in the isolated presentation harness pass. Real speech callback timing and visual rendering still require device validation.
+
+
+## Recoverable paid chat allowances — 2026-09-20
+
+- Each storyteller has a persisted receipt, transcript, compact model memory, sent-message count and return deadline. The first successful reply commits the debit and transcript together; failed generation/save does not spend an allowance. Later successful sent messages increment it atomically. AI reply bubbles do not count.
+- Returning within ten minutes restores the paid allowance, including after spending the last coin. Leaving/backgrounding checkpoints the deadline; abrupt termination falls back to the last saved successful reply. Expired or 100-message allowances retain the transcript behind the renewal panel. Renewal costs one coin on the next successful reply and retains the conversation. Saved history is bounded to the latest 400 messages plus compact memory.
+- Shared tests cover disk-record/JSON round trips, relaunch, storyteller isolation, exact expiry boundary and backward-clock rejection, leaving/checkpointing, message limit/renewal, and dismissal during the first atomic save. Presentation tests cover bypassing admission on restore and showing renewal without clearing messages.
+- Validation: 152 shared-model tests and 43 isolated presentation-model tests passed. Full iOS application and test sources type-checked. Physical background termination, Apple Intelligence generation, haptics, keyboard and panel animation still require device validation. A local receipt enforces normal app behavior; it is not a server-verified anti-tamper credential.
+
+## Daily streak bonus and paid revival — 2026-09-20
+
+- New qualifying streak days require a completed book. Existing practice-day streak history is retained until the first updated reading action; sentence encounters continue to record practice but no longer advance the streak. A first completion on an extended streak awards one additional doubloon, separately from the distinct-book reward, with persisted day-level duplicate protection.
+- Today offers revival only for yesterday's single missed day when the preceding day qualified. Payment commits four doubloons and the bridge together. Today's completed book is still mandatory, whether completed before or after payment. The missed day contributes neither a streak increment nor a practice day. Unfinished paid revival expires at the next calendar day. Two missed days cannot be revived.
+- Tests cover initial/no-bonus day, consecutive bonuses, repeat/reloaded/overlapping completions, failed save and retry, exact charge and duplicate rejection, insufficient funds, both payment/reading orders, relaunch and record round trips, expiry and the existing ten-day theme gift. The HomeViewModel test verifies failed payment followed by saved payment and the required-reading notice.
+- Validation: 157 shared-model tests and 49 isolated presentation-model tests passed. iOS application and test sources type-checked. Visual layout and physical-device runtime remain unverified.

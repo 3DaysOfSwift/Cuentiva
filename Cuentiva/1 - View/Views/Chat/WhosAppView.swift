@@ -17,7 +17,7 @@ struct WhosAppView: View {
                         DoubloonIcon(size: 26)
                         Text("1 doubloon · one conversation").font(.headline)
                     }
-                    Text("Choose a storyteller, then slide to confirm the cost. You’re charged only after the first successful reply. Keep chatting until you leave the conversation.")
+                    Text("Choose a storyteller, then slide to confirm the cost. You’re charged only after the first successful reply. Each coin covers up to \(ChatLimits.messagesPerCoin) sent messages. Return within 10 minutes to resume your saved conversation.")
                         .font(.footnote).foregroundStyle(theme.theme.muted)
                     ForEach(model.authors) { author in
                         NavigationLink { ChatView(author: author) } label: {

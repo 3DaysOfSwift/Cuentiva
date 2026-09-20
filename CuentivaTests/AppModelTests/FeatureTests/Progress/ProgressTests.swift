@@ -7,6 +7,130 @@ import Testing
 #endif
 
 @Suite @MainActor struct ProgressTests {
+    @Test func dailyBonusRequiresCompletionAndIsOncePerDayAcrossReload() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress(), book = sample()
+        let progress = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await progress.load()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        #expect(progress.streak == 0)
+        #expect(try await progress.complete(book: book).streakBonus == 0)
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        #expect(progress.streak == 1)
+        await repo.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.complete(book: book) }
+        #expect(progress.snapshot.doubloons == 1)
+        await repo.setFailure(false)
+        #expect(try await progress.complete(book: book).streakBonus == 1)
+        #expect(progress.streak == 2)
+        let restored = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await restored.load()
+        #expect(try await restored.complete(book: book).streakBonus == 0)
+        #expect(restored.snapshot.doubloons == 2)
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        #expect(try await restored.complete(book: book).streakBonus == 1)
+        #expect(restored.snapshot.doubloons == 3)
+        #expect(try ProgressRecords.decode(ProgressRecords.encode(restored.snapshot)) == restored.snapshot)
+    }
+
+    @Test(arguments: [false, true]) func revivalCostsFourRequiresTodaysBookAndCannotRepeat(readFirst: Bool) async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress(), book = sample()
+        var saved = LearnerProgress(); saved.doubloons = 10
+        try await repo.save(saved)
+        let progress = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await progress.load()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        now = try #require(calendar.date(byAdding: .day, value: 2, to: now))
+        #expect(progress.streak == 0)
+        #expect(progress.canReviveStreak)
+        if readFirst { _ = try await progress.complete(book: book) }
+        await repo.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.reviveStreak() }
+        #expect(progress.snapshot.doubloons == 11)
+        await repo.setFailure(false)
+        try await progress.reviveStreak()
+        #expect(!progress.canReviveStreak)
+        #expect(progress.revivalNeedsBook == !readFirst)
+        #expect(progress.streak == (readFirst ? 2 : 0))
+        #expect(progress.snapshot.doubloons == (readFirst ? 8 : 7))
+        await #expect(throws: AppFailure.self) { try await progress.reviveStreak() }
+        let restored = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await restored.load()
+        _ = try await restored.complete(book: book)
+        #expect(restored.streak == 2)
+        #expect(restored.snapshot.doubloons == 8)
+        #expect(restored.snapshot.practiceDays.count == 2)
+        #expect(!restored.revivalNeedsBook)
+        #expect(try ProgressRecords.decode(ProgressRecords.encode(restored.snapshot)) == restored.snapshot)
+    }
+
+    @Test func revivalExpiresAndInsufficientFundsDoNotChangeProgress() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let progress = ProgressManager(repository: MemoryProgress(), now: { now }, calendar: calendar)
+        try await progress.load()
+        let book = sample()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        now = try #require(calendar.date(byAdding: .day, value: 2, to: now))
+        #expect(progress.canReviveStreak)
+        await #expect(throws: AppFailure.self) { try await progress.reviveStreak() }
+        #expect(progress.snapshot.doubloons == 1)
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        #expect(!progress.canReviveStreak)
+        await #expect(throws: AppFailure.self) { try await progress.reviveStreak() }
+        #expect(try await progress.complete(book: book).streakBonus == 0)
+        #expect(progress.streak == 1)
+    }
+
+    @Test func paidRevivalWithoutTodaysBookExpiresAtMidnight() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress(), book = sample()
+        var saved = LearnerProgress(); saved.doubloons = 4
+        try await repo.save(saved)
+        let progress = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await progress.load()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        now = try #require(calendar.date(byAdding: .day, value: 2, to: now))
+        try await progress.reviveStreak()
+        #expect(progress.revivalNeedsBook)
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        #expect(progress.streak == 0)
+        #expect(!progress.canReviveStreak)
+        #expect(!progress.revivalNeedsBook)
+        #expect(try await progress.complete(book: book).streakBonus == 0)
+        #expect(progress.streak == 1)
+        #expect(progress.snapshot.doubloons == 1)
+    }
+
+    @Test func overlappingCompletionsAwardOneDailyBonus() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let progress = ProgressManager(repository: MemoryProgress(), now: { now }, calendar: calendar)
+        try await progress.load()
+        let book = sample()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
+        async let first = progress.complete(book: book)
+        async let second = progress.complete(book: book)
+        let receipts = try await [first, second]
+        #expect(receipts.map(\.streakBonus).reduce(0, +) == 1)
+        #expect(progress.snapshot.doubloons == 2)
+    }
+
     @Test func completionIsIdempotentAndSurvivesReload() async throws {
         let repository = MemoryProgress(), book = sample()
         let progress = ProgressManager(repository: repository)
@@ -39,7 +163,8 @@ import Testing
         #expect(progress.streak == 1)
         now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
         #expect(progress.streak == 1)
-        try await progress.recordEncounter(book: book, sentence: book.sentences[0]); #expect(progress.streak == 2)
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0]); #expect(progress.streak == 1)
+        _ = try await progress.complete(book: book); #expect(progress.streak == 2)
         now = try #require(calendar.date(byAdding: .day, value: 2, to: now))
         #expect(progress.streak == 0); #expect(progress.snapshot.completed.count == 1)
     }

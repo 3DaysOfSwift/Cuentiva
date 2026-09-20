@@ -3,6 +3,35 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct HomeViewModelTests {
+    @Test func revivalShowsFailureThenReadingRequirementAfterSavedPayment() async throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress(), book = sample()
+        var saved = LearnerProgress(); saved.doubloons = 4
+        try await repo.save(saved)
+        let progress = ProgressManager(repository: repo, now: { now }, calendar: calendar)
+        try await progress.load()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        _ = try await progress.complete(book: book)
+        now = try #require(calendar.date(byAdding: .day, value: 2, to: now))
+        let home = HomeViewModel(library: DelayedLibrary(), progress: progress)
+        #expect(home.canReviveStreak)
+        await repo.setFailure(true)
+        await home.reviveStreak()
+        #expect(home.revivalError != nil)
+        #expect(home.revivalNotice == nil)
+        #expect(home.revivalBalance == 5)
+        await repo.setFailure(false)
+        await home.reviveStreak()
+        #expect(home.revivalError == nil)
+        #expect(home.revivalNeedsBook)
+        #expect(home.revivalBalance == 1)
+        #expect(home.revivalNotice != nil)
+        #expect(!home.canReviveStreak)
+        #expect(!home.reviving)
+    }
+
     @Test func dailyCarouselFocusesNextUnreadAndAllowsBrowsingCompletedBooks() async throws {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress())

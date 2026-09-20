@@ -6,6 +6,9 @@ import Observation
     var revision: UUID { get }
     var loaded: Bool { get }
     var streak: Int { get }
+    var canReviveStreak: Bool { get }
+    var revivalNeedsBook: Bool { get }
+    func reviveStreak() async throws
     var week: [WeekDay] { get }
     var dailyWelcome: DailyWelcome? { get }
     var dailyChallenge: DailyMatchChallenge? { get }
@@ -24,6 +27,9 @@ import Observation
     func setLearningLevel(_ level: LearningLevel?) async throws
     func recordPractice(book: Book, matches: Int, elapsed: Double?) async throws
     func installThemePack(_ pack: ThemePack) async throws
+    func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool) async throws -> PaidChatSession
+    func checkpointChat(authorID: String, receiptID: UUID) async throws
+    func clearChat(authorID: String) async throws
     func payForChat(deliver: @MainActor () -> Bool) async throws
     func reset() async throws
 }
@@ -100,7 +106,7 @@ import Observation
         let day = dayKey(now())
         guard loaded, snapshot.lastWelcomeDay != day else { return nil }
         return DailyWelcome(day: day, streak: streak,
-            practicedToday: snapshot.practiceDays.contains(day),
+            practicedToday: snapshot.qualifyingStreakDays.contains(day),
             returningReader: !snapshot.practiceDays.isEmpty)
     }
     func acknowledgeWelcome(day: String) async throws {
@@ -110,17 +116,56 @@ import Observation
     var streak: Int { streak(in: snapshot) }
     private func streak(in value: LearnerProgress) -> Int {
         var day = calendar.startOfDay(for: now())
+        let days = value.qualifyingStreakDays
         var count = 0
-        if !value.practiceDays.contains(dayKey(day)) {
+        if !days.contains(dayKey(day)) {
             guard let previous = calendar.date(byAdding: .day, value: -1, to: day) else { return 0 }
             day = previous
         }
-        while value.practiceDays.contains(dayKey(day)) {
-            count += 1
+        while true {
+            if days.contains(dayKey(day)) { count += 1 }
+            else if count == 0 || !(value.revivedStreakDays ?? []).contains(dayKey(day)) { break }
             guard let previous = calendar.date(byAdding: .day, value: -1, to: day), previous < day else { break }
             day = previous
         }
         return count
+    }
+    private func missedDay(in value: LearnerProgress) -> String? {
+        guard let yesterday = calendar.date(byAdding: .day, value: -1, to: now()),
+              let before = calendar.date(byAdding: .day, value: -2, to: now()),
+              value.qualifyingStreakDays.contains(dayKey(before)),
+              !value.qualifyingStreakDays.contains(dayKey(yesterday)),
+              !(value.revivedStreakDays ?? []).contains(dayKey(yesterday)) else { return nil }
+        return dayKey(yesterday)
+    }
+    var canReviveStreak: Bool { loaded && missedDay(in: snapshot) != nil }
+    var revivalNeedsBook: Bool {
+        guard let yesterday = calendar.date(byAdding: .day, value: -1, to: now()) else { return false }
+        return (snapshot.revivedStreakDays ?? []).contains(dayKey(yesterday))
+            && !snapshot.qualifyingStreakDays.contains(dayKey(now()))
+    }
+    func reviveStreak() async throws {
+        try await commit { next in
+            guard let missed = missedDay(in: next) else {
+                throw AppFailure.unavailable("A streak can only be revived the day after one missed day.")
+            }
+            guard (next.doubloons ?? 0) >= 4 else {
+                throw AppFailure.unavailable("You need 4 doubloons to revive your streak.")
+            }
+            next.doubloons = (next.doubloons ?? 0) - 4
+            if next.revivedStreakDays == nil { next.revivedStreakDays = [] }
+            next.revivedStreakDays?.insert(missed)
+            // Reading before paying is also valid; award today's bonus exactly once.
+            if next.qualifyingStreakDays.contains(dayKey(now())) { _ = awardStreakBonus(to: &next) }
+        }
+    }
+    private func awardStreakBonus(to next: inout LearnerProgress) -> Int {
+        let today = dayKey(now())
+        guard streak(in: next) >= 2, !(next.rewardedStreakDays ?? []).contains(today) else { return 0 }
+        if next.rewardedStreakDays == nil { next.rewardedStreakDays = [] }
+        next.rewardedStreakDays?.insert(today)
+        next.doubloons = (next.doubloons ?? 0) + 1
+        return 1
     }
     var week: [WeekDay] {
         let today = now()
@@ -129,7 +174,7 @@ import Observation
             guard let date = calendar.date(byAdding: .day, value: offset, to: start) else { return nil }
             return WeekDay(
                 id: dayKey(date), label: date.formatted(.dateTime.weekday(.narrow)),
-                practiced: snapshot.practiceDays.contains(dayKey(date)),
+                practiced: snapshot.qualifyingStreakDays.contains(dayKey(date)),
                 today: calendar.isDate(date, inSameDayAs: today))
         }
     }
@@ -181,6 +226,7 @@ import Observation
         }
     }
     private func addEncounter(book: Book, sentence: Sentence, to next: inout LearnerProgress) {
+        if next.streakDays == nil { next.streakDays = next.practiceDays }
         if next.bookLastRead == nil { next.bookLastRead = [:] }
         next.bookLastRead?[book.id] = now()
         if next.wordHistoryComplete == nil { next.wordHistoryComplete = next.evidence.isEmpty }
@@ -254,6 +300,11 @@ import Observation
             if includingContinuation {
                 for sentence in book.continuation ?? [] { addEncounter(book: book, sentence: sentence, to: &next) }
             }
+            if next.streakDays == nil { next.streakDays = next.practiceDays }
+            next.streakDays?.insert(dayKey(now()))
+            next.practiceDays.insert(dayKey(now()))
+            let streakBonus = awardStreakBonus(to: &next)
+            if next.earnedStreakTheme != true && streak(in: next) >= 10 { next.earnedStreakTheme = true }
             let streakGift = next.earnedStreakTheme == true && next.celebratedStreakTheme != true
             let isNew = !next.completed.contains(book.id)
             let celebrate = !(next.celebratedCompletionDays ?? []).contains(dayKey(now()))
@@ -268,7 +319,7 @@ import Observation
             if next.celebratedCompletionDays == nil { next.celebratedCompletionDays = [] }
             next.celebratedCompletionDays?.insert(dayKey(now()))
             return CompletionReceipt(book: book, isNew: isNew, total: next.completed.count,
-                streakCelebration: celebrate ? streak(in: next) : nil, streakThemeGift: streakGift ? .vip : nil)
+                streakBonus: streakBonus, streakCelebration: celebrate ? streak(in: next) : nil, streakThemeGift: streakGift ? .vip : nil)
         }
     }
     func setVocabulary(_ lemma: String, state: VocabularyState) async throws {
@@ -314,6 +365,53 @@ import Observation
         settled.pendingChatAdmission = false
         try await repository.save(settled)
         snapshot = settled
+    }
+    func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool) async throws -> PaidChatSession {
+        try await commit { next in
+            guard next.chatUnlocked, !authorID.isEmpty else { throw AppFailure.incomplete }
+            let previous = next.chatSessions?[authorID]
+            guard previous?.receiptID == receiptID else { throw AppFailure.unavailable("This conversation changed. Reopen it to continue.") }
+            let count: Int
+            let token: UUID
+            if renewing {
+                guard next.availableChatCoins > 0 else { throw AppFailure.unavailable("Complete another story to earn a doubloon.") }
+                if next.pendingChatAdmission == true { next.pendingChatAdmission = false }
+                else { next.doubloons = (next.doubloons ?? 0) - 1 }
+                count = 1
+                token = UUID()
+            } else {
+                guard let previous, previous.sentMessages > 0,
+                      previous.sentMessages < ChatLimits.messagesPerCoin else {
+                    throw AppFailure.unavailable("This chat allowance is complete. Slide to continue for 1 doubloon.")
+                }
+                count = previous.sentMessages + 1
+                token = previous.receiptID
+            }
+            var saved = conversation
+            saved.messages = Array(saved.messages.suffix(ChatLimits.savedMessages))
+            // An interrupted in-flight message remains visible and can be retried on return.
+            for index in saved.messages.indices where saved.messages[index].delivery == .pending {
+                saved.messages[index].delivery = .failed
+            }
+            let date = now()
+            let session = PaidChatSession(receiptID: token, conversation: saved, sentMessages: count,
+                lastActivity: date, resumeUntil: date.addingTimeInterval(ChatLimits.returnWindow))
+            if next.chatSessions == nil { next.chatSessions = [:] }
+            next.chatSessions?[authorID] = session
+            return session
+        }
+    }
+    func checkpointChat(authorID: String, receiptID: UUID) async throws {
+        try await commit { next in
+            guard var session = next.chatSessions?[authorID], session.receiptID == receiptID,
+                  session.sentMessages < ChatLimits.messagesPerCoin else { return }
+            session.lastActivity = now()
+            session.resumeUntil = session.lastActivity.addingTimeInterval(ChatLimits.returnWindow)
+            next.chatSessions?[authorID] = session
+        }
+    }
+    func clearChat(authorID: String) async throws {
+        try await commit { $0.chatSessions?[authorID] = nil }
     }
     func installThemePack(_ pack: ThemePack) async throws {
         try await commit { next in

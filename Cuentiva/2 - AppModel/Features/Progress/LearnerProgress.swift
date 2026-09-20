@@ -41,6 +41,11 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var dailyReadingIDs: [String]? = nil
     var positions: [String: Int] = [:]
     var practiceDays: Set<String> = []
+    // Nil preserves pre-upgrade streak history until the next reading action.
+    var streakDays: Set<String>? = nil
+    var revivedStreakDays: Set<String>? = nil
+    var rewardedStreakDays: Set<String>? = nil
+    var qualifyingStreakDays: Set<String> { streakDays ?? practiceDays }
     var vocabulary: [String: VocabularyState] = [:]
     var seenWords: Set<String>? = nil
     var wordHistoryComplete: Bool? = nil
@@ -63,6 +68,7 @@ struct LearnerProgress: Codable, Sendable, Equatable {
             bestFullMatchTimes?[bookID] = best
         }
     }
+    var chatSessions: [String: PaidChatSession]? = nil
     var doubloons: Int? = nil
     /// A paid first reply that has not yet been delivered. Counts as one usable coin.
     var pendingChatAdmission: Bool? = nil
@@ -74,6 +80,7 @@ struct CompletionReceipt: Identifiable, Sendable {
     let book: Book
     let isNew: Bool
     let total: Int
+    var streakBonus = 0
     var streakCelebration: Int? = nil
     var streakThemeGift: ThemePack? = nil
     var unlocksChat: Bool { isNew && total == ReadingMilestones.chatOfferBookCount }

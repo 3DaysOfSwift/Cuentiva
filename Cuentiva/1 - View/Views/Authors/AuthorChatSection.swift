@@ -39,7 +39,7 @@ struct AuthorChatSection: View {
                     cost
                 }
             }
-            Text("One doubloon covers a topic until you leave the chat. Charged after your first successful reply, with no charge per message.")
+            Text("One doubloon covers up to 100 sent messages. Charged after your first successful reply. Return within ten minutes to continue with the same storyteller.")
                 .font(.footnote).foregroundStyle(theme.theme.muted)
             if coins > 0 {
                 NavigationLink { ChatView(author: author) } label: {

@@ -5,6 +5,7 @@ import Observation
     let author: Author
     let feature: any ChatFeature
     private let audio: any LessonAudio
+    private var spokenMessageID: UUID?
     var draft = ""
     var level: LearningLevel
     private(set) var preparationError: String?
@@ -26,7 +27,7 @@ import Observation
     private(set) var admissionSuccess = 0
     private var admissionTask: Task<Void, Never>?
     private let admissionPause: @MainActor (Duration) async throws -> Void
-    var admissionVisible: Bool { admissionPhase != .dismissing && admissionPhase != .finished }
+    var admissionVisible: Bool { !feature.sessionAuthorized || (admissionPhase != .dismissing && admissionPhase != .finished) }
     var admissionCelebrating: Bool {
         admissionPhase == .celebrating || admissionPhase == .balanceUpdated
     }
@@ -62,7 +63,7 @@ import Observation
         }
         return true
     }
-    private func resetAdmission() {
+    func resetAdmission() {
         admissionTask?.cancel()
         admissionTask = nil
         admissionPhase = .ready
@@ -76,7 +77,8 @@ import Observation
         self.level = LearningLevel(rawValue: level) ?? .a2
     }
     var unlocked: Bool { feature.hasAccess }
-    var canStart: Bool { unlocked && preparedSession && feature.ready && feature.unavailable == nil }
+    var canPresentAdmission: Bool { preparedSession && feature.ready && feature.unavailable == nil }
+    var canStart: Bool { unlocked && canPresentAdmission }
     @discardableResult func authorizeSession() -> Bool {
         guard canStart else { return false }
         error = nil
@@ -84,9 +86,9 @@ import Observation
         catch { self.error = error.localizedDescription; return false }
     }
     var sessionMessage: String {
-        if feature.sessionPaid { return "This topic is paid for. Keep chatting while this screen stays open." }
+        if feature.sessionPaid { return "This chat allowance is paid for. Return within ten minutes to continue." }
         if feature.sessionAuthorized { return "1 doubloon reserved. Charged after your first successful reply." }
-        return "One doubloon covers this topic. Charged after your first successful reply."
+        return "One doubloon covers this chat. Charged after your first successful reply."
     }
     var turns: [ChatTurn] { feature.conversation(for: author).turns }
     var messages: [ChatMessage] { feature.conversation(for: author).messages }
@@ -109,6 +111,7 @@ import Observation
             guard !Task.isCancelled, sessionID == preparingSessionID else { return }
             feature.beginSession(id: preparingSessionID, author: author)
             preparedSession = true
+            if feature.sessionPaid { admissionPhase = .finished }
         } catch { preparationError = error.localizedDescription }
     }
     func toggleTranslation(for turn: ChatMessage) {
@@ -126,6 +129,7 @@ import Observation
             defer { replyTasks[requestID] = nil }
             do {
                 try await feature.send(text, to: author, level: sendingLevel)
+                if sessionID == sendingSession, !feature.sessionAuthorized { resetAdmission() }
             } catch {
                 guard sessionID == sendingSession else { return }
                 if draft.isEmpty { draft = text }
@@ -135,6 +139,7 @@ import Observation
     }
     func cancel() {
         for task in replyTasks.values { task.cancel() }
+        spokenMessageID = nil
         audio.stop()
     }
     func endSession() {
@@ -147,9 +152,18 @@ import Observation
         error = nil
         translations = []; suggestionTranslations = []
     }
-    func listen(_ turn: ChatMessage) { if unlocked { audio.speak(turn.text, slow: true) } }
+    func listen(_ turn: ChatMessage) {
+        guard unlocked else { return }
+        spokenMessageID = turn.id
+        audio.speak(turn.text, slow: true)
+    }
+    func spokenRange(for message: ChatMessage) -> NSRange? {
+        guard unlocked, spokenMessageID == message.id else { return nil }
+        return audio.spokenRange
+    }
     var audioError: String? { audio.error }
     func clear() async {
+        spokenMessageID = nil
         audio.stop()
         error = nil
         do {

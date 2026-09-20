@@ -40,6 +40,7 @@ import Testing
         try await progress.load()
         let book = sample()
         try await progress.recordEncounter(book: book, sentence: #require(book.sentences.first))
+        _ = try await progress.complete(book: book)
         let today = try #require(progress.dailyWelcome)
         #expect(today.practicedToday)
         #expect(today.nextDay == 1)

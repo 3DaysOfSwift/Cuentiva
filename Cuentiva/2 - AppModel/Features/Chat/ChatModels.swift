@@ -1,6 +1,9 @@
 import Foundation
 
 enum ChatLimits {
+    static let messagesPerCoin = 100
+    static let returnWindow: TimeInterval = 10 * 60
+    static let savedMessages = 400
     static let message = 500
     static let memory = 500
     static let recentExchanges = 2
@@ -47,7 +50,7 @@ struct ChatTurn: Codable, Identifiable, Sendable {
 }
 enum ChatRole: String, Codable, Sendable { case learner, storyteller }
 enum ChatDelivery: String, Codable, Sendable { case pending, delivered, failed }
-struct ChatMessage: Codable, Identifiable, Sendable {
+struct ChatMessage: Codable, Identifiable, Sendable, Equatable {
     var id = UUID()
     let role: ChatRole
     let text: String
@@ -58,7 +61,7 @@ struct ChatMessage: Codable, Identifiable, Sendable {
     var suggestion = ""
     var suggestionEnglish: String? = nil
 }
-struct ChatConversation: Codable, Sendable {
+struct ChatConversation: Codable, Sendable, Equatable {
     var messages: [ChatMessage] = []
     var memory = ""
 
@@ -123,4 +126,18 @@ struct ChatRequest: Sendable {
 protocol ChatGenerator: Sendable {
     func availabilityMessage() async -> String?
     func reply(to request: ChatRequest) async throws -> ChatReply
+}
+
+/// Saved with the wallet debit and transcript in one progress transaction.
+struct PaidChatSession: Codable, Sendable, Equatable {
+    var receiptID: UUID
+    var conversation: ChatConversation
+    var sentMessages: Int
+    var lastActivity: Date
+    var resumeUntil: Date
+    func canResume(at date: Date) -> Bool {
+        sentMessages > 0 && sentMessages < ChatLimits.messagesPerCoin
+            && date >= lastActivity && date < resumeUntil
+            && resumeUntil.timeIntervalSince(lastActivity) <= ChatLimits.returnWindow
+    }
 }

@@ -26,6 +26,13 @@ struct CompletionView: View {
                     DoubloonBalance(count: 1, earned: true, size: 36)
                         .font(.subheadline).foregroundStyle(theme.theme.rewardGold)
                 }
+                if receipt.streakBonus > 0 {
+                    VStack(spacing: 8) {
+                        Label("You kept your streak going!", systemImage: "flame.fill")
+                        DoubloonBalance(count: receipt.streakBonus, earned: true, size: 36)
+                        Text("Daily streak bonus").font(.caption).foregroundStyle(theme.theme.muted)
+                    }.foregroundStyle(theme.theme.rewardGold)
+                }
                 if viewModel.supportsChat && receipt.offersChat && !receipt.unlocksChat {
                     Button {
                         viewModel.showingChat = true
@@ -33,7 +40,7 @@ struct CompletionView: View {
                         Label("Chat with \(receipt.book.storyteller.name) · 1 doubloon",
                               systemImage: "bubble.left.and.bubble.right")
                     }.buttonStyle(.bordered).tint(theme.theme.accent)
-                    Text("Keep practising Spanish together. One doubloon covers this chat until you leave its screen.")
+                    Text("Keep practising Spanish together. One doubloon covers up to 100 sent messages. Return within ten minutes to continue.")
                         .font(.subheadline).foregroundStyle(theme.theme.muted)
                         .multilineTextAlignment(.center)
                 }

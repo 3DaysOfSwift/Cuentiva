@@ -18,6 +18,7 @@ import Testing
         let sentence = try #require(book.sentences.first)
         for day in 1...9 {
             try await progress.recordEncounter(book: book, sentence: sentence)
+            _ = try await progress.complete(book: book)
             #expect(progress.streak == day)
             #expect(!progress.snapshot.earnedThemePacks.contains(.vip))
             now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
@@ -27,13 +28,14 @@ import Testing
         #expect(progress.snapshot.earnedStreakTheme != true)
         await repository.setFailure(false)
         try await progress.recordEncounter(book: book, sentence: sentence)
+        #expect(progress.streak == 9)
+        let receipt = try await progress.completeReading(book: book)
         #expect(progress.streak == 10)
         #expect(progress.snapshot.earnedThemePacks.contains(.vip))
         #expect(!progress.snapshot.isVIP)
         #expect(!progress.snapshot.availableThemes.contains(.vip))
         let earned = try ProgressRecords.decode(ProgressRecords.encode(progress.snapshot))
         #expect(earned.earnedThemePacks.contains(.vip))
-        let receipt = try await progress.completeReading(book: book)
         #expect(receipt.streakThemeGift == .vip)
         let duplicate = try await progress.complete(book: book)
         #expect(duplicate.streakThemeGift == nil)
@@ -47,6 +49,7 @@ import Testing
         try await restored.reset()
         for _ in 1...10 {
             try await restored.recordEncounter(book: book, sentence: sentence)
+            _ = try await restored.complete(book: book)
             now = try #require(calendar.date(byAdding: .day, value: 1, to: now))
         }
         let later = try await restored.completeReading(book: book)

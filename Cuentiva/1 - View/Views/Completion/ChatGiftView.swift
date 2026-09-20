@@ -17,7 +17,7 @@ struct ChatGiftView: View {
                     .font(.title2.weight(.semibold))
                 Text("Your new gift is Spanish messaging practice. Choose a storyteller and practise chatting with the Spanish-speaking friends you haven’t met yet.")
                 Text("Tell them about a journey, a funny afternoon, or something that happened today. Learn to tell the tales of your own life, one message at a time.")
-                Text("WhosApp now has its own tab. Each new topic costs 1 earned doubloon, and you can keep chatting until you leave the conversation.")
+                Text("WhosApp now has its own tab. Each new topic costs 1 earned doubloon, covering up to \(ChatLimits.messagesPerCoin) sent messages. Return within 10 minutes to resume.")
                     .font(.subheadline).foregroundStyle(theme.theme.muted)
             }.multilineTextAlignment(.center).padding(28)
         }

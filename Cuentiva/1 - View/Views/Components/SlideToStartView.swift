@@ -3,6 +3,7 @@ import SwiftUI
 struct SlideToStartView: View {
     let confirm: () -> Bool
     let coinAnimation: Namespace.ID
+    var title = "Slide to start"
     @State private var model = SlideToStartViewModel()
     @GestureState private var translation: CGFloat = 0
     @Environment(ThemeManager.self) private var theme
@@ -19,7 +20,7 @@ struct SlideToStartView: View {
                 Capsule().fill(theme.theme.surface)
                 Capsule().strokeBorder(theme.theme.rewardGold.opacity(0.45), lineWidth: 1)
                 HStack(spacing: 6) {
-                    Text("Slide to start").font(.headline)
+                    Text(title).font(.headline)
                     Image(systemName: "chevron.forward").font(.caption.weight(.bold))
                 }
                 .frame(maxWidth: .infinity)
@@ -39,8 +40,8 @@ struct SlideToStartView: View {
             }
             .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8), value: translation)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Start chat for 1 doubloon")
-            .accessibilityHint("Charged after the first successful reply. No charge per message.")
+            .accessibilityLabel("\(title) for 1 doubloon")
+            .accessibilityHint("One doubloon covers up to 100 sent messages. Charged after the first successful reply.")
             .accessibilityAddTraits(.isButton)
             .accessibilityAction { model.activate(confirm: confirm) }
         }

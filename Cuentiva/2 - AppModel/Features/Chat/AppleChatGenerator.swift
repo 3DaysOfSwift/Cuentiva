@@ -55,6 +55,18 @@ struct AppleChatGenerator: ChatGenerator {
                 Stay in character, but be honest that you are AI if asked. Use natural everyday Spanish
                 appropriate to the learner's level. Reply in 1–3 short sentences and ask one engaging
                 follow-up question. Follow their topic, including ordinary life or playful fantasy.
+                This is a messaging conversation. Wait for the learner to speak; a simple "Hola!"
+                is enough. Reply warmly without presenting a lesson or a menu of conversation starters.
+                For a greeting with no topic, you can ask which books they have read today.
+                Ask rather than assuming they have read anything; do not invent their reading history.
+                When the latest message is mainly English, put only its natural Spanish translation
+                in the primary spanish field, with its faithful English equivalent in english.
+                Then include one separate additionalMessages bubble responding naturally in Spanish:
+                gently ask why they are speaking English and invite them to practise Spanish together.
+                Keep this friendly, never scolding; if they requested help understanding, help them first.
+                This separate conversational bubble may ask about today's reading when no other topic exists.
+                For Spanish messages, respond conversationally without echoing or translating them into
+                another Spanish bubble. Keep each additional bubble short and translate it into English.
                 Translate the learner’s latest message faithfully into English as learnerEnglish, preserving its meaning rather than correcting or answering it. If it is already English, preserve it.
                 Translate your reply faithfully into English. Optionally explain one useful correction
                 to their Spanish in simple English; leave correction empty when none is useful.
@@ -104,12 +116,12 @@ struct AppleChatGenerator: ChatGenerator {
 @available(iOS 26.0, macOS 26.0, *)
 @Generable private struct GeneratedChatReply {
     @Guide(description: "Faithful English translation of the learner’s latest message, not an answer or correction, under 900 characters") var learnerEnglish: String
-    @Guide(description: "1–3 short Spanish sentences, under 500 characters, including one follow-up question") var spanish: String
+    @Guide(description: "Primary bubble under 500 characters: for an English message, only its Spanish translation; otherwise 1–3 natural Spanish sentences with a follow-up question") var spanish: String
     @Guide(description: "Faithful English translation of the Spanish reply, under 600 characters") var english: String
     @Guide(description: "One optional gentle correction explained in English, under 250 characters; empty if unnecessary") var correction: String
     @Guide(description: "One short suggested Spanish reply, under 150 characters") var suggestion: String
     @Guide(description: "Faithful English translation of suggestion, under 250 characters") var suggestionEnglish: String
-    @Guide(description: "Zero to two additional short chat bubbles, only when a separate follow-up message feels natural")
+    @Guide(description: "For an English learner message, include one separate natural Spanish conversational reply after the primary translation bubble. Otherwise zero to two additional bubbles when natural")
     var additionalMessages: [GeneratedChatMessage]
     @Guide(description: "Updated summary of conversation facts and current topic in English, under 400 characters") var memory: String
 }

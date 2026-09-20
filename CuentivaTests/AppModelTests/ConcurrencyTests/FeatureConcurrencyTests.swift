@@ -235,7 +235,7 @@ private actor GatedProgressRepository: ProgressRepository {
         #expect(progress.snapshot.doubloons == 0)
     }
 
-    @Test(arguments: [false, true]) func dismissalDuringPaymentKeepsAdmissionAcrossRelaunch(cancelTask: Bool) async throws {
+    @Test(arguments: [false, true]) func dismissalDuringPaymentKeepsPaidTranscriptAcrossRelaunch(cancelTask: Bool) async throws {
         var initial = LearnerProgress(); initial.doubloons = 1
         initial.completed = Set((0..<11).map { "earned-\($0)" })
         let store = GatedProgressRepository(initial)
@@ -251,17 +251,18 @@ private actor GatedProgressRepository: ProgressRepository {
         if cancelTask { sending.cancel() }
         await store.release()
         await #expect(throws: CancellationError.self) { try await sending.value }
-        #expect(chat.coins == 1)
+        #expect(chat.coins == 0)
         #expect(chat.conversation(for: author).turns.isEmpty)
         let reloaded = ProgressManager(repository: store)
         let reopened = ChatManager(generator: ImmediateChatGenerator(), progress: reloaded)
         try await reopened.prepare()
         reopened.beginSession(id: UUID(), author: author)
-        if reopened.hasAccess { try reopened.authorizeSession() }
+        #expect(reopened.sessionAuthorized)
+        #expect(reopened.conversation(for: author).turns.count == 1)
         try await reopened.send("Otro tema", to: author, level: "A2")
         #expect(reopened.coins == 0)
-        #expect(reopened.conversation(for: author).turns.count == 1)
-        #expect(reloaded.snapshot.pendingChatAdmission == false)
+        #expect(reopened.conversation(for: author).turns.count == 2)
+        #expect(reloaded.snapshot.chatSessions?[author.id]?.sentMessages == 2)
         #expect(await store.writes.count == 2)
     }
 

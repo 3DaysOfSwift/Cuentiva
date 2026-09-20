@@ -22,6 +22,10 @@ import Observation
 @MainActor @Observable final class ChatManager: ChatFeature {
     private let progress: any ProgressFeature
     private let generator: any ChatGenerator
+    private let now: () -> Date
+    private var savedReceiptID: UUID?
+    private var sentInAllowance = 0
+    @ObservationIgnored private var checkpointTask: Task<Void, Error>?
     private var sessionID: UUID?
     private var sessionAuthorID: String?
     private var sessionConversation = ChatConversation()
@@ -44,7 +48,8 @@ import Observation
     var coins: Int { progress.snapshot.availableChatCoins }
     var hasAccess: Bool { progress.snapshot.chatUnlocked && (coins > 0 || sessionPaid) }
 
-    init(generator: any ChatGenerator, progress: any ProgressFeature) {
+    init(generator: any ChatGenerator, progress: any ProgressFeature, now: @escaping () -> Date = Date.init) {
+        self.now = now
         self.progress = progress
         self.generator = generator
     }
@@ -52,14 +57,26 @@ import Observation
         guard sessionID != id else { return }
         sessionID = id
         sessionAuthorID = author.id
-        sessionPaid = false
-        sessionAuthorized = false
-        sessionConversation = .init()
+        let saved = progress.snapshot.chatSessions?[author.id]
+        savedReceiptID = saved?.receiptID
+        sentInAllowance = saved?.sentMessages ?? 0
+        sessionPaid = saved?.canResume(at: now()) == true
+        sessionAuthorized = sessionPaid
+        sessionConversation = saved?.conversation ?? .init()
     }
     func endSession(id: UUID) {
         guard sessionID == id else { return }
+        if sessionPaid, let authorID = sessionAuthorID, let receiptID = savedReceiptID {
+            let earlier = checkpointTask
+            checkpointTask = Task {
+                if let earlier { try await earlier.value }
+                try await progress.checkpointChat(authorID: authorID, receiptID: receiptID)
+            }
+        }
         sessionID = nil
         sessionAuthorID = nil
+        savedReceiptID = nil
+        sentInAllowance = 0
         sessionPaid = false
         sessionAuthorized = false
         sessionConversation = .init()
@@ -75,6 +92,10 @@ import Observation
         preparing = true
         let task = Task { @MainActor in
             try await self.progress.load()
+            if let checkpoint = self.checkpointTask {
+                self.checkpointTask = nil
+                try await checkpoint.value
+            }
             self.unavailable = await self.generator.availabilityMessage()
             self.ready = true
         }
@@ -103,6 +124,11 @@ import Observation
         }
         if let unavailable { throw AppFailure.unavailable(unavailable) }
         guard sessionAuthorized else { throw AppFailure.unavailable("Confirm the 1 doubloon cost before starting your chat.") }
+        let pending = sessionConversation.messages.filter { $0.role == .learner && $0.delivery == .pending }.count
+        let used = sessionPaid ? sentInAllowance : 0
+        guard used + pending < ChatLimits.messagesPerCoin else {
+            throw AppFailure.unavailable("Please wait for the final reply before continuing for another doubloon.")
+        }
         let outgoing = ChatMessage(role: .learner, text: text, delivery: .pending)
         sessionConversation.messages.append(outgoing)
         // Publish the learner's bubble immediately, then process replies in order.
@@ -122,24 +148,32 @@ import Observation
             guard ChatLimits.acceptsReply(reply) else {
                 throw AppFailure.unavailable("The storyteller couldn’t finish a short reply. Please try again.")
             }
-            let deliver: @MainActor @Sendable () -> Bool = {
-                guard self.sessionID == sendingSessionID else { return false }
-                self.sessionPaid = true
-                if let index = self.sessionConversation.messages.firstIndex(where: { $0.id == outgoing.id }) {
-                    self.sessionConversation.messages[index].delivery = .delivered
-                    self.sessionConversation.messages[index].english = reply.learnerEnglish ?? ""
-                }
-                self.sessionConversation.messages.append(ChatMessage(role: .storyteller, text: reply.spanish,
-                    inReplyTo: outgoing.id, english: reply.english, correction: reply.correction, suggestion: reply.suggestion, suggestionEnglish: reply.suggestionEnglish))
-                for message in reply.additionalMessages {
-                    self.sessionConversation.messages.append(ChatMessage(role: .storyteller, text: message.spanish,
-                        inReplyTo: outgoing.id, english: message.english))
-                }
-                self.sessionConversation.memory = String(reply.memory.prefix(ChatLimits.memory))
-                return true
+            var updated = sessionConversation
+            if let index = updated.messages.firstIndex(where: { $0.id == outgoing.id }) {
+                updated.messages[index].delivery = .delivered
+                updated.messages[index].english = reply.learnerEnglish ?? ""
             }
-            if sessionPaid { _ = deliver() }
-            else { try await progress.payForChat(deliver: deliver) }
+            updated.messages.append(ChatMessage(role: .storyteller, text: reply.spanish,
+                inReplyTo: outgoing.id, english: reply.english, correction: reply.correction,
+                suggestion: reply.suggestion, suggestionEnglish: reply.suggestionEnglish))
+            for message in reply.additionalMessages {
+                updated.messages.append(ChatMessage(role: .storyteller, text: message.spanish,
+                    inReplyTo: outgoing.id, english: message.english))
+            }
+            updated.memory = String(reply.memory.prefix(ChatLimits.memory))
+            let saved = try await progress.saveChatReply(authorID: author.id, conversation: updated,
+                receiptID: savedReceiptID, renewing: !sessionPaid)
+            // Payment and transcript survive a close/termination during the save.
+            guard sessionID == sendingSessionID else { throw CancellationError() }
+            savedReceiptID = saved.receiptID
+            sentInAllowance = saved.sentMessages
+            // Preserve any new outgoing messages appended while the save was suspended.
+            let existingIDs = Set(updated.messages.map(\.id))
+            updated.messages.append(contentsOf: sessionConversation.messages.filter { !existingIDs.contains($0.id) })
+            sessionConversation = updated
+            sessionPaid = sentInAllowance < ChatLimits.messagesPerCoin
+            sessionAuthorized = sessionPaid
+
         } catch {
             if sessionID == sendingSessionID,
                let index = sessionConversation.messages.firstIndex(where: { $0.id == outgoing.id }),
@@ -161,6 +195,9 @@ import Observation
     func clear(author: Author) async throws {
         guard ready, !busy else { throw AppFailure.busy }
         guard sessionAuthorID == author.id else { return }
+        try await progress.clearChat(authorID: author.id)
+        savedReceiptID = nil
+        sentInAllowance = 0
         sessionPaid = false
         sessionAuthorized = false
         sessionConversation = .init()

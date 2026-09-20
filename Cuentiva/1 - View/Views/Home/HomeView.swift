@@ -14,6 +14,24 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 StreakBar(days: viewModel.week)
+                if viewModel.canReviveStreak {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Keep your streak going", systemImage: "flame.fill").font(.title2.bold())
+                        Text("Missed yesterday? Revive your streak for 4 doubloons before today ends. You must also complete a book today.")
+                            .foregroundStyle(theme.theme.muted)
+                        DoubloonBalance(count: viewModel.revivalBalance)
+                        Button("Revive streak · 4 doubloons") { Task { await viewModel.reviveStreak() } }
+                            .buttonStyle(PrimaryButton())
+                            .disabled(viewModel.reviving || viewModel.revivalBalance < 4)
+                        if viewModel.revivalBalance < 4 {
+                            Text("You need 4 doubloons. Earn more by reading or playing Match Pairs.").font(.caption)
+                        }
+                    }.padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
+                } else if viewModel.revivalNeedsBook {
+                    Label("Complete a book today to restore your streak.", systemImage: "flame.fill")
+                }
+                InlineError(message: viewModel.revivalError)
+                if let notice = viewModel.revivalNotice { Text(notice).foregroundStyle(theme.theme.accent) }
                 Divider()
                 if let challenge = viewModel.dailyChallenge, viewModel.challengeBooks.count == 3 {
                     DailyMatchSection(books: viewModel.challengeBooks, challenge: challenge, onPlay: viewModel.playDailyGame)

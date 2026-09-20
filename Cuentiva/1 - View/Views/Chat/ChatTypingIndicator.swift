@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ChatTypingIndicator: View {
     let storyteller: String
+    @Environment(\.layoutDirection) private var layoutDirection
     @Environment(ThemeManager.self) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
@@ -12,14 +13,14 @@ struct ChatTypingIndicator: View {
             HStack(spacing: 6) {
                 ForEach(0..<3) { index in
                     Circle()
-                        .fill(theme.theme.muted)
+                        .fill(theme.theme.chatSecondaryText)
                         .frame(width: 7, height: 7)
                         .offset(y: offset(for: index, at: context.date))
                 }
             }
             .padding(.horizontal, 18)
             .frame(height: 44)
-            .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
+            .background(theme.theme.chatReceived, in: ChatBubbleShape(tailOnRight: layoutDirection == .rightToLeft))
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .ignore)

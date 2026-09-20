@@ -4,6 +4,24 @@ import Observation
 @MainActor @Observable final class HomeViewModel {
     private let library: any LibraryFeature
     private let progress: any ProgressFeature
+    var canReviveStreak: Bool { progress.canReviveStreak }
+    var revivalNeedsBook: Bool { progress.revivalNeedsBook }
+    var revivalBalance: Int { progress.snapshot.doubloons ?? 0 }
+    private(set) var reviving = false
+    var revivalError: String?
+    var revivalNotice: String?
+    func reviveStreak() async {
+        guard !reviving else { return }
+        reviving = true
+        revivalError = nil
+        defer { reviving = false }
+        do {
+            try await progress.reviveStreak()
+            revivalNotice = progress.revivalNeedsBook
+                ? "4 doubloons paid. Complete a book today to restore your streak."
+                : "Streak restored. You also earned today’s 1-doubloon streak bonus."
+        } catch { revivalError = error.localizedDescription }
+    }
     var practiceBook: Book?
     var challengeDay: String?
     var dailyChallenge: DailyMatchChallenge? { progress.dailyChallenge }

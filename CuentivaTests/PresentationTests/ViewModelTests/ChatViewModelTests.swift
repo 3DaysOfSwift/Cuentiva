@@ -3,6 +3,67 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct ChatViewModelTests {
+    @Test func restoredPaidChatBypassesAdmissionAndKeepsTranscript() async {
+        let feature = ChatViewModelFeature()
+        feature.coins = 0
+        feature.sessionPaid = true
+        feature.sessionAuthorized = true
+        feature.savedConversation.messages = [ChatMessage(role: .learner, text: "Hola")]
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        #expect(model.admissionPhase == .finished)
+        #expect(!model.admissionVisible)
+        #expect(model.displayedCoins == 0)
+        #expect(model.messages.count == 1)
+        model.draft = "Otra pregunta"
+        #expect(model.canSend)
+    }
+
+    @Test func exhaustedAllowancePresentsRenewalWithoutClearingMessages() async throws {
+        let feature = ChatViewModelFeature()
+        feature.sessionPaid = true
+        feature.sessionAuthorized = true
+        feature.savedConversation.messages = [ChatMessage(role: .learner, text: "Hola")]
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        model.draft = "Última pregunta"
+        model.send()
+        try await waitUntil { feature.reply != nil }
+        feature.sessionPaid = false
+        feature.sessionAuthorized = false
+        feature.finishReply()
+        try await waitUntil { !model.sending }
+        #expect(model.admissionPhase == .ready)
+        #expect(model.admissionVisible)
+        #expect(model.messages.count == 1)
+        #expect(model.celebrateAdmission())
+        #expect(feature.sessionAuthorized)
+        model.endSession()
+    }
+
+    @Test func speechHighlightTracksOnlyThePlayingMessageAndClearsWhenStopped() async {
+        let feature = ChatViewModelFeature(), audio = TestAudio()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: audio)
+        let first = ChatMessage(role: .storyteller, text: "¡Hola! ¿Cómo estás?")
+        let second = ChatMessage(role: .storyteller, text: "Estoy bien.")
+        model.listen(first)
+        audio.spokenRange = NSRange(location: 1, length: 4)
+        #expect(model.spokenRange(for: first) == audio.spokenRange)
+        #expect(model.spokenRange(for: second) == nil)
+        audio.spokenRange = nil
+        #expect(model.spokenRange(for: first) == nil)
+        model.listen(second)
+        audio.spokenRange = NSRange(location: 0, length: 5)
+        #expect(model.spokenRange(for: first) == nil)
+        #expect(model.spokenRange(for: second) == audio.spokenRange)
+        model.cancel()
+        #expect(model.spokenRange(for: second) == nil)
+        model.listen(second)
+        await model.clear()
+        #expect(model.spokenRange(for: second) == nil)
+        #expect(audio.spokenRates == [true, true, true])
+    }
+
     @Test func admissionCelebratesThenReservesTheLastCoinWithoutChargingItTwice() async throws {
         let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
         let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio(),

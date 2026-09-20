@@ -30,6 +30,15 @@ enum ProgressRecords {
     /// Encode only changed fields and explicitly removed keys, never the full archive.
     static func changes(_ value: LearnerProgress, previous: LearnerProgress?) throws -> RecordChanges {
         var rows = RecordChanges()
+        if previous == nil || previous?.streakDays != value.streakDays {
+            rows["streakDays"] = try RecordCoding.encode(value.streakDays)
+        }
+        if previous == nil || previous?.revivedStreakDays != value.revivedStreakDays {
+            rows["revivedStreakDays"] = try RecordCoding.encode(value.revivedStreakDays)
+        }
+        if previous == nil || previous?.rewardedStreakDays != value.rewardedStreakDays {
+            rows["rewardedStreakDays"] = try RecordCoding.encode(value.rewardedStreakDays)
+        }
         if previous == nil || previous?.earnedStreakTheme != value.earnedStreakTheme {
             rows["earnedStreakTheme"] = try RecordCoding.encode(value.earnedStreakTheme)
         }
@@ -114,6 +123,10 @@ enum ProgressRecords {
             rows["bestMatches"] = try RecordCoding.encode(value.bestMatches != nil)
             try map("bestMatches", value.bestMatches ?? [:], previous?.bestMatches ?? [:], into: &rows)
         }
+        if previous == nil || previous?.chatSessions != value.chatSessions {
+            rows["chatSessions"] = try RecordCoding.encode(value.chatSessions != nil)
+            try map("chatSessions", value.chatSessions ?? [:], previous?.chatSessions ?? [:], into: &rows)
+        }
         if previous == nil || previous?.pendingChatAdmission != value.pendingChatAdmission {
             rows["pendingChatAdmission"] = try RecordCoding.encode(value.pendingChatAdmission)
         }
@@ -142,6 +155,16 @@ enum ProgressRecords {
             throw AppFailure.unavailable("Your progress records are incomplete.")
         }
         var value = LearnerProgress()
+        if let data = rows["streakDays"] { value.streakDays = try RecordCoding.decode(Set<String>?.self, data) }
+        if let data = rows["revivedStreakDays"] { value.revivedStreakDays = try RecordCoding.decode(Set<String>?.self, data) }
+        if let data = rows["rewardedStreakDays"] { value.rewardedStreakDays = try RecordCoding.decode(Set<String>?.self, data) }
+
+        if let data = rows["chatSessions"], try RecordCoding.decode(Bool.self, data) {
+            value.chatSessions = [:]
+        }
+        for (key, data) in rows where key.hasPrefix("chatSessions/") {
+            value.chatSessions?[String(key.dropFirst(13))] = try RecordCoding.decode(PaidChatSession.self, data)
+        }
         if let data = rows["earnedStreakTheme"] { value.earnedStreakTheme = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["celebratedStreakTheme"] { value.celebratedStreakTheme = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["installedThemePacks"] {

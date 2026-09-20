@@ -83,6 +83,9 @@
 		6E14EC3FEAB575E901940E73 /* LanguageTermsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FCA66A4BAC68DE634CAE90B /* LanguageTermsViewModelTests.swift */; };
 		70383857801EB3BE559F581E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 024C09AE9C4C923058DC9B6C /* PrivacyInfo.xcprivacy */; };
 		706B23E164274B8386BD5368 /* ChatTurnView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1672C9A1D0A64BADAD3DCE19 /* ChatTurnView.swift */; };
+		F6D8AAC045C1473194726CF3 /* ChatBubbleShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EC7A3D44E3F46DD89EF75A9 /* ChatBubbleShape.swift */; };
+		8B3B07E9CEE14C22813C30D8 /* ChatIntroductionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE377F714E04AB881F2B58D /* ChatIntroductionView.swift */; };
+		FE834FDEB145448DA713B9EC /* ChatWallpaperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B2BD3213494E969F66F84D /* ChatWallpaperView.swift */; };
 		9FAB9C8A020F41E6BE1ACD3C /* ChatTypingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30D9AF9EA0B242CD9A1A8F9B /* ChatTypingIndicator.swift */; };
 		70B60559C4F02D647DB559CA /* PracticeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6BC690D9F0CFAF0D7119287 /* PracticeManager.swift */; };
 		73523D41A8787B7767AFCE45 /* RecommendationPriorityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7582137AE55E93AD75C9A2F5 /* RecommendationPriorityTests.swift */; };
@@ -232,6 +235,9 @@
 		106F8ADA973BDE6248BF4D42 /* Repositories.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Repositories.swift; sourceTree = "<group>"; };
 		111E91D09E0545EEBFAF8332 /* SwiftDataStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataStore.swift; sourceTree = "<group>"; };
 		1672C9A1D0A64BADAD3DCE19 /* ChatTurnView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTurnView.swift; sourceTree = "<group>"; };
+		1EC7A3D44E3F46DD89EF75A9 /* ChatBubbleShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubbleShape.swift; sourceTree = "<group>"; };
+		ACE377F714E04AB881F2B58D /* ChatIntroductionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatIntroductionView.swift; sourceTree = "<group>"; };
+		70B2BD3213494E969F66F84D /* ChatWallpaperView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatWallpaperView.swift; sourceTree = "<group>"; };
 		30D9AF9EA0B242CD9A1A8F9B /* ChatTypingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTypingIndicator.swift; sourceTree = "<group>"; };
 		16A8B4EE676E4A169BC5B716 /* ThemePackGiftViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePackGiftViewModel.swift; sourceTree = "<group>"; };
 		182C07F2F5B237D30D009E0D /* WordComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordComparison.swift; sourceTree = "<group>"; };
@@ -895,6 +901,9 @@
 				3CE4343C97CA4159A668F5B9 /* ChatViewModel.swift */,
 				80CD9BB2A9C34A0AA5B9BE9A /* WhosAppViewModel.swift */,
 				1672C9A1D0A64BADAD3DCE19 /* ChatTurnView.swift */,
+				1EC7A3D44E3F46DD89EF75A9 /* ChatBubbleShape.swift */,
+				ACE377F714E04AB881F2B58D /* ChatIntroductionView.swift */,
+				70B2BD3213494E969F66F84D /* ChatWallpaperView.swift */,
 				30D9AF9EA0B242CD9A1A8F9B /* ChatTypingIndicator.swift */,
 				9401AFC6368743628E02605A /* ChatPaywallView.swift */,
 				AB86F3CFE2354C73B7263BD2 /* ChatComposerView.swift */,
@@ -1406,6 +1415,9 @@
 				CC73C85CF02E43AD8E94EB86 /* ChatViewModel.swift in Sources */,
 				0BED77D247624760BB6C65D7 /* WhosAppViewModel.swift in Sources */,
 				706B23E164274B8386BD5368 /* ChatTurnView.swift in Sources */,
+				F6D8AAC045C1473194726CF3 /* ChatBubbleShape.swift in Sources */,
+				8B3B07E9CEE14C22813C30D8 /* ChatIntroductionView.swift in Sources */,
+				FE834FDEB145448DA713B9EC /* ChatWallpaperView.swift in Sources */,
 				9FAB9C8A020F41E6BE1ACD3C /* ChatTypingIndicator.swift in Sources */,
 				8CFF494A7F154CA2877E0BB7 /* ChatModels.swift in Sources */,
 				B82D738306D14B60829F4F51 /* ChatRepository.swift in Sources */,

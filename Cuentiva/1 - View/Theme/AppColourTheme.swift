@@ -37,6 +37,21 @@ struct AppColourTheme {
     let checkButtonBackground = Color(red: 0.18, green: 0.37, blue: 0.29)
     let checkButtonForeground: Color = .white
     var rewardGold: Color { colorScheme == .dark ? Color(red: 0.95, green: 0.78, blue: 0.35) : Color(red: 0.55, green: 0.36, blue: 0.07) }
+    // Chat has its own complementary, opaque surfaces within every app palette.
+    let chatSent = Color(red: 0.29, green: 0.32, blue: 0.39)
+    var chatReceived: Color {
+        // Follow the selected palette while keeping white message text legible.
+        Color(red: 0.16, green: 0.17, blue: 0.19)
+            .mix(with: accent, by: colorScheme == .dark ? 0.36 : 0.75)
+    }
+    let chatText = Color.white
+    let chatSecondaryText = Color(red: 0.89, green: 0.90, blue: 0.92)
+    let chatAction = Color(red: 0.95, green: 0.95, blue: 0.98)
+    let chatError = Color(red: 1, green: 0.72, blue: 0.72)
+    var chatWallpaper: Color {
+        colorScheme == .dark ? Color(red: 0.10, green: 0.11, blue: 0.14)
+            : Color(red: 0.95, green: 0.94, blue: 0.97)
+    }
     // Decorative coin artwork remains gold in every palette.
     let coinHighlight = Color(red: 1, green: 0.92, blue: 0.60)
     let coinGold = Color(red: 0.95, green: 0.66, blue: 0.17)
