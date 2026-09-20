@@ -12,7 +12,10 @@ struct HiddenProgressView: View {
                 .foregroundStyle(theme.theme.accent)
             Text("\(viewModel.streak) day streak")
                 .font(.system(.title2, design: .serif, weight: .medium))
-            Text("\(viewModel.booksRead) \(viewModel.booksRead == 1 ? "book" : "books") read · \(viewModel.doubloons) doubloons available")
+            HStack {
+                Text("\(viewModel.booksRead) \(viewModel.booksRead == 1 ? "book" : "books") read")
+                DoubloonBalance(count: viewModel.doubloons, size: 20)
+            }
                 .font(.subheadline)
             Text("\(viewModel.practiceDays) days practised")
                 .font(.subheadline)

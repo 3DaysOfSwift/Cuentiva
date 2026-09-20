@@ -18,7 +18,14 @@ enum LessonAdvance: Sendable {
     private let progress: any ProgressFeature
     init(purchases: any PurchaseFeature, progress: any ProgressFeature) { self.purchases = purchases; self.progress = progress }
     func canRead(_ book: Book) -> Bool { purchases.hasAccess || (book.id == "cafe" && !progress.snapshot.completed.contains(book.id)) }
-    func position(_ book: Book) -> Int { min(progress.snapshot.positions[book.id] ?? 0, book.sentences.count) }
+    func position(_ book: Book) -> Int {
+        let attempts = progress.snapshot.attempts[book.id, default: []]
+        // A rewritten edition has new sentence IDs. Resume it at the beginning
+        // instead of carrying an old edition's position into unrelated text.
+        if book.editorialRevision != nil, !attempts.isEmpty,
+           attempts.isDisjoint(with: Set(book.sentences.map(\.id))) { return 0 }
+        return min(progress.snapshot.positions[book.id] ?? 0, book.sentences.count)
+    }
     func check(book: Book, sentence: Sentence, answer: String) async throws -> AnswerFeedback {
         guard canRead(book) else { throw AppFailure.locked }
         guard book.sentences.contains(sentence) else { throw AppFailure.invalidBook }

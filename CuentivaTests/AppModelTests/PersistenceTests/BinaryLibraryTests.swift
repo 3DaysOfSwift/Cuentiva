@@ -51,6 +51,62 @@ import Testing
         #expect(throws: AppFailure.self) { try BinaryLibrary.encode([invalid]) }
     }
 
+    @Test func editorialLibraryHasThreeChaptersWithAnUnchangedTwoChapterReader() throws {
+        let books = try BinaryLibrary(url: resource("Library.dat")).books()
+        var allSentenceIDs: Set<String> = []
+        for book in books {
+            let middle = try #require(book.continuation)
+            let ending = try #require(book.ending)
+            #expect(book.editorialRevision == 3)
+            #expect(book.sentences.count >= 4 && middle.count >= 4 && ending.count >= 4)
+            #expect(book.fullText == book.sentences + middle)
+            #expect(book.completeText == book.fullText + ending)
+            #expect(Author.demoProfiles.contains { $0.id == book.authorID && $0.name == book.author })
+            for sentence in book.completeText {
+                #expect(allSentenceIDs.insert(sentence.id).inserted)
+                #expect(!sentence.spanish.isEmpty && !sentence.english.isEmpty)
+                if book.kind == .movieScript { #expect(sentence.speaker != nil) }
+            }
+            let words = book.fullText.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
+            let counts = Dictionary(grouping: words, by: { $0 }).mapValues(\.count)
+            #expect(Set(counts.keys) == Set(book.vocabulary.map(\.word)))
+            for entry in book.vocabulary { #expect(counts[entry.word] == entry.occurrences) }
+            if let focus = book.verbFocus { #expect(Set(focus.forms).isSubset(of: Set(words))) }
+            let glossary = try #require(book.matchGlossary)
+            #expect(Set(glossary.keys) == Set(words))
+            #expect(glossary.values.allSatisfy { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty })
+        }
+        #expect(Set(books.map(\.authorID)).count == 9)
+        #expect(books.filter { $0.kind == .movieScript }.count == 3)
+        #expect(books.filter { $0.kind == .verbs }.count == 3)
+    }
+
+    @Test func legacyVersionOneRemainsReadableAndEndingOffsetsAreValidated() throws {
+        let book = sample()
+        var legacy = try BinaryLibrary.encode([book])
+        // A v1 single-record file: the first 140 bytes are the old record.
+        // Unreferenced padding before its strings is legal; offsets stay absolute.
+        legacy[8] = 1
+        #expect(try BinaryLibrary(data: legacy).books() == [book])
+        var revised = book
+        revised.ending = [.init(id: "ending", spanish: "Fin.", english: "The end.")]
+        revised.editorialRevision = 2
+        let valid = try BinaryLibrary.encode([revised])
+        #expect(try BinaryLibrary(data: valid).books() == [revised])
+        var bad = valid
+        bad.replaceSubrange(156..<160, with: [0xfe, 0xff, 0xff, 0xff])
+        #expect(throws: AppFailure.self) { try BinaryLibrary(data: bad).books() }
+        bad = valid
+        bad.replaceSubrange(160..<164, with: [0xff, 0xff, 0xff, 0xff])
+        #expect(throws: AppFailure.self) { try BinaryLibrary(data: bad).books() }
+        revised.ending = []
+        #expect(try BinaryLibrary(data: BinaryLibrary.encode([revised])).books() == [revised])
+        revised.editorialRevision = -1
+        #expect(throws: AppFailure.self) { try BinaryLibrary.encode([revised]) }
+        revised.editorialRevision = Int(UInt32.max)
+        #expect(throws: AppFailure.self) { try BinaryLibrary.encode([revised]) }
+    }
+
     @Test func introductionWorksWithoutFullLibraryFile() async throws {
         let repository = BundledBookRepository(url: nil, introductionURL: (try resource("Introduction.dat")))
         let book = try await repository.introduction()

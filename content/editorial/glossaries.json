@@ -1,0 +1,293 @@
+{
+  "cafe": {
+    "a": "to / at",
+    "allí": "there",
+    "amigos": "friends",
+    "américa": "the Americas",
+    "argentina": "Argentina",
+    "aventuras": "adventures",
+    "belice": "Belize",
+    "café": "coffee",
+    "chats": "chats",
+    "colombia": "Colombia",
+    "con": "with",
+    "contar": "to tell",
+    "costa": "coast (Costa Rica: country)",
+    "cuaderno": "notebook",
+    "de": "of / from",
+    "después": "afterwards",
+    "dos": "two",
+    "el": "the",
+    "empieza": "begins",
+    "en": "in",
+    "enseño": "I teach",
+    "escondido": "hidden (Puerto Escondido: place)",
+    "español": "Spanish",
+    "guatemala": "Guatemala",
+    "hacia": "towards",
+    "hoy": "today",
+    "inglés": "English",
+    "me": "me / myself",
+    "mi": "my",
+    "mis": "my (plural)",
+    "mochila": "backpack",
+    "méxico": "Mexico",
+    "nuevos": "new",
+    "oficina": "office",
+    "otro": "other",
+    "palabras": "words",
+    "perú": "Peru",
+    "pipa": "Pipa (name)",
+    "por": "through / for / by",
+    "puerto": "port (Puerto Escondido: place)",
+    "que": "that",
+    "quiero": "I want",
+    "rica": "rich (Costa Rica: country)",
+    "ropa": "clothes",
+    "sigo": "I continue",
+    "soy": "I am",
+    "tabasco": "Tabasco",
+    "un": "a / one",
+    "una": "a / one",
+    "viaje": "journey",
+    "whatsapp": "WhatsApp",
+    "y": "and",
+    "yo": "I",
+    "al": "to the",
+    "aterriza": "lands",
+    "chaqueta": "jacket",
+    "cierro": "I close",
+    "cuando": "when",
+    "cuentas": "you tell",
+    "desayuno": "breakfast",
+    "dibuja": "draws",
+    "diseña": "designs",
+    "enseñan": "they teach",
+    "entonces": "then",
+    "escribo": "I write",
+    "faltan": "are lacking",
+    "junto": "beside (junto a)",
+    "la": "the (feminine singular)",
+    "lagarto": "lizard",
+    "llega": "arrives",
+    "llego": "I arrive",
+    "llegues": "you arrive (after cuando)",
+    "lápiz": "pencil",
+    "mapa": "map",
+    "mar": "sea",
+    "mensaje": "message",
+    "miro": "I look at",
+    "mosca": "fly (insect)",
+    "muchos": "many",
+    "nombres": "names",
+    "nos": "us",
+    "pero": "but",
+    "puerta": "door",
+    "suerte": "luck",
+    "tenemos": "we have",
+    "tengo": "I have",
+    "todavía": "still",
+    "tu": "your",
+    "uno": "one",
+    "vacío": "empty"
+  },
+  "garden": {
+    "de": "of / from",
+    "el": "the",
+    "es": "is",
+    "jardín": "garden",
+    "la": "the",
+    "las": "the (plural)",
+    "los": "the (plural)",
+    "mi": "my",
+    "padre": "father",
+    "por": "at / for",
+    "puerta": "door",
+    "sombrero": "hat",
+    "tengo": "I have",
+    "tiene": "has",
+    "un": "a / one",
+    "una": "a / one",
+    "y": "and",
+    "abro": "I open",
+    "aparto": "I move aside",
+    "bajo": "beneath",
+    "busco": "I look for",
+    "caliente": "warm",
+    "cerradura": "lock",
+    "conozco": "I know",
+    "debajo": "underneath",
+    "deja": "leaves",
+    "dice": "says",
+    "en": "in",
+    "encuentro": "I find",
+    "entre": "among",
+    "esta": "this (feminine)",
+    "está": "is (state or location)",
+    "hacer": "to do",
+    "hechizos": "spells",
+    "hojas": "leaves",
+    "libro": "book",
+    "llave": "key",
+    "maceta": "flowerpot",
+    "magia": "magic",
+    "mano": "hand",
+    "muchos": "many",
+    "musgo": "Musgo (name)",
+    "mía": "mine (feminine)",
+    "negra": "black (feminine)",
+    "no": "not",
+    "noche": "night",
+    "nombre": "name",
+    "oigo": "I hear",
+    "ojos": "eyes",
+    "oscura": "dark (feminine)",
+    "para": "for",
+    "pequeña": "small (feminine)",
+    "pero": "but",
+    "primera": "first (feminine)",
+    "qué": "what",
+    "raíces": "roots",
+    "regadera": "watering can",
+    "sale": "comes out",
+    "sed": "thirst",
+    "señala": "points to",
+    "sombra": "shadow",
+    "sopla": "blows",
+    "soy": "I am",
+    "sé": "I know",
+    "tierra": "soil",
+    "vela": "candle",
+    "vez": "time (occasion)",
+    "voz": "voice"
+  },
+  "train": {
+    "sobre": "envelope",
+    "llevaba": "was carrying",
+    "viene": "comes (que viene: next)"
+  },
+  "sea": {
+    "vela": "sail"
+  },
+  "repair": {
+    "llevaba": "had been (duration)"
+  },
+  "loan-notebook": {
+    "pluma": "pen",
+    "hacíamos": "we did"
+  },
+  "small-guide": {
+    "llevaba": "had been (duration)"
+  },
+  "three-paths": {
+    "llevaba": "was carrying / led",
+    "hizo": "made (hizo señas: beckoned)"
+  },
+  "three-envelopes": {
+    "pluma": "feather / quill",
+    "siento": "I sit (me siento)",
+    "pasa": "passes by"
+  },
+  "patient-investor": {
+    "cerca": "fence",
+    "llevaba": "was carrying / had been"
+  },
+  "first-stitch": {
+    "llevaba": "had been (duration)"
+  },
+  "different-door": {
+    "encantado": "delighted",
+    "letra": "print / lettering",
+    "recuerdo": "memory"
+  },
+  "empty-wallet": {
+    "pasa": "happens"
+  },
+  "shared-table": {
+    "quedó": "remained"
+  },
+  "honest-change": {
+    "encantado": "enchanted",
+    "letra": "letter (written symbol)"
+  },
+  "sunday-pot": {
+    "puesto": "put (past participle)",
+    "educación": "politeness"
+  },
+  "film-conversation": {
+    "salida": "exit"
+  },
+  "thoughtful-yes": {
+    "papel": "role / part"
+  },
+  "enough-on-paper": {
+    "recuerdo": "souvenir",
+    "pasamos": "we spent",
+    "perdí": "I missed"
+  },
+  "travelling-seed": {
+    "llevaba": "had been (duration)",
+    "joven": "young woman",
+    "volvió": "did again (volvió a...)"
+  },
+  "body-care": {
+    "salida": "start (of a race)",
+    "valía": "was allowed"
+  },
+  "water-toast": {
+    "faro": "lighthouse"
+  },
+  "ten-pages": {
+    "pluma": "feather"
+  },
+  "metaphor-not-law": {
+    "vela": "candle",
+    "llevaba": "had been (duration)"
+  },
+  "brand-from-within": {
+    "llevaba": "bore (a name)",
+    "trabajo": "work"
+  },
+  "four-years-road": {
+    "llevaba": "had been (duration)",
+    "llamó": "knocked",
+    "pasado": "happened"
+  },
+  "calendar-of-later": {
+    "nube": "Nube (name)"
+  },
+  "cow-two-names": {
+    "luna": "Luna (name)",
+    "estrella": "Estrella (name)",
+    "llamó": "called"
+  },
+  "travelling-sun": {
+    "nube": "cloud / Nube (name)"
+  },
+  "no-place-to-land": {
+    "faro": "lighthouse",
+    "nube": "Nube (name)",
+    "velas": "sails",
+    "llevaban": "had been (duration)",
+    "mismos": "themselves",
+    "salvo": "safe (a salvo)"
+  },
+  "table-for-three": {
+    "baja": "comes down"
+  },
+  "last-train-scene": {
+    "cuenta": "tell!"
+  },
+  "verb-ser": {
+    "camino": "I walk",
+    "baja": "lowers"
+  },
+  "verb-estar": {
+    "hace": "for (desde hace: duration)",
+    "media": "half",
+    "pasa": "passes"
+  },
+  "nearby-pattaya": {
+    "llevaba": "contained"
+  }
+}

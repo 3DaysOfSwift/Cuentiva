@@ -244,6 +244,7 @@ private actor GatedProgressRepository: ProgressRepository {
         let chat = ChatManager(generator: ImmediateChatGenerator(), progress: progress)
         try await chat.prepare()
         let session = UUID(); chat.beginSession(id: session, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         let sending = Task { try await chat.send("Hola", to: author, level: "A2") }
         await store.waitForSave()
         chat.endSession(id: session)
@@ -256,6 +257,7 @@ private actor GatedProgressRepository: ProgressRepository {
         let reopened = ChatManager(generator: ImmediateChatGenerator(), progress: reloaded)
         try await reopened.prepare()
         reopened.beginSession(id: UUID(), author: author)
+        if reopened.hasAccess { try reopened.authorizeSession() }
         try await reopened.send("Otro tema", to: author, level: "A2")
         #expect(reopened.coins == 0)
         #expect(reopened.conversation(for: author).turns.count == 1)

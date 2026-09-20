@@ -1,0 +1,310 @@
+{
+  "cafe": {
+    "level": "A1",
+    "symbol": "airplane",
+    "palette": 0
+  },
+  "garden": {
+    "level": "A1",
+    "symbol": "leaf",
+    "palette": 1
+  },
+  "train": {
+    "level": "A2",
+    "symbol": "tram",
+    "palette": 2
+  },
+  "sea": {
+    "level": "A2",
+    "symbol": "water.waves",
+    "palette": 3
+  },
+  "repair": {
+    "level": "B1",
+    "symbol": "bicycle",
+    "palette": 4
+  },
+  "repair-hour": {
+    "level": "A1",
+    "symbol": "wrench.and.screwdriver",
+    "palette": 0
+  },
+  "loan-notebook": {
+    "level": "B1",
+    "symbol": "book.closed",
+    "palette": 1
+  },
+  "small-guide": {
+    "level": "A2",
+    "symbol": "map",
+    "palette": 2
+  },
+  "three-paths": {
+    "level": "B1",
+    "symbol": "signpost.right",
+    "palette": 3
+  },
+  "three-envelopes": {
+    "level": "A1",
+    "symbol": "envelope",
+    "palette": 4
+  },
+  "rainy-roof": {
+    "level": "A2",
+    "symbol": "cloud.rain",
+    "palette": 0
+  },
+  "patient-investor": {
+    "level": "B1",
+    "symbol": "chart.line.uptrend.xyaxis",
+    "palette": 1
+  },
+  "first-stitch": {
+    "level": "A2",
+    "symbol": "scissors",
+    "palette": 2
+  },
+  "different-door": {
+    "level": "B1",
+    "symbol": "door.left.hand.open",
+    "palette": 3
+  },
+  "empty-wallet": {
+    "level": "A1",
+    "symbol": "heart",
+    "palette": 4
+  },
+  "shared-table": {
+    "level": "A2",
+    "symbol": "person.3",
+    "palette": 0
+  },
+  "honest-change": {
+    "level": "A2",
+    "symbol": "eurosign.circle",
+    "palette": 1
+  },
+  "sunday-pot": {
+    "level": "A2",
+    "symbol": "carrot",
+    "palette": 2
+  },
+  "film-conversation": {
+    "level": "B1",
+    "symbol": "film",
+    "palette": 3
+  },
+  "beans-question": {
+    "level": "B1",
+    "symbol": "leaf",
+    "palette": 4
+  },
+  "first-invitation": {
+    "level": "A1",
+    "symbol": "sun.max",
+    "palette": 0
+  },
+  "thoughtful-yes": {
+    "level": "A2",
+    "symbol": "hand.raised",
+    "palette": 1
+  },
+  "enough-on-paper": {
+    "level": "B1",
+    "symbol": "pencil.and.list.clipboard",
+    "palette": 2
+  },
+  "useful-service": {
+    "level": "A2",
+    "symbol": "desktopcomputer",
+    "palette": 3
+  },
+  "travelling-seed": {
+    "level": "A2",
+    "symbol": "bird",
+    "palette": 4
+  },
+  "tomato-question": {
+    "level": "B1",
+    "symbol": "questionmark.circle",
+    "palette": 0
+  },
+  "garden-colours": {
+    "level": "B1",
+    "symbol": "tree",
+    "palette": 1
+  },
+  "potato-basket": {
+    "level": "A2",
+    "symbol": "basket",
+    "palette": 2
+  },
+  "two-carrots": {
+    "level": "A1",
+    "symbol": "carrot",
+    "palette": 3
+  },
+  "body-care": {
+    "level": "A2",
+    "symbol": "figure.walk",
+    "palette": 4
+  },
+  "water-toast": {
+    "level": "A2",
+    "symbol": "drop",
+    "palette": 0
+  },
+  "pause-before-plan": {
+    "level": "B1",
+    "symbol": "pause.circle",
+    "palette": 1
+  },
+  "ten-pages": {
+    "level": "A1",
+    "symbol": "books.vertical",
+    "palette": 2
+  },
+  "metaphor-not-law": {
+    "level": "B1",
+    "symbol": "magnifyingglass",
+    "palette": 3
+  },
+  "world-in-backpack": {
+    "level": "A2",
+    "symbol": "laptopcomputer",
+    "palette": 0
+  },
+  "brand-from-within": {
+    "level": "B1",
+    "symbol": "paintpalette",
+    "palette": 1
+  },
+  "four-years-road": {
+    "level": "A2",
+    "symbol": "globe.americas",
+    "palette": 2
+  },
+  "calendar-of-later": {
+    "level": "A2",
+    "symbol": "calendar",
+    "palette": 3
+  },
+  "cow-two-names": {
+    "level": "B1",
+    "symbol": "book",
+    "palette": 4
+  },
+  "cube-among-stars": {
+    "level": "B1",
+    "symbol": "cube",
+    "palette": 0
+  },
+  "feet-on-earth": {
+    "level": "B1",
+    "symbol": "globe.europe.africa",
+    "palette": 0
+  },
+  "travelling-sun": {
+    "level": "A2",
+    "symbol": "sun.max",
+    "palette": 1
+  },
+  "no-place-to-land": {
+    "level": "B1",
+    "symbol": "sparkles",
+    "palette": 2
+  },
+  "wrong-suitcase": {
+    "level": "A1",
+    "symbol": "suitcase",
+    "palette": 0,
+    "format": "movieScript"
+  },
+  "table-for-three": {
+    "level": "A2",
+    "symbol": "fork.knife",
+    "palette": 1,
+    "format": "movieScript"
+  },
+  "last-train-scene": {
+    "level": "B1",
+    "symbol": "tram",
+    "palette": 2,
+    "format": "movieScript"
+  },
+  "verb-ser": {
+    "level": "A2",
+    "symbol": "text.book.closed",
+    "palette": 2,
+    "format": "verbs",
+    "verbFocus": {
+      "infinitive": "ser",
+      "tense": "Present indicative",
+      "forms": [
+        "soy",
+        "eres",
+        "es",
+        "somos",
+        "sois",
+        "son"
+      ],
+      "scope": "Identity, relationships, and roles. Six present-indicative forms; vosotros is used in Spain."
+    }
+  },
+  "verb-estar": {
+    "level": "A2",
+    "symbol": "text.book.closed",
+    "palette": 3,
+    "format": "verbs",
+    "verbFocus": {
+      "infinitive": "estar",
+      "tense": "Present indicative",
+      "forms": [
+        "estoy",
+        "estás",
+        "está",
+        "estamos",
+        "estáis",
+        "están"
+      ],
+      "scope": "Location and how someone feels or is doing. Six present-indicative forms; vosotros is used in Spain."
+    }
+  },
+  "verb-querer": {
+    "level": "B1",
+    "symbol": "text.book.closed",
+    "palette": 4,
+    "format": "verbs",
+    "verbFocus": {
+      "infinitive": "querer",
+      "tense": "Present indicative",
+      "forms": [
+        "quiero",
+        "quieres",
+        "quiere",
+        "queremos",
+        "queréis",
+        "quieren"
+      ],
+      "scope": "Wants, wishes, and affection. Six present-indicative forms; vosotros is used in Spain."
+    }
+  },
+  "nearby-bangkok": {
+    "level": "A2",
+    "symbol": "globe.asia.australia",
+    "palette": 1,
+    "format": "story"
+  },
+  "nearby-pattaya": {
+    "level": "A2",
+    "symbol": "sun.horizon",
+    "palette": 0,
+    "format": "story"
+  },
+  "nearby-thailand": {
+    "level": "A2",
+    "symbol": "sparkles",
+    "palette": 3,
+    "format": "story"
+  }
+}

@@ -2,6 +2,10 @@ import Foundation
 import Observation
 
 @MainActor @Observable final class CompletionViewModel {
+    let supportsChat: Bool
+    func offersChatGift(_ receipt: CompletionReceipt) -> Bool {
+        receipt.offersChatGift(onSupportedDevice: supportsChat)
+    }
     private let purchases: (any PurchaseFeature)?
     var annualOfferDismissed = false
     func showsAnnualOffer(_ receipt: CompletionReceipt) -> Bool {
@@ -26,7 +30,7 @@ import Observation
     /// Returns true when the completion screen should close.
     func continueJourney(_ receipt: CompletionReceipt, practiceAllowed: Bool) -> Bool {
         if receipt.unlocksWriting { presentWritingMilestone(receipt) }
-        else if receipt.unlocksChat { showingChatGift = true }
+        else if offersChatGift(receipt) { showingChatGift = true }
         else if let pack = receipt.themePackGift { showingThemePack = pack }
         else if receipt.streakCelebration != nil && practiceAllowed { showingPractice = true }
         else { return true }
@@ -40,7 +44,8 @@ import Observation
     }
     private var preparedReceiptID: UUID?
 
-    init(receipt: CompletionReceipt? = nil, purchases: (any PurchaseFeature)? = nil) {
+    init(receipt: CompletionReceipt? = nil, purchases: (any PurchaseFeature)? = nil, supportsChat: Bool = AppleChatGenerator.supportsDevice) {
+        self.supportsChat = supportsChat
         self.purchases = purchases
         if let receipt { prepare(receipt) }
     }

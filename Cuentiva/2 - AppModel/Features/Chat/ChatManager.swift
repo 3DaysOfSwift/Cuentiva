@@ -5,6 +5,8 @@ import Observation
     var hasAccess: Bool { get }
     var coins: Int { get }
     var sessionPaid: Bool { get }
+    var sessionAuthorized: Bool { get }
+    func authorizeSession() throws
     var preparing: Bool { get }
     var unavailable: String? { get }
     var ready: Bool { get }
@@ -25,9 +27,19 @@ import Observation
     private var sessionConversation = ChatConversation()
     @ObservationIgnored private var preparationTask: Task<Void, Error>?
     private(set) var sessionPaid = false
+    private(set) var sessionAuthorized = false
     private(set) var preparing = false
     private(set) var ready = false
     private(set) var busy = false
+    @ObservationIgnored private var waitingReplies: [CheckedContinuation<Void, Never>] = []
+    private func acquireReply() async {
+        if !busy { busy = true; return }
+        await withCheckedContinuation { waitingReplies.append($0) }
+    }
+    private func releaseReply() {
+        if waitingReplies.isEmpty { busy = false }
+        else { waitingReplies.removeFirst().resume() }
+    }
     private(set) var unavailable: String?
     var coins: Int { progress.snapshot.availableChatCoins }
     var hasAccess: Bool { progress.snapshot.chatUnlocked && (coins > 0 || sessionPaid) }
@@ -41,6 +53,7 @@ import Observation
         sessionID = id
         sessionAuthorID = author.id
         sessionPaid = false
+        sessionAuthorized = false
         sessionConversation = .init()
     }
     func endSession(id: UUID) {
@@ -48,7 +61,14 @@ import Observation
         sessionID = nil
         sessionAuthorID = nil
         sessionPaid = false
+        sessionAuthorized = false
         sessionConversation = .init()
+    }
+    func authorizeSession() throws {
+        guard ready, sessionID != nil else { throw AppFailure.unavailable("Please wait for chat to finish loading.") }
+        if let unavailable { throw AppFailure.unavailable(unavailable) }
+        guard hasAccess else { throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.") }
+        sessionAuthorized = true
     }
     func prepare() async throws {
         if let preparationTask { return try await preparationTask.value }
@@ -73,40 +93,59 @@ import Observation
             throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.")
         }
         guard ready else { throw AppFailure.unavailable("Please wait for chat to finish loading.") }
-        guard !busy else { throw AppFailure.busy }
         let text = ChatLimits.normalizedMessage(message)
         guard ChatLimits.acceptsMessage(text) else {
             throw AppFailure.unavailable("Write a message of 1–500 characters.")
         }
         guard let sendingSessionID = sessionID, sessionAuthorID == author.id else { throw CancellationError() }
-        busy = true
-        defer { busy = false }
-        unavailable = await generator.availabilityMessage()
-        if let unavailable { throw AppFailure.unavailable(unavailable) }
-        try Task.checkCancellation()
-        guard sessionID == sendingSessionID else { throw CancellationError() }
-        let previous = sessionConversation
-        let reply = try await generator.reply(to: makeRequest(message: text, author: author, level: level, conversation: previous))
-        try Task.checkCancellation()
-        guard sessionID == sendingSessionID else { throw CancellationError() }
-        guard ChatLimits.acceptsReply(reply) else {
-            throw AppFailure.unavailable("The storyteller couldn’t finish a short reply. Please try again.")
+        guard sessionConversation.messages.filter({ $0.delivery == .pending }).count < 5 else {
+            throw AppFailure.unavailable("Please wait for a reply before sending more messages.")
         }
-        var conversation = previous
-        conversation.turns.append(.init(question: text, spanish: reply.spanish, english: reply.english,
-                                       correction: reply.correction, suggestion: reply.suggestion))
-        conversation.memory = String(reply.memory.prefix(ChatLimits.memory))
-        // Charge only after a valid first reply. Later messages never debit again.
-        // Publish only after durable payment succeeds; AI failures cost nothing.
-        if sessionPaid {
-            sessionConversation = conversation
-        } else {
-            try await progress.payForChat {
+        if let unavailable { throw AppFailure.unavailable(unavailable) }
+        guard sessionAuthorized else { throw AppFailure.unavailable("Confirm the 1 doubloon cost before starting your chat.") }
+        let outgoing = ChatMessage(role: .learner, text: text, delivery: .pending)
+        sessionConversation.messages.append(outgoing)
+        // Publish the learner's bubble immediately, then process replies in order.
+        await acquireReply()
+        defer { releaseReply() }
+        do {
+            try Task.checkCancellation()
+            guard sessionID == sendingSessionID else { throw CancellationError() }
+            unavailable = await generator.availabilityMessage()
+            if let unavailable { throw AppFailure.unavailable(unavailable) }
+            try Task.checkCancellation()
+            guard sessionID == sendingSessionID else { throw CancellationError() }
+            let reply = try await generator.reply(to: makeRequest(message: text, author: author,
+                level: level, conversation: sessionConversation))
+            try Task.checkCancellation()
+            guard sessionID == sendingSessionID else { throw CancellationError() }
+            guard ChatLimits.acceptsReply(reply) else {
+                throw AppFailure.unavailable("The storyteller couldn’t finish a short reply. Please try again.")
+            }
+            let deliver: @MainActor @Sendable () -> Bool = {
                 guard self.sessionID == sendingSessionID else { return false }
                 self.sessionPaid = true
-                self.sessionConversation = conversation
+                if let index = self.sessionConversation.messages.firstIndex(where: { $0.id == outgoing.id }) {
+                    self.sessionConversation.messages[index].delivery = .delivered
+                }
+                self.sessionConversation.messages.append(ChatMessage(role: .storyteller, text: reply.spanish,
+                    inReplyTo: outgoing.id, english: reply.english, correction: reply.correction, suggestion: reply.suggestion))
+                for message in reply.additionalMessages {
+                    self.sessionConversation.messages.append(ChatMessage(role: .storyteller, text: message.spanish,
+                        inReplyTo: outgoing.id, english: message.english))
+                }
+                self.sessionConversation.memory = String(reply.memory.prefix(ChatLimits.memory))
                 return true
             }
+            if sessionPaid { _ = deliver() }
+            else { try await progress.payForChat(deliver: deliver) }
+        } catch {
+            if sessionID == sendingSessionID,
+               let index = sessionConversation.messages.firstIndex(where: { $0.id == outgoing.id }),
+               sessionConversation.messages[index].delivery == .pending {
+                sessionConversation.messages[index].delivery = .failed
+            }
+            throw error
         }
     }
     private func makeRequest(message: String, author: Author, level: String, conversation: ChatConversation) -> ChatRequest {
@@ -122,6 +161,7 @@ import Observation
         guard ready, !busy else { throw AppFailure.busy }
         guard sessionAuthorID == author.id else { return }
         sessionPaid = false
+        sessionAuthorized = false
         sessionConversation = .init()
     }
 }

@@ -5,7 +5,7 @@ import Testing
 @Suite @MainActor struct CompletedViewModelTests {
     @Test func newerSearchWinsWhenResponsesFinishOutOfOrder() async throws {
         let library = DelayedLibrary()
-        let model = CompletedViewModel(library: library)
+        let model = CompletedViewModel(library: library, progress: ProgressManager(repository: MemoryProgress()))
         #expect(model.refreshID.query.completedOnly)
         model.query = "first"
         let first = Task { await model.refresh() }

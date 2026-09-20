@@ -27,6 +27,11 @@ import Observation
         let result = await library.presentation(requested.query)
         guard !Task.isCancelled, requested == refreshID else { return false }
         presentation = result
+        // Publish an explicit selection with the prepared books, before Today mounts.
+        // The visible fallback alone cannot position a newly created scroll view.
+        if !dailyReads.contains(where: { $0.id == focusedBookID }) {
+            focusNextRead()
+        }
         return true
     }
     var dailyReadsCompleted: Bool { presentation.dailyReadsCompleted }
@@ -83,6 +88,12 @@ import Observation
               progress.snapshot.completed.contains(visit.id),
               let next = focusedRead, next.id != visit.id, !completed(next) else { return }
         readCelebration += 1
+    }
+
+    func tapDailyRead(_ book: Book) {
+        guard dailyReads.contains(where: { $0.id == book.id }) else { return }
+        if focusedRead?.id == book.id { selectedBook = book }
+        else { focusedBookID = book.id }
     }
 
     func focusNextRead() { focusedBookID = nextRead?.id }

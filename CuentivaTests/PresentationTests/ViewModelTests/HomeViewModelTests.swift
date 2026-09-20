@@ -12,18 +12,52 @@ import Testing
         let home = HomeViewModel(library: library, progress: progress)
         await home.prepareDailyReads()
         let first = try #require(home.focusedRead)
-        #expect(home.readButtonTitle == "Read book 1")
+        #expect(home.readButtonTitle == "Read book")
         try await progress.recordEncounter(book: first, sentence: first.sentences[0])
         _ = try await progress.complete(book: first)
         await home.refresh()
         home.focusNextRead()
-        #expect(home.readButtonTitle == "Read book 2")
+        #expect(home.readButtonTitle == "Read book")
         #expect(home.focusedRead?.id != first.id)
         #expect(home.dailyReads.contains { $0.id == first.id })
         home.focusedBookID = first.id
-        #expect(home.readButtonTitle == "Read again")
+        #expect(home.readButtonTitle == "Read book")
         #expect(home.focusedRead?.id == first.id)
         #expect(home.completed(first))
+    }
+
+    @Test func launchRefreshPublishesAnExplicitNextUnreadScrollTarget() async throws {
+        let library = DelayedLibrary()
+        let home = HomeViewModel(library: library, progress: ProgressManager(repository: MemoryProgress()))
+        let first = sample("completed")
+        let next = sample("next")
+        let refresh = Task { await home.refresh() }
+        try await waitUntil { library.pending.count == 1 }
+        library.pending[0].resume(returning: .init(dailyReads: [first, next], nextRead: next))
+        #expect(await refresh.value)
+        #expect(home.focusedBookID == next.id)
+        #expect(home.focusedRead?.id == next.id)
+    }
+
+    @Test func tappingAnotherBookSelectsItBeforeOpeningTheLesson() async throws {
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = LibraryManager(repository: MemoryBooks(values: (0..<3).map { sample("tap-\($0)") }), purchases: purchases, progress: progress)
+        try await progress.load()
+        try await library.load()
+        let home = HomeViewModel(library: library, progress: progress)
+        await home.prepareDailyReads()
+        let third = try #require(home.dailyReads.last)
+        home.tapDailyRead(third)
+        #expect(home.focusedBookID == third.id)
+        #expect(home.focusedRead?.id == third.id)
+        #expect(home.selectedBook == nil)
+        home.tapDailyRead(third)
+        #expect(home.selectedBook?.id == third.id)
+        home.selectedBook = nil
+        home.tapDailyRead(sample("outside-daily-selection"))
+        #expect(home.focusedBookID == third.id)
+        #expect(home.selectedBook == nil)
     }
 
     @Test func celebratesOnlyNewDailyCompletionWithAnotherUnreadBook() async throws {

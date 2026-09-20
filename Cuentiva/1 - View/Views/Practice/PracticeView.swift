@@ -132,7 +132,7 @@ struct PracticeView: View {
                 Button("Ready") { model.startGame() }.buttonStyle(PrimaryButton())
                 Text(model.feedback).font(.caption)
             } else {
-                Text("This book needs a checked English word glossary before Match Pairs is available. Try Ana’s little café or My father’s garden. Your turn is available for every completed book.")
+                Text("Matching practice isn’t available for this book yet. You can still practise reading with Your turn.")
             }
         }
     }
@@ -170,7 +170,7 @@ struct PracticeView: View {
                 Text("Words to revisit").font(.headline)
                 ForEach(model.missed.sorted(), id: \.self) { word in Text("\(word) — \(model.glossary?[word] ?? "")") }
             }
-            Label("\(model.coins) doubloons available", systemImage: "circle.circle.fill").font(.title2).foregroundStyle(theme.theme.rewardGold)
+            DoubloonBalance(count: model.coins, size: 36).font(.title2).foregroundStyle(theme.theme.rewardGold)
             if model.matches == 0 { Text("Try another round to practise these words. Your story-completion doubloon is already earned.") }
             if model.saving { ProgressView("Saving your round…") }
             if model.error != nil { Button("Retry saving score") { Task { await model.saveScore() } } }

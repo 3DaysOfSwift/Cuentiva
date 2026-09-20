@@ -5,7 +5,7 @@ import Observation
     var syncing: Bool { library.syncing }
     var syncMessage: String? { library.syncMessage }
     func syncLibrary() async { await library.sync() }
-    var chatUnlocked: Bool { progress.snapshot.chatUnlocked }
+    var chatUnlocked: Bool { progress.snapshot.canOfferChat(onSupportedDevice: AppleChatGenerator.supportsDevice) }
     private let progress: any ProgressFeature
     private let purchases: any PurchaseFeature
     var showingThemePack: ThemePack?

@@ -8,6 +8,41 @@ import CryptoKit
 #endif
 
 @Suite struct CatalogueSyncTests {
+    @Test func newerBundledEditorialEditionSurvivesAnOlderOfflineSnapshot() async throws {
+        let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = directory.appending(path: "catalogue.json")
+        let store = SwiftDataStore(url: directory.appending(path: "app.store"))
+        let old = sample()
+        var remoteNewer = sample("future")
+        remoteNewer.editorialRevision = 3
+        let transport = try TestCatalogueTransport([old, sample("remote-only"), remoteNewer])
+        let first = SyncedBookRepository(bundled: MemoryBooks(values: [old]), transport: transport,
+            cacheURL: cache, store: store)
+        _ = try await first.sync()
+        let snapshot = await first.snapshotURL
+        let before = try Data(contentsOf: snapshot)
+        var revised = old
+        revised.editorialRevision = 2
+        revised.ending = [.init(id: "new-ending", spanish: "Volvió a casa.", english: "He returned home.")]
+        var bundledOlder = remoteNewer
+        bundledOlder.editorialRevision = 2
+        var missing = sample("bundled-only")
+        missing.editorialRevision = 2
+        let next = SyncedBookRepository(bundled: MemoryBooks(values: [revised, bundledOlder, missing]),
+            transport: transport, cacheURL: cache, store: store)
+        await transport.fail()
+        let books = try await next.books()
+        #expect(books.map(\.id) == ["cafe", "remote-only", "future", "bundled-only"])
+        #expect(books[0] == revised)
+        #expect(books[2].editorialRevision == 3)
+        #expect(books[3] == missing)
+        #expect(try Data(contentsOf: snapshot) == before)
+        #expect(!FileManager.default.fileExists(atPath: directory.appending(path: "app.store").path))
+        // No completion IDs are changed by a content revision.
+        #expect(books.first?.id == old.id)
+    }
+
     @Test func legacyPacksMigrateInBackgroundWithoutChangingCurrentSession() async throws {
         let directory = URL.temporaryDirectory.appending(path: UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }

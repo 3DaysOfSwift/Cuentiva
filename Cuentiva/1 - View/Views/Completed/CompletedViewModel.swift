@@ -2,6 +2,9 @@ import Foundation
 import Observation
 @MainActor @Observable final class CompletedViewModel {
     private let library: any LibraryFeature
+    private let progress: any ProgressFeature
+    var streak: Int { progress.streak }
+    var week: [WeekDay] { progress.week }
     var query = ""
     var format: BookFormat?
     var sort: BookSort = .library
@@ -20,5 +23,9 @@ import Observation
         guard !Task.isCancelled, requested == refreshID else { return }
         presentation = result
     }
-    init(library: any LibraryFeature = AppModel.shared.library) { self.library = library }
+    init(library: any LibraryFeature = AppModel.shared.library,
+         progress: any ProgressFeature = AppModel.shared.progress) {
+        self.library = library
+        self.progress = progress
+    }
 }

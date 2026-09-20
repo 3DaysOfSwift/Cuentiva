@@ -5,7 +5,9 @@ import Foundation
 struct BinaryLibrary: Sendable {
     private let data: Data
     let count: Int
-    private static let bookStride = 140
+    private static let bookStride = 152
+    private let recordStride: Int
+    private let version: UInt32
 
     init(data: Data) throws {
         guard data.count >= 16, data.prefix(8) == Data("CUENLIB\0".utf8) else {
@@ -13,8 +15,10 @@ struct BinaryLibrary: Sendable {
         }
         self.data = data
         self.count = Int(Self.word(data, at: 12))
-        guard Self.word(data, at: 8) == 1, count > 0, count <= 20_000,
-            count <= (data.count - 16) / Self.bookStride else { throw AppFailure.invalidBook }
+        version = Self.word(data, at: 8)
+        recordStride = version == 1 ? 140 : Self.bookStride
+        guard (version == 1 || version == 2), count > 0, count <= 20_000,
+            count <= (data.count - 16) / recordStride else { throw AppFailure.invalidBook }
     }
 
     init(url: URL) throws {
@@ -25,7 +29,7 @@ struct BinaryLibrary: Sendable {
 
     func book(at index: Int) throws -> Book {
         guard index >= 0, index < count else { throw AppFailure.invalidBook }
-        let base = 16 + index * Self.bookStride
+        let base = 16 + index * recordStride
         let r = Reader(data: data)
         let format = try r.optionalText(base + 72)
         let kind = format.flatMap(BookFormat.init(rawValue:))
@@ -56,7 +60,9 @@ struct BinaryLibrary: Sendable {
             matchGlossary: glossary, isDemoLocation: flag == 2 ? nil : flag == 1,
             submissionLocation: try r.optionalRecord(base + 132, read: r.location), format: kind,
             scene: try r.optionalText(base + 80), continuation: try r.table(base + 112, stride: 32, read: r.sentence),
-            verbFocus: try r.optionalRecord(base + 128, read: r.verb)
+            verbFocus: try r.optionalRecord(base + 128, read: r.verb),
+            ending: version >= 2 ? try r.table(base + 140, stride: 32, read: r.sentence) : nil,
+            editorialRevision: version >= 2 ? try r.optionalRevision(base + 148) : nil
         )
     }
 
@@ -74,6 +80,10 @@ struct BinaryLibrary: Sendable {
         func uint(_ offset: Int) throws -> UInt32 {
             try check(offset, length: 4)
             return BinaryLibrary.word(data, at: offset)
+        }
+        func optionalRevision(_ offset: Int) throws -> Int? {
+            let value = try uint(offset)
+            return value == .max ? nil : Int(value)
         }
         func double(_ offset: Int) throws -> Double {
             try check(offset, length: 8)
@@ -142,11 +152,11 @@ struct BinaryLibrary: Sendable {
 
 extension BinaryLibrary {
     /// Used only when preparing a downloaded replacement, never on the display path.
-    /// Matches the build-time compiler's version-one wire format.
+    /// Matches the build-time compiler's version-two wire format; version-one snapshots remain readable.
     static func encode(_ books: [Book]) throws -> Data {
         guard !books.isEmpty, books.count <= 20_000 else { throw AppFailure.invalidBook }
         let writer = Writer()
-        writer.data = Data("CUENLIB\0".utf8) + writer.word(1) + writer.word(UInt32(books.count))
+        writer.data = Data("CUENLIB\0".utf8) + writer.word(2) + writer.word(UInt32(books.count))
         writer.data.append(Data(count: books.count * bookStride))
         for (index, book) in books.enumerated() {
             let record = try writer.book(book)
@@ -231,6 +241,13 @@ extension BinaryLibrary {
             bytes.append(try record(value.verbFocus, encode: verb))
             bytes.append(try record(value.submissionLocation, encode: location))
             bytes.append(try record(value.personalAuthor, encode: author))
+            bytes.append(try table(value.ending, encode: sentence))
+            if let revision = value.editorialRevision {
+                guard revision > 0, revision < Int(UInt32.max) else { throw AppFailure.invalidBook }
+                bytes.append(try number(revision))
+            } else {
+                bytes.append(word(.max))
+            }
             return bytes
         }
     }

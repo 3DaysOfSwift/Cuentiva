@@ -35,6 +35,15 @@ private actor ChatTestGenerator: ChatGenerator {
 }
 @Suite @MainActor struct ChatTests {
     private let author = Author.demoProfiles[0]
+    private func waitUntil(_ condition: () async -> Bool) async throws {
+        let clock = ContinuousClock()
+        let deadline = clock.now.advanced(by: .seconds(3))
+        while !(await condition()) {
+            guard clock.now < deadline else { throw AppFailure.unavailable("Timed out waiting for chat test.") }
+            await Task.yield()
+        }
+    }
+
     private func wallet(_ coins: Int = 2, repository: MemoryProgress = MemoryProgress()) async throws -> ProgressManager {
         var value = LearnerProgress(); value.doubloons = coins
         value.completed = Set((0..<11).map { "earned-\($0)" })
@@ -43,6 +52,18 @@ private actor ChatTestGenerator: ChatGenerator {
         try await progress.load()
         return progress
     }
+    @Test func chatPromotionRequiresBothReadingMilestoneAndDeviceSupport() {
+        var progress = LearnerProgress()
+        progress.completed = Set((0..<11).map { "book-\($0)" })
+        #expect(!progress.canOfferChat(onSupportedDevice: false))
+        #expect(progress.canOfferChat(onSupportedDevice: true))
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
+        #expect(!receipt.offersChatGift(onSupportedDevice: false))
+        #expect(receipt.offersChatGift(onSupportedDevice: true))
+        progress.completed = []
+        #expect(!progress.canOfferChat(onSupportedDevice: true))
+    }
+
     @Test func coinsDoNotBypassReadingUnlock() async throws {
         var value = LearnerProgress(); value.doubloons = 10
         value.completed = Set((0..<10).map { "earned-\($0)" })
@@ -84,12 +105,56 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(reloaded.snapshot.doubloons == 2)
         #expect(!reloaded.snapshot.completed.contains("third"))
     }
+    @Test func confirmingCostDoesNotSpendAndNewTopicsRequireFreshConsent() async throws {
+        let generator = ChatTestGenerator()
+        let chat = ChatManager(generator: generator, progress: try await wallet(2))
+        try await chat.prepare()
+        let id = UUID()
+        chat.beginSession(id: id, author: author)
+        await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A1") }
+        #expect(await generator.requests.isEmpty)
+        #expect(chat.conversation(for: author).messages.isEmpty)
+        #expect(chat.coins == 2)
+        try chat.authorizeSession()
+        try chat.authorizeSession()
+        #expect(chat.sessionAuthorized)
+        #expect(!chat.sessionPaid)
+        #expect(chat.coins == 2)
+        chat.beginSession(id: id, author: author)
+        #expect(chat.sessionAuthorized)
+        try await chat.send("Hola", to: author, level: "A1")
+        #expect(chat.coins == 1)
+        try await chat.clear(author: author)
+        #expect(!chat.sessionAuthorized)
+        await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A1") }
+        try chat.authorizeSession()
+        chat.endSession(id: id)
+        #expect(!chat.sessionAuthorized)
+        #expect(chat.coins == 1)
+    }
+
+    @Test func unavailableAndEmptyWalletCannotAuthorizeChat() async throws {
+        let generator = ChatTestGenerator()
+        await generator.configure(unavailable: "Unsupported device")
+        let unavailable = ChatManager(generator: generator, progress: try await wallet())
+        try await unavailable.prepare()
+        unavailable.beginSession(id: UUID(), author: author)
+        #expect(throws: AppFailure.self) { try unavailable.authorizeSession() }
+        #expect(!unavailable.sessionAuthorized)
+        let empty = ChatManager(generator: ChatTestGenerator(), progress: try await wallet(0))
+        try await empty.prepare()
+        empty.beginSession(id: UUID(), author: author)
+        #expect(throws: AppFailure.self) { try empty.authorizeSession() }
+        #expect(!empty.sessionAuthorized)
+    }
+
     @Test func oneCoinCoversContinuousChatAndClosingRequiresAnother() async throws {
         let progress = try await wallet()
         let generator = ChatTestGenerator()
         let chat = ChatManager(generator: generator, progress: progress)
         try await chat.prepare()
         let first = UUID(); chat.beginSession(id: first, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         #expect(chat.coins == 2)
         for n in 0..<6 { try await chat.send("Hola \(n)", to: author, level: "B1") }
         #expect(chat.coins == 1)
@@ -101,6 +166,7 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(chat.conversation(for: author).turns.isEmpty)
         #expect(!chat.sessionPaid)
         let second = UUID(); chat.beginSession(id: second, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         try await chat.send("Otro tema", to: author, level: "A2")
         #expect(chat.coins == 0)
         try await chat.send("Más", to: author, level: "A2")
@@ -108,14 +174,58 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(chat.conversation(for: author).turns.count == 2)
         chat.endSession(id: second)
         chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         #expect(!chat.hasAccess)
         await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A2") }
         #expect(await generator.requests.count == 8)
     }
+    @Test func outgoingBubblesAppearImmediatelyAndRepliesAreSerial() async throws {
+        let progress = try await wallet(1)
+        let generator = ChatTestGenerator()
+        await generator.configure(paused: true)
+        let chat = ChatManager(generator: generator, progress: progress)
+        try await chat.prepare()
+        chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
+        let first = Task { try await chat.send("Hola", to: author, level: "A2") }
+        defer { first.cancel(); Task { await generator.resume() } }
+        try await waitUntil { await generator.isWaiting() }
+        let second = Task { try await chat.send("Soy de Londres", to: author, level: "A2") }
+        defer { second.cancel() }
+        try await waitUntil { chat.conversation(for: author).messages.count == 2 }
+        #expect(chat.conversation(for: author).messages.map(\.role) == [.learner, .learner])
+        #expect(await generator.requests.count == 1)
+        #expect(chat.coins == 1)
+        await generator.configure(paused: false)
+        await generator.resume()
+        try await first.value
+        try await second.value
+        let transcript = chat.conversation(for: author).messages
+        #expect(transcript.map(\.role) == [.learner, .learner, .storyteller, .storyteller])
+        #expect(transcript.allSatisfy { $0.delivery == .delivered })
+        #expect(chat.coins == 0)
+        #expect(await generator.requests.count == 2)
+        #expect(!chat.busy)
+    }
+
+    @Test func storytellerCanSendSeveralBubblesForOneCoin() async throws {
+        let generator = ChatTestGenerator()
+        await generator.setReply(.init(spanish: "¡Hola!", english: "Hello!", correction: "", suggestion: "", memory: "Greetings",
+            additionalMessages: [.init(spanish: "¿Cómo estás?", english: "How are you?")]))
+        let chat = ChatManager(generator: generator, progress: try await wallet(1))
+        try await chat.prepare()
+        chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
+        try await chat.send("Hola", to: author, level: "A1")
+        #expect(chat.conversation(for: author).messages.map(\.role) == [.learner, .storyteller, .storyteller])
+        #expect(chat.coins == 0)
+    }
+
     @Test func noCoinsMeansNoGeneration() async throws {
         let generator = ChatTestGenerator()
         let chat = ChatManager(generator: generator, progress: try await wallet(0))
         try await chat.prepare(); chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A2") }
         #expect(await generator.requests.isEmpty)
     }
@@ -124,6 +234,7 @@ private actor ChatTestGenerator: ChatGenerator {
         let progress = try await wallet(1, repository: repository)
         let chat = ChatManager(generator: ChatTestGenerator(), progress: progress)
         try await chat.prepare(); chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         await repository.setFailure(true)
         await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A2") }
         #expect(chat.coins == 1); #expect(!chat.sessionPaid)
@@ -139,12 +250,13 @@ private actor ChatTestGenerator: ChatGenerator {
         let chat = ChatManager(generator: generator, progress: try await wallet(1))
         try await chat.prepare()
         let id = UUID(); chat.beginSession(id: id, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         let task = Task { try await chat.send("Hola", to: author, level: "A2") }
         while !(await generator.isWaiting()) { await Task.yield() }
-        await #expect(throws: AppFailure.self) { try await chat.send("Otro", to: author, level: "A2") }
         if cancel { task.cancel() } else {
             chat.endSession(id: id)
             chat.beginSession(id: UUID(), author: author)
+            if chat.hasAccess { try chat.authorizeSession() }
         }
         await generator.resume()
         await #expect(throws: CancellationError.self) { try await task.value }
@@ -156,21 +268,25 @@ private actor ChatTestGenerator: ChatGenerator {
         let chat = ChatManager(generator: ChatTestGenerator(), progress: try await wallet())
         try await chat.prepare()
         let oldID = UUID(); chat.beginSession(id: oldID, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         try await chat.send("Hola", to: author, level: "A2")
         try await chat.clear(author: author)
         #expect(!chat.sessionPaid)
         #expect(chat.conversation(for: author).turns.isEmpty)
         let id = UUID(); chat.beginSession(id: id, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         chat.endSession(id: oldID)
         try await chat.send("Nuevo tema", to: author, level: "A2")
         #expect(chat.coins == 0); #expect(chat.sessionPaid)
         chat.beginSession(id: id, author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         #expect(chat.sessionPaid)
     }
     @Test func unavailableDeviceAndInvalidInputDoNotSpend() async throws {
         let generator = ChatTestGenerator()
         let chat = ChatManager(generator: generator, progress: try await wallet(1))
         try await chat.prepare(); chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         await #expect(throws: AppFailure.self) { try await chat.send(String(repeating: "a", count: 501), to: author, level: "A2") }
         await generator.configure(unavailable: "Model not ready")
         await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A2") }
@@ -192,6 +308,7 @@ private actor ChatTestGenerator: ChatGenerator {
         await generator.setReply(reply)
         let chat = ChatManager(generator: generator, progress: try await wallet(1))
         try await chat.prepare(); chat.beginSession(id: UUID(), author: author)
+        if chat.hasAccess { try chat.authorizeSession() }
         await #expect(throws: AppFailure.self) { try await chat.send("Hola", to: author, level: "A2") }
         #expect(chat.coins == 1); #expect(!chat.sessionPaid)
         #expect(chat.conversation(for: author).turns.isEmpty)

@@ -13,11 +13,25 @@ struct CompletedView: View {
                         .padding(.bottom, 10)
                     Text("\(viewModel.total)").font(.system(size: 72, weight: .medium, design: .serif)).monospacedDigit()
                     Text(viewModel.total == 1 ? "BOOK READ" : "BOOKS READ").font(.headline).tracking(2)
-                    Text("\(viewModel.practiceDays) days practised · \(viewModel.doubloons) doubloons available")
-                        .font(.subheadline).foregroundStyle(theme.theme.muted)
+                    DoubloonBalance(count: viewModel.doubloons)
                 }
                 Text("Look how far you’ve read.").font(.system(.title2, design: .serif))
                 Text("Every finished story belongs here. Your collection stays with you, even when a streak ends.").foregroundStyle(theme.theme.muted)
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Your reading rhythm")
+                        .font(.system(.title2, design: .serif, weight: .medium))
+                    StreakBar(days: viewModel.week)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label("\(viewModel.streak)-day streak", systemImage: "flame.fill")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(theme.theme.accent)
+                        Text("\(viewModel.practiceDays) \(viewModel.practiceDays == 1 ? "day" : "days") practised in total")
+                            .font(.subheadline).foregroundStyle(theme.theme.muted)
+                    }
+                }
+                .padding(20)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 24))
                 LibraryControls(format: $viewModel.format, sort: $viewModel.sort, counts: viewModel.presentation.formatCounts, horizontalInset: 24)
                 if viewModel.books.isEmpty { ContentUnavailableView("No completed books here", systemImage: "books.vertical", description: Text("Try another filter or finish a book to add it to your shelf.")) }
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 145), spacing: 20)], spacing: 25) {

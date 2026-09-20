@@ -114,9 +114,10 @@ actor SyncedBookRepository: SyncingBookRepository {
             books.allSatisfy({ book in
                 !book.id.isEmpty && !book.title.isEmpty && !book.englishTitle.isEmpty && !book.author.isEmpty
                     && LearningLevel.allCases.contains(where: { $0.rawValue == book.level }) && book.palette >= 0
-                    && !book.sentences.isEmpty && book.fullText.count <= 1000
-                    && Set(book.fullText.map(\.id)).count == book.fullText.count
-                    && book.fullText.allSatisfy { !$0.id.isEmpty && !$0.spanish.isEmpty && !$0.english.isEmpty }
+                    && (book.editorialRevision == nil || (book.editorialRevision ?? 0) > 0)
+                    && !book.sentences.isEmpty && book.completeText.count <= 1000
+                    && Set(book.completeText.map(\.id)).count == book.completeText.count
+                    && book.completeText.allSatisfy { !$0.id.isEmpty && !$0.spanish.isEmpty && !$0.english.isEmpty }
                     && book.vocabulary.allSatisfy { !$0.word.isEmpty && !$0.lemma.isEmpty && $0.occurrences > 0 }
                     && (book.submissionLocation == nil
                         || (book.isDemoLocation == true && book.submissionLocation?.valid == true))
@@ -191,10 +192,35 @@ actor SyncedBookRepository: SyncingBookRepository {
     func books() async throws -> [Book] {
         if let currentBooks { return currentBooks }
         if let prepared = readSnapshot() {
-            currentBooks = prepared.books
-            currentAuthors = prepared.authors
+            // An installed pack must not roll a newer bundled editorial edition
+            // back to the old text. Keep remote-only books and newer revisions.
+            var books = prepared.books
+            var authors = prepared.authors
+            do {
+                let bundledBooks = try await bundled.books()
+                let bundledAuthors = await bundled.authors()
+                for replacement in bundledBooks where (replacement.editorialRevision ?? 0) > 0 {
+                    if let index = books.firstIndex(where: { $0.id == replacement.id }) {
+                        guard (replacement.editorialRevision ?? 0) > (books[index].editorialRevision ?? 0) else { continue }
+                        books[index] = replacement
+                    } else {
+                        books.append(replacement)
+                    }
+                    if let author = bundledAuthors.first(where: { $0.id == replacement.authorID }) {
+                        authors.removeAll { $0.id == author.id }
+                        authors.append(author)
+                    }
+                }
+            } catch {
+                // The verified snapshot is still useful if the bundle is unavailable.
+                Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Library")
+                    .error("Bundled editorial update could not be read; using the installed snapshot.")
+            }
+            if let currentBooks { return currentBooks }
+            currentBooks = books
+            currentAuthors = authors
             currentArrivals = prepared.arrivals
-            return prepared.books
+            return books
         }
         let books = try await bundled.books()
         let authors = await bundled.authors()

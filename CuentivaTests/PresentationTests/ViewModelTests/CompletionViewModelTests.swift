@@ -17,7 +17,7 @@ import Testing
 
     @Test func eleventhNewBookOffersChatGiftButRereadsDoNot() {
         let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
-        let model = CompletionViewModel(receipt: receipt)
+        let model = CompletionViewModel(receipt: receipt, supportsChat: true)
         #expect(receipt.unlocksChat)
         #expect(!model.continueJourney(receipt, practiceAllowed: false))
         #expect(model.showingChatGift)
@@ -26,6 +26,15 @@ import Testing
         #expect(!reread.unlocksChat)
         #expect(!model.showingChatGift)
         #expect(model.continueJourney(reread, practiceAllowed: false))
+    }
+
+    @Test func unsupportedDeviceNeverOffersChatGift() {
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
+        let model = CompletionViewModel(receipt: receipt, supportsChat: false)
+        #expect(!model.offersChatGift(receipt))
+        #expect(model.continueJourney(receipt, practiceAllowed: false))
+        #expect(!model.showingChatGift)
+        #expect(!model.showingChat)
     }
 
     @Test func celebrationCountsOnce() {

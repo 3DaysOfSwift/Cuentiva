@@ -5,6 +5,7 @@ enum LearningLevel: String, Codable, CaseIterable, Sendable { case a1 = "A1", a2
 struct LearnerProgress: Codable, Sendable, Equatable {
     /// Shared across all targets; only distinct, saved completions unlock writing.
     var chatUnlocked: Bool { completed.count >= ReadingMilestones.chatOfferBookCount }
+    func canOfferChat(onSupportedDevice supported: Bool) -> Bool { supported && chatUnlocked }
     var writingUnlocked: Bool { completed.count >= ReadingMilestones.writingBookCount }
     var isVIP: Bool { completed.count >= ReadingMilestones.honouredReaderBookCount }
     var readerBadges: [ReaderBadge] {
@@ -61,6 +62,7 @@ struct CompletionReceipt: Identifiable, Sendable {
     var streakThemeGift: ThemePack? = nil
     var unlocksChat: Bool { isNew && total == ReadingMilestones.chatOfferBookCount }
     var offersChat: Bool { total >= ReadingMilestones.chatOfferBookCount }
+    func offersChatGift(onSupportedDevice supported: Bool) -> Bool { supported && unlocksChat }
     var unlocksWriting: Bool { isNew && total == ReadingMilestones.writingBookCount }
     var celebratesHundredBooks: Bool { isNew && total == ReadingMilestones.honouredReaderBookCount }
     var themePackGift: ThemePack? {

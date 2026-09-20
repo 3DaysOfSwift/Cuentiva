@@ -3,6 +3,25 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct AuthorViewModelTests {
+    @Test func chatInvitationReflectsWalletAndDeviceEligibility() async throws {
+        var value = LearnerProgress()
+        value.completed = Set((0..<11).map { "read-\($0)" })
+        value.doubloons = 3
+        let repository = MemoryProgress()
+        try await repository.save(value)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let library = DelayedLibrary()
+        let author = Author.demoProfiles[0]
+        let supported = AuthorViewModel(author: author, library: library, progress: progress, supportsChat: true)
+        let unsupported = AuthorViewModel(author: author, library: library, progress: progress, supportsChat: false)
+        #expect(supported.chatUnlocked)
+        #expect(!unsupported.chatUnlocked)
+        #expect(supported.doubloons == 3)
+        try await progress.payForChat { true }
+        #expect(supported.doubloons == 2)
+    }
+
     @Test func cancelledRefreshCannotReplaceDisplayedBooks() async throws {
         let library = DelayedLibrary()
         let progress = ProgressManager(repository: MemoryProgress())

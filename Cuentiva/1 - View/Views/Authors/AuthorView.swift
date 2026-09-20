@@ -14,13 +14,13 @@ struct AuthorView: View {
                 Text("STORYTELLER").font(.caption.weight(.semibold)).foregroundStyle(theme.theme.accent)
                 Text(model.author.introduction).font(.title3)
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Behind the stories").font(.headline)
+                    Text("Personal Bio").font(.headline)
                     Text(model.author.note).font(.system(.body, design: .serif))
+                        .lineSpacing(4).fixedSize(horizontal: false, vertical: true)
                 }.padding(20).frame(maxWidth: .infinity, alignment: .leading).background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
                 if model.chatUnlocked {
-                    NavigationLink { ChatView(author: model.author) } label: {
-                        Label("Talk with \(model.author.name)", systemImage: "bubble.left.and.bubble.right")
-                    }
+                    AuthorChatSection(author: model.author, coins: model.doubloons,
+                        fantasy: AppModel.shared.fantasy)
                 }
                 Text("Stories by \(model.author.name)").font(.system(.title2, design: .serif))
                 ForEach(model.books) { book in

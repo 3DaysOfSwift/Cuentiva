@@ -9,12 +9,12 @@ ROOT = Path(__file__).resolve().parents[1]
 RESOURCES = ROOT / 'Cuentiva/3 - App Resources'
 NONE = 0xffffffff
 STRINGS = ['id', 'title', 'englishTitle', 'author', 'level', 'symbol', 'summary', 'license', 'authorID', 'format', 'scene']
-FIELDS = set(STRINGS + ['palette', 'isDemoLocation', 'sentences', 'vocabulary', 'continuation', 'matchGlossary', 'verbFocus', 'submissionLocation', 'personalAuthor'])
+FIELDS = set(STRINGS + ['palette', 'isDemoLocation', 'sentences', 'vocabulary', 'continuation', 'matchGlossary', 'verbFocus', 'submissionLocation', 'personalAuthor', 'ending', 'editorialRevision'])
 
 class Builder:
     def __init__(self, books):
-        self.data = bytearray(b'CUENLIB\x00' + struct.pack('<II', 1, len(books)))
-        self.data.extend(bytes(140 * len(books)))
+        self.data = bytearray(b'CUENLIB\x00' + struct.pack('<II', 2, len(books)))
+        self.data.extend(bytes(152 * len(books)))
         self.strings = {}
         for i, book in enumerate(books):
             if set(book) - FIELDS:
@@ -29,8 +29,10 @@ class Builder:
             record += self.optional_record(book.get('verbFocus'), self.verb)
             record += self.optional_record(book.get('submissionLocation'), self.location)
             record += self.optional_record(book.get('personalAuthor'), self.author)
-            assert len(record) == 140
-            self.data[16 + 140*i:16 + 140*(i+1)] = record
+            record += self.table(book.get('ending'), self.sentence)
+            record += struct.pack('<I', book.get('editorialRevision', NONE))
+            assert len(record) == 152
+            self.data[16 + 152*i:16 + 152*(i+1)] = record
 
     def append(self, data):
         offset = len(self.data)

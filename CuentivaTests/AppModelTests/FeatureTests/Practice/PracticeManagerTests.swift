@@ -7,6 +7,40 @@ import Testing
 #endif
 
 @Suite @MainActor struct PracticeManagerTests {
+    @Test func everyBundledBookSupportsMatchingAfterCompletion() async throws {
+        #if canImport(CuentivaAppModel)
+        let url = TestResources.repositoryRoot.appending(path: "Cuentiva/3 - App Resources/Library.dat")
+        #else
+        let url = try #require(Bundle.main.url(forResource: "Library", withExtension: "dat"))
+        #endif
+        let books = try BinaryLibrary(url: url).books()
+        #expect(books.count == 52)
+        let repository = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.completed = Set(books.map(\.id))
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let feature = PracticeManager(progress: progress, purchases: purchases)
+        let startingCoins = feature.coins
+        for book in books {
+            #expect(feature.allowed(book))
+            let glossary = try #require(feature.glossary(book))
+            #expect(!glossary.isEmpty)
+            #expect(Set(glossary.keys) == Set(book.vocabulary.map(\.word)))
+            try await feature.recordScore(book, matches: glossary.count)
+            #expect(feature.best(book) == glossary.count)
+        }
+        #expect(feature.coins == startingCoins)
+        let train = try #require(books.first { $0.id == "train" })
+        let verb = try #require(books.first { $0.id == "verb-ser" })
+        let owl = try #require(books.first { $0.id == "patient-investor" })
+        #expect(feature.glossary(train)?["sobre"] == "envelope")
+        #expect(feature.glossary(verb)?["camino"] == "I walk")
+        #expect(feature.glossary(owl)?["cerca"] == "fence")
+    }
+
     @Test func accessRequiresPurchaseAndCompletionAndScoresDoNotMintCoins() async throws {
         let repository = MemoryProgress()
         let progress = ProgressManager(repository: repository)

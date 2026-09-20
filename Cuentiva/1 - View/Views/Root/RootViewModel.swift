@@ -6,7 +6,7 @@ import Observation
     private(set) var dailyWelcome: DailyWelcomeViewModel?
     let today: HomeViewModel
     private let progress: any ProgressFeature
-    var chatUnlocked: Bool { progress.snapshot.chatUnlocked }
+    var chatUnlocked: Bool { progress.snapshot.canOfferChat(onSupportedDevice: AppleChatGenerator.supportsDevice) }
     var writingUnlocked: Bool { progress.snapshot.writingUnlocked }
     private let purchases: any PurchaseFeature
     private let library: any LibraryFeature
@@ -52,9 +52,9 @@ import Observation
     private func loadIntroduction() async {
         let started = Date()
         do {
-            async let introduction: Void = library.loadIntroduction()
-            try await progress.load()
-            try await introduction
+            // Welcome content has no dependency on the user's database.
+            // Onboarding prepares progress after its first screen is mounted.
+            try await library.loadIntroduction()
             onboardingReady = true
             logger.info("Onboarding ready in \(Date().timeIntervalSince(started), privacy: .public) seconds")
         } catch { self.error = error.localizedDescription }

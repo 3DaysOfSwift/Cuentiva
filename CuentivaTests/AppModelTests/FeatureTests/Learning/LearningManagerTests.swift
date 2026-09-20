@@ -7,6 +7,31 @@ import Testing
 #endif
 
 @Suite @MainActor struct LearningManagerTests {
+    @Test func rewrittenEditionRestartsOldAttemptsWithoutErasingCompletedHistory() async throws {
+        let repository = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.positions["cafe"] = 2
+        saved.attempts["cafe"] = ["old-sentence"]
+        saved.completed.insert("cafe")
+        saved.doubloons = 1
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let feature = LearningManager(purchases: purchases, progress: progress)
+        var revised = sample(sentences: 2)
+        revised.editorialRevision = 2
+        #expect(feature.position(revised) == 0)
+        #expect(progress.snapshot == saved)
+        _ = try await feature.advance(book: revised, from: 0)
+        #expect(feature.position(revised) == 1)
+        _ = try await feature.advance(book: revised, from: 1)
+        let receipt = try await feature.finishReading(revised)
+        #expect(!receipt.isNew)
+        #expect(progress.snapshot.doubloons == 1)
+        #expect(progress.snapshot.completed == ["cafe"])
+    }
+
     @Test func movingAndFinishingRespectAccessAndCommittedProgress() async throws {
         let repository = MemoryProgress()
         let progress = ProgressManager(repository: repository)

@@ -36,7 +36,10 @@ struct StatsView: View {
                 Divider()
                 VStack(spacing: 22) {
                     stat(viewModel.booksRead == 1 ? "Book read" : "Books read", value: "\(viewModel.booksRead)", symbol: "books.vertical")
-                    stat("Doubloons available", value: "\(viewModel.doubloons)", symbol: "star.circle")
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Doubloons available").font(.headline)
+                        DoubloonBalance(count: viewModel.doubloons, size: 40).font(.title2)
+                    }.frame(maxWidth: .infinity, alignment: .leading)
                     stat("Days practised", value: "\(viewModel.practiceDays)", symbol: "calendar")
                     VStack(alignment: .leading, spacing: 8) {
                         Label("First recorded practice", systemImage: "sunrise").font(.headline)

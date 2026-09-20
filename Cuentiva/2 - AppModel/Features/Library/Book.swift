@@ -21,6 +21,10 @@ struct Book: Codable, Identifiable, Hashable, Sendable {
     var scene: String? = nil
     var continuation: [Sentence]? = nil
     var verbFocus: VerbFocus? = nil
+    /// Chapter three is retained for the next reader release, not displayed yet.
+    var ending: [Sentence]? = nil
+    var editorialRevision: Int? = nil
+    var completeText: [Sentence] { fullText + (ending ?? []) }
     var storytellerName: String {
         personalAuthor?.name ?? Author.demoProfiles.first(where: { $0.id == authorID })?.name
             ?? author.split(whereSeparator: { $0.isWhitespace }).first.map(String.init) ?? author

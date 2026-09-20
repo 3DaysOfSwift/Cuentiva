@@ -36,20 +36,29 @@ struct OnboardingView: View {
                     }
                     .safeAreaInset(edge: .bottom, spacing: 0) {
                         if let book = viewModel.book {
-                            Button { viewModel.lesson = book } label: {
-                                VStack(spacing: 4) {
-                                    Text("Read Pipa's story  →")
-                                    Text("Told by \(book.storytellerName)").font(.caption)
-                                }.frame(maxWidth: .infinity)
-                            }
+                            VStack(spacing: 8) {
+                                if let error = viewModel.preparationError {
+                                    InlineError(message: error)
+                                    Button("Try preparing again") { Task { await viewModel.prepareProgress() } }
+                                        .disabled(viewModel.preparing)
+                                }
+                                Button(action: viewModel.startReading) {
+                                    VStack(spacing: 4) {
+                                        Text(viewModel.progressReady ? "Read Pipa's story  →" : "Preparing your story…")
+                                        Text("Told by \(book.storytellerName)").font(.caption)
+                                    }.frame(maxWidth: .infinity)
+                                }
                                 .buttonStyle(PrimaryButton())
-                                .padding(.horizontal, 26).padding(.vertical, 12)
-                                .background(theme.theme.paper)
-                                .dockedAreaBorder()
+                                .disabled(!viewModel.canStartReading)
+                            }
+                            .padding(.horizontal, 26).padding(.vertical, 12)
+                            .background(theme.theme.paper)
+                            .dockedAreaBorder()
                         }
                     }
                 }
             }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
+                .task { await viewModel.prepareProgress() }
                 .fullScreenCover(item: $viewModel.lesson) { book in NavigationStack { LessonView(book: book) } }
         }
     }

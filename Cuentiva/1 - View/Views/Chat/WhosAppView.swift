@@ -12,9 +12,12 @@ struct WhosAppView: View {
                         .font(.system(.largeTitle, design: .serif))
                     Text("Practise messaging your future Spanish-speaking friends. Start with a real moment from your life.")
                         .foregroundStyle(theme.theme.muted)
-                    Label("\(model.coins) doubloons", systemImage: "circle.circle.fill")
-                        .foregroundStyle(theme.theme.accent)
-                    Text("Your first message starts a topic for 1 doubloon. Keep chatting until you leave the conversation. Choosing a storyteller costs nothing.")
+                    DoubloonBalance(count: model.coins, size: 38).font(.title3.weight(.semibold))
+                    HStack(spacing: 10) {
+                        DoubloonIcon(size: 26)
+                        Text("1 doubloon · one conversation").font(.headline)
+                    }
+                    Text("Choose a storyteller, then slide to confirm the cost. You’re charged only after the first successful reply. Keep chatting until you leave the conversation.")
                         .font(.footnote).foregroundStyle(theme.theme.muted)
                     ForEach(model.authors) { author in
                         NavigationLink { ChatView(author: author) } label: {

@@ -21,7 +21,18 @@ struct ChatView: View {
                             Text("A little Spanish. A conversation of your own.").font(.subheadline).foregroundStyle(theme.theme.muted)
                         }
                     }
+                    DoubloonBalance(count: model.feature.coins)
                     Text(model.sessionMessage).font(.subheadline).foregroundStyle(theme.theme.accent)
+                    if let unavailable = model.feature.unavailable {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label("On-device chat unavailable", systemImage: "iphone.slash")
+                                .font(.headline)
+                            Text(unavailable)
+                            Button("Check again") { Task { await model.prepare() } }
+                                .disabled(model.feature.preparing)
+                        }.padding().frame(maxWidth: .infinity, alignment: .leading)
+                            .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
+                    }
                     if !model.feature.ready {
                         if model.feature.preparing || model.preparationError == nil {
                             ProgressView("Preparing chat…")
@@ -29,23 +40,23 @@ struct ChatView: View {
                             Text("Chat couldn’t load. Please try again.")
                             Button("Try again") { Task { await model.prepare() } }
                         }
-                    } else if model.unlocked {
+                    } else if model.unlocked && model.feature.sessionAuthorized {
                         Picker("Spanish level", selection: $model.level) {
                             ForEach(LearningLevel.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                         }.disabled(model.sending)
-                        if model.turns.isEmpty {
+                        if model.messages.isEmpty && model.feature.unavailable == nil {
                             Text("Tell me about your day, plan a journey, or step into a world of talking dragons. You can write in Spanish or ask for help in English.")
                             ForEach(["¡Hola! ¿Cómo estás?", "Vamos a explorar un bosque mágico.", "Quiero hablar de mis viajes."], id: \.self) { prompt in
                                 Button(prompt) { model.draft = prompt; composing = true }
                             }
                         }
-                        ForEach(model.turns) { turn in
+                        ForEach(model.messages) { turn in
                             ChatTurnView(turn: turn, name: model.author.name,
                                 translated: model.translations.contains(turn.id),
                                 translate: { model.toggleTranslation(for: turn) }, listen: { model.listen(turn) })
                                 .id(turn.id)
                         }
-                        if model.sending { ProgressView("\(model.author.name) is thinking…") }
+                        if model.sending { ProgressView("\(model.author.name) is typing…") }
                         if let suggestion = model.turns.last?.suggestion, !suggestion.isEmpty {
                             Button { model.draft = suggestion; composing = true } label: {
                                 VStack(alignment: .leading, spacing: 4) {
@@ -56,13 +67,8 @@ struct ChatView: View {
                         }
                         Text("AI can make mistakes. This topic stays on your device while the screen is open. Your storyteller remembers a short summary and recent messages.")
                             .font(.caption).foregroundStyle(theme.theme.muted)
-                    } else {
+                    } else if !model.unlocked {
                         ChatPaywallView()
-                    }
-                    if let unavailable = model.feature.unavailable {
-                        Text(unavailable).foregroundStyle(theme.theme.muted)
-                        Button("Check again") { Task { await model.prepare() } }
-                            .disabled(model.feature.preparing)
                     }
                     InlineError(message: model.preparationError)
                     InlineError(message: model.error)
@@ -73,15 +79,17 @@ struct ChatView: View {
             .scrollDismissesKeyboard(.interactively)
             .task {
                 await model.prepare()
-                if !model.turns.isEmpty { proxy.scrollTo("chat-bottom", anchor: .bottom) }
+                if !model.messages.isEmpty { proxy.scrollTo("chat-bottom", anchor: .bottom) }
             }
-            .onChange(of: model.turns.count) { _, _ in
+            .onChange(of: model.messages.count) { _, _ in
                 withAnimation { proxy.scrollTo("chat-bottom", anchor: .bottom) }
             }
             .safeAreaInset(edge: .bottom) {
-                if model.unlocked && model.feature.ready {
+                if model.canStart && !model.feature.sessionAuthorized {
+                    ChatAdmissionView(coins: model.feature.coins, confirm: model.authorizeSession)
+                } else if model.canStart && model.feature.sessionAuthorized {
                     ChatComposerView(draft: $model.draft, composing: $composing,
-                        sending: model.sending, canSend: model.canSend,
+                        sending: model.sending, notice: model.composerNotice, canSend: model.canSend,
                         send: model.send, cancel: model.cancel)
                 }
             }
@@ -89,7 +97,7 @@ struct ChatView: View {
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
         .navigationTitle("Storyteller Chat").navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if model.unlocked && !model.turns.isEmpty {
+            if model.unlocked && !model.messages.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("New chat", systemImage: "square.and.pencil") { model.confirmingClear = true }
                         .disabled(model.feature.busy)

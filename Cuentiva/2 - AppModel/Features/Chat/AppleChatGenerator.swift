@@ -4,8 +4,47 @@ import FoundationModels
 #endif
 
 struct AppleChatGenerator: ChatGenerator {
+    /// Hardware capability is distinct from a model still downloading or AI
+    /// being switched off. Those temporary states remain actionable in chat.
+    static var supportsDevice: Bool {
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch SystemLanguageModel.default.availability {
+            case .available: return true
+            case .unavailable(.deviceNotEligible): return false
+            case .unavailable(.appleIntelligenceNotEnabled), .unavailable(.modelNotReady): return true
+            case .unavailable: return false
+            }
+        }
+        #endif
+        return false
+    }
+
     func availabilityMessage() async -> String? {
-        await AppleFantasyGenerator().availabilityMessage()
+        #if canImport(FoundationModels)
+        if #available(iOS 26.0, macOS 26.0, *) {
+            switch SystemLanguageModel.default.availability {
+            case .available:
+                guard SystemLanguageModel.default.supportsLocale(Locale(identifier: "es")),
+                      SystemLanguageModel.default.supportsLocale(Locale(identifier: "en")) else {
+                    return "This device’s on-device model doesn’t support Spanish and English together yet. No doubloons will be spent."
+                }
+                return nil
+            case .unavailable(let reason):
+                switch reason {
+                case .deviceNotEligible:
+                    return "This device doesn’t support Apple Intelligence. Chat needs an iPhone 15 Pro, iPhone 15 Pro Max, or an iPhone 16 or later. iPhone 13 can read every book, but cannot run these on-device conversations. No doubloons will be spent."
+                case .appleIntelligenceNotEnabled:
+                    return "Turn on Apple Intelligence in your device’s Settings, then check again. No doubloons will be spent until you receive a reply."
+                case .modelNotReady:
+                    return "Apple Intelligence is still downloading or preparing its on-device model. Check again when it is ready. No doubloons will be spent."
+                @unknown default:
+                    return "Apple Intelligence is unavailable right now. Please check again later. No doubloons will be spent."
+                }
+            }
+        }
+        #endif
+        return "Chat needs iOS 26 or later and a device that supports Apple Intelligence. Conversations run entirely on your device. No doubloons will be spent."
     }
     func reply(to request: ChatRequest) async throws -> ChatReply {
         #if canImport(FoundationModels)
@@ -38,7 +77,8 @@ struct AppleChatGenerator: ChatGenerator {
                     options: GenerationOptions(temperature: 0.6, maximumResponseTokens: 700))
                 let value = response.content
                 return .init(spanish: value.spanish, english: value.english, correction: value.correction,
-                             suggestion: value.suggestion, memory: value.memory)
+                             suggestion: value.suggestion, memory: value.memory,
+                             additionalMessages: value.additionalMessages.map { .init(spanish: $0.spanish, english: $0.english) })
             } catch is CancellationError { throw CancellationError() }
             catch let error as LanguageModelSession.GenerationError {
                 switch error {
@@ -65,6 +105,13 @@ struct AppleChatGenerator: ChatGenerator {
     @Guide(description: "Faithful English translation of the Spanish reply, under 600 characters") var english: String
     @Guide(description: "One optional gentle correction explained in English, under 250 characters; empty if unnecessary") var correction: String
     @Guide(description: "One short suggested Spanish reply, under 150 characters") var suggestion: String
+    @Guide(description: "Zero to two additional short chat bubbles, only when a separate follow-up message feels natural")
+    var additionalMessages: [GeneratedChatMessage]
     @Guide(description: "Updated summary of conversation facts and current topic in English, under 400 characters") var memory: String
+}
+@available(iOS 26.0, macOS 26.0, *)
+@Generable private struct GeneratedChatMessage {
+    @Guide(description: "One short Spanish chat message under 250 characters") var spanish: String
+    @Guide(description: "Faithful English translation under 300 characters") var english: String
 }
 #endif

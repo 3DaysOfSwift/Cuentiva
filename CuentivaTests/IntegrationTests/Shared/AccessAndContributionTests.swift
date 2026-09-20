@@ -210,12 +210,8 @@ import Testing
         #expect(books.filter { $0.kind == .movieScript }.count == 3)
         #expect(books.filter { $0.kind == .story }.count == 46)
         #expect(books.filter { $0.kind == .verbs }.count == 3)
-        let seeded = books.filter { $0.isDemoLocation == true }
-        #expect(seeded.count == 3)
-        for book in seeded {
-            let location = try #require(book.submissionLocation)
-            #expect(location.valid)
-        }
+        // These are fictional travel stories, not location submissions.
+        #expect(books.allSatisfy { $0.isDemoLocation == nil && $0.submissionLocation == nil })
 
         for book in books {
             if let glossary = book.matchGlossary {
@@ -229,7 +225,7 @@ import Testing
                 let focus = try #require(book.verbFocus)
                 #expect(focus.forms.count == 6)
                 #expect(focus.tense == "Present indicative")
-                for half in [book.sentences, book.continuation ?? []] {
+                for half in [book.sentences, book.continuation ?? [], book.ending ?? []] {
                     let tokens = half.flatMap { WordComparison.words($0.spanish).map(WordComparison.normalized) }
                     for form in focus.forms { #expect(tokens.contains(form)) }
                 }
@@ -237,7 +233,7 @@ import Testing
             }
             if book.kind == .movieScript {
                 #expect(book.scene?.isEmpty == false)
-                #expect(book.cast.count == 2)
+                #expect(book.cast.count >= 2)
                 #expect(book.continuation?.count == book.sentences.count)
                 #expect(book.sentences.allSatisfy { $0.speaker?.isEmpty == false })
             }

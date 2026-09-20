@@ -12,6 +12,7 @@ import Testing
         #expect(root.dailyWelcome == nil)
         #expect(root.onboardingReady)
         #expect(root.canShowContent)
+        #expect(!progress.loaded) // The welcome does not open or wait for the database.
         #expect(!root.ready)
         #expect(library.loads == 0)
         #expect(library.syncs == 0)

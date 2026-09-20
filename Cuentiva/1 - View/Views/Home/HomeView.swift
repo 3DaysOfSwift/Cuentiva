@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel
+    @State private var carouselWidth: CGFloat = 0
 
     init(viewModel: HomeViewModel = HomeViewModel()) {
         _viewModel = State(initialValue: viewModel)
@@ -35,56 +36,7 @@ struct HomeView: View {
                             .accessibilityLabel("\(viewModel.total) \(viewModel.total == 1 ? "book" : "books") read in total")
                         PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 44)
                     }
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 16) {
-                            HStack(spacing: 16) {
-                                ForEach(viewModel.dailyReads) { book in
-                                    Button {
-                                        viewModel.selectedBook = book
-                                    } label: {
-                                        BookCover(book: book, completed: viewModel.completed(book), compact: true,
-                                            showsReadingAction: viewModel.focusedRead?.id == book.id,
-                                            readingCelebration: viewModel.readCelebration)
-                                            .frame(width: 190)
-                                            .overlay {
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .fill(
-                                                        theme.theme.paper.opacity(
-                                                            viewModel.focusedRead?.id == book.id ? 0 : 0.6)
-                                                    )
-                                                    .allowsHitTesting(false)
-                                            }
-                                            .overlay {
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .strokeBorder(theme.theme.accent, lineWidth: 3)
-                                                    .opacity(viewModel.focusedRead?.id == book.id ? 1 : 0)
-                                                    .allowsHitTesting(false)
-                                            }
-                                            .animation(
-                                                reduceMotion ? nil : .easeInOut(duration: 0.2),
-                                                value: viewModel.focusedRead?.id
-                                            )
-                                            .padding(.vertical, 12)
-                                    }
-                                    .buttonStyle(.plain)
-                                    .id(book.id)
-                                    .accessibilityAddTraits(viewModel.focusedRead?.id == book.id ? .isSelected : [])
-                                    .accessibilityLabel(
-                                        "\(book.englishTitle), by \(book.storytellerName)\(viewModel.completed(book) ? ", completed" : ", unread")")
-                                    .accessibilityHint("Open this book to read")
-                                }
-                            }.scrollTargetLayout()
-                            // Outside the book targets: scrolling here never selects a fourth book.
-                            if viewModel.showTomorrowFooter {
-                                TomorrowFooter()
-                            }
-                        }
-                    }
-                    .contentMargins(.horizontal, 23, for: .scrollContent)
-                    .scrollIndicators(.hidden)
-                    .scrollTargetBehavior(.viewAligned)
-                    .scrollPosition(id: $viewModel.focusedBookID, anchor: .center)
-                    .padding(.horizontal, -23)
+                    dailyCarousel
 
                 }
                 if let book = viewModel.focusedRead {
@@ -205,5 +157,73 @@ struct HomeView: View {
             .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { Task { await viewModel.readingDismissed() } }) { book in
                 NavigationStack { LessonView(book: book) }
             }
+    }
+
+    private var dailyCarousel: some View {
+        ScrollViewReader { carousel in
+            ScrollView(.horizontal) {
+                HStack(spacing: 16) {
+                    HStack(spacing: 16) {
+                        ForEach(viewModel.dailyReads) { book in
+                            Button {
+                                viewModel.tapDailyRead(book)
+                            } label: {
+                                BookCover(book: book, completed: viewModel.completed(book), compact: true,
+                                    showsReadingAction: viewModel.focusedRead?.id == book.id,
+                                    readingCelebration: viewModel.readCelebration)
+                                    .frame(width: 190)
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(
+                                                theme.theme.paper.opacity(
+                                                    viewModel.focusedRead?.id == book.id ? 0 : 0.6)
+                                            )
+                                            .allowsHitTesting(false)
+                                    }
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .strokeBorder(theme.theme.accent, lineWidth: 3)
+                                            .opacity(viewModel.focusedRead?.id == book.id ? 1 : 0)
+                                            .allowsHitTesting(false)
+                                    }
+                                    .animation(
+                                        reduceMotion ? nil : .easeInOut(duration: 0.2),
+                                        value: viewModel.focusedRead?.id
+                                    )
+                                    .padding(.vertical, 12)
+                            }
+                            .buttonStyle(.plain)
+                            .id(book.id)
+                            .accessibilityAddTraits(viewModel.focusedRead?.id == book.id ? .isSelected : [])
+                            .accessibilityLabel(
+                                "\(book.englishTitle), by \(book.storytellerName)\(viewModel.completed(book) ? ", completed" : ", unread")")
+                            .accessibilityHint(viewModel.focusedRead?.id == book.id ? "Open this book to read" : "Select this book")
+                        }
+                    }.scrollTargetLayout()
+                    // Outside the book targets: scrolling here never selects a fourth book.
+                    if viewModel.showTomorrowFooter {
+                        TomorrowFooter()
+                    }
+                }
+            }
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { carouselWidth = $0 }
+            .contentMargins(.leading, 23, for: .scrollContent)
+            // Leave enough room for the final book to reach the same leading position.
+            .contentMargins(.trailing, max(23, carouselWidth - 23 - 190), for: .scrollContent)
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $viewModel.focusedBookID, anchor: .leading)
+            .animation(reduceMotion ? nil : .snappy(duration: 0.35), value: viewModel.focusedBookID)
+            .padding(.horizontal, -23)
+            .onAppear {
+                if let id = viewModel.focusedRead?.id { carousel.scrollTo(id, anchor: .leading) }
+            }
+            .onChange(of: carouselWidth) { _, width in
+                // Reapply after measuring the viewport and its final trailing margin.
+                if width > 0, let id = viewModel.focusedRead?.id {
+                    carousel.scrollTo(id, anchor: .leading)
+                }
+            }
+        }
     }
 }

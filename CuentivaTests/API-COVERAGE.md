@@ -40,7 +40,9 @@ Subsequent investigation isolated the recurring crash to concurrent SwiftData co
 
 ### ChatManager
 
-Executed contract members: `beginSession()`, `endSession()`, `prepare()`, `conversation()`, `send()`, `clear()`.
+Executed contract members: `beginSession()`, `endSession()`, `prepare()`, `authorizeSession()`, `conversation()`, `send()`, `clear()`.
+
+Cost confirmation is required before sending, does not itself debit a coin, is idempotent within a session, and resets for a new topic. Unsupported/unavailable chat and empty wallets cannot authorize a session.
 
 State exposed by the contract: `hasAccess`, `coins`, `sessionPaid`, `preparing`, `unavailable`, `ready`, `busy`. Property reads are not assigned execution status here because Observation-generated accessors are not consistently reported by source coverage.
 
@@ -133,3 +135,11 @@ Priority follow-ups:
 For each exposed operation, list the meaningful contract: valid input, empty/invalid input, access restrictions, state boundaries, persistence failure and retry, repeated invocation, and cancellation/overlap where it suspends. For a read-only property, assert the meaningful state transitions that change it. Keep each test focused enough that its failure identifies a behaviour.
 
 Neither one test per function nor 100% line coverage proves all possibilities. Coverage tells us what code ran; the scenario matrix tells us what promises were checked. This audit deliberately leaves unverified areas visible.
+
+### Editorial edition 2 — 20 September 2026
+
+BinaryLibraryTests and the shared content integration test execute checks for 52 complete three-chapter books, 792 bilingual passages, current-reader two-chapter boundaries, valid cast attribution, vocabulary counts, glossaries, and six verb forms per chapter. Binary tests cover version-one compatibility, version-two round trips, malformed ending descriptors and invalid revision integers. CatalogueSyncTests cover an older offline snapshot, a newer remote revision, remote-only books and a missing revised bundle book without launch-time writes. LearningManagerTests cover restarting old-edition attempts while retaining completion and doubloon history. Coverage percentages above predate these changes and were not remeasured.
+
+## Matching coverage — editorial revision 3
+
+All 52 bundled books now include exact vocabulary-to-English coverage (4,260 pairs across 1,651 distinct Spanish surface forms). `PracticeManagerTests.everyBundledBookSupportsMatchingAfterCompletion` exercises availability, glossary acceptance and score persistence for every real bundled book without minting coins; it also checks contextual meanings for envelope, fence and “I walk”. Binary round-trip tests require nonblank glossaries for every book. The editorial generator rejects missing, null and whitespace-only meanings. Revision-2 passage IDs remain unchanged to preserve reading attempts.

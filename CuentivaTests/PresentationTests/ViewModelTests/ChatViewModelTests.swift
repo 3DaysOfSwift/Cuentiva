@@ -3,10 +3,29 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct ChatViewModelTests {
+    @Test func composerRequiresCostConfirmationForEachNewTopic() async throws {
+        let feature = ChatViewModelFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        model.draft = "Hola"
+        #expect(model.canStart)
+        #expect(!model.canSend)
+        model.send()
+        #expect(feature.messages.isEmpty)
+        model.authorizeSession()
+        #expect(model.canSend)
+        #expect(feature.coins == 1)
+        await model.clear()
+        #expect(!model.canSend)
+        model.endSession()
+        #expect(!model.canStart)
+    }
+
     @Test func sendingGuardsDuplicateTapsAndPreservesANewerDraft() async throws {
         let feature = ChatViewModelFeature()
         let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
         await model.prepare()
+        model.authorizeSession()
         model.draft = "Hola"
         #expect(model.canSend)
         model.send()
@@ -27,10 +46,31 @@ import Testing
         #expect(model.draft.isEmpty)
     }
 
+    @Test func consecutiveMessagesClearComposerImmediatelyAndKeepNewDraft() async throws {
+        let feature = ChatViewModelFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        model.authorizeSession()
+        model.draft = "Hola"
+        model.send()
+        #expect(model.draft.isEmpty)
+        model.draft = "Soy de Londres"
+        #expect(model.canSend)
+        model.send()
+        try await waitUntil { feature.messages.count == 2 }
+        #expect(feature.messages == ["Hola", "Soy de Londres"])
+        model.draft = "Otra idea"
+        feature.finishReply()
+        feature.finishReply()
+        try await waitUntil { !model.sending }
+        #expect(model.draft == "Otra idea")
+    }
+
     @Test func failedReplyKeepsDraftAndCanBeRetried() async throws {
         let feature = ChatViewModelFeature()
         let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
         await model.prepare()
+        model.authorizeSession()
         model.draft = "Hola"
         model.send()
         try await waitUntil { feature.reply != nil }
@@ -46,6 +86,7 @@ import Testing
         let audio = TestAudio()
         let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: audio)
         await model.prepare()
+        model.authorizeSession()
         let session = try #require(feature.session)
         model.translations.insert(UUID())
         await audio.startRecording()
@@ -59,7 +100,7 @@ import Testing
         #expect(model.translations.isEmpty)
         #expect(!audio.recording)
         #expect(model.error == nil)
-        #expect(model.draft == "Hola")
+        #expect(model.draft.isEmpty)
     }
 
     @Test func preparationFailureAndInputAvailabilityAreVisible() async {
@@ -67,10 +108,12 @@ import Testing
         feature.preparationFailure = .unavailable("Unavailable")
         let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
         await model.prepare()
+        model.authorizeSession()
         #expect(model.preparationError != nil)
         #expect(feature.session == nil)
         feature.preparationFailure = nil
         await model.prepare()
+        model.authorizeSession()
         #expect(model.preparationError == nil)
         model.draft = "   "
         #expect(!model.canSend)
@@ -89,6 +132,8 @@ import Testing
     var hasAccess = true
     var coins = 1
     var sessionPaid = false
+    var sessionAuthorized = false
+    func authorizeSession() throws { sessionAuthorized = true }
     var preparing = false
     var unavailable: String?
     var ready = false
@@ -97,24 +142,25 @@ import Testing
     var ended: [UUID] = []
     var messages: [String] = []
     var preparationFailure: AppFailure?
-    var reply: CheckedContinuation<Void, Error>?
+    private var replies: [CheckedContinuation<Void, Error>] = []
+    var reply: CheckedContinuation<Void, Error>? { replies.first }
     func prepare() async throws {
         if let preparationFailure { throw preparationFailure }
         ready = true
     }
     func beginSession(id: UUID, author: Author) { session = id }
-    func endSession(id: UUID) { ended.append(id); session = nil }
+    func endSession(id: UUID) { ended.append(id); session = nil; sessionAuthorized = false }
     func conversation(for author: Author) -> ChatConversation { .init() }
     func send(_ message: String, to author: Author, level: String) async throws {
         messages.append(message)
-        try await withCheckedThrowingContinuation { reply = $0 }
+        try await withCheckedThrowingContinuation { replies.append($0) }
         try Task.checkCancellation()
     }
     func finishReply(error: (any Error)? = nil) {
-        let pending = reply
-        reply = nil
-        if let error { pending?.resume(throwing: error) }
-        else { pending?.resume() }
+        guard !replies.isEmpty else { return }
+        let pending = replies.removeFirst()
+        if let error { pending.resume(throwing: error) }
+        else { pending.resume() }
     }
-    func clear(author: Author) async throws {}
+    func clear(author: Author) async throws { sessionAuthorized = false }
 }

@@ -23,10 +23,10 @@ struct CompletionView: View {
                     Text(receipt.isNew ? "+1 to your collection" : "A familiar story, practiced again").font(.subheadline).foregroundStyle(theme.theme.accent)
                 }
                 if receipt.isNew {
-                    Label("+1 doubloon", systemImage: "circle.circle.fill")
+                    DoubloonBalance(count: 1, earned: true, size: 36)
                         .font(.subheadline).foregroundStyle(theme.theme.rewardGold)
                 }
-                if receipt.offersChat && !receipt.unlocksChat {
+                if viewModel.supportsChat && receipt.offersChat && !receipt.unlocksChat {
                     Button {
                         viewModel.showingChat = true
                     } label: {
@@ -51,7 +51,7 @@ struct CompletionView: View {
                         .multilineTextAlignment(.center)
                     Text("Five little adventures in Spanish. Every story is another step on your journey.")
                         .multilineTextAlignment(.center)
-                } else if receipt.unlocksChat {
+                } else if viewModel.offersChatGift(receipt) {
                     Image(systemName: "gift.fill").font(.system(size: 80)).foregroundStyle(theme.theme.accent)
                     Text("Eleven books.\nA new way to connect.")
                         .font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
@@ -104,7 +104,7 @@ struct CompletionView: View {
             }.padding(28).frame(maxWidth: .infinity)
         }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Button(receipt.unlocksChat ? "Open my gift →" : "Finish →", action: continueJourney)
+                Button(viewModel.offersChatGift(receipt) ? "Open my gift →" : "Finish →", action: continueJourney)
                     .buttonStyle(PrimaryButton()).padding(.horizontal, 28).padding(.vertical, 12)
                     .background(theme.theme.paper)
                     .dockedAreaBorder()
