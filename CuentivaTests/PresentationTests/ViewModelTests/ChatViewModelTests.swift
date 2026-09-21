@@ -26,6 +26,24 @@ import Testing
         #expect(model.canSend)
     }
 
+    @Test func completedRolePlayCannotSendAnotherMessage() async {
+        let feature = ChatViewModelFeature()
+        feature.sessionPaid = true
+        feature.sessionAuthorized = true
+        var conversation = ChatConversation()
+        conversation.messages = [ChatMessage(role: .storyteller, text: "Listo. Que disfrute su café.", scenarioComplete: true)]
+        feature.savedConversation = conversation
+        let scenario = ConversationScenario.catalogue[0]
+        let model = ChatViewModel(author: Author.demoProfiles[0], scenario: scenario, feature: feature, audio: TestAudio())
+        await model.prepare()
+        model.draft = "Otra cosa"
+
+        #expect(model.scenarioComplete)
+        #expect(!model.canSend)
+        model.send()
+        #expect(feature.messages.isEmpty)
+    }
+
     @Test func exhaustedAllowancePresentsRenewalWithoutClearingMessages() async throws {
         let feature = ChatViewModelFeature()
         feature.sessionPaid = true

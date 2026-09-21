@@ -131,11 +131,23 @@ struct ChatView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                if model.canPresentAdmission && model.admissionVisible {
+                if model.scenarioComplete {
+                    VStack(spacing: 12) {
+                        Label("Role Play ended", systemImage: "checkmark.seal.fill")
+                            .font(.headline).foregroundStyle(theme.theme.accent)
+                        Button("Practise again") { model.confirmingClear = true }
+                            .buttonStyle(PrimaryButton())
+                    }.padding(.horizontal, 23).padding(.vertical, 16)
+                        .frame(maxWidth: .infinity)
+                        .background(theme.theme.paper)
+                        .dockedAreaBorder()
+                } else if model.canPresentAdmission && model.admissionVisible {
                     ChatAdmissionView(coins: model.displayedCoins, cost: model.feature.sessionCost, celebrating: model.admissionCelebrating,
                         continuing: !model.messages.isEmpty,
                         confirm: model.celebrateAdmission)
                         .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
+                        .animation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.5, dampingFraction: 0.85),
+                            value: model.admissionPhase)
                 } else if model.canStart && model.feature.sessionAuthorized {
                     ChatComposerView(draft: $model.draft, composing: $composing,
                         notice: model.composerNotice, canSend: model.canSend,
@@ -144,8 +156,6 @@ struct ChatView: View {
                 }
             }
         }
-        .animation(reduceMotion ? .easeOut(duration: 0.15) : .spring(response: 0.5, dampingFraction: 0.85),
-            value: model.admissionPhase)
         .sensoryFeedback(.success, trigger: model.admissionSuccess)
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
         .toolbarBackground(theme.theme.paper, for: .navigationBar)
@@ -186,6 +196,9 @@ struct ChatView: View {
         }
         .onChange(of: model.feature.sessionAuthorized) { _, authorized in
             if !authorized { composing = false; model.resetAdmission() }
+        }
+        .onChange(of: model.scenarioComplete) { _, complete in
+            if complete { composing = false }
         }
         .onDisappear { composing = false; model.endSession() }
         .onChange(of: model.unlocked) { _, access in if !access { model.cancel() } }

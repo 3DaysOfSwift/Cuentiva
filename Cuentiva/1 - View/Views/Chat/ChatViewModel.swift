@@ -112,7 +112,7 @@ import Observation
         return nil
     }
     var canSend: Bool {
-        canStart && feature.sessionAuthorized && replyTasks.count < 5
+        canStart && feature.sessionAuthorized && !scenarioComplete && replyTasks.count < 5
             && ChatLimits.acceptsMessage(draft)
     }
     func prepare() async {
