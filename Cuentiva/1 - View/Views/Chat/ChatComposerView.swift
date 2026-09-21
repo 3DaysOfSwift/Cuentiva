@@ -23,7 +23,13 @@ struct ChatComposerView: View {
             }
             HStack(alignment: .bottom) {
                 TextField("Message", text: $draft, axis: .vertical)
-                    .lineLimit(1...4).focused($composing)
+                    .lineLimit(1...4)
+                    .focused($composing)
+                    .submitLabel(.send)
+                    .onSubmit {
+                        guard canSend else { return }
+                        send()
+                    }
                 Button { send() } label: {
                         Image(systemName: "arrow.up.circle.fill").font(.title)
                     }.accessibilityLabel("Send message").disabled(!canSend)
