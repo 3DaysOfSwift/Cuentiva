@@ -23,11 +23,17 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 22) {
                 StreakBar(days: viewModel.week)
                 if viewModel.hasVerbGift {
+                    Label("Your gifts", systemImage: "gift.fill")
+                        .font(.system(.largeTitle, design: .serif, weight: .medium))
                     Button { viewModel.showingVerbGift = true } label: {
                         Label("Your third-book gift · Verb Training", systemImage: "gift.fill")
                             .font(.title3.bold()).padding(20).frame(maxWidth: .infinity, alignment: .leading)
                             .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
                     }.buttonStyle(.plain)
+                }
+                if viewModel.showingRevival || viewModel.revivalNeedsBook {
+                    Label("Revive your streak", systemImage: "flame.fill")
+                        .font(.system(.largeTitle, design: .serif, weight: .medium))
                 }
                 if viewModel.showingRevival {
                     VStack(alignment: .leading, spacing: 12) {
