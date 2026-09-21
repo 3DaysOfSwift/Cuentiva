@@ -203,7 +203,7 @@ struct AppleChatGenerator: ChatGenerator {
     @Guide(description: "Updated summary of conversation facts and current topic in English, under 400 characters") var memory: String
     @Guide(description: "Role Play required-objective IDs the learner successfully met in this reply; empty for storyteller chat")
     var metObjectiveIDs: [String]
-    @Guide(description: "True only when every required Role Play objective is met and the interaction has naturally concluded; false for storyteller chat")
+    @Guide(description: "True only when every required Role Play objective is met and this reply naturally concludes the interaction. Always false if this reply asks the learner any question; false for storyteller chat")
     var scenarioComplete: Bool
 }
 @available(iOS 26.0, macOS 26.0, *)

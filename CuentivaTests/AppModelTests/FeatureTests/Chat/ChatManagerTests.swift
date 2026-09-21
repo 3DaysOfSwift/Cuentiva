@@ -274,6 +274,24 @@ private actor ChatTestGenerator: ChatGenerator {
         #expect(chat.coins == 0)
     }
 
+    @Test func rolePlayCannotCompleteWhileStorytellerStillAsksAQuestion() async throws {
+        let progress = try await wallet(2)
+        let generator = ChatTestGenerator()
+        let chat = ChatManager(generator: generator, progress: progress)
+        let scenario = try #require(ConversationScenario.catalogue.first)
+        await generator.setReply(.init(spanish: "¿Cómo te gustaría que lo preparáramos?", english: "How would you like it prepared?",
+            correction: "", suggestion: "Lo quiero frío.", memory: "The barista is still clarifying the order.",
+            metObjectives: scenario.requiredObjectives, scenarioComplete: true))
+        let rolePlay = ConversationContext(author: author, scenario: scenario)
+        try await chat.prepare()
+        chat.beginSession(id: UUID(), context: rolePlay)
+        try chat.authorizeSession()
+        try await chat.send("Quisiera un café.", in: rolePlay, level: "A1")
+
+        #expect(!chat.conversation(for: rolePlay).scenarioComplete)
+        #expect(progress.snapshot.rolePlayCompletions?[scenario.id] == nil)
+    }
+
     @Test func tenMinuteReturnWindowExpiresWithoutDeletingTranscript() async throws {
         let clock = ChatSessionClock()
         let progress = try await wallet(2, now: { clock.date })

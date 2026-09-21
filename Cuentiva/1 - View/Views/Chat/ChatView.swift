@@ -86,7 +86,8 @@ struct ChatView: View {
                                 .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
                         }
                         if model.sending { ChatTypingIndicator(storyteller: model.author.name) }
-                        if model.feature.sessionAuthorized, !model.admissionVisible, model.draft.isEmpty, !model.sending, let turn = model.suggestedTurn {
+                        if model.feature.sessionAuthorized, !model.admissionVisible, !model.scenarioComplete,
+                           model.draft.isEmpty, !model.sending, let turn = model.suggestedTurn {
                             VStack(alignment: .leading, spacing: 14) {
                                 Button { model.draft = turn.suggestion; composing = true } label: {
                                     VStack(alignment: .leading, spacing: 8) {

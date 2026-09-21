@@ -188,8 +188,11 @@ extension ChatFeature {
             }
             let allowedObjectives = Set(context.scenario?.requiredObjectives ?? [])
             let metObjectives = reply.metObjectives.filter(allowedObjectives.contains)
+            let replyStillAsksForInformation = ([reply.spanish] + reply.additionalMessages.map(\.spanish))
+                .contains { $0.contains("?") || $0.contains("¿") }
             let scenarioComplete = context.scenario != nil && reply.scenarioComplete
                 && allowedObjectives.isSubset(of: Set(updated.metObjectives).union(metObjectives))
+                && !replyStillAsksForInformation
             updated.messages.append(ChatMessage(role: .storyteller, text: reply.spanish,
                 inReplyTo: outgoing.id, english: reply.english, correction: reply.correction,
                 suggestion: reply.suggestion, suggestionEnglish: reply.suggestionEnglish,

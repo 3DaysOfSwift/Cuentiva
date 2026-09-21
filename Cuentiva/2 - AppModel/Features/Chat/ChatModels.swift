@@ -234,7 +234,12 @@ struct ChatConversation: Codable, Sendable, Equatable {
     var messages: [ChatMessage] = []
     var memory = ""
     var metObjectives: Set<String> { Set(messages.flatMap { $0.metObjectives ?? [] }) }
-    var scenarioComplete: Bool { messages.contains { $0.scenarioComplete == true } }
+    var scenarioComplete: Bool {
+        messages.contains {
+            $0.role == .storyteller && $0.scenarioComplete == true
+                && !$0.text.contains("?") && !$0.text.contains("¿")
+        }
+    }
 
     // Older archives and the bounded generation context use exchanges. The
     // visible transcript is an ordered message array, with no alternating-role rule.
