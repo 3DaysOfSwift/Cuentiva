@@ -1,3 +1,10 @@
+//
+// Cuentiva
+// Copyright © 2026 3DaysOfSwiftConcurrency.com.
+// All rights reserved.
+// See LICENSE for permitted use.
+//
+
 import SwiftUI
 
 /// Bundled character artwork keeps profiles available offline without remote image requests.

@@ -1,3 +1,10 @@
+//
+// Cuentiva
+// Copyright © 2026 3DaysOfSwiftConcurrency.com.
+// All rights reserved.
+// See LICENSE for permitted use.
+//
+
 import SwiftUI
 
 struct ReaderBadgesView: View {

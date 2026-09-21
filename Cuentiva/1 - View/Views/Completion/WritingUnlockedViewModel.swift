@@ -1,3 +1,10 @@
+//
+// Cuentiva
+// Copyright © 2026 3DaysOfSwiftConcurrency.com.
+// All rights reserved.
+// See LICENSE for permitted use.
+//
+
 import Observation
 
 /// This reveal is paced by the reader. The saved completion already grants access.

@@ -1,3 +1,10 @@
+//
+// Cuentiva
+// Copyright © 2026 3DaysOfSwiftConcurrency.com.
+// All rights reserved.
+// See LICENSE for permitted use.
+//
+
 enum InAppPurchases: String, CaseIterable, Identifiable, Sendable {
     case monthly = "com.cuentiva.monthly"
     case annual = "com.cuentiva.annual"

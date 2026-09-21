@@ -1,0 +1,79 @@
+CUENTIVA SOURCE-AVAILABLE LICENSE
+Version 1.0 — 2026
+
+Copyright © 2026 3DaysOfSwiftConcurrency.com. All rights reserved.
+
+1. PURPOSE
+
+Cuentiva is a production application and a public reference implementation intended to demonstrate software architecture, Swift, SwiftUI, Swift Concurrency, StoreKit, and related development techniques.
+
+The source code is made publicly available so developers may read, study, evaluate, and learn from the implementation. Public availability does not place the software in the public domain and does not grant unrestricted rights to copy, redistribute, publish, sublicense, or sell it.
+
+2. PERMITTED USE
+
+Subject to this License, you may:
+
+a. View, download, and study the source code for personal, educational, and reference purposes.
+
+b. Run the source code privately for learning, testing, and evaluation.
+
+c. Learn from the architectural patterns, concepts, techniques, and ideas demonstrated by the project and independently apply those concepts in your own software.
+
+d. Refer to limited portions of the source code when discussing or teaching the project, where permitted by applicable copyright law, provided appropriate attribution is given.
+
+3. RESTRICTED USE
+
+Without prior written permission from the copyright holder, you may not:
+
+a. Redistribute, republish, mirror, sublicense, sell, or commercially distribute the Cuentiva source code, in whole or in substantial part.
+
+b. Publish, distribute, sell, submit to an app marketplace, or otherwise make available Cuentiva, a rebranded copy of Cuentiva, or an application substantially derived from the Cuentiva source code.
+
+c. Use this repository as the basis for a clone or substantially similar commercial or publicly distributed application.
+
+d. Remove, obscure, or alter copyright, attribution, licensing, or ownership notices contained in the project.
+
+e. Represent Cuentiva, its source code, branding, content, or other protected materials as your own work.
+
+4. BRANDING, CONTENT, AND ASSETS
+
+Unless expressly stated otherwise, the permissions in Section 2 do not grant rights to Cuentiva branding or creative assets.
+
+The Cuentiva name, logos, characters, illustrations, story content, audio, artwork, interface artwork, promotional material, and other original media or creative assets remain proprietary to their respective copyright or rights holders.
+
+No trademark rights or rights to use the Cuentiva name, identity, or branding are granted by this License.
+
+5. CFA AND SEPARATELY LICENSED COMPONENTS
+
+Cooperative Feature Architecture (CFA), associated AI skills, libraries, tools, dependencies, or other components may be distributed separately under their own licenses.
+
+Where a file or component contains a separate license notice, that separate license governs that file or component.
+
+Nothing in this License restricts rights independently granted under those separate licenses.
+
+6. CONTRIBUTIONS
+
+Unless a separate written contribution agreement or repository policy states otherwise, submission of a contribution does not transfer ownership of the Cuentiva project or grant the contributor rights to redistribute or commercially publish Cuentiva.
+
+Contributors retain any rights they may have in their original contributions, subject to any permissions they expressly grant when contributing.
+
+7. THIRD-PARTY MATERIAL
+
+Third-party software, frameworks, libraries, fonts, media, or other materials included in or referenced by the project remain subject to their respective licenses and terms. This License does not grant rights that the copyright holder does not possess.
+
+8. NO WARRANTY
+
+THE SOFTWARE AND SOURCE CODE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE COPYRIGHT HOLDER SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE SOFTWARE, THE SOURCE CODE, OR THEIR USE.
+
+9. TERMINATION
+
+Any rights granted under this License terminate automatically if you materially breach its terms. Upon termination, you must cease any use that depended upon the permissions granted by this License.
+
+10. OTHER RIGHTS
+
+No rights are granted except those expressly stated in this License. All other rights are reserved.
+
+For permission beyond the scope of this License, contact the copyright holder through:
+https://www.3DaysOfSwiftConcurrency.com

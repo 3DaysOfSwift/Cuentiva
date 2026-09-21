@@ -1,3 +1,10 @@
+//
+// Cuentiva
+// Copyright © 2026 3DaysOfSwiftConcurrency.com.
+// All rights reserved.
+// See LICENSE for permitted use.
+//
+
 // © www.3DaysOfSwiftConcurrency.com. All rights reserved.
 
 import Foundation

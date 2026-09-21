@@ -4,7 +4,7 @@
 
 **Bring Spanish to life through stories.**
 
-Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Read at your own pace, listen to Spanish, practise speaking or writing, and collect the books you complete.
+Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Its premise is simple: **stop learning Spanish one word at a time and start reading it.** Read at your own pace, listen to Spanish, practise speaking or writing, and encounter vocabulary in context.
 
 Cuentiva combines a shared reading collection with private, personalised fantasy stories created on the device. Public story submission has been retired. Readers can publish one saved AI tale to their own Discover library every seven days, credited to their personal storyteller; nothing is uploaded. New avatars have an 80% chance of being the fox, with existing avatars preserved. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with private local drafts. The bundled stories are fictional, and personal tales stay on the device.
 
@@ -17,6 +17,16 @@ View → ViewModel → Feature API → Feature Manager → Repository
 ```
 
 Explore the [open-source CFA skills and toolkit](https://github.com/3DaysOfSwift/cooperative-feature-architecture).
+
+## Source availability and licence
+
+Cuentiva is a **production App Store application and a public reference implementation of Cooperative Feature Architecture (CFA)**. Its source is published so iOS developers can inspect a complete SwiftUI application, study its architecture, and see how CFA is applied in a real product.
+
+The Cuentiva application itself is **source-available, not distributed under an unrestricted open-source software licence**. You may view, download, run privately, study, and learn from the source, and independently apply the architectural concepts and techniques demonstrated here. You may not republish, redistribute, sell, rebrand, submit to an app marketplace, or use this repository as the basis for a clone or substantially similar publicly distributed application without prior written permission.
+
+The Cuentiva name, branding, characters, illustrations, stories, audio, artwork, promotional material, and other original creative assets remain proprietary. CFA, its AI skills, and separately distributed tools may have their own licences.
+
+See [`LICENSE`](LICENSE) for the complete terms.
 
 ## The publisher and its training
 
@@ -34,14 +44,14 @@ Explore the [open-source CFA skills and toolkit](https://github.com/3DaysOfSwift
 4. Run. Read or listen to the introductory book, tap Next sentence at your own pace, then Read the full story. Enjoy the extended bilingual reader and use Mark as read at its end. Speak, Write, and Check my words are optional.
 5. Continue from the celebration to the subscription offer. Purchase full access in the local StoreKit purchase sheet to unlock the full library.
 
-The StoreKit file configures **$9.99/month and $39.99/year auto-renewable subscriptions** in one group, with no trial. The annual charge is paid yearly. Production App Store Connect setup is still required; display prices come from StoreKit for the user's storefront. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
+The StoreKit file configures **$9.99/month and $39.99/year auto-renewable subscriptions** in one subscription group. Production uses the matching App Store Connect product identifiers `com.cuentiva.monthly` and `com.cuentiva.annual`. A **one-week introductory free trial** is offered to eligible new subscribers; introductory-offer eligibility and localized display prices come from StoreKit for the user's storefront. The annual charge is paid yearly after the trial unless cancelled. Local StoreKit testing does not charge money. Directly launching an installed build outside the Xcode scheme may not connect to local StoreKit. There is no hidden purchase bypass.
 
 For a physical device, select your signing team. The bundle ID is `com.3DaysOfSwiftConcurrency.Cuentiva`; test targets append their target name. All package dependencies are Apple frameworks—there are no third-party dependencies.
 
 ## Demo experience
 
 - One free A1 introductory book; onboarding can resume mid-book.
-- One-time purchase gate after completion; Restore Purchases is available before and after the introductory lesson.
+- Subscription gate after completion; eligible new subscribers can begin with a one-week free trial and choose **$9.99/month** or **$39.99/year**. Restore Purchases is available before and after the introductory lesson.
 - Fifty-two bundled books: 46 stories, three Movie Scripts, and three Verbs books across A1, A2, and B1. Each has a typographic cover, aligned bilingual sentences, and a word/lemma index. All 52 books, including the three fictional Thailand stories, appear in Books.
 - Listen with synchronized Spanish text highlighting and a slower playback option.
 - On-device Spanish speech recognition when supported; explicit fallback to writing when microphone, permissions, or recognition support are unavailable.
@@ -81,7 +91,7 @@ Speech uses `SFSpeechRecognizer` for short on-device utterances behind a replace
 - Next sentence records an encounter and advances after its progress transaction succeeds. The final guided sentence opens the full reader without awarding completion. Mark as read records the continuation and book completion in one atomic save. There is no Skip button or compulsory assessment.
 - Advancing a sentence or completing an optional checked attempt qualifies a day for the streak. Opening the app does not.
 - Dates use the device's current calendar/time zone when the progress manager is created; stored day keys represent the local date on which practice occurred. Earlier dates are not rebased on travel. The clock/calendar are injectable in tests.
-- A verified active subscription unlocks access until its expiry. Existing lifetime purchases remain valid. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
+- A verified active subscription unlocks access until its expiry. Monthly and annual plans provide the same library entitlement; eligible new subscribers may receive the configured one-week introductory offer. Existing lifetime purchases remain valid for legacy users. Refund/revocation locks features without deleting progress. Access is rechecked on StoreKit updates and when returning to the foreground.
 - Public submission, publishing goals and contribution eligibility are retired from the app experience.
 - Existing local drafts are preserved; new personal tales are saved privately on the device.
 

@@ -342,6 +342,7 @@
 		7A820C14890348F4B0414FF0 /* CuentivaTests/AppModelTests/FeatureTests/Verbs/VerbCatalogueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuentivaTests/AppModelTests/FeatureTests/Verbs/VerbCatalogueTests.swift; sourceTree = SOURCE_ROOT; };
 		7A9B043E1F5C7FE14B2C39DC /* OnboardingViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewModelTests.swift; sourceTree = "<group>"; };
 		7BD5B4143060F4EC00589F28 /* InAppPurchases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InAppPurchases.swift; sourceTree = "<group>"; };
+		7BD5B5433060F79600589F28 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		7D3FBC5E5F774282B36E1BBC /* DailyWelcome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyWelcome.swift; sourceTree = "<group>"; };
 		7E899BAC2B144D43B8FF8AB3 /* AuthorChatSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthorChatSection.swift; sourceTree = "<group>"; };
 		7F1CFCE640384A9EC12DCC51 /* LearningLevelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningLevelTests.swift; sourceTree = "<group>"; };
@@ -1040,6 +1041,7 @@
 				AB318DA9416FA64BB6CD5617 /* Cuentiva */,
 				39ADEBEA8921CDE95AD01F11 /* CuentivaTests */,
 				FBDC4F23F93125BBEEAE800C /* Products */,
+				7BD5B5433060F79600589F28 /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};

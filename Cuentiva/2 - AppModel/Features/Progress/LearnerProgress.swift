@@ -1,3 +1,10 @@
+//
+// Cuentiva
+// Copyright © 2026 3DaysOfSwiftConcurrency.com.
+// All rights reserved.
+// See LICENSE for permitted use.
+//
+
 import Foundation
 
 enum VocabularyState: String, Codable, CaseIterable, Sendable { case unknown, learning, known }
