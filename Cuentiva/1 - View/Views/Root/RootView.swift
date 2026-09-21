@@ -20,6 +20,10 @@ struct RootView: View {
                 DailyWelcomeView(viewModel: welcome, ready: viewModel.ready) {
                     Task { await viewModel.beginDay() }
                 }.transition(.opacity)
+            } else if let tip = viewModel.languageTip, viewModel.ready, !viewModel.checkingAccess {
+                LanguageTipView(term: tip, busy: viewModel.savingTip, error: viewModel.tipError) {
+                    Task { await viewModel.continueLanguageTip() }
+                }.transition(.opacity)
             } else if viewModel.canShowContent {
                 if viewModel.hasAccess {
                     TabView(selection: $selectedTab) {

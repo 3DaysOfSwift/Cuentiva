@@ -37,6 +37,9 @@ enum ProgressRecords {
     /// Encode only changed fields and explicitly removed keys, never the full archive.
     static func changes(_ value: LearnerProgress, previous: LearnerProgress?) throws -> RecordChanges {
         var rows = RecordChanges()
+        if previous == nil || previous?.languageTips != value.languageTips {
+            rows["languageTips"] = try RecordCoding.encode(value.languageTips)
+        }
         if previous == nil || previous?.debugVerbTrainingEnabled != value.debugVerbTrainingEnabled {
             rows["debugVerbTrainingEnabled"] = try RecordCoding.encode(value.debugVerbTrainingEnabled)
         }
@@ -183,6 +186,7 @@ enum ProgressRecords {
         var value = LearnerProgress()
         if let data = rows["debugVerbTrainingEnabled"] { value.debugVerbTrainingEnabled = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["claimedVerbGift"] { value.claimedVerbGift = try RecordCoding.decode(Bool?.self, data) }
+        if let data = rows["languageTips"] { value.languageTips = try RecordCoding.decode(LanguageTipProgress?.self, data) }
         if let data = rows["verbTraining"] { value.verbTraining = try RecordCoding.decode(VerbTrainingState?.self, data) }
         if let data = rows["dailyPracticeSession"] { value.dailyPracticeSession = try RecordCoding.decode(DailyPracticeSession?.self, data) }
         if let data = rows["wordExposureHistory"] { value.wordExposureHistory = try RecordCoding.decode([String: Int]?.self, data) }

@@ -28,6 +28,7 @@ struct SettingsView: View {
                     Text("Future experiments will be optional and may be unfinished. We’ll explain each one before you choose to try it. More VIP rewards are planned; none are available yet.")
                 }.listRowBackground(themeManager.theme.surface)
             }
+            AppIconSettingsSection()
             Section("Appearance") {
                 Picker("Colour theme", selection: $themeManager.selectedTheme) {
                     ForEach(themeManager.availableThemes) { theme in

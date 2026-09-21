@@ -14,6 +14,39 @@ import Testing
 #endif
 
 @Suite @MainActor struct DailyWelcomeTests {
+    @Test func languageTipsAlternateVisitDaysPersistAndStopWhenAllSeen() async throws {
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repo = MemoryProgress()
+        var progress = ProgressManager(repository: repo, now: { now })
+        try await progress.load()
+        let ids = LanguageTermsManager.terms.map(\.id)
+        for visit in 0..<(ids.count * 2 + 2) {
+            let welcome = try #require(progress.dailyWelcome)
+            try await progress.acknowledgeWelcome(day: welcome.day)
+            try await progress.acknowledgeWelcome(day: welcome.day)
+            #expect(progress.snapshot.languageTips?.visitDays.count == visit + 1)
+            let pending = progress.snapshot.languageTips?.pending
+            if visit % 2 == 0 && visit / 2 < ids.count {
+                #expect(pending == ids[visit / 2])
+                let id = try #require(pending)
+                let restored = ProgressManager(repository: repo, now: { now })
+                try await restored.load(); progress = restored
+                #expect(progress.snapshot.languageTips?.pending == id)
+                await repo.setFailure(true)
+                await #expect(throws: AppFailure.self) { try await progress.acknowledgeLanguageTip(id) }
+                #expect(progress.snapshot.languageTips?.pending == id)
+                await repo.setFailure(false)
+                try await progress.acknowledgeLanguageTip(id)
+                #expect(progress.snapshot.languageTips?.pending == nil)
+            } else { #expect(pending == nil) }
+            #expect(progress.snapshot.practiceDays.isEmpty)
+            #expect(try ProgressRecords.decode(ProgressRecords.encode(progress.snapshot)) == progress.snapshot)
+            // Missing calendar days does not skip unseen terms.
+            now = now.addingTimeInterval(visit % 3 == 0 ? 3 * 86400 : 86400)
+        }
+        #expect(progress.snapshot.languageTips?.seen == Set(ids))
+    }
+
     @Test func welcomePersistsWithoutAwardingPracticeAndReturnsNextDay() async throws {
         var now = Date(timeIntervalSince1970: 1_800_000_000)
         let calendar = Calendar(identifier: .gregorian)

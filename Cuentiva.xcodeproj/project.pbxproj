@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DDC320C6A6D2484CB62A6E9B /* LanguageTipProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F59476B06245399B13FAF1; };
+		8DC845C9711C4CFF935F7F96 /* LanguageTipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF62815E12BE457981117D69; };
+		28FA0FA65D914DBE9A62413B /* AppIconSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2056141D136428298C3AC2F; };
 		00FDA7A5557149E9AC23BC5F /* CuentivaTests/AppModelTests/FeatureTests/Verbs/VerbTrainingManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A69C3E1937492C9746BA3C /* CuentivaTests/AppModelTests/FeatureTests/Verbs/VerbTrainingManagerTests.swift */; };
 		01BB140433D274579B0E934D /* InlineError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FE1BEB6017044EEC7F4F85E /* InlineError.swift */; };
 		031561F6CE644E96B1AAA74E /* Cuentiva/2 - AppModel/Features/Verbs/VerbTrainingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83F422FE9225498792468820 /* Cuentiva/2 - AppModel/Features/Verbs/VerbTrainingManager.swift */; };
@@ -238,6 +241,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		19F59476B06245399B13FAF1 /* LanguageTipProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/LanguageTerms/LanguageTipProgress.swift"; sourceTree = SOURCE_ROOT; };
+		CF62815E12BE457981117D69 /* LanguageTipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/LanguageTerms/LanguageTipView.swift"; sourceTree = SOURCE_ROOT; };
+		C2056141D136428298C3AC2F /* AppIconSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Settings/AppIconSettingsSection.swift"; sourceTree = SOURCE_ROOT; };
 		024C09AE9C4C923058DC9B6C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		026ED7858EC8A278FC40CB0E /* StatsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsViewModelTests.swift; sourceTree = "<group>"; };
 		036495EF4BAB433594BFCD7E /* Cuentiva/1 - View/Views/DailyPractice/DailyPracticeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/DailyPractice/DailyPracticeCard.swift"; sourceTree = SOURCE_ROOT; };
@@ -485,6 +491,9 @@
 		00AAA2D68ABF2349C21D9466 /* PresentationTests */ = {
 			isa = PBXGroup;
 			children = (
+				19F59476B06245399B13FAF1 /* LanguageTipProgress.swift */,
+				CF62815E12BE457981117D69 /* LanguageTipView.swift */,
+				C2056141D136428298C3AC2F /* AppIconSettingsSection.swift */,
 				81CDBBBEF31346A498C4E703 /* Cuentiva/1 - View/Views/Verbs/VerbWorkoutCelebration.swift */,
 				66E04FE9A0CB4C83946D60F4 /* Cuentiva/2 - AppModel/Features/Verbs/VerbWorkoutSummary.swift */,
 				8633D49FBAC54967B834C86F /* Cuentiva/1 - View/Views/DailyPractice/DailyPracticeOverview.swift */,
@@ -1396,6 +1405,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DDC320C6A6D2484CB62A6E9B /* LanguageTipProgress.swift in Sources */,
+				8DC845C9711C4CFF935F7F96 /* LanguageTipView.swift in Sources */,
+				28FA0FA65D914DBE9A62413B /* AppIconSettingsSection.swift in Sources */,
 				7EF46A775B1E4FA2A5FBD63A /* Cuentiva/1 - View/Views/Verbs/VerbWorkoutCelebration.swift in Sources */,
 				FA33200143314BF3BC2618B0 /* Cuentiva/2 - AppModel/Features/Verbs/VerbWorkoutSummary.swift in Sources */,
 				0B8BA045E58446A9BEDA92B0 /* Cuentiva/1 - View/Views/DailyPractice/DailyPracticeOverview.swift in Sources */,

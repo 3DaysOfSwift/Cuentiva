@@ -10,6 +10,24 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct RootViewModelTests {
+    @Test func languageTipIsPaidOnlyAndContinueRetriesFailedSave() async throws {
+        let repo = MemoryProgress()
+        let progress = ProgressManager(repository: repo); try await progress.load()
+        let day = try #require(progress.dailyWelcome?.day)
+        try await progress.acknowledgeWelcome(day: day)
+        let purchases = TestPurchases(); purchases.hasAccess = false
+        let root = makeRoot(purchases, GatedLaunchLibrary(gated: false), progress)
+        #expect(root.languageTip == nil)
+        purchases.hasAccess = true
+        #expect(root.languageTip?.id == "noun")
+        await repo.setFailure(true)
+        await root.continueLanguageTip()
+        #expect(root.tipError != nil && root.languageTip?.id == "noun")
+        await repo.setFailure(false)
+        await root.continueLanguageTip()
+        #expect(root.tipError == nil && root.languageTip == nil)
+    }
+
     @Test func automaticSyncSurvivesRelaunchAndChecksAgainNextDay() async throws {
         var now = Date(timeIntervalSince1970: 1_800_000_000)
         let repo = MemoryProgress()

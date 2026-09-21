@@ -31,6 +31,7 @@ import Observation
     @discardableResult func performVerbTraining(_ action: VerbTrainingAction) async throws -> Bool
     func claimAutomaticLibraryCheck() async throws -> Bool
     func acknowledgeWelcome(day: String) async throws
+    func acknowledgeLanguageTip(_ id: String) async throws
     func load() async throws
     func registerLibrary(_ books: [Book]) async throws
     func saveDailyReading(_ ids: [String], date: Date) async throws
@@ -237,7 +238,19 @@ import Observation
     }
     func acknowledgeWelcome(day: String) async throws {
         guard day == dayKey(now()) else { return }
-        try await commit { $0.lastWelcomeDay = day }
+        try await commit { next in
+            next.lastWelcomeDay = day
+            var tips = next.languageTips ?? LanguageTipProgress()
+            tips.visit(day: day, termIDs: LanguageTermsManager.terms.map(\.id))
+            next.languageTips = tips
+        }
+    }
+    func acknowledgeLanguageTip(_ id: String) async throws {
+        try await commit { next in
+            guard var tips = next.languageTips else { throw AppFailure.incomplete }
+            try tips.acknowledge(id)
+            next.languageTips = tips
+        }
     }
     var streak: Int { streak(in: snapshot) }
     private func streak(in value: LearnerProgress) -> Int {

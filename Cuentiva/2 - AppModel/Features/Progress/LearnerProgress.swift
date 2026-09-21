@@ -50,6 +50,7 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     var wordExposureHistory: [String: Int]? = nil
     var lastAutomaticLibraryCheckDay: String? = nil
     var lastWelcomeDay: String? = nil
+    var languageTips: LanguageTipProgress? = nil
     var schemaVersion = 1
     var selectedLearningLevel: LearningLevel? = nil
     var completed: Set<String> = []

@@ -17,7 +17,7 @@ import Foundation
         return Self.terms.filter { query.isEmpty || "\($0.english) \($0.spanish) \($0.meaning)".localizedStandardContains(query) }
     }
     func term(_ id: String) -> LanguageTerm? { Self.terms.first { $0.id == id } }
-    private static let terms: [LanguageTerm] = [
+    static let terms: [LanguageTerm] = [
         .init(id: "noun", english: "Noun", spanish: "Sustantivo",
               meaning: "A naming word: a word for a person, place, thing or idea.",
               explanation: "Look around a kitchen. You might see a table, a cup and Ana. Table, cup and Ana are all naming words. The grammar name for a naming word is noun. You can also name something you cannot touch: love or happiness.",

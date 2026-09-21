@@ -11,6 +11,21 @@ import Observation
 
 @MainActor @Observable final class RootViewModel {
     private(set) var dailyWelcome: DailyWelcomeViewModel?
+    var languageTip: LanguageTerm? {
+        guard hasAccess, let id = progress.snapshot.languageTips?.pending else { return nil }
+        return LanguageTermsManager.terms.first { $0.id == id }
+    }
+    private(set) var savingTip = false
+    private(set) var tipError: String?
+    func continueLanguageTip() async {
+        guard hasAccess, !checkingAccess, !savingTip, let tip = languageTip else { return }
+        savingTip = true; tipError = nil
+        defer { savingTip = false }
+        do {
+            try await progress.acknowledgeLanguageTip(tip.id)
+            showingStoryteller = hasAccess && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
+        } catch { tipError = error.localizedDescription }
+    }
     let today: HomeViewModel
     private let progress: any ProgressFeature
     var chatUnlocked: Bool { progress.snapshot.canOfferChat(onSupportedDevice: AppleChatGenerator.supportsDevice) }
@@ -92,7 +107,7 @@ import Observation
                 guard dailyWelcome === welcome, hasAccess, !checkingAccess else { return }
                 today.focusNextRead()
                 dailyWelcome = nil
-                showingStoryteller = checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
+                showingStoryteller = languageTip == nil && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
                 return
             }
         }
@@ -175,7 +190,7 @@ import Observation
                     guard hasAccess, !checkingAccess else { return }
                     today.focusNextRead()
                     ready = true
-                    showingStoryteller = dailyWelcome == nil && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
+                    showingStoryteller = dailyWelcome == nil && languageTip == nil && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
                     logger.info("Local library ready in \(Date().timeIntervalSince(started), privacy: .public) seconds; purchase check pending: \(self.purchases.checking, privacy: .public)")
                     break
                 }
