@@ -13,6 +13,8 @@ struct ChatView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var composing: Bool
+    @State private var messagesPresentAtOpening: Set<UUID> = []
+    @State private var readyToAnimateResponses = false
     init(author: Author = Author.demoProfiles[0], scenario: ConversationScenario? = nil) {
         let app = AppModel.shared
         _model = State(initialValue: ChatViewModel(author: author.storyteller, scenario: scenario, feature: app.chat,
@@ -54,6 +56,14 @@ struct ChatView: View {
                         ForEach(model.messages) { turn in
                             ChatTurnView(turn: turn, spokenRange: model.spokenRange(for: turn),
                                 translated: model.translations.contains(turn.id),
+                                animateArrival: readyToAnimateResponses && turn.role == .storyteller
+                                    && !messagesPresentAtOpening.contains(turn.id),
+                                arrivalPosition: responsePosition(for: turn),
+                                positionArrival: {
+                                    withAnimation(reduceMotion ? nil : .easeOut(duration: 0.2)) {
+                                        proxy.scrollTo(turn.id, anchor: .bottom)
+                                    }
+                                },
                                 translate: { model.toggleTranslation(for: turn) }, listen: { model.listen(turn) })
                                 .id(turn.id)
                         }
@@ -106,7 +116,11 @@ struct ChatView: View {
             }
             .background { ChatWallpaperView() }
             .scrollDismissesKeyboard(.interactively)
-            .task { await model.prepare() }
+            .task {
+                await model.prepare()
+                messagesPresentAtOpening.formUnion(model.messages.map(\.id))
+                readyToAnimateResponses = true
+            }
             .onChange(of: model.messages.last(where: { $0.role == .learner })?.id) { _, messageID in
                 guard let messageID else { return }
                 // Only the reader sending a new message moves the viewport.
@@ -178,6 +192,15 @@ struct ChatView: View {
             if phase == .background { composing = false; model.endSession() }
             else if phase != .active { model.cancel() }
             else { Task { await model.prepare() } }
+        }
+    }
+
+    private func responsePosition(for turn: ChatMessage) -> Int {
+        guard turn.role == .storyteller,
+              let replyID = turn.inReplyTo,
+              let index = model.messages.firstIndex(where: { $0.id == turn.id }) else { return 0 }
+        return model.messages[..<index].count {
+            $0.role == .storyteller && $0.inReplyTo == replyID
         }
     }
 }

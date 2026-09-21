@@ -11,9 +11,14 @@ struct ChatTurnView: View {
     let turn: ChatMessage
     let spokenRange: NSRange?
     let translated: Bool
+    let animateArrival: Bool
+    let arrivalPosition: Int
+    let positionArrival: () -> Void
     let translate: () -> Void
     let listen: () -> Void
+    @State private var revealed = false
     @Environment(\.layoutDirection) private var layoutDirection
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(ThemeManager.self) private var theme
     private var fromLearner: Bool { turn.role == .learner }
 
@@ -66,6 +71,27 @@ struct ChatTurnView: View {
                 .background(fromLearner ? theme.theme.chatSent : theme.theme.chatReceived,
                             in: ChatBubbleShape(tailOnRight: fromLearner == (layoutDirection == .leftToRight)))
             if !fromLearner { Spacer(minLength: 32) }
+        }
+        .opacity(animateArrival && !revealed ? 0 : 1)
+        .offset(y: animateArrival && !revealed ? 36 : 0)
+        .scaleEffect(animateArrival && !revealed ? 0.82 : 1, anchor: .bottomLeading)
+        .task(id: turn.id) {
+            guard animateArrival else {
+                revealed = true
+                return
+            }
+            let sequenceDelay = arrivalPosition * 650
+            let naturalVariation = Int.random(in: 45...120)
+            try? await Task.sleep(for: .milliseconds(sequenceDelay + naturalVariation))
+            guard !Task.isCancelled else { return }
+            positionArrival()
+            guard !reduceMotion else {
+                revealed = true
+                return
+            }
+            withAnimation(.spring(duration: 0.25, bounce: 0.4)) {
+                revealed = true
+            }
         }
     }
 }

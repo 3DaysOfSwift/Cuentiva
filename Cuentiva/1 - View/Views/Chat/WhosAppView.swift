@@ -17,22 +17,16 @@ struct WhosAppView: View {
                 if model.unlocked {
                     Text("Chat with a Storyteller").font(.system(.largeTitle, design: .serif))
                     HStack(spacing: 14) {
-                        PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 58)
-                        Divider().frame(height: 44)
+                        PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 64)
+                        Divider().frame(height: 48)
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Your balance")
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(theme.theme.muted)
-                            DoubloonBalance(count: model.coins, size: 30)
-                                .font(.title3.weight(.semibold))
+                            DoubloonBalance(count: model.coins, size: 38)
+                                .font(.title2.weight(.semibold))
                         }
                         Spacer(minLength: 0)
-                    }
-                    .padding(14)
-                    .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 18)
-                            .stroke(theme.theme.accent.opacity(0.18), lineWidth: 1)
                     }
                     ForEach(model.authors) { author in
                         NavigationLink { ChatView(author: author) } label: {
@@ -56,6 +50,10 @@ struct WhosAppView: View {
                                 Image(systemName: "chevron.right").accessibilityHidden(true)
                             }.padding(16)
                                 .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 18)
+                                        .stroke(theme.theme.accent.opacity(0.5), lineWidth: 1.5)
+                                }
                         }.buttonStyle(.plain)
                     }
                     Divider().padding(.vertical, 4)
