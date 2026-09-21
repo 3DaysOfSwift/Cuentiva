@@ -226,6 +226,7 @@ extension ChatFeature {
         return ChatRequest(
             name: String(storyteller.name.prefix(ChatLimits.authorName)),
             biography: String(storyteller.introduction.prefix(ChatLimits.biography)),
+            persona: .forAuthorID(storyteller.id),
             level: (LearningLevel(rawValue: level) ?? .a2).rawValue,
             memory: String(conversation.memory.prefix(ChatLimits.memory)),
             recent: Array(conversation.turns.suffix(ChatLimits.recentExchanges)), message: message,
