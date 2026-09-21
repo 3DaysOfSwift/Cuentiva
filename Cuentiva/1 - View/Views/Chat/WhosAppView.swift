@@ -16,18 +16,7 @@ struct WhosAppView: View {
             VStack(alignment: .leading, spacing: 24) {
                 if model.unlocked {
                     Text("Chat with a Storyteller").font(.system(.largeTitle, design: .serif))
-                    HStack(spacing: 14) {
-                        PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 64)
-                        Divider().frame(height: 48)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Your balance")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(theme.theme.muted)
-                            DoubloonBalance(count: model.coins, size: 38)
-                                .font(.title2.weight(.semibold))
-                        }
-                        Spacer(minLength: 0)
-                    }
+                    UserDoubloonBalance(count: model.coins)
                     ForEach(model.authors) { author in
                         NavigationLink { ChatView(author: author) } label: {
                             HStack(spacing: 16) {
@@ -114,9 +103,9 @@ private struct RolePlayView: View {
                 Text("Role Play Real Life").font(.system(.largeTitle, design: .serif))
                 Text("Don’t just learn the sentence. Practise what the other person says next.")
                     .foregroundStyle(theme.theme.muted)
+                UserDoubloonBalance(count: model.coins)
                 HStack {
-                    DoubloonBalance(count: model.coins, size: 32)
-                    Spacer()
+                    Spacer(minLength: 0)
                     Text("\(model.totalRolePlays) completed")
                         .font(.subheadline.weight(.semibold)).monospacedDigit()
                 }
@@ -170,5 +159,25 @@ private struct RolePlayView: View {
             .background(theme.theme.surface.opacity(unlocked ? 1 : 0.6), in: RoundedRectangle(cornerRadius: 20))
             .overlay(RoundedRectangle(cornerRadius: 20).stroke(
                 unlocked ? theme.theme.accent.opacity(0.65) : theme.theme.muted.opacity(0.25), lineWidth: unlocked ? 1.5 : 1))
+    }
+}
+
+private struct UserDoubloonBalance: View {
+    let count: Int
+    @Environment(ThemeManager.self) private var theme
+
+    var body: some View {
+        HStack(spacing: 14) {
+            PersonalStorytellerButton(feature: AppModel.shared.fantasy, size: 64)
+            Divider().frame(height: 48)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Your balance")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(theme.theme.muted)
+                DoubloonBalance(count: count, size: 38)
+                    .font(.title2.weight(.semibold))
+            }
+            Spacer(minLength: 0)
+        }
     }
 }
