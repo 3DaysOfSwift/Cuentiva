@@ -57,15 +57,40 @@ struct AppleChatGenerator: ChatGenerator {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *) {
             do {
+                let modeInstructions: String
+                if let scenario = request.scenario {
+                    let pace: String = switch request.difficulty {
+                    case .easy: "Use short, predictable Spanish and gently rephrase when the learner is lost."
+                    case .natural: "Use natural Mexican phrasing and vary your questions while remaining supportive."
+                    case .realMexico: "Speak as a person normally would in Mexico, using reasonable unexpected questions and everyday Mexican vocabulary."
+                    }
+                    modeInstructions = """
+                    You are role-playing as \(scenario.aiRole) in \(scenario.context). The learner is \(scenario.learnerRole).
+                    Their goal is: \(scenario.objective)
+                    Conduct a dynamic interaction rather than reciting a script. Ask one thing at a time. Do not speak for the learner.
+                    Allow imperfect Spanish when the meaning is understandable. Stay in the scenario until it reaches a natural conclusion.
+                    Scenario behaviour: \(scenario.instructions)
+                    Required points to cover naturally: \(scenario.requiredObjectives.joined(separator: ", ")).
+                    Report a required point in metObjectiveIDs only after the learner has communicated it successfully.
+                    Set scenarioComplete only when every required point has been met and the interaction has reached a natural conclusion.
+                    You may occasionally introduce one fitting complication: \(scenario.optionalComplications.joined(separator: " "))
+                    \(pace)
+                    """
+                } else {
+                    modeInstructions = """
+                    You are a friendly fictional storyteller helping an English speaker practise Spanish.
+                    Stay in character. Follow their topic, including ordinary life or playful fantasy.
+                    For a greeting with no topic, you can ask which books they have read today.
+                    Ask rather than assuming they have read anything; do not invent their reading history.
+                    """
+                }
                 let session = LanguageModelSession(instructions: """
-                You are a friendly fictional storyteller helping an English speaker practise Spanish.
-                Stay in character, but be honest that you are AI if asked. Use natural everyday Spanish
+                \(modeInstructions)
+                Be honest that you are AI if asked. Use natural everyday Spanish
                 appropriate to the learner's level. Reply in 1–3 short sentences and ask one engaging
-                follow-up question. Follow their topic, including ordinary life or playful fantasy.
+                follow-up question when the interaction naturally needs one.
                 This is a messaging conversation. Wait for the learner to speak; a simple "Hola!"
                 is enough. Reply warmly without presenting a lesson or a menu of conversation starters.
-                For a greeting with no topic, you can ask which books they have read today.
-                Ask rather than assuming they have read anything; do not invent their reading history.
                 When the latest message is mainly English, put only its natural Spanish translation
                 in the primary spanish field, with its faithful English equivalent in english.
                 Then include one separate additionalMessages bubble responding naturally in Spanish:
@@ -99,7 +124,8 @@ struct AppleChatGenerator: ChatGenerator {
                 return .init(spanish: value.spanish, english: value.english, correction: value.correction,
                              suggestion: value.suggestion, memory: value.memory,
                              additionalMessages: value.additionalMessages.map { .init(spanish: $0.spanish, english: $0.english) },
-                             suggestionEnglish: value.suggestionEnglish, learnerEnglish: value.learnerEnglish)
+                             suggestionEnglish: value.suggestionEnglish, learnerEnglish: value.learnerEnglish,
+                             metObjectives: value.metObjectiveIDs, scenarioComplete: value.scenarioComplete)
             } catch is CancellationError { throw CancellationError() }
             catch let error as LanguageModelSession.GenerationError {
                 switch error {
@@ -131,6 +157,10 @@ struct AppleChatGenerator: ChatGenerator {
     @Guide(description: "For an English learner message, include one separate natural Spanish conversational reply after the primary translation bubble. Otherwise zero to two additional bubbles when natural")
     var additionalMessages: [GeneratedChatMessage]
     @Guide(description: "Updated summary of conversation facts and current topic in English, under 400 characters") var memory: String
+    @Guide(description: "Role Play required-objective IDs the learner successfully met in this reply; empty for storyteller chat")
+    var metObjectiveIDs: [String]
+    @Guide(description: "True only when every required Role Play objective is met and the interaction has naturally concluded; false for storyteller chat")
+    var scenarioComplete: Bool
 }
 @available(iOS 26.0, macOS 26.0, *)
 @Generable private struct GeneratedChatMessage {

@@ -13,17 +13,31 @@ import Observation
     var coins: Int { get }
     var sessionPaid: Bool { get }
     var sessionAuthorized: Bool { get }
+    var sessionCost: Int { get }
     func authorizeSession() throws
     var preparing: Bool { get }
     var unavailable: String? { get }
     var ready: Bool { get }
     var busy: Bool { get }
     func beginSession(id: UUID, author: Author)
+    func beginSession(id: UUID, context: ConversationContext)
     func endSession(id: UUID)
     func prepare() async throws
     func conversation(for author: Author) -> ChatConversation
+    func conversation(for context: ConversationContext) -> ChatConversation
     func send(_ message: String, to author: Author, level: String) async throws
+    func send(_ message: String, in context: ConversationContext, level: String) async throws
     func clear(author: Author) async throws
+    func clear(context: ConversationContext) async throws
+}
+
+extension ChatFeature {
+    func beginSession(id: UUID, context: ConversationContext) { beginSession(id: id, author: context.author) }
+    func conversation(for context: ConversationContext) -> ChatConversation { conversation(for: context.author) }
+    func send(_ message: String, in context: ConversationContext, level: String) async throws {
+        try await send(message, to: context.author, level: level)
+    }
+    func clear(context: ConversationContext) async throws { try await clear(author: context.author) }
 }
 
 @MainActor @Observable final class ChatManager: ChatFeature {
@@ -34,7 +48,8 @@ import Observation
     private var sentInAllowance = 0
     @ObservationIgnored private var checkpointTask: Task<Void, Error>?
     private var sessionID: UUID?
-    private var sessionAuthorID: String?
+    private var sessionStorageKey: String?
+    private(set) var sessionCost = 1
     private var sessionConversation = ChatConversation()
     @ObservationIgnored private var preparationTask: Task<Void, Error>?
     private(set) var sessionPaid = false
@@ -53,7 +68,7 @@ import Observation
     }
     private(set) var unavailable: String?
     var coins: Int { progress.snapshot.availableChatCoins }
-    var hasAccess: Bool { progress.snapshot.chatUnlocked && (coins > 0 || sessionPaid) }
+    var hasAccess: Bool { progress.snapshot.chatUnlocked && (coins >= sessionCost || sessionPaid) }
 
     init(generator: any ChatGenerator, progress: any ProgressFeature, now: @escaping () -> Date = Date.init) {
         self.now = now
@@ -61,10 +76,14 @@ import Observation
         self.generator = generator
     }
     func beginSession(id: UUID, author: Author) {
+        beginSession(id: id, context: ConversationContext(author: author))
+    }
+    func beginSession(id: UUID, context: ConversationContext) {
         guard sessionID != id else { return }
         sessionID = id
-        sessionAuthorID = author.id
-        let saved = progress.snapshot.chatSessions?[author.id]
+        sessionStorageKey = context.storageKey
+        sessionCost = context.isRolePlay ? 2 : 1
+        let saved = progress.snapshot.chatSessions?[context.storageKey]
         savedReceiptID = saved?.receiptID
         sentInAllowance = saved?.sentMessages ?? 0
         sessionPaid = saved?.canResume(at: now()) == true
@@ -73,15 +92,16 @@ import Observation
     }
     func endSession(id: UUID) {
         guard sessionID == id else { return }
-        if sessionPaid, let authorID = sessionAuthorID, let receiptID = savedReceiptID {
+        if sessionPaid, let storageKey = sessionStorageKey, let receiptID = savedReceiptID {
             let earlier = checkpointTask
             checkpointTask = Task {
                 if let earlier { try await earlier.value }
-                try await progress.checkpointChat(authorID: authorID, receiptID: receiptID)
+                try await progress.checkpointChat(authorID: storageKey, receiptID: receiptID)
             }
         }
         sessionID = nil
-        sessionAuthorID = nil
+        sessionStorageKey = nil
+        sessionCost = 1
         savedReceiptID = nil
         sentInAllowance = 0
         sessionPaid = false
@@ -91,7 +111,7 @@ import Observation
     func authorizeSession() throws {
         guard ready, sessionID != nil else { throw AppFailure.unavailable("Please wait for chat to finish loading.") }
         if let unavailable { throw AppFailure.unavailable(unavailable) }
-        guard hasAccess else { throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.") }
+        guard hasAccess else { throw AppFailure.unavailable("You need \(sessionCost) doubloons to begin this conversation.") }
         sessionAuthorized = true
     }
     func prepare() async throws {
@@ -111,11 +131,17 @@ import Observation
         try await task.value
     }
     func conversation(for author: Author) -> ChatConversation {
-        sessionAuthorID == author.id ? sessionConversation : .init()
+        conversation(for: ConversationContext(author: author))
+    }
+    func conversation(for context: ConversationContext) -> ChatConversation {
+        sessionStorageKey == context.storageKey ? sessionConversation : .init()
     }
     func send(_ message: String, to author: Author, level: String) async throws {
+        try await send(message, in: ConversationContext(author: author), level: level)
+    }
+    func send(_ message: String, in context: ConversationContext, level: String) async throws {
         guard progress.snapshot.chatUnlocked else {
-            throw AppFailure.unavailable("Storyteller Chat unlocks after you complete 11 books.")
+            throw AppFailure.unavailable("Storyteller Chat unlocks after you complete \(ReadingMilestones.chatOfferBookCount) books.")
         }
         guard hasAccess else {
             throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.")
@@ -125,12 +151,12 @@ import Observation
         guard ChatLimits.acceptsMessage(text) else {
             throw AppFailure.unavailable("Write a message of 1–500 characters.")
         }
-        guard let sendingSessionID = sessionID, sessionAuthorID == author.id else { throw CancellationError() }
+        guard let sendingSessionID = sessionID, sessionStorageKey == context.storageKey else { throw CancellationError() }
         guard sessionConversation.messages.filter({ $0.delivery == .pending }).count < 5 else {
             throw AppFailure.unavailable("Please wait for a reply before sending more messages.")
         }
         if let unavailable { throw AppFailure.unavailable(unavailable) }
-        guard sessionAuthorized else { throw AppFailure.unavailable("Confirm the 1 doubloon cost before starting your chat.") }
+        guard sessionAuthorized else { throw AppFailure.unavailable("Confirm the \(sessionCost)-doubloon cost before starting your chat.") }
         let pending = sessionConversation.messages.filter { $0.role == .learner && $0.delivery == .pending }.count
         let used = sessionPaid ? sentInAllowance : 0
         guard used + pending < ChatLimits.messagesPerCoin else {
@@ -148,7 +174,7 @@ import Observation
             if let unavailable { throw AppFailure.unavailable(unavailable) }
             try Task.checkCancellation()
             guard sessionID == sendingSessionID else { throw CancellationError() }
-            let reply = try await generator.reply(to: makeRequest(message: text, author: author,
+            let reply = try await generator.reply(to: makeRequest(message: text, context: context,
                 level: level, conversation: sessionConversation))
             try Task.checkCancellation()
             guard sessionID == sendingSessionID else { throw CancellationError() }
@@ -160,16 +186,21 @@ import Observation
                 updated.messages[index].delivery = .delivered
                 updated.messages[index].english = reply.learnerEnglish ?? ""
             }
+            let allowedObjectives = Set(context.scenario?.requiredObjectives ?? [])
+            let metObjectives = reply.metObjectives.filter(allowedObjectives.contains)
+            let scenarioComplete = context.scenario != nil && reply.scenarioComplete
+                && allowedObjectives.isSubset(of: Set(updated.metObjectives).union(metObjectives))
             updated.messages.append(ChatMessage(role: .storyteller, text: reply.spanish,
                 inReplyTo: outgoing.id, english: reply.english, correction: reply.correction,
-                suggestion: reply.suggestion, suggestionEnglish: reply.suggestionEnglish))
+                suggestion: reply.suggestion, suggestionEnglish: reply.suggestionEnglish,
+                metObjectives: metObjectives, scenarioComplete: scenarioComplete))
             for message in reply.additionalMessages {
                 updated.messages.append(ChatMessage(role: .storyteller, text: message.spanish,
                     inReplyTo: outgoing.id, english: message.english))
             }
             updated.memory = String(reply.memory.prefix(ChatLimits.memory))
-            let saved = try await progress.saveChatReply(authorID: author.id, conversation: updated,
-                receiptID: savedReceiptID, renewing: !sessionPaid)
+            let saved = try await progress.saveChatReply(authorID: context.storageKey, conversation: updated,
+                receiptID: savedReceiptID, renewing: !sessionPaid, cost: sessionCost)
             // Payment and transcript survive a close/termination during the save.
             guard sessionID == sendingSessionID else { throw CancellationError() }
             savedReceiptID = saved.receiptID
@@ -190,19 +221,23 @@ import Observation
             throw error
         }
     }
-    private func makeRequest(message: String, author: Author, level: String, conversation: ChatConversation) -> ChatRequest {
-        let storyteller = author.storyteller
+    private func makeRequest(message: String, context: ConversationContext, level: String, conversation: ChatConversation) -> ChatRequest {
+        let storyteller = context.author.storyteller
         return ChatRequest(
             name: String(storyteller.name.prefix(ChatLimits.authorName)),
             biography: String(storyteller.introduction.prefix(ChatLimits.biography)),
             level: (LearningLevel(rawValue: level) ?? .a2).rawValue,
             memory: String(conversation.memory.prefix(ChatLimits.memory)),
-            recent: Array(conversation.turns.suffix(ChatLimits.recentExchanges)), message: message)
+            recent: Array(conversation.turns.suffix(ChatLimits.recentExchanges)), message: message,
+            scenario: context.scenario, difficulty: context.difficulty)
     }
     func clear(author: Author) async throws {
+        try await clear(context: ConversationContext(author: author))
+    }
+    func clear(context: ConversationContext) async throws {
         guard ready, !busy else { throw AppFailure.busy }
-        guard sessionAuthorID == author.id else { return }
-        try await progress.clearChat(authorID: author.id)
+        guard sessionStorageKey == context.storageKey else { return }
+        try await progress.clearChat(authorID: context.storageKey)
         savedReceiptID = nil
         sentInAllowance = 0
         sessionPaid = false

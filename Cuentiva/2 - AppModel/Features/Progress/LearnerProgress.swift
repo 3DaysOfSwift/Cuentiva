@@ -45,7 +45,7 @@ struct LearnerProgress: Codable, Sendable, Equatable {
         #endif
     }
     var verbTrainingGiftOpened: Bool { claimedVerbGift == true || verbTrainingPreview }
-    var verbTrainingUnlocked: Bool { verbTrainingGiftOpened || practiceDays.count >= 20 }
+    var verbTrainingUnlocked: Bool { verbTrainingGiftOpened || completed.count >= ReadingMilestones.verbTrainingBookCount }
     var dailyPracticeSession: DailyPracticeSession? = nil
     var wordExposureHistory: [String: Int]? = nil
     var lastAutomaticLibraryCheckDay: String? = nil
@@ -92,6 +92,8 @@ struct LearnerProgress: Codable, Sendable, Equatable {
         }
     }
     var chatSessions: [String: PaidChatSession]? = nil
+    var rolePlayCompletions: [String: Int]? = nil
+    var totalRolePlayCompletions: Int { rolePlayCompletions?.values.reduce(0, +) ?? 0 }
     var doubloons: Int? = nil
     /// A paid first reply that has not yet been delivered. Counts as one usable coin.
     var pendingChatAdmission: Bool? = nil

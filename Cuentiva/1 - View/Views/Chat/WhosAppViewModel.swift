@@ -14,7 +14,16 @@ import Observation
     private(set) var authors: [Author] = []
     var unlocked: Bool { progress.snapshot.chatUnlocked }
     var coins: Int { progress.snapshot.availableChatCoins }
+    var totalRolePlays: Int { progress.snapshot.totalRolePlayCompletions }
+    var progressRevision: UUID { progress.revision }
     var revision: LibraryRevision { library.revision }
+
+    func completions(for scenario: ConversationScenario) -> Int {
+        progress.snapshot.rolePlayCompletions?[scenario.id] ?? 0
+    }
+    func isUnlocked(_ index: Int) -> Bool {
+        index == 0 || completions(for: ConversationScenario.catalogue[index - 1]) > 0
+    }
 
     init(library: any LibraryFeature = AppModel.shared.library,
          progress: any ProgressFeature = AppModel.shared.progress) {

@@ -10,8 +10,10 @@ import Foundation
 /// Reviews are independent of rewards. Never infer a review from a prompt or link tap.
 enum ReadingMilestones {
     static let honouredReaderBookCount = 100
-    static let writingBookCount = 5
-    static let chatOfferBookCount = 11
+    // The opening books continue onboarding by unveiling one useful gift at a time.
+    static let writingBookCount = 1
+    static let chatOfferBookCount = 2
+    static let verbTrainingBookCount = 3
     static let reviewBookCount = 15
     static let reviewURL = URL(string: "https://apps.apple.com/app/id6813381807?action=write-review")
 }

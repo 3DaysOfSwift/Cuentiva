@@ -13,9 +13,9 @@ struct ChatView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var composing: Bool
-    init(author: Author = Author.demoProfiles[0]) {
+    init(author: Author = Author.demoProfiles[0], scenario: ConversationScenario? = nil) {
         let app = AppModel.shared
-        _model = State(initialValue: ChatViewModel(author: author.storyteller, feature: app.chat,
+        _model = State(initialValue: ChatViewModel(author: author.storyteller, scenario: scenario, feature: app.chat,
             audio: app.makeAudio(), level: app.progress.snapshot.selectedLearningLevel?.rawValue ?? "A2"))
     }
     var body: some View {
@@ -23,6 +23,16 @@ struct ChatView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 20) {
                     ChatIntroductionView(locked: !model.feature.sessionAuthorized)
+                    if let scenario = model.context.scenario, model.messages.isEmpty {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Label(scenario.title, systemImage: scenario.symbol).font(.title2.weight(.semibold))
+                            Text(scenario.objective).font(.body)
+                            Text("You are the \(scenario.learnerRole.lowercased()). \(model.author.name) is the \(scenario.aiRole.lowercased()).")
+                                .font(.subheadline).foregroundStyle(theme.theme.muted)
+                            Text("Begin naturally in Spanish. Every attempt can unfold differently.")
+                                .font(.footnote).foregroundStyle(theme.theme.muted)
+                        }.padding().background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
+                    }
                     if let unavailable = model.feature.unavailable {
                         VStack(alignment: .leading, spacing: 12) {
                             Label("On-device chat unavailable", systemImage: "iphone.slash")
@@ -46,6 +56,24 @@ struct ChatView: View {
                                 translated: model.translations.contains(turn.id),
                                 translate: { model.toggleTranslation(for: turn) }, listen: { model.listen(turn) })
                                 .id(turn.id)
+                        }
+                        if let scenario = model.context.scenario, !model.metObjectives.isEmpty {
+                            VStack(alignment: .leading, spacing: 12) {
+                                Label(model.scenarioComplete ? "Role Play complete" : "You’re making progress",
+                                      systemImage: model.scenarioComplete ? "checkmark.seal.fill" : "list.bullet.clipboard.fill")
+                                    .font(.headline).foregroundStyle(model.scenarioComplete ? theme.theme.accent : theme.theme.ink)
+                                ForEach(scenario.requiredObjectives, id: \.self) { objective in
+                                    Label(objective.replacingOccurrences(of: "-", with: " ").capitalized,
+                                          systemImage: model.metObjectives.contains(objective) ? "checkmark.circle.fill" : "circle")
+                                        .font(.subheadline)
+                                        .foregroundStyle(model.metObjectives.contains(objective) ? theme.theme.accent : theme.theme.muted)
+                                }
+                                if model.scenarioComplete {
+                                    Text("You communicated your way through this real-life situation.")
+                                        .font(.subheadline).foregroundStyle(theme.theme.muted)
+                                }
+                            }.padding().frame(maxWidth: .infinity, alignment: .leading)
+                                .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
                         }
                         if model.sending { ChatTypingIndicator(storyteller: model.author.name) }
                         if model.feature.sessionAuthorized, !model.admissionVisible, model.draft.isEmpty, !model.sending, let turn = model.suggestedTurn {
@@ -89,7 +117,7 @@ struct ChatView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if model.canPresentAdmission && model.admissionVisible {
-                    ChatAdmissionView(coins: model.displayedCoins, celebrating: model.admissionCelebrating,
+                    ChatAdmissionView(coins: model.displayedCoins, cost: model.feature.sessionCost, celebrating: model.admissionCelebrating,
                         continuing: !model.messages.isEmpty,
                         confirm: model.celebrateAdmission)
                         .transition(reduceMotion ? .opacity : .move(edge: .bottom).combined(with: .opacity))
@@ -107,14 +135,14 @@ struct ChatView: View {
         .background(theme.theme.paper).foregroundStyle(theme.theme.ink).tint(theme.theme.accent)
         .toolbarBackground(theme.theme.paper, for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .navigationTitle(model.author.name).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(model.context.title).navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack(spacing: 8) {
                     AuthorPortrait(author: model.author, size: 32).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 1) {
-                        Text(model.author.name).font(.headline).lineLimit(1)
-                        Text("AI storyteller").font(.caption2).foregroundStyle(theme.theme.muted)
+                        Text(model.context.title).font(.headline).lineLimit(1)
+                        Text(model.context.subtitle).font(.caption2).foregroundStyle(theme.theme.muted).lineLimit(1)
                     }
                 }.accessibilityElement(children: .combine).accessibilityAddTraits(.isHeader)
             }
@@ -138,8 +166,8 @@ struct ChatView: View {
                 }
             }
         }
-        .confirmationDialog("Start a new topic? This clears this saved conversation and its remaining allowance. The next topic costs 1 doubloon.", isPresented: $model.confirmingClear, titleVisibility: .visible) {
-            Button("Start new topic", role: .destructive) { Task { await model.clear() } }
+        .confirmationDialog(model.context.isRolePlay ? "Start this Role Play again? This clears the current attempt and its remaining allowance. A new attempt costs 2 doubloons." : "Start a new topic? This clears this saved conversation and its remaining allowance. The next topic costs 1 doubloon.", isPresented: $model.confirmingClear, titleVisibility: .visible) {
+            Button(model.context.isRolePlay ? "Start again" : "Start new topic", role: .destructive) { Task { await model.clear() } }
         }
         .onChange(of: model.feature.sessionAuthorized) { _, authorized in
             if !authorized { composing = false; model.resetAdmission() }

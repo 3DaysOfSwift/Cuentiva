@@ -32,7 +32,7 @@ struct WritingUnlockedView: View {
                             Text("A free gift.\nJust for you.")
                                 .font(.system(.largeTitle, design: .serif))
                                 .accessibilityAddTraits(.isHeader)
-                            Text("You’ve made time to learn through \(ReadingMilestones.writingBookCount) complete stories. That’s worth celebrating! Your free gift is a character of your own to accompany your reading adventures.")
+                            Text("You’ve completed your first Spanish book. That’s worth celebrating! Your free gift is a character of your own to accompany your reading adventures.")
                             Button("Open my gift  →") { model.next() }
                                 .buttonStyle(PrimaryButton())
                         } else {

@@ -18,9 +18,8 @@ struct VerbTrainingView: View {
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 24) {
                     if !model.eligible {
-                        Label("A gift for day 20", systemImage: "gift.fill").font(.largeTitle)
-                        Text("Practise on 20 different days to unlock Verb Training.")
-                        Text("\(model.days) of 20 practice days")
+                        Label("A gift after book 3", systemImage: "gift.fill").font(.largeTitle)
+                        Text("Complete three different books to unlock Verb Training.")
                     } else if !model.claimed || model.giftCelebrated {
                         gift
                     } else if model.awaitingCompletion {
@@ -136,7 +135,7 @@ struct VerbTrainingView: View {
             Image(systemName: model.giftCelebrated ? "checkmark.seal.fill" : "gift.fill")
                 .font(.system(size: 90)).foregroundStyle(theme.theme.accent)
                 .symbolEffect(.bounce, options: .nonRepeating, isActive: model.giftCelebrated && !reduceMotion)
-            Text(model.giftCelebrated ? "Your words, in every time." : "Twenty days. A new way to speak.")
+            Text(model.giftCelebrated ? "Your words, in every time." : "Three books. A new way to speak.")
                 .font(.system(.largeTitle, design: .serif))
             Text("Your Verb Training gift includes 29 everyday verbs, past and future practice, and a word cloud that keeps going. It’s yours to revisit, even if your streak ends.")
                 .foregroundStyle(theme.theme.muted)

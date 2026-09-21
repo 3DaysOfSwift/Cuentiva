@@ -21,7 +21,7 @@ enum ThemePack: String, CaseIterable, Identifiable, Sendable {
     var id: Self { self }
     var title: String { self == .vip ? "VIP" : rawValue.capitalized }
     var requiredBooks: Int? {
-        switch self { case .storybook: 10; case .wanderlust: 25; case .enchanted: 50; case .vip: nil }
+        switch self { case .storybook: 4; case .wanderlust: 5; case .enchanted: 6; case .vip: nil }
     }
     var giftReason: String {
         if let requiredBooks { return "A free gift for completing \(requiredBooks) books." }

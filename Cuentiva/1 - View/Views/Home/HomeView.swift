@@ -24,7 +24,7 @@ struct HomeView: View {
                 StreakBar(days: viewModel.week)
                 if viewModel.hasVerbGift {
                     Button { viewModel.showingVerbGift = true } label: {
-                        Label("Your day-20 gift · Verb Training", systemImage: "gift.fill")
+                        Label("Your third-book gift · Verb Training", systemImage: "gift.fill")
                             .font(.title3.bold()).padding(20).frame(maxWidth: .infinity, alignment: .leading)
                             .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
                     }.buttonStyle(.plain)

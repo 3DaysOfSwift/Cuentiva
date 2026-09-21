@@ -29,6 +29,33 @@ struct PaywallView: View {
                     ], id: \.self
                 ) { item in Label(item, systemImage: "checkmark").font(.body) }
                 Divider()
+                Label("EVERYTHING YOUR SPANISH NEEDS", systemImage: "sparkles")
+                    .font(.caption.weight(.bold)).tracking(1)
+                Text("A reason to come back tomorrow.")
+                    .font(.system(.title2, design: .serif, weight: .medium))
+                VStack(alignment: .leading, spacing: 18) {
+                    subscriptionReason(
+                        "Read a complete Spanish library",
+                        detail: "Follow stories from the first sentence to the final page.",
+                        symbol: "books.vertical.fill")
+                    subscriptionReason(
+                        "Practise for real conversations",
+                        detail: "Chat with storytellers and rehearse everyday life in Mexico.",
+                        symbol: "bubble.left.and.bubble.right.fill")
+                    subscriptionReason(
+                        "Turn sentences into instinct",
+                        detail: "Train vocabulary, listening, verbs and word order through play.",
+                        symbol: "brain.head.profile.fill")
+                    subscriptionReason(
+                        "Earn rewards by learning",
+                        detail: "Complete books and games to collect doubloons and thoughtful gifts.",
+                        symbol: "medal.fill")
+                    subscriptionReason(
+                        "Learn privately on your device",
+                        detail: "Keep your progress and supported AI conversations with you.",
+                        symbol: "lock.shield.fill")
+                }
+                Divider()
                 ForEach(InAppPurchases.allCases) { plan in
                     Button { viewModel.selectedPlan = plan } label: {
                         HStack {
@@ -79,5 +106,18 @@ struct PaywallView: View {
                 }.font(.caption2)
             }.padding(28)
         }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).task { await viewModel.reload() }
+    }
+
+    private func subscriptionReason(_ title: String, detail: String, symbol: String) -> some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: symbol)
+                .font(.title3)
+                .foregroundStyle(theme.theme.accent)
+                .frame(width: 30)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.headline)
+                Text(detail).font(.subheadline).foregroundStyle(theme.theme.muted)
+            }
+        }
     }
 }

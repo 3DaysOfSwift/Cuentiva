@@ -45,7 +45,7 @@ import Observation
     func setLearningLevel(_ level: LearningLevel?) async throws
     func recordPractice(book: Book, matches: Int, elapsed: Double?) async throws
     func installThemePack(_ pack: ThemePack) async throws
-    func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool) async throws -> PaidChatSession
+    func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool, cost: Int) async throws -> PaidChatSession
     func checkpointChat(authorID: String, receiptID: UUID) async throws
     func clearChat(authorID: String) async throws
     func payForChat(deliver: @MainActor () -> Bool) async throws
@@ -59,9 +59,9 @@ import Observation
     #endif
     @discardableResult func performVerbTraining(_ action: VerbTrainingAction) async throws -> Bool {
         try await commit { next in
-            guard next.verbTrainingUnlocked else { throw AppFailure.unavailable("Your Verb Training gift opens after 20 practice days.") }
+            guard next.verbTrainingUnlocked else { throw AppFailure.unavailable("Your Verb Training gift opens after 3 completed books.") }
             if case .claimGift = action {
-                if next.practiceDays.count >= 20 { next.claimedVerbGift = true }
+                if next.completed.count >= ReadingMilestones.verbTrainingBookCount { next.claimedVerbGift = true }
                 return true
             }
             guard next.verbTrainingGiftOpened else { throw AppFailure.unavailable("Open your Verb Training gift first.") }
@@ -505,17 +505,18 @@ import Observation
         try await repository.save(settled)
         snapshot = settled
     }
-    func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool) async throws -> PaidChatSession {
+    func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool, cost: Int = 1) async throws -> PaidChatSession {
         try await commit { next in
-            guard next.chatUnlocked, !authorID.isEmpty else { throw AppFailure.incomplete }
+            guard next.chatUnlocked, !authorID.isEmpty, cost > 0 else { throw AppFailure.incomplete }
             let previous = next.chatSessions?[authorID]
             guard previous?.receiptID == receiptID else { throw AppFailure.unavailable("This conversation changed. Reopen it to continue.") }
             let count: Int
             let token: UUID
             if renewing {
-                guard next.availableChatCoins > 0 else { throw AppFailure.unavailable("Complete another story to earn a doubloon.") }
-                if next.pendingChatAdmission == true { next.pendingChatAdmission = false }
-                else { next.doubloons = (next.doubloons ?? 0) - 1 }
+                guard next.availableChatCoins >= cost else { throw AppFailure.unavailable("Earn more doubloons to begin this conversation.") }
+                let reservedCredit = next.pendingChatAdmission == true ? 1 : 0
+                next.pendingChatAdmission = false
+                next.doubloons = (next.doubloons ?? 0) - (cost - reservedCredit)
                 count = 1
                 token = UUID()
             } else {
@@ -537,6 +538,12 @@ import Observation
                 lastActivity: date, resumeUntil: date.addingTimeInterval(ChatLimits.returnWindow))
             if next.chatSessions == nil { next.chatSessions = [:] }
             next.chatSessions?[authorID] = session
+            if authorID.hasPrefix("role-play:"), conversation.scenarioComplete,
+               previous?.conversation.scenarioComplete != true {
+                let scenarioID = String(authorID.dropFirst("role-play:".count))
+                if next.rolePlayCompletions == nil { next.rolePlayCompletions = [:] }
+                next.rolePlayCompletions?[scenarioID, default: 0] += 1
+            }
             return session
         }
     }

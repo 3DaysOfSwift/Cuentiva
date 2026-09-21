@@ -60,14 +60,14 @@ struct CompletionView: View {
                         .buttonStyle(PrimaryButton())
                 }
                 if receipt.unlocksWriting {
-                    Text("Five books.\nLook how far you’ve come.")
+                    Text("Your first book.\nLook how far you’ve come.")
                         .font(.system(.largeTitle, design: .serif))
                         .multilineTextAlignment(.center)
-                    Text("Five little adventures in Spanish. Every story is another step on your journey.")
+                    Text("Your first complete adventure in Spanish. Every story is another step on your journey.")
                         .multilineTextAlignment(.center)
                 } else if viewModel.offersChatGift(receipt) {
                     Image(systemName: "gift.fill").font(.system(size: 80)).foregroundStyle(theme.theme.accent)
-                    Text("Eleven books.\nA new way to connect.")
+                    Text("Two books.\nA new way to connect.")
                         .font(.system(.largeTitle, design: .serif)).multilineTextAlignment(.center)
                     Text("You’ve earned a new gift. Let’s put those Spanish words into a conversation.")
                         .multilineTextAlignment(.center)

@@ -156,6 +156,10 @@ enum ProgressRecords {
             rows["chatSessions"] = try RecordCoding.encode(value.chatSessions != nil)
             try map("chatSessions", value.chatSessions ?? [:], previous?.chatSessions ?? [:], into: &rows)
         }
+        if previous == nil || previous?.rolePlayCompletions != value.rolePlayCompletions {
+            rows["rolePlayCompletions"] = try RecordCoding.encode(value.rolePlayCompletions != nil)
+            try map("rolePlayCompletions", value.rolePlayCompletions ?? [:], previous?.rolePlayCompletions ?? [:], into: &rows)
+        }
         if previous == nil || previous?.pendingChatAdmission != value.pendingChatAdmission {
             rows["pendingChatAdmission"] = try RecordCoding.encode(value.pendingChatAdmission)
         }
@@ -200,6 +204,12 @@ enum ProgressRecords {
         }
         for (key, data) in rows where key.hasPrefix("chatSessions/") {
             value.chatSessions?[String(key.dropFirst(13))] = try RecordCoding.decode(PaidChatSession.self, data)
+        }
+        if let marker = rows["rolePlayCompletions"], try RecordCoding.decode(Bool.self, marker) {
+            value.rolePlayCompletions = [:]
+        }
+        for (key, data) in rows where key.hasPrefix("rolePlayCompletions/") {
+            value.rolePlayCompletions?[String(key.dropFirst(20))] = try RecordCoding.decode(Int.self, data)
         }
         if let data = rows["earnedStreakTheme"] { value.earnedStreakTheme = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["celebratedStreakTheme"] { value.celebratedStreakTheme = try RecordCoding.decode(Bool?.self, data) }

@@ -10,6 +10,7 @@ import Observation
 
 @MainActor @Observable final class ChatViewModel {
     let author: Author
+    let context: ConversationContext
     let feature: any ChatFeature
     private let audio: any LessonAudio
     private var spokenMessageID: UUID?
@@ -41,7 +42,7 @@ import Observation
     var displayedCoins: Int {
         let reserved = feature.sessionAuthorized && !feature.sessionPaid
             && admissionPhase != .ready && admissionPhase != .accepted && admissionPhase != .celebrating
-        return max(0, feature.coins - (reserved ? 1 : 0))
+        return max(0, feature.coins - (reserved ? feature.sessionCost : 0))
     }
     // Optimistic reservation only. The feature still commits the charge with the first reply.
     @discardableResult func celebrateAdmission() -> Bool {
@@ -75,10 +76,12 @@ import Observation
         admissionTask = nil
         admissionPhase = .ready
     }
-    init(author: Author, feature: any ChatFeature, audio: any LessonAudio, level: String = "A2",
+    init(author: Author, scenario: ConversationScenario? = nil, difficulty: RolePlayDifficulty = .easy,
+         feature: any ChatFeature, audio: any LessonAudio, level: String = "A2",
          admissionPause: @escaping @MainActor (Duration) async throws -> Void = { try await Task.sleep(for: $0) }) {
         self.admissionPause = admissionPause
         self.author = author
+        self.context = ConversationContext(author: author, scenario: scenario, difficulty: difficulty)
         self.feature = feature
         self.audio = audio
         self.level = LearningLevel(rawValue: level) ?? .a2
@@ -94,11 +97,13 @@ import Observation
     }
     var sessionMessage: String {
         if feature.sessionPaid { return "This chat allowance is paid for. Return within ten minutes to continue." }
-        if feature.sessionAuthorized { return "1 doubloon reserved. Charged after your first successful reply." }
-        return "One doubloon covers this chat. Charged after your first successful reply."
+        if feature.sessionAuthorized { return "\(feature.sessionCost) doubloons reserved. Charged after your first successful reply." }
+        return "\(feature.sessionCost) doubloons cover this chat. Charged after your first successful reply."
     }
-    var turns: [ChatTurn] { feature.conversation(for: author).turns }
-    var messages: [ChatMessage] { feature.conversation(for: author).messages }
+    var turns: [ChatTurn] { feature.conversation(for: context).turns }
+    var messages: [ChatMessage] { feature.conversation(for: context).messages }
+    var metObjectives: Set<String> { feature.conversation(for: context).metObjectives }
+    var scenarioComplete: Bool { feature.conversation(for: context).scenarioComplete }
     var composerNotice: String? {
         if let preparationError { return preparationError }
         if let unavailable = feature.unavailable { return unavailable }
@@ -116,7 +121,7 @@ import Observation
         do {
             try await feature.prepare()
             guard !Task.isCancelled, sessionID == preparingSessionID else { return }
-            feature.beginSession(id: preparingSessionID, author: author)
+            feature.beginSession(id: preparingSessionID, context: context)
             preparedSession = true
             if feature.sessionPaid { admissionPhase = .finished }
         } catch { preparationError = error.localizedDescription }
@@ -135,7 +140,7 @@ import Observation
         replyTasks[requestID] = Task {
             defer { replyTasks[requestID] = nil }
             do {
-                try await feature.send(text, to: author, level: sendingLevel)
+                try await feature.send(text, in: context, level: sendingLevel)
                 if sessionID == sendingSession, !feature.sessionAuthorized { resetAdmission() }
             } catch {
                 guard sessionID == sendingSession else { return }
@@ -174,7 +179,7 @@ import Observation
         audio.stop()
         error = nil
         do {
-            try await feature.clear(author: author)
+            try await feature.clear(context: context)
             resetAdmission()
             translations = []; suggestionTranslations = []
         } catch { self.error = error.localizedDescription }

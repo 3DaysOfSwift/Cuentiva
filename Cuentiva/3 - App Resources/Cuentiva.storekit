@@ -45,7 +45,7 @@
               "locale": "en_US"
             }
           ],
-          "productID": "com.3DaysOfSwiftConcurrency.Cuentiva.monthly",
+          "productID": "com.cuentiva.monthly",
           "recurringSubscriptionPeriod": "P1M",
           "referenceName": "Cuentiva Monthly",
           "subscriptionGroupID": "CuentivaLibrarySubscriptions",
@@ -73,7 +73,7 @@
               "locale": "en_US"
             }
           ],
-          "productID": "com.3DaysOfSwiftConcurrency.Cuentiva.annual",
+          "productID": "com.cuentiva.annual",
           "recurringSubscriptionPeriod": "P1Y",
           "referenceName": "Cuentiva Annual",
           "subscriptionGroupID": "CuentivaLibrarySubscriptions",

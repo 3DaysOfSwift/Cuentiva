@@ -38,10 +38,10 @@ import Testing
         #expect(progress.snapshot.practiceDays.isEmpty)
         #expect(try ProgressRecords.decode(ProgressRecords.encode(progress.snapshot)) == progress.snapshot)
     }
-    @Test func twentiethDistinctDayUnlocksGiftAndAccessStillRequired() async throws {
+    @Test func thirdCompletedBookUnlocksGiftAndAccessStillRequired() async throws {
         let repo = MemoryProgress()
         var saved = LearnerProgress()
-        saved.practiceDays = Set((1...19).map { String(format: "2026-01-%02d", $0) })
+        saved.completed = ["first", "second"]
         try await repo.save(saved)
         let progress = ProgressManager(repository: repo)
         try await progress.load()
@@ -49,23 +49,24 @@ import Testing
         let feature = VerbTrainingManager(progress: progress, purchases: purchases)
         #expect(!feature.eligible)
         await #expect(throws: AppFailure.self) { try await feature.perform(.claimGift) }
-        let book = sample()
-        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
-        #expect(feature.practiceDays == 20)
-        #expect(feature.eligible)
-        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
-        #expect(feature.practiceDays == 20)
+
+        saved.completed.insert("third")
+        try await repo.save(saved)
+        let qualifiedProgress = ProgressManager(repository: repo)
+        try await qualifiedProgress.load()
+        let qualifiedFeature = VerbTrainingManager(progress: qualifiedProgress, purchases: purchases)
+        #expect(qualifiedFeature.eligible)
         purchases.hasAccess = false
-        await #expect(throws: AppFailure.self) { try await feature.perform(.claimGift) }
+        await #expect(throws: AppFailure.self) { try await qualifiedFeature.perform(.claimGift) }
         purchases.hasAccess = true
         await repo.setFailure(true)
-        await #expect(throws: AppFailure.self) { try await feature.perform(.claimGift) }
-        #expect(!feature.claimed)
+        await #expect(throws: AppFailure.self) { try await qualifiedFeature.perform(.claimGift) }
+        #expect(!qualifiedFeature.claimed)
         await repo.setFailure(false)
-        try await feature.perform(.claimGift)
-        try await feature.perform(.claimGift)
-        #expect(feature.claimed)
-        #expect(progress.snapshot.availableChatCoins == 0)
+        try await qualifiedFeature.perform(.claimGift)
+        try await qualifiedFeature.perform(.claimGift)
+        #expect(qualifiedFeature.claimed)
+        #expect(qualifiedProgress.snapshot.availableChatCoins == 0)
         let reopened = ProgressManager(repository: repo); try await reopened.load()
         #expect(reopened.snapshot.verbTrainingUnlocked)
         #expect(reopened.snapshot.claimedVerbGift == true)

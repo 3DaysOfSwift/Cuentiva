@@ -14,7 +14,7 @@ import Testing
 #endif
 
 @Suite @MainActor struct ThemePackTests {
-    @Test(arguments: [0, 9, 10, 24, 25, 49, 50, 100])
+    @Test(arguments: [0, 3, 4, 5, 6, 7, 100])
     func rewardsAreEarnedButNotAutomaticallyInstalled(count: Int) {
         var progress = LearnerProgress()
         progress.completed = Set((0..<count).map { "book-\($0)" })

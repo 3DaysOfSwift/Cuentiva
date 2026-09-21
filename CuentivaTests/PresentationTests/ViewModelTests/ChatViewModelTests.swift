@@ -309,6 +309,7 @@ import Testing
     var coins = 1
     var sessionPaid = false
     var sessionAuthorized = false
+    var sessionCost = 1
     var authorizationFailure: AppFailure?
     func authorizeSession() throws {
         if let authorizationFailure { throw authorizationFailure }

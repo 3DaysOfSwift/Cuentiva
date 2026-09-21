@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ChatAdmissionView: View {
     let coins: Int
+    let cost: Int
     let celebrating: Bool
     var continuing = false
     let confirm: () -> Bool
@@ -22,7 +23,7 @@ struct ChatAdmissionView: View {
             HStack(spacing: 14) {
                 DoubloonIcon(size: 58)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(continuing ? "Continue for 1 doubloon" : "Cost: 1 doubloon").font(.title2.weight(.semibold))
+                    Text(continuing ? "Continue for \(cost) doubloons" : "Cost: \(cost) doubloons").font(.title2.weight(.semibold))
                     Text("Up to \(ChatLimits.messagesPerCoin) sent messages. AI replies are included.")
                         .font(.subheadline).foregroundStyle(theme.theme.muted)
                 }
@@ -36,8 +37,8 @@ struct ChatAdmissionView: View {
                 .opacity(celebrating ? 0 : 1)
             if celebrating {
                 Color.clear.frame(height: handleSize + 12)
-            } else if coins == 0 {
-                Label("Read a new story or complete a Match Pairs game to earn a doubloon.", systemImage: "lock.fill")
+            } else if coins < cost {
+                Label("Earn \(cost - coins) more \(cost - coins == 1 ? "doubloon" : "doubloons") to begin.", systemImage: "lock.fill")
                     .font(.subheadline).foregroundStyle(theme.theme.muted)
             } else {
                 SlideToStartView(confirm: confirm, coinAnimation: coinAnimation, title: continuing ? "Slide to continue" : "Slide to start")

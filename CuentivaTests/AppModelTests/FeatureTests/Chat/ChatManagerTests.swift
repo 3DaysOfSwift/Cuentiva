@@ -53,7 +53,7 @@ private actor ChatTestGenerator: ChatGenerator {
 
     private func wallet(_ coins: Int = 2, repository: MemoryProgress = MemoryProgress(), now: @escaping () -> Date = Date.init) async throws -> ProgressManager {
         var value = LearnerProgress(); value.doubloons = coins
-        value.completed = Set((0..<11).map { "earned-\($0)" })
+        value.completed = Set((0..<ReadingMilestones.chatOfferBookCount).map { "earned-\($0)" })
         try await repository.save(value)
         let progress = ProgressManager(repository: repository, now: now)
         try await progress.load()
@@ -92,10 +92,10 @@ private actor ChatTestGenerator: ChatGenerator {
 
     @Test func chatPromotionRequiresBothReadingMilestoneAndDeviceSupport() {
         var progress = LearnerProgress()
-        progress.completed = Set((0..<11).map { "book-\($0)" })
+        progress.completed = Set((0..<ReadingMilestones.chatOfferBookCount).map { "book-\($0)" })
         #expect(!progress.canOfferChat(onSupportedDevice: false))
         #expect(progress.canOfferChat(onSupportedDevice: true))
-        let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: ReadingMilestones.chatOfferBookCount)
         #expect(!receipt.offersChatGift(onSupportedDevice: false))
         #expect(receipt.offersChatGift(onSupportedDevice: true))
         progress.completed = []
@@ -104,7 +104,7 @@ private actor ChatTestGenerator: ChatGenerator {
 
     @Test func coinsDoNotBypassReadingUnlock() async throws {
         var value = LearnerProgress(); value.doubloons = 10
-        value.completed = Set((0..<10).map { "earned-\($0)" })
+        value.completed = Set((0..<(ReadingMilestones.chatOfferBookCount - 1)).map { "earned-\($0)" })
         let store = MemoryProgress(); try await store.save(value)
         let progress = ProgressManager(repository: store); try await progress.load()
         let chat = ChatManager(generator: ChatTestGenerator(), progress: progress)
@@ -238,6 +238,40 @@ private actor ChatTestGenerator: ChatGenerator {
         let rows = try ProgressRecords.encode(restoredProgress.snapshot)
         #expect(try ProgressRecords.decode(rows) == restoredProgress.snapshot)
         #expect(try JSONDecoder().decode(LearnerProgress.self, from: JSONEncoder().encode(restoredProgress.snapshot)) == restoredProgress.snapshot)
+    }
+
+    @Test func rolePlayUsesScenarioInstructionsAndASeparatePaidTranscript() async throws {
+        let progress = try await wallet(2)
+        let generator = ChatTestGenerator()
+        let chat = ChatManager(generator: generator, progress: progress)
+        let scenario = try #require(ConversationScenario.catalogue.first)
+        await generator.setReply(.init(spanish: "Son cincuenta pesos.", english: "It is fifty pesos.", correction: "",
+            suggestion: "Pago con tarjeta.", memory: "The coffee order is complete.",
+            metObjectives: scenario.requiredObjectives + ["invented-objective"], scenarioComplete: true))
+        let rolePlay = ConversationContext(author: author, scenario: scenario)
+        try await chat.prepare()
+        chat.beginSession(id: UUID(), context: rolePlay)
+        #expect(chat.sessionCost == 2)
+        try chat.authorizeSession()
+        try await chat.send("Quisiera un café.", in: rolePlay, level: "A1")
+        let request = try #require(await generator.requests.last)
+        #expect(request.scenario?.id == scenario.id)
+        #expect(request.difficulty == .easy)
+        #expect(progress.snapshot.chatSessions?[rolePlay.storageKey]?.sentMessages == 1)
+        #expect(progress.snapshot.chatSessions?[author.id] == nil)
+        #expect(chat.conversation(for: rolePlay).turns.count == 1)
+        #expect(chat.conversation(for: rolePlay).metObjectives == Set(scenario.requiredObjectives))
+        #expect(chat.conversation(for: rolePlay).scenarioComplete)
+        #expect(progress.snapshot.rolePlayCompletions?[scenario.id] == 1)
+        #expect(progress.snapshot.totalRolePlayCompletions == 1)
+        try await chat.send("Gracias.", in: rolePlay, level: "A1")
+        #expect(progress.snapshot.rolePlayCompletions?[scenario.id] == 1)
+        let restoredProgress = try ProgressRecords.decode(ProgressRecords.encode(progress.snapshot))
+        #expect(restoredProgress.rolePlayCompletions?[scenario.id] == 1)
+        chat.beginSession(id: UUID(), author: author)
+        #expect(chat.conversation(for: author).messages.isEmpty)
+        #expect(!chat.sessionAuthorized)
+        #expect(chat.coins == 0)
     }
 
     @Test func tenMinuteReturnWindowExpiresWithoutDeletingTranscript() async throws {
