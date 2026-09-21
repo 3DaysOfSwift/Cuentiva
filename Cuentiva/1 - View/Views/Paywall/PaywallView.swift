@@ -22,7 +22,7 @@ struct PaywallView: View {
                     ], id: \.self
                 ) { item in Label(item, systemImage: "checkmark").font(.body) }
                 Divider()
-                ForEach(LibraryPlan.allCases) { plan in
+                ForEach(InAppPurchases.allCases) { plan in
                     Button { viewModel.selectedPlan = plan } label: {
                         HStack {
                             Image(systemName: viewModel.selectedPlan == plan ? "checkmark.circle.fill" : "circle")

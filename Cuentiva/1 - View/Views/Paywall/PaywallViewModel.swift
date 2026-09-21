@@ -5,17 +5,17 @@ import Observation
     var busy = false
     var error: String?
     var title: String { "Your next chapter\nis waiting." }
-    var selectedPlan: LibraryPlan = .annual
+    var selectedPlan: InAppPurchases = .annual
     var trialNotice: String? {
         guard purchases.hasOneWeekTrial(for: selectedPlan) else { return nil }
         return "1 week free trial · then \(price). Cancel at least 24 hours before the trial ends to avoid payment."
     }
     var button: String { "1 week free trial · \(price)" }
     var price: String { price(for: selectedPlan) }
-    func price(for plan: LibraryPlan) -> String {
+    func price(for plan: InAppPurchases) -> String {
         purchases.offer(for: plan).map { "\($0.displayPrice) / \(plan.billingPeriod)" } ?? "Price unavailable"
     }
-    func available(_ plan: LibraryPlan) -> Bool { purchases.offer(for: plan) != nil }
+    func available(_ plan: InAppPurchases) -> Bool { purchases.offer(for: plan) != nil }
     var available: Bool { available(selectedPlan) }
     var annualSaves: Bool { purchases.annualPlanSaves }
     var storeMessage: String? { purchases.message }

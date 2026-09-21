@@ -3,14 +3,6 @@ import OSLog
 import Observation
 import StoreKit
 
-enum LibraryPlan: String, CaseIterable, Identifiable, Sendable {
-    case monthly, annual
-    var id: Self { self }
-    var productID: String { "com.3DaysOfSwiftConcurrency.Cuentiva.\(rawValue)" }
-    var title: String { self == .monthly ? "Monthly" : "Annual" }
-    var billingPeriod: String { self == .monthly ? "month" : "year" }
-}
-
 /// Only verified transactions reach this policy; renewal cancellation alone is not expiry.
 enum LibraryAccess {
     static func shouldPromoteAnnual(total: Int, isNew: Bool, monthlyOnly: Bool, checking: Bool, saves: Bool) -> Bool {
@@ -31,9 +23,9 @@ enum LibraryAccess {
     var offers: [Product] { get }
     var isMonthlySubscriber: Bool { get }
     var message: String? { get }
-    func hasOneWeekTrial(for plan: LibraryPlan) -> Bool
+    func hasOneWeekTrial(for plan: InAppPurchases) -> Bool
     func refresh() async
-    func purchase(plan: LibraryPlan) async throws
+    func purchase(plan: InAppPurchases) async throws
     func restore() async throws
 }
 extension PurchaseFeature {
@@ -42,9 +34,9 @@ extension PurchaseFeature {
         LibraryAccess.shouldPromoteAnnual(total: receipt.total, isNew: receipt.isNew,
             monthlyOnly: hasAccess && isMonthlySubscriber, checking: checking, saves: annualPlanSaves)
     }
-    func hasOneWeekTrial(for plan: LibraryPlan) -> Bool { false }
+    func hasOneWeekTrial(for plan: InAppPurchases) -> Bool { false }
 
-    func offer(for plan: LibraryPlan) -> Product? {
+    func offer(for plan: InAppPurchases) -> Product? {
         offers.first { $0.id == plan.productID }
     }
 
@@ -57,14 +49,14 @@ extension PurchaseFeature {
 
 @MainActor @Observable final class PurchaseManager: PurchaseFeature {
     static let legacyLifetimeProductID = "com.3DaysOfSwiftConcurrency.Cuentiva.lifetime"
-    private let entitlementProductIDs = Set(LibraryPlan.allCases.map(\.productID) + [PurchaseManager.legacyLifetimeProductID])
+    private let entitlementProductIDs = Set(InAppPurchases.allCases.map(\.productID) + [PurchaseManager.legacyLifetimeProductID])
     private var expirationTask: Task<Void, Never>?
     private(set) var isMonthlySubscriber = false
     private(set) var hasAccess = false
     private(set) var checking = true
     private(set) var offers: [Product] = []
-    private var trialEligiblePlans: Set<LibraryPlan> = []
-    func hasOneWeekTrial(for plan: LibraryPlan) -> Bool {
+    private var trialEligiblePlans: Set<InAppPurchases> = []
+    func hasOneWeekTrial(for plan: InAppPurchases) -> Bool {
         !hasAccess && trialEligiblePlans.contains(plan)
     }
     private(set) var message: String?
@@ -120,12 +112,12 @@ extension PurchaseFeature {
         trialEligiblePlans = []
         guard !hasAccess else { return }
         do {
-            if offers.count < LibraryPlan.allCases.count {
-                offers = try await loadProducts(LibraryPlan.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
+            if offers.count < InAppPurchases.allCases.count {
+                offers = try await loadProducts(InAppPurchases.allCases.map(\.productID)).filter { $0.type == .autoRenewable }
             }
             // The group, not the selected billing period, determines trial eligibility.
-            var eligible: Set<LibraryPlan> = []
-            for plan in LibraryPlan.allCases {
+            var eligible: Set<InAppPurchases> = []
+            for plan in InAppPurchases.allCases {
                 guard let subscription = offer(for: plan)?.subscription,
                       let intro = subscription.introductoryOffer,
                       intro.paymentMode == .freeTrial,
@@ -188,7 +180,7 @@ extension PurchaseFeature {
         guard revision == entitlementRevision else { return }
         hasAccess = active
         let activeIDs = Set(verified.values.filter { isActive($0) }.map(\.productID))
-        isMonthlySubscriber = activeIDs == [LibraryPlan.monthly.productID]
+        isMonthlySubscriber = activeIDs == [InAppPurchases.monthly.productID]
         scheduleExpirationCheck(at: expiry)
         verificationFailure = active ? nil : failedVerification
         logger.info("Entitlement check finished; access: \(active), verification failure: \(failedVerification != nil)")
@@ -219,7 +211,7 @@ extension PurchaseFeature {
         return LibraryAccess.isActive(expiration: transaction.expirationDate,
             revoked: transaction.revocationDate != nil, upgraded: transaction.isUpgraded, lifetime: lifetime)
     }
-    func purchase(plan: LibraryPlan = .annual) async throws {
+    func purchase(plan: InAppPurchases = .annual) async throws {
         guard !operationInProgress else { return }
         operationInProgress = true
         defer { operationInProgress = false }

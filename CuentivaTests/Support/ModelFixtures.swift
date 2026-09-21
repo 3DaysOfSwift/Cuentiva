@@ -40,7 +40,7 @@ struct MemoryBooks: BookRepository {
     var message: String?
     var refreshCalls = 0
     func refresh() async { refreshCalls += 1 }
-    func purchase(plan: LibraryPlan) async throws { hasAccess = true }
+    func purchase(plan: InAppPurchases) async throws { hasAccess = true }
     var restoresAccess = false
     var restoreFailure: AppFailure?
     func restore() async throws {

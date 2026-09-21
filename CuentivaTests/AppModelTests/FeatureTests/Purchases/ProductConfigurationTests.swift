@@ -28,7 +28,7 @@ import Testing
         let group = try #require(groups.first)
         let subscriptions = try #require(group["subscriptions"] as? [[String: Any]])
         #expect(subscriptions.count == 2)
-        for plan in LibraryPlan.allCases {
+        for plan in InAppPurchases.allCases {
             let product = try #require(subscriptions.first { $0["productID"] as? String == plan.productID })
             #expect(product["type"] as? String == "RecurringSubscription")
             #expect(product["displayPrice"] as? String == (plan == .annual ? "39.99" : "9.99"))

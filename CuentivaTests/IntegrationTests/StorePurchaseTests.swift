@@ -6,7 +6,7 @@ import Testing
 import StoreKitTest
 
 @Suite(.serialized) @MainActor struct StorePurchaseTests {
-    @Test(arguments: LibraryPlan.allCases) func subscriptionSurvivesNewManagerAndRestoresWithoutRepurchase(plan: LibraryPlan) async throws {
+    @Test(arguments: InAppPurchases.allCases) func subscriptionSurvivesNewManagerAndRestoresWithoutRepurchase(plan: InAppPurchases) async throws {
         let configuration = TestResources.repositoryRoot
             .appending(path: "Cuentiva/3 - App Resources/Cuentiva.storekit")
         let session = try SKTestSession(contentsOf: configuration)
@@ -17,7 +17,7 @@ import StoreKitTest
         await purchases.refresh()
         #expect(!purchases.hasAccess)
         #expect(purchases.offers.count == 2)
-        for choice in LibraryPlan.allCases {
+        for choice in InAppPurchases.allCases {
             let product = try #require(purchases.offer(for: choice))
             let intro = try #require(product.subscription?.introductoryOffer)
             #expect(intro.paymentMode == .freeTrial)
