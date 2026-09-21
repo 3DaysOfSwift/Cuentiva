@@ -31,8 +31,13 @@ struct ChatComposerView: View {
                         send()
                     }
                 Button { send() } label: {
-                        Image(systemName: "arrow.up.circle.fill").font(.title)
-                    }.accessibilityLabel("Send message").disabled(!canSend)
+                    Image(systemName: "arrow.up.circle.fill")
+                        .font(.title)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .accessibilityLabel("Send message")
+                .disabled(!canSend)
             }
             if characterCount > ChatLimits.message - 50 {
                 Text("\(characterCount)/\(ChatLimits.message) characters").font(.caption)
