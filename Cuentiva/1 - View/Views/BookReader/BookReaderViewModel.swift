@@ -24,6 +24,7 @@ import Observation
     private(set) var audioEnabled: Bool
     let chapterTwo: Bool
     var revealed: Set<String> = []
+    var showingPagedReader = false
     func passages(_ book: Book) -> [Sentence] { chapterTwo ? (book.continuation ?? []) : book.fullText }
     private(set) var busy = false
     func chapterTitle(_ book: Book, at index: Int) -> String? {

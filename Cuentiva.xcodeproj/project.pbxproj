@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		998FFAD6E07E42B8967D0373 /* PagedBookReaderViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9252C7B749C340F3B4A92AB9; };
+		F61A4A1DE8214C9282395814 /* PagedBookReaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4514D1923FF646CFA70CE52E; };
+		0B4D330AE6A244B8B4CE6519 /* PagedBookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127FB670F1534CEE926A6F0E; };
 		DDC320C6A6D2484CB62A6E9B /* LanguageTipProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F59476B06245399B13FAF1; };
 		8DC845C9711C4CFF935F7F96 /* LanguageTipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF62815E12BE457981117D69; };
 		28FA0FA65D914DBE9A62413B /* AppIconSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2056141D136428298C3AC2F; };
@@ -241,6 +244,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9252C7B749C340F3B4A92AB9 /* PagedBookReaderViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedBookReaderViewModelTests.swift; sourceTree = "<group>"; };
+		4514D1923FF646CFA70CE52E /* PagedBookReaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedBookReaderViewModel.swift; sourceTree = "<group>"; };
+		127FB670F1534CEE926A6F0E /* PagedBookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedBookReaderView.swift; sourceTree = "<group>"; };
 		19F59476B06245399B13FAF1 /* LanguageTipProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/2 - AppModel/Features/LanguageTerms/LanguageTipProgress.swift"; sourceTree = SOURCE_ROOT; };
 		CF62815E12BE457981117D69 /* LanguageTipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/LanguageTerms/LanguageTipView.swift"; sourceTree = SOURCE_ROOT; };
 		C2056141D136428298C3AC2F /* AppIconSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Cuentiva/1 - View/Views/Settings/AppIconSettingsSection.swift"; sourceTree = SOURCE_ROOT; };
@@ -684,6 +690,8 @@
 			isa = PBXGroup;
 			children = (
 				4087CE5A5FE98D91E7F1CD1E /* BookReaderView.swift */,
+				4514D1923FF646CFA70CE52E /* PagedBookReaderViewModel.swift */,
+				127FB670F1534CEE926A6F0E /* PagedBookReaderView.swift */,
 				51D9151D403DB2AEEFB34C3D /* BookReaderViewModel.swift */,
 				FAE881B82542A25F44392FE3 /* ScriptDialogueRow.swift */,
 				7A12102DC4C66B23219F4943 /* StoryParagraphRow.swift */,
@@ -824,6 +832,7 @@
 			children = (
 				C66B458DB16638F61594DB96 /* AuthorViewModelTests.swift */,
 				CE0CFBD1A511C9538FBF9043 /* BookReaderViewModelTests.swift */,
+				9252C7B749C340F3B4A92AB9 /* PagedBookReaderViewModelTests.swift */,
 				BF5FAFDBC00E83CDB562EE5C /* ChatViewModelTests.swift */,
 				5E722E9857514E1495DCCE4A /* SlideToStartViewModelTests.swift */,
 				4D1FF3AE80D944ED98E2C986 /* WhosAppViewModelTests.swift */,
@@ -1376,6 +1385,7 @@
 				B7DB19B6D35ECE09E19D3680 /* TestResources.swift in Sources */,
 				27B0C4899568DE38272362FD /* AuthorViewModelTests.swift in Sources */,
 				971CDD876DA1D77EFDD5ED8B /* BookReaderViewModelTests.swift in Sources */,
+				998FFAD6E07E42B8967D0373 /* PagedBookReaderViewModelTests.swift in Sources */,
 				D572819E077C6613AD147B15 /* ChatViewModelTests.swift in Sources */,
 				A551DB812D8243AEA58263F0 /* SlideToStartViewModelTests.swift in Sources */,
 				CA83BD97E0224A969B235FEF /* WhosAppViewModelTests.swift in Sources */,
@@ -1496,6 +1506,8 @@
 				C80F50B40A63029D8EDA07F4 /* ConfettiBurst.swift in Sources */,
 				F45D8BA38B13E2873ABB4F6E /* LibraryControls.swift in Sources */,
 				A58184BF54F28F1DABEA99A1 /* BookReaderView.swift in Sources */,
+				F61A4A1DE8214C9282395814 /* PagedBookReaderViewModel.swift in Sources */,
+				0B4D330AE6A244B8B4CE6519 /* PagedBookReaderView.swift in Sources */,
 				2E56226E6108F045C5DDCC6D /* BookReaderViewModel.swift in Sources */,
 				79A9103969021DFE95FEAC98 /* ScriptDialogueRow.swift in Sources */,
 				FBF0B8705DC9367B4E818CA9 /* StoryParagraphRow.swift in Sources */,
