@@ -42,6 +42,8 @@ extension ChatFeature {
 
 @MainActor @Observable final class ChatManager: ChatFeature {
     private let progress: any ProgressFeature
+    private let purchases: any PurchaseFeature
+    private var sessionScenario: ConversationScenario?
     private let generator: any ChatGenerator
     private let now: () -> Date
     private var savedReceiptID: UUID?
@@ -68,9 +70,10 @@ extension ChatFeature {
     }
     private(set) var unavailable: String?
     var coins: Int { progress.snapshot.availableChatCoins }
-    var hasAccess: Bool { progress.snapshot.chatUnlocked && (coins >= sessionCost || sessionPaid) }
+    var hasAccess: Bool { purchases.hasAccess && !purchases.checking && progress.snapshot.chatUnlocked && (coins >= sessionCost || sessionPaid) }
 
-    init(generator: any ChatGenerator, progress: any ProgressFeature, now: @escaping () -> Date = Date.init) {
+    init(generator: any ChatGenerator, progress: any ProgressFeature, purchases: any PurchaseFeature, now: @escaping () -> Date = Date.init) {
+        self.purchases = purchases
         self.now = now
         self.progress = progress
         self.generator = generator
@@ -81,6 +84,7 @@ extension ChatFeature {
     func beginSession(id: UUID, context: ConversationContext) {
         guard sessionID != id else { return }
         sessionID = id
+        sessionScenario = context.scenario
         sessionStorageKey = context.storageKey
         sessionCost = context.isRolePlay ? 2 : 1
         let saved = progress.snapshot.chatSessions?[context.storageKey]
@@ -108,7 +112,22 @@ extension ChatFeature {
         sessionAuthorized = false
         sessionConversation = .init()
     }
+    private func validateSessionAccess() throws {
+        guard progress.snapshot.chatUnlocked else {
+            throw AppFailure.unavailable("Storyteller Chat unlocks after you complete \(ReadingMilestones.chatOfferBookCount) books.")
+        }
+        guard purchases.hasAccess, !purchases.checking else {
+            throw AppFailure.unavailable("An active subscription is needed to chat.")
+        }
+        if let scenario = sessionScenario, !progress.snapshot.canStartRolePlay(scenario) {
+            throw AppFailure.unavailable("Complete the previous Role Play before starting this one.")
+        }
+        guard !sessionConversation.scenarioComplete else {
+            throw AppFailure.unavailable("This Role Play has ended. Reset it to practise again.")
+        }
+    }
     func authorizeSession() throws {
+        try validateSessionAccess()
         guard ready, sessionID != nil else { throw AppFailure.unavailable("Please wait for chat to finish loading.") }
         if let unavailable { throw AppFailure.unavailable(unavailable) }
         guard hasAccess else { throw AppFailure.unavailable("You need \(sessionCost) doubloons to begin this conversation.") }
@@ -140,9 +159,7 @@ extension ChatFeature {
         try await send(message, in: ConversationContext(author: author), level: level)
     }
     func send(_ message: String, in context: ConversationContext, level: String) async throws {
-        guard progress.snapshot.chatUnlocked else {
-            throw AppFailure.unavailable("Storyteller Chat unlocks after you complete \(ReadingMilestones.chatOfferBookCount) books.")
-        }
+        try validateSessionAccess()
         guard hasAccess else {
             throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.")
         }
@@ -170,14 +187,17 @@ extension ChatFeature {
         do {
             try Task.checkCancellation()
             guard sessionID == sendingSessionID else { throw CancellationError() }
+            try validateSessionAccess()
             unavailable = await generator.availabilityMessage()
             if let unavailable { throw AppFailure.unavailable(unavailable) }
             try Task.checkCancellation()
             guard sessionID == sendingSessionID else { throw CancellationError() }
+            try validateSessionAccess()
             let reply = try await generator.reply(to: makeRequest(message: text, context: context,
                 level: level, conversation: sessionConversation))
             try Task.checkCancellation()
             guard sessionID == sendingSessionID else { throw CancellationError() }
+            try validateSessionAccess()
             guard ChatLimits.acceptsReply(reply) else {
                 throw AppFailure.unavailable("The storyteller couldn’t finish a short reply. Please try again.")
             }
@@ -204,7 +224,8 @@ extension ChatFeature {
             updated.memory = String(reply.memory.prefix(ChatLimits.memory))
             let saved = try await progress.saveChatReply(authorID: context.storageKey, conversation: updated,
                 receiptID: savedReceiptID, renewing: !sessionPaid, cost: sessionCost)
-            // Payment and transcript survive a close/termination during the save.
+            // The save committed payment and transcript. Publish that confirmed result
+            // even if access changed during persistence; subsequent sends recheck access.
             guard sessionID == sendingSessionID else { throw CancellationError() }
             savedReceiptID = saved.receiptID
             sentInAllowance = saved.sentMessages

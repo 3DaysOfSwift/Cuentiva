@@ -26,8 +26,8 @@ import Testing
             let receipt = number.isMultiple(of: 2)
                 ? try await progress.complete(book: book)
                 : try await progress.completeReading(book: book)
-            #expect(progress.snapshot.writingUnlocked == (number >= 5))
-            #expect(receipt.unlocksWriting == (number == 5))
+            #expect(progress.snapshot.writingUnlocked == (number >= 1))
+            #expect(receipt.unlocksWriting == (number == 1))
             #expect(receipt.requestsReview == (number == 15))
             let repeated = try await progress.completeReading(book: book)
             #expect(!repeated.unlocksWriting)
@@ -42,10 +42,9 @@ import Testing
         try await restored.reset()
         #expect(!restored.snapshot.writingUnlocked)
     }
-    @Test func failedFifthCompletionCannotUnlockWriting() async throws {
+    @Test func failedFirstCompletionCannotUnlockWriting() async throws {
         let repository = MemoryProgress()
-        var saved = LearnerProgress()
-        saved.completed = ["one", "two", "three", "four"]
+        let saved = LearnerProgress()
         try await repository.save(saved)
         let progress = ProgressManager(repository: repository)
         try await progress.load()

@@ -131,7 +131,7 @@ struct SettingsView: View {
                 Text("Your review helps others discover Cuentiva, so we can help more people bring Spanish to life.")
             }.listRowBackground(themeManager.theme.surface)
             Section("Privacy") {
-                Text("Your progress and drafts are stored on this device. Topic chats end when you leave the screen. Storyteller Chat uses on-device Apple Intelligence. Speech recognition is on-device where supported. Recordings are not saved. There are no analytics or advertising SDKs.")
+                Text("Your progress and drafts are stored on this device. Chat transcripts are stored on this device. Paid conversations can resume within ten minutes of leaving, subject to their message allowance. Completed Role Plays must be reset before practising again. Storyteller Chat uses on-device Apple Intelligence. Speech recognition is on-device where supported. Recordings are not saved. There are no analytics or advertising SDKs.")
                 Text("Device backups may include app data. Deleting the app removes its local data; purchases remain with your Apple Account.")
                 Button("Reset learning progress", role: .destructive) { viewModel.resetConfirmation = true }
             }.listRowBackground(themeManager.theme.surface)

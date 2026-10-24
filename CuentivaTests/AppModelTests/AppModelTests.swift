@@ -12,7 +12,7 @@ import Testing
     @Test func compositionKeepsInjectedFeaturesAndSharesAccessAndProgress() async throws {
         let (purchases, progress, library, learning, contributions) = try await makeViewModelTestGraph()
         let fantasy = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
-        let chat = ChatManager(generator: CompositionChatGenerator(), progress: progress)
+        let chat = ChatManager(generator: CompositionChatGenerator(), progress: progress, purchases: TestPurchases(hasAccess: true))
         let audio = TestAudio()
         let app = AppModel(library: library, progress: progress, purchases: purchases,
                            learning: learning, contributions: contributions, fantasy: fantasy,

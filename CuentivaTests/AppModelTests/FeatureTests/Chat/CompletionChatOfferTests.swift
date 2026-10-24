@@ -15,10 +15,10 @@ import Testing
 
 @Suite struct CompletionChatOfferTests {
     @Test(arguments: [0, 5, 10, 11, 12, 100])
-    func offerStartsAtElevenCompletedBooks(total: Int) {
+    func offerStartsAtSecondCompletedBook(total: Int) {
         for isNew in [true, false] {
             let receipt = CompletionReceipt(book: sample(), isNew: isNew, total: total)
-            #expect(receipt.offersChat == (total >= 11))
+            #expect(receipt.offersChat == (total >= 2))
         }
     }
 }

@@ -104,6 +104,15 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     }
     var chatSessions: [String: PaidChatSession]? = nil
     var rolePlayCompletions: [String: Int]? = nil
+    func rolePlayPrerequisite(for scenario: ConversationScenario) -> ConversationScenario? {
+        guard let index = ConversationScenario.catalogue.firstIndex(where: { $0.id == scenario.id }), index > 0 else { return nil }
+        return ConversationScenario.catalogue[index - 1]
+    }
+    func canStartRolePlay(_ scenario: ConversationScenario) -> Bool {
+        guard chatUnlocked, ConversationScenario.catalogue.contains(where: { $0.id == scenario.id }) else { return false }
+        guard let previous = rolePlayPrerequisite(for: scenario) else { return true }
+        return (rolePlayCompletions?[previous.id] ?? 0) > 0
+    }
     var totalRolePlayCompletions: Int { rolePlayCompletions?.values.reduce(0, +) ?? 0 }
     var doubloons: Int? = nil
     /// A paid first reply that has not yet been delivered. Counts as one usable coin.

@@ -248,7 +248,7 @@ private actor GatedProgressRepository: ProgressRepository {
         let store = GatedProgressRepository(initial)
         let progress = ProgressManager(repository: store); try await progress.load()
         let author = Author.demoProfiles[0]
-        let chat = ChatManager(generator: ImmediateChatGenerator(), progress: progress)
+        let chat = ChatManager(generator: ImmediateChatGenerator(), progress: progress, purchases: TestPurchases(hasAccess: true))
         try await chat.prepare()
         let session = UUID(); chat.beginSession(id: session, author: author)
         if chat.hasAccess { try chat.authorizeSession() }
@@ -261,7 +261,7 @@ private actor GatedProgressRepository: ProgressRepository {
         #expect(chat.coins == 0)
         #expect(chat.conversation(for: author).turns.isEmpty)
         let reloaded = ProgressManager(repository: store)
-        let reopened = ChatManager(generator: ImmediateChatGenerator(), progress: reloaded)
+        let reopened = ChatManager(generator: ImmediateChatGenerator(), progress: reloaded, purchases: TestPurchases(hasAccess: true))
         try await reopened.prepare()
         reopened.beginSession(id: UUID(), author: author)
         #expect(reopened.sessionAuthorized)

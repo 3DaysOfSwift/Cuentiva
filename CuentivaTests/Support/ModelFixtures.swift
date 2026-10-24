@@ -41,6 +41,7 @@ struct MemoryBooks: BookRepository {
 }
 
 @MainActor final class TestPurchases: PurchaseFeature {
+    init(hasAccess: Bool = false) { self.hasAccess = hasAccess }
     var hasAccess = false
     var checking = false
     var offers: [Product] { [] }

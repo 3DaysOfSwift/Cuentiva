@@ -59,7 +59,7 @@ import Foundation
         let contributions = ContributionManager(
             repository: LocalContributionRepository(url: directory.appending(path: "drafts.json"), store: store),
             purchases: purchases, progress: progress, topicRepository: LocalTopicRequestRepository())
-        let chat = ChatManager(generator: AppleChatGenerator(), progress: progress)
+        let chat = ChatManager(generator: AppleChatGenerator(), progress: progress, purchases: purchases)
         return .init(
             library: library, progress: progress, purchases: purchases, learning: learning,
             contributions: contributions, fantasy: fantasy, chat: chat, makeAudio: { AppleLessonAudio() })
