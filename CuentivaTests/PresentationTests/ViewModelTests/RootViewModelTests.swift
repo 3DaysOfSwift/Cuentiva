@@ -158,8 +158,7 @@ import Testing
         await launch.value
         #expect(root.canShowContent)
         #expect(root.dailyWelcome != nil)
-        #expect(root.today.dailyReads.map(\.id) == library.books.map(\.id))
-        #expect(root.today.focusedRead?.id == library.books.first?.id)
+        #expect(root.todayPresentation.dailyReads.map(\.id) == library.books.map(\.id))
         #expect(library.dailyPreparations == 0) // Launch prepares display without saving a selection.
 
         purchases.checking = true
@@ -167,7 +166,7 @@ import Testing
         purchases.checking = false
         await root.accessChanged()
         #expect(root.canShowContent)
-        #expect(root.today.dailyReads.map(\.id) == library.books.map(\.id))
+        #expect(root.todayPresentation.dailyReads.map(\.id) == library.books.map(\.id))
         #expect(library.loads == 1)
     }
 

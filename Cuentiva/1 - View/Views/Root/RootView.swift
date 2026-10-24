@@ -17,9 +17,9 @@ struct RootView: View {
     var body: some View {
         Group {
             if let welcome = viewModel.dailyWelcome, viewModel.hasAccess, !viewModel.checkingAccess, viewModel.error == nil {
-                DailyWelcomeView(viewModel: welcome, ready: viewModel.ready) {
+                DailyWelcomeView(welcome: welcome, ready: viewModel.ready) {
                     Task { await viewModel.beginDay() }
-                }.transition(.opacity)
+                }.id(welcome.day).transition(.opacity)
             } else if let tip = viewModel.languageTip, viewModel.ready, !viewModel.checkingAccess {
                 LanguageTipView(term: tip, busy: viewModel.savingTip, error: viewModel.tipError) {
                     Task { await viewModel.continueLanguageTip() }
@@ -28,7 +28,7 @@ struct RootView: View {
                 if viewModel.hasAccess {
                     TabView(selection: $selectedTab) {
                         Tab("Today", systemImage: "sun.max", value: LibraryTab.today) {
-                            NavigationStack { HomeView(viewModel: viewModel.today) }
+                            NavigationStack { HomeView(presentation: viewModel.todayPresentation) }
                         }
                         Tab("Bookstore", systemImage: "books.vertical", value: LibraryTab.bookstore) {
                             NavigationStack { BookstoreView() }

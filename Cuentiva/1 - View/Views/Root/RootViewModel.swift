@@ -10,7 +10,7 @@ import OSLog
 import Observation
 
 @MainActor @Observable final class RootViewModel {
-    private(set) var dailyWelcome: DailyWelcomeViewModel?
+    private(set) var dailyWelcome: DailyWelcome?
     var languageTip: LanguageTerm? {
         guard hasAccess, let id = progress.snapshot.languageTips?.pending else { return nil }
         return LanguageTermsManager.terms.first { $0.id == id }
@@ -26,7 +26,7 @@ import Observation
             showingStoryteller = hasAccess && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
         } catch { tipError = error.localizedDescription }
     }
-    let today: HomeViewModel
+    private(set) var todayPresentation = LibraryPresentation()
     private let progress: any ProgressFeature
     var chatUnlocked: Bool { progress.snapshot.canOfferChat(onSupportedDevice: AppleChatGenerator.supportsDevice) }
     var verbsUnlocked: Bool { progress.snapshot.verbTrainingUnlocked }
@@ -52,7 +52,6 @@ import Observation
         library: any LibraryFeature = AppModel.shared.library,
         progress: any ProgressFeature = AppModel.shared.progress, fantasy: any FantasyFeature = AppModel.shared.fantasy
     ) {
-        today = HomeViewModel(library: library, progress: progress)
         self.progress = progress
         self.fantasy = fantasy
         self.purchases = purchases
@@ -93,24 +92,31 @@ import Observation
 
     private func prepareWelcome() {
         guard hasAccess, !checkingAccess, let welcome = progress.dailyWelcome else { return }
-        guard dailyWelcome?.welcome.day != welcome.day else { return }
-        dailyWelcome = DailyWelcomeViewModel(welcome: welcome, progress: progress)
+        guard dailyWelcome?.day != welcome.day else { return }
+        dailyWelcome = welcome
     }
 
     func beginDay() async {
         guard ready, hasAccess, !checkingAccess, let welcome = dailyWelcome else { return }
-        guard await welcome.beginDay(), dailyWelcome === welcome else { return }
+        guard progress.dailyWelcome == nil else { return }
         // A suspended app may be welcoming a new calendar day. Prepare that
         // day's selection before fading back to the retained Today screen.
         while hasAccess && !checkingAccess && !Task.isCancelled {
-            if await today.refresh() {
-                guard dailyWelcome === welcome, hasAccess, !checkingAccess else { return }
-                today.focusNextRead()
+            if await prepareToday() {
+                guard dailyWelcome == welcome, hasAccess, !checkingAccess else { return }
                 dailyWelcome = nil
                 showingStoryteller = languageTip == nil && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
                 return
             }
         }
+    }
+
+    private func prepareToday() async -> Bool {
+        let revision = library.revision
+        let presentation = await library.presentation(.init(hideCompleted: true, recommendations: true))
+        guard !Task.isCancelled, revision == library.revision else { return false }
+        todayPresentation = presentation
+        return true
     }
 
     func enteredBackground() { hasEnteredBackground = true }
@@ -186,9 +192,8 @@ import Observation
             // introduction loading); never reveal a discarded, empty presentation.
             while hasAccess && !checkingAccess {
                 try Task.checkCancellation()
-                if await today.refresh() {
+                if await prepareToday() {
                     guard hasAccess, !checkingAccess else { return }
-                    today.focusNextRead()
                     ready = true
                     showingStoryteller = dailyWelcome == nil && languageTip == nil && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
                     logger.info("Local library ready in \(Date().timeIntervalSince(started), privacy: .public) seconds; purchase check pending: \(self.purchases.checking, privacy: .public)")

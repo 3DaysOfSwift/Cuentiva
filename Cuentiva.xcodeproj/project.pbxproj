@@ -232,6 +232,12 @@
 		FBF0B8705DC9367B4E818CA9 /* StoryParagraphRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12102DC4C66B23219F4943 /* StoryParagraphRow.swift */; };
 		FE06D8579EF74DCD873EC194 /* DailyMatchSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14DC90D361234FA6BDE655F1 /* DailyMatchSection.swift */; };
 		FE834FDEB145448DA713B9EC /* ChatWallpaperView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B2BD3213494E969F66F84D /* ChatWallpaperView.swift */; };
+		399B0CA5F30B482C9E39EACC /* RolePlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70BF21276A18409599E8E16E /* RolePlayView.swift */; };
+		43BAAA8EC566423BA7EE468E /* RolePlayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA25157C4DF04DC1B80D1E94 /* RolePlayViewModel.swift */; };
+		ADCF54D3E90D42318335DE96 /* UserDoubloonBalance.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC2C8347F9764DA4AA78755E /* UserDoubloonBalance.swift */; };
+		7DD679F126C44B76A6D9F2A6 /* AppIconSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 452AEB5B439049D08A219BDD /* AppIconSettingsViewModel.swift */; };
+		7F72008BD405426CA4B29935 /* RolePlayViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DAB49AB21C84C64B754B963 /* RolePlayViewModelTests.swift */; };
+		576A061EE8B04084AFE66EF9 /* AppIconSettingsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87E1D52C3BB4553874AA8EE /* AppIconSettingsViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -476,6 +482,12 @@
 		FAF1F7B88E6CFD40636811A9 /* LanguageTerm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageTerm.swift; sourceTree = "<group>"; };
 		FBEA330C85B09B99B4DD90F4 /* LessonViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonViewModelTests.swift; sourceTree = "<group>"; };
 		FEDA66EEE66264CF52DCFEEC /* CuentivaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CuentivaApp.swift; sourceTree = "<group>"; };
+		70BF21276A18409599E8E16E /* RolePlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolePlayView.swift; sourceTree = "<group>"; };
+		AA25157C4DF04DC1B80D1E94 /* RolePlayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolePlayViewModel.swift; sourceTree = "<group>"; };
+		EC2C8347F9764DA4AA78755E /* UserDoubloonBalance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDoubloonBalance.swift; sourceTree = "<group>"; };
+		452AEB5B439049D08A219BDD /* AppIconSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconSettingsViewModel.swift; sourceTree = "<group>"; };
+		4DAB49AB21C84C64B754B963 /* RolePlayViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RolePlayViewModelTests.swift; sourceTree = "<group>"; };
+		A87E1D52C3BB4553874AA8EE /* AppIconSettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppIconSettingsViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -501,6 +513,7 @@
 			children = (
 				19F59476B06245399B13FAF1 /* LanguageTipProgress.swift */,
 				CF62815E12BE457981117D69 /* LanguageTipView.swift */,
+				452AEB5B439049D08A219BDD /* AppIconSettingsViewModel.swift */,
 				C2056141D136428298C3AC2F /* AppIconSettingsSection.swift */,
 				81CDBBBEF31346A498C4E703 /* Cuentiva/1 - View/Views/Verbs/VerbWorkoutCelebration.swift */,
 				66E04FE9A0CB4C83946D60F4 /* Cuentiva/2 - AppModel/Features/Verbs/VerbWorkoutSummary.swift */,
@@ -838,6 +851,7 @@
 				9252C7B749C340F3B4A92AB9 /* PagedBookReaderViewModelTests.swift */,
 				BF5FAFDBC00E83CDB562EE5C /* ChatViewModelTests.swift */,
 				5E722E9857514E1495DCCE4A /* SlideToStartViewModelTests.swift */,
+				4DAB49AB21C84C64B754B963 /* RolePlayViewModelTests.swift */,
 				4D1FF3AE80D944ED98E2C986 /* WhosAppViewModelTests.swift */,
 				1C9129A2A53698BDDCAE5C79 /* CompletedViewModelTests.swift */,
 				A06BC0C84136BBC8AE204847 /* CompletionViewModelTests.swift */,
@@ -854,6 +868,7 @@
 				151422DB4C3540E4A7E2DB0E /* DailyWelcomeViewModelTests.swift */,
 				DD365B70E239B51ABC2F2C2A /* SettingsViewModelTests.swift */,
 				026ED7858EC8A278FC40CB0E /* StatsViewModelTests.swift */,
+				A87E1D52C3BB4553874AA8EE /* AppIconSettingsViewModelTests.swift */,
 				534D1ADAE703E0915C35004C /* StorytellerRevealViewModelTests.swift */,
 				F4AB56E8AE5043E61151B268 /* ThemePackGiftViewModelTests.swift */,
 				786EEEE37B2929AB9F86E68C /* VocabularyViewModelTests.swift */,
@@ -993,6 +1008,9 @@
 			children = (
 				2CCE250E765C451FB95023A9 /* ChatView.swift */,
 				3F2A4B2ABE6B48EF9EDA5AAD /* ChatAdmissionView.swift */,
+				70BF21276A18409599E8E16E /* RolePlayView.swift */,
+				AA25157C4DF04DC1B80D1E94 /* RolePlayViewModel.swift */,
+				EC2C8347F9764DA4AA78755E /* UserDoubloonBalance.swift */,
 				9E5CCB2656BB47D5A6E0612C /* WhosAppView.swift */,
 				3CE4343C97CA4159A668F5B9 /* ChatViewModel.swift */,
 				80CD9BB2A9C34A0AA5B9BE9A /* WhosAppViewModel.swift */,
@@ -1391,6 +1409,7 @@
 				998FFAD6E07E42B8967D0373 /* PagedBookReaderViewModelTests.swift in Sources */,
 				D572819E077C6613AD147B15 /* ChatViewModelTests.swift in Sources */,
 				A551DB812D8243AEA58263F0 /* SlideToStartViewModelTests.swift in Sources */,
+				7F72008BD405426CA4B29935 /* RolePlayViewModelTests.swift in Sources */,
 				CA83BD97E0224A969B235FEF /* WhosAppViewModelTests.swift in Sources */,
 				A90CC5802CB4D76B47A8316A /* CompletedViewModelTests.swift in Sources */,
 				8208986408C0507179F399D8 /* CompletionViewModelTests.swift in Sources */,
@@ -1407,6 +1426,7 @@
 				C1F595A5122844E8BFC6F738 /* DailyWelcomeViewModelTests.swift in Sources */,
 				D564166A0EC402FFCDE49C8C /* SettingsViewModelTests.swift in Sources */,
 				8C980AE1F0A8BDA350780F4A /* StatsViewModelTests.swift in Sources */,
+				576A061EE8B04084AFE66EF9 /* AppIconSettingsViewModelTests.swift in Sources */,
 				070F5201A1553D36CFDFB55E /* StorytellerRevealViewModelTests.swift in Sources */,
 				E44925E200BEECA0947644D1 /* ThemePackGiftViewModelTests.swift in Sources */,
 				A34058DDE5EEC1B3B7D70491 /* VocabularyViewModelTests.swift in Sources */,
@@ -1420,6 +1440,7 @@
 			files = (
 				DDC320C6A6D2484CB62A6E9B /* LanguageTipProgress.swift in Sources */,
 				8DC845C9711C4CFF935F7F96 /* LanguageTipView.swift in Sources */,
+				7DD679F126C44B76A6D9F2A6 /* AppIconSettingsViewModel.swift in Sources */,
 				28FA0FA65D914DBE9A62413B /* AppIconSettingsSection.swift in Sources */,
 				7EF46A775B1E4FA2A5FBD63A /* Cuentiva/1 - View/Views/Verbs/VerbWorkoutCelebration.swift in Sources */,
 				FA33200143314BF3BC2618B0 /* Cuentiva/2 - AppModel/Features/Verbs/VerbWorkoutSummary.swift in Sources */,
@@ -1553,6 +1574,9 @@
 				4451EA27691E4ABABCA45FED /* AppleChatGenerator.swift in Sources */,
 				7B1B74AA59434C6CADA577FA /* ChatView.swift in Sources */,
 				F75326F15FD24D1E929AD81B /* ChatAdmissionView.swift in Sources */,
+				399B0CA5F30B482C9E39EACC /* RolePlayView.swift in Sources */,
+				43BAAA8EC566423BA7EE468E /* RolePlayViewModel.swift in Sources */,
+				ADCF54D3E90D42318335DE96 /* UserDoubloonBalance.swift in Sources */,
 				20C6E5BFB4B84241816FDBF4 /* WhosAppView.swift in Sources */,
 				CC73C85CF02E43AD8E94EB86 /* ChatViewModel.swift in Sources */,
 				0BED77D247624760BB6C65D7 /* WhosAppViewModel.swift in Sources */,

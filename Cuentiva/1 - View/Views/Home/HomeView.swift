@@ -12,8 +12,10 @@ struct HomeView: View {
     @State private var carouselWidth: CGFloat = 0
     @Namespace private var revivalCoinAnimation
 
-    init(viewModel: HomeViewModel = HomeViewModel()) {
-        _viewModel = State(initialValue: viewModel)
+    init(presentation: LibraryPresentation = LibraryPresentation()) {
+        let model = HomeViewModel()
+        model.present(presentation)
+        _viewModel = State(initialValue: model)
     }
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase

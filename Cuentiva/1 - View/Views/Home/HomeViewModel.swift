@@ -98,13 +98,12 @@ import Observation
         let requested = refreshID
         let result = await library.presentation(requested.query)
         guard !Task.isCancelled, requested == refreshID else { return false }
-        presentation = result
-        // Publish an explicit selection with the prepared books, before Today mounts.
-        // The visible fallback alone cannot position a newly created scroll view.
-        if !dailyReads.contains(where: { $0.id == focusedBookID }) {
-            focusNextRead()
-        }
+        present(result)
         return true
+    }
+    func present(_ prepared: LibraryPresentation) {
+        presentation = prepared
+        if !dailyReads.contains(where: { $0.id == focusedBookID }) { focusNextRead() }
     }
     var dailyReadsCompleted: Bool { presentation.dailyReadsCompleted }
     var showTomorrowFooter: Bool { dailyReads.count == 3 && dailyReadsCompleted }

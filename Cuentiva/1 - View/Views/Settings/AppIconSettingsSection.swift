@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AppIconSettingsSection: View {
-    @State private var model = StorytellerRevealViewModel(feature: AppModel.shared.fantasy)
+    @State private var model = AppIconSettingsViewModel()
     @Environment(ThemeManager.self) private var theme
     @Environment(\.scenePhase) private var scenePhase
     var body: some View {

@@ -8,7 +8,13 @@
 import SwiftUI
 
 struct DailyWelcomeView: View {
-    let viewModel: DailyWelcomeViewModel
+    @State private var viewModel: DailyWelcomeViewModel
+
+    init(welcome: DailyWelcome, ready: Bool, onBegin: @escaping () -> Void) {
+        _viewModel = State(initialValue: DailyWelcomeViewModel(welcome: welcome, progress: AppModel.shared.progress))
+        self.ready = ready
+        self.onBegin = onBegin
+    }
     let ready: Bool
     let onBegin: () -> Void
     @Environment(ThemeManager.self) private var theme
@@ -29,7 +35,9 @@ struct DailyWelcomeView: View {
                 .foregroundStyle(theme.theme.muted)
             Spacer()
             InlineError(message: viewModel.error)
-            Button(viewModel.buttonTitle, action: onBegin)
+            Button(viewModel.buttonTitle) {
+                Task { if await viewModel.beginDay() { onBegin() } }
+            }
                 .buttonStyle(PrimaryButton())
                 .opacity(viewModel.buttonVisible ? 1 : 0)
                 .disabled(!viewModel.buttonVisible || !ready || viewModel.saving)
