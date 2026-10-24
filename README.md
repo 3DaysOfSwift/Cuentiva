@@ -6,7 +6,7 @@
 
 Cuentiva is a native SwiftUI reading and language-learning app built around short stories, Movie Scripts and verb stories. Its premise is simple: **stop learning Spanish one word at a time and start reading it.** Read at your own pace, listen to Spanish, practise speaking or writing, and encounter vocabulary in context.
 
-Cuentiva combines a shared reading collection with private, personalised fantasy stories created on the device. Public story submission has been retired. Readers can publish one saved AI tale to their own Discover library every seven days, credited to their personal storyteller; nothing is uploaded. New avatars have an 80% chance of being the fox, with existing avatars preserved. The current iOS 26 demo contains **52 original fictional books** across A1, A2 and B1, with private local drafts. The bundled stories are fictional, and personal tales stay on the device.
+Cuentiva combines a shared reading collection with private, personalised fantasy stories created on the device. Public story submission has been retired. Readers can publish one saved AI tale to their own Discover library every seven days, credited to their personal storyteller; nothing is uploaded. New avatars have an 80% chance of being the fox, with existing avatars preserved. The current iOS 26 release candidate contains **52 original fictional books** across A1, A2 and B1, with private local drafts. The bundled stories are fictional, and personal tales stay on the device.
 
 ## Cooperative Feature Architecture (CFA)
 
@@ -20,7 +20,7 @@ Explore the [open-source CFA skills and toolkit](https://github.com/3DaysOfSwift
 
 ## Source availability and licence
 
-Cuentiva is a **production App Store application and a public reference implementation of Cooperative Feature Architecture (CFA)**. Its source is published so iOS developers can inspect a complete SwiftUI application, study its architecture, and see how CFA is applied in a real product.
+Cuentiva is an **iOS release candidate and a public reference implementation of Cooperative Feature Architecture (CFA)**. See [release gates and maintenance](Documentation/RELEASE.md) for the remaining launch evidence. Its source is published so iOS developers can inspect a complete SwiftUI application, study its architecture, and see how CFA is applied in a real product.
 
 The Cuentiva application itself is **source-available, not distributed under an unrestricted open-source software licence**. You may view, download, run privately, study, and learn from the source, and independently apply the architectural concepts and techniques demonstrated here. You may not republish, redistribute, sell, rebrand, submit to an app marketplace, or use this repository as the basis for a clone or substantially similar publicly distributed application without prior written permission.
 

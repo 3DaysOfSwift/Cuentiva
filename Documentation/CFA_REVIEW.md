@@ -1,3 +1,5 @@
+> Current release-hardening work and validation are recorded in [RELEASE.md](RELEASE.md). The review below is historical and does not certify the current build.
+
 # CFA implementation review
 
 Historical review from the initial implementation. For the current storage and startup design, read [the architecture guide](../docs/architecture.md). Earlier simulator results below do not validate the current build.
