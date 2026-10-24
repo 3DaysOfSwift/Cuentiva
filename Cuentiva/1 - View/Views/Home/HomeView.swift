@@ -180,6 +180,7 @@ struct HomeView: View {
                     }.contentMargins(.horizontal, 23, for: .scrollContent)
                         .scrollIndicators(.hidden).padding(.horizontal, -23)
                 }
+                eReaderSection
                 Text(
                     "Open source • Original illustrative stories • Lightweight local AI-enabled library of Spanish stories & tales."
                 ).font(.caption2).foregroundStyle(theme.theme.muted).padding(.top, 8)
@@ -232,12 +233,53 @@ struct HomeView: View {
             .fullScreenCover(isPresented: $viewModel.showingDailyPractice) {
                 NavigationStack { DailyPracticeView(books: viewModel.dailyReads, feature: AppModel.shared.dailyPractice) }
             }
+            .fullScreenCover(item: $viewModel.eReaderBook) { book in
+                NavigationStack { PagedBookReaderView(book: book) }
+            }
             .fullScreenCover(item: $viewModel.practiceBook) { book in
                 NavigationStack { PracticeView(book: book, match: true, challengeDay: viewModel.challengeDay) }
             }
             .fullScreenCover(item: $viewModel.selectedBook, onDismiss: { Task { await viewModel.readingDismissed() } }) { book in
                 NavigationStack { LessonView(book: book) }
             }
+    }
+
+    private var eReaderSection: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            Divider()
+            Label("eReader practice", systemImage: "book.pages")
+                .font(.system(.largeTitle, design: .serif, weight: .medium))
+            Text("Return to familiar stories and read them like a Spanish book. Keep English between the lines for support, then hide it when you feel ready.")
+                .font(.subheadline).foregroundStyle(theme.theme.muted)
+            if viewModel.eReaderBooks.isEmpty {
+                Text("Your last three finished books will appear here. Finish your first book to begin.")
+                    .foregroundStyle(theme.theme.muted)
+                    .padding(20).frame(maxWidth: .infinity, alignment: .leading)
+                    .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
+            } else {
+                ForEach(viewModel.eReaderBooks) { book in
+                    Button { viewModel.openEReader(book) } label: {
+                        HStack(spacing: 16) {
+                            BookCover(book: book, completed: true, compact: true)
+                                .frame(width: 140).scaleEffect(0.5)
+                                .frame(width: 70, height: 110).accessibilityHidden(true)
+                            VStack(alignment: .leading, spacing: 7) {
+                                Text(book.title).font(.system(.title3, design: .serif, weight: .semibold))
+                                Text(book.englishTitle).font(.subheadline).foregroundStyle(theme.theme.muted)
+                                Label("Read again", systemImage: "book.pages")
+                                    .font(.caption.weight(.semibold)).foregroundStyle(theme.theme.accent)
+                            }
+                            Spacer(minLength: 0)
+                            Image(systemName: "chevron.right").foregroundStyle(theme.theme.accent)
+                        }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 20))
+                            .overlay { RoundedRectangle(cornerRadius: 20).stroke(theme.theme.accent.opacity(0.45), lineWidth: 1) }
+                            .contentShape(RoundedRectangle(cornerRadius: 20))
+                    }.buttonStyle(.plain)
+                        .accessibilityLabel("Read \(book.englishTitle) in eReader practice")
+                }
+            }
+        }
     }
 
     private var dailyCarousel: some View {

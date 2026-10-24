@@ -62,6 +62,7 @@ struct LibraryPresentation: Sendable {
     var coverage: [String: String] = [:]
     var formatShowcase: [Book] = []
     var moreBooks: [Book] = []
+    var recentlyFinishedBooks: [Book] = []
 }
 
 @MainActor protocol LibraryFeature: AnyObject, Sendable {
@@ -250,6 +251,7 @@ private actor LibraryWorker {
         } : search(allFormats)
         result.formatCounts = Dictionary(grouping: candidates, by: \.kind).mapValues(\.count)
         result.books = candidates.filter { query.format == nil || $0.kind == query.format }
+        result.recentlyFinishedBooks = input.progress.recentlyFinishedBooks(in: available)
         result.completedTotal = input.progress.completed.count
         result.practiceDays = input.progress.practiceDays.count
         result.doubloons = input.progress.availableChatCoins

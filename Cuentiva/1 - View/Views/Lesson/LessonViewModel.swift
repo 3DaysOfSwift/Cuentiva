@@ -28,7 +28,6 @@ import Observation
     private(set) var showingReader = false
     private(set) var receipt: CompletionReceipt?
     var showingWholeBook = false
-    var showingPagedReader = false
     var showingCompletion = false
     var chapter: Int { guard let book else { return 1 }; return index >= book.chapterThreeStart ? 3 : 1 }
     private(set) var showingChapterCelebration = false

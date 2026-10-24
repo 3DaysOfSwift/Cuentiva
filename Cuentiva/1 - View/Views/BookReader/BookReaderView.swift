@@ -128,18 +128,7 @@ struct BookReaderView: View {
                 }.padding(16).background(theme.theme.paper).dockedAreaBorder()
             }
         }
-        .fullScreenCover(isPresented: $viewModel.showingPagedReader) {
-            NavigationStack { PagedBookReaderView(book: book) }
-        }
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    viewModel.stop()
-                    viewModel.showingPagedReader = true
-                } label: {
-                    Label("Book pages", systemImage: "book.pages")
-                }.accessibilityHint("Read with horizontal pages and optional English")
-            }
             if chapterTwo {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { viewModel.toggleAudio(book) } label: {

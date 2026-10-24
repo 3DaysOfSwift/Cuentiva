@@ -59,6 +59,17 @@ struct LearnerProgress: Codable, Sendable, Equatable {
     // Optional for backward-compatible decoding of existing learner files.
     var bookArrivals: [String: Date]? = nil
     var bookLastRead: [String: Date]? = nil
+    var bookFinishedAt: [String: Date]? = nil
+
+    /// Legacy completions use the best available reading date; ties have a stable order.
+    func recentlyFinishedBooks(in books: [Book], limit: Int = 3) -> [Book] {
+        Array(books.filter { completed.contains($0.id) }.sorted {
+            let left = bookFinishedAt?[$0.id] ?? bookLastRead?[$0.id] ?? .distantPast
+            let right = bookFinishedAt?[$1.id] ?? bookLastRead?[$1.id] ?? .distantPast
+            return left == right ? $0.id < $1.id : left > right
+        }.prefix(max(0, limit)))
+    }
+
     var dailyMatchChallenge: DailyMatchChallenge? = nil
     var dailyReadingDate: Date? = nil
     var dailyReadingIDs: [String]? = nil

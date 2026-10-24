@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B4BFB82FA8B14572B60A80F1 /* ReaderLineBreaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ACC015B2BA04658B5E57065; };
 		998FFAD6E07E42B8967D0373 /* PagedBookReaderViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9252C7B749C340F3B4A92AB9; };
 		F61A4A1DE8214C9282395814 /* PagedBookReaderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4514D1923FF646CFA70CE52E; };
 		0B4D330AE6A244B8B4CE6519 /* PagedBookReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 127FB670F1534CEE926A6F0E; };
@@ -244,6 +245,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4ACC015B2BA04658B5E57065 /* ReaderLineBreaker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReaderLineBreaker.swift; sourceTree = "<group>"; };
 		9252C7B749C340F3B4A92AB9 /* PagedBookReaderViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedBookReaderViewModelTests.swift; sourceTree = "<group>"; };
 		4514D1923FF646CFA70CE52E /* PagedBookReaderViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedBookReaderViewModel.swift; sourceTree = "<group>"; };
 		127FB670F1534CEE926A6F0E /* PagedBookReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PagedBookReaderView.swift; sourceTree = "<group>"; };
@@ -690,6 +692,7 @@
 			isa = PBXGroup;
 			children = (
 				4087CE5A5FE98D91E7F1CD1E /* BookReaderView.swift */,
+				4ACC015B2BA04658B5E57065 /* ReaderLineBreaker.swift */,
 				4514D1923FF646CFA70CE52E /* PagedBookReaderViewModel.swift */,
 				127FB670F1534CEE926A6F0E /* PagedBookReaderView.swift */,
 				51D9151D403DB2AEEFB34C3D /* BookReaderViewModel.swift */,
@@ -1506,6 +1509,7 @@
 				C80F50B40A63029D8EDA07F4 /* ConfettiBurst.swift in Sources */,
 				F45D8BA38B13E2873ABB4F6E /* LibraryControls.swift in Sources */,
 				A58184BF54F28F1DABEA99A1 /* BookReaderView.swift in Sources */,
+				B4BFB82FA8B14572B60A80F1 /* ReaderLineBreaker.swift in Sources */,
 				F61A4A1DE8214C9282395814 /* PagedBookReaderViewModel.swift in Sources */,
 				0B4D330AE6A244B8B4CE6519 /* PagedBookReaderView.swift in Sources */,
 				2E56226E6108F045C5DDCC6D /* BookReaderViewModel.swift in Sources */,

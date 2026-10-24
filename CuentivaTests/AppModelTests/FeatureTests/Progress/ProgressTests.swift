@@ -14,6 +14,54 @@ import Testing
 #endif
 
 @Suite @MainActor struct ProgressTests {
+    @Test func recentFinishedBooksUseCompletionDatesAndSurviveReload() async throws {
+        var now = Date(timeIntervalSince1970: 1_800_000_000)
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository, now: { now })
+        try await progress.load()
+        let books = (0..<4).map { sample("finished-\($0)") }
+        for book in books {
+            try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+            _ = try await progress.complete(book: book)
+            now = now.addingTimeInterval(60)
+        }
+        #expect(progress.snapshot.recentlyFinishedBooks(in: books).map(\.id) == ["finished-3", "finished-2", "finished-1"])
+        // Reading an older book again does not count as finishing it again.
+        try await progress.recordEncounter(book: books[0], sentence: books[0].sentences[0])
+        #expect(progress.snapshot.recentlyFinishedBooks(in: books).first?.id == "finished-3")
+        let restored = ProgressManager(repository: repository)
+        try await restored.load()
+        #expect(restored.snapshot.bookFinishedAt == progress.snapshot.bookFinishedAt)
+        let decoded = try ProgressRecords.decode(ProgressRecords.encode(progress.snapshot))
+        #expect(decoded.bookFinishedAt == progress.snapshot.bookFinishedAt)
+        #expect(decoded.recentlyFinishedBooks(in: books).map(\.id) == ["finished-3", "finished-2", "finished-1"])
+    }
+
+    @Test func failedCompletionDoesNotAddARecentFinishedBook() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let book = sample()
+        try await progress.recordEncounter(book: book, sentence: book.sentences[0])
+        await repository.setFailure(true)
+        await #expect(throws: AppFailure.self) { try await progress.complete(book: book) }
+        #expect(progress.snapshot.bookFinishedAt == nil)
+        #expect(progress.snapshot.recentlyFinishedBooks(in: [book]).isEmpty)
+    }
+
+    @Test func legacyCompletedBooksUseReadingDatesAndExcludeUnfinishedBooks() throws {
+        var saved = LearnerProgress()
+        saved.completed = ["old-a", "old-b", "old-c"]
+        saved.bookLastRead = ["old-a": Date(timeIntervalSince1970: 200), "old-b": Date(timeIntervalSince1970: 300)]
+        let books = [sample("unread"), sample("old-c"), sample("old-a"), sample("old-b")]
+        #expect(saved.recentlyFinishedBooks(in: books).map(\.id) == ["old-b", "old-a", "old-c"])
+        #expect(saved.recentlyFinishedBooks(in: books, limit: 0).isEmpty)
+        let rows = try ProgressRecords.encode(saved).filter { $0.key != "bookFinishedAt" }
+        let decoded = try ProgressRecords.decode(rows)
+        #expect(decoded.bookFinishedAt == nil)
+        #expect(decoded.recentlyFinishedBooks(in: books).map(\.id) == ["old-b", "old-a", "old-c"])
+    }
+
     @Test func dailyBonusRequiresCompletionAndIsOncePerDayAcrossReload() async throws {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))

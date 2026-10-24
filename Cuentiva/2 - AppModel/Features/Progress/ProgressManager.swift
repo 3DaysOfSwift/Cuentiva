@@ -454,6 +454,8 @@ import Observation
                 next.rewardedBooks?.insert(book.id)
             }
             next.completed.insert(book.id)
+            if next.bookFinishedAt == nil { next.bookFinishedAt = [:] }
+            next.bookFinishedAt?[book.id] = now()
             next.positions[book.id] = 0
             if next.celebratedCompletionDays == nil { next.celebratedCompletionDays = [] }
             next.celebratedCompletionDays?.insert(dayKey(now()))

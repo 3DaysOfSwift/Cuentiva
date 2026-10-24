@@ -37,6 +37,9 @@ enum ProgressRecords {
     /// Encode only changed fields and explicitly removed keys, never the full archive.
     static func changes(_ value: LearnerProgress, previous: LearnerProgress?) throws -> RecordChanges {
         var rows = RecordChanges()
+        if previous == nil || previous?.bookFinishedAt != value.bookFinishedAt {
+            rows["bookFinishedAt"] = try RecordCoding.encode(value.bookFinishedAt)
+        }
         if previous == nil || previous?.languageTips != value.languageTips {
             rows["languageTips"] = try RecordCoding.encode(value.languageTips)
         }
@@ -188,6 +191,9 @@ enum ProgressRecords {
             throw AppFailure.unavailable("Your progress records are incomplete.")
         }
         var value = LearnerProgress()
+        if let data = rows["bookFinishedAt"] {
+            value.bookFinishedAt = try RecordCoding.decode([String: Date]?.self, data)
+        }
         if let data = rows["debugVerbTrainingEnabled"] { value.debugVerbTrainingEnabled = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["claimedVerbGift"] { value.claimedVerbGift = try RecordCoding.decode(Bool?.self, data) }
         if let data = rows["languageTips"] { value.languageTips = try RecordCoding.decode(LanguageTipProgress?.self, data) }

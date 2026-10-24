@@ -63,6 +63,12 @@ import Observation
     var showingDailyPractice = false
     var dailyPracticeSession: DailyPracticeSession? { progress.dailyPractice }
     var practiceBook: Book?
+    var eReaderBook: Book?
+    var eReaderBooks: [Book] { presentation.recentlyFinishedBooks }
+    func openEReader(_ book: Book) {
+        guard eReaderBooks.contains(where: { $0.id == book.id }) else { return }
+        eReaderBook = book
+    }
     var challengeDay: String?
     var dailyChallenge: DailyMatchChallenge? { progress.dailyChallenge }
     var challengeBooks: [Book] { dailyReads.filter { dailyChallenge?.bookIDs.contains($0.id) == true } }

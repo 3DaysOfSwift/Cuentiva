@@ -10,6 +10,27 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct HomeViewModelTests {
+    @Test func eReaderShowsTheLastThreeFinishedBooksAndOpensOnlyThose() async throws {
+        let books = (0..<5).map { sample("reader-\($0)") }
+        var saved = LearnerProgress()
+        saved.completed = Set(books.prefix(4).map(\.id))
+        saved.bookFinishedAt = Dictionary(uniqueKeysWithValues: books.prefix(4).enumerated().map {
+            ($0.element.id, Date(timeIntervalSince1970: Double($0.offset + 1)))
+        })
+        let repository = MemoryProgress(); try await repository.save(saved)
+        let progress = ProgressManager(repository: repository); try await progress.load()
+        let purchases = TestPurchases(); purchases.hasAccess = true
+        let library = LibraryManager(repository: MemoryBooks(values: books), purchases: purchases, progress: progress)
+        try await library.load()
+        let home = HomeViewModel(library: library, progress: progress)
+        await home.refresh()
+        #expect(home.eReaderBooks.map(\.id) == ["reader-3", "reader-2", "reader-1"])
+        home.openEReader(books[4])
+        #expect(home.eReaderBook == nil)
+        home.openEReader(books[3])
+        #expect(home.eReaderBook?.id == "reader-3")
+    }
+
     @Test func revivalShowsFailureThenReadingRequirementAfterSavedPayment() async throws {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))

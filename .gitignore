@@ -7,3 +7,4 @@ xcuserdata/
 .env
 .env.*
 backend/node_modules/
+/com.apple.DeveloperTools/

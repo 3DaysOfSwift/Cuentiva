@@ -111,20 +111,11 @@ struct LessonView: View {
                 ToolbarItem(placement: .topBarLeading) { Button { viewModel.stop(); dismiss() } label: { Image(systemName: "xmark") }.accessibilityLabel("Close lesson") }
                 if !viewModel.showingReader {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button {
-                            viewModel.stop()
-                            viewModel.showingPagedReader = true
-                        } label: { Label("Book pages", systemImage: "book.pages") }
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
                         NavigationLink { AuthorView(author: book.storyteller) } label: {
                             AuthorPortrait(author: book.storyteller, size: 44)
                         }.buttonStyle(.plain).accessibilityLabel("About \(book.storytellerName)")
                     }.sharedBackgroundVisibility(.hidden)
                 }
-            }
-            .fullScreenCover(isPresented: $viewModel.showingPagedReader) {
-                NavigationStack { PagedBookReaderView(book: book) }
             }
             .onAppear { viewModel.load(book) }.onDisappear { viewModel.stop() }
             .onChange(of: scenePhase) { _, phase in if phase != .active { viewModel.stop() } }
