@@ -14,6 +14,28 @@ import Testing
 #endif
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct LaunchAccessTests {
+    @Test func cancellationDuringEntitlementReadStopsPurchase() async throws {
+        let gate = PurchasePreparationGate()
+        let purchases = PurchaseManager(readEntitlements: {
+            try? await gate.prepare()
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, observesTransactions: false)
+        var request: Task<Void, Error>?
+        await withCheckedContinuation { started in
+            request = Task {
+                started.resume()
+                try await purchases.purchase()
+            }
+        }
+        let task = try #require(request)
+        defer { gate.finish(); task.cancel() }
+        #expect(gate.calls == 1)
+        task.cancel()
+        gate.finish()
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(!purchases.hasAccess)
+    }
+
     @Test func pendingPurchaseRejectsRepeatedPurchaseAndRestore() async throws {
         let gate = PurchasePreparationGate()
         var entitlementReads = 0

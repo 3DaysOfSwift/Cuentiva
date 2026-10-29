@@ -226,6 +226,7 @@ extension PurchaseFeature {
         try await prepareForPurchase()
         try Task.checkCancellation()
         await updateEntitlements()
+        try Task.checkCancellation()
         guard !hasAccess else { return }
         guard let offer = offer(for: plan) else {
             throw AppFailure.unavailable("Purchase options have not loaded. Please retry.")
