@@ -11,12 +11,26 @@ import Observation
     #if DEBUG
     var verbTrainingPreview: Bool { progress.snapshot.verbTrainingPreview }
     private(set) var changingVerbPreview = false
-    func toggleVerbTrainingPreview() async {
-        guard !changingVerbPreview else { return }
-        changingVerbPreview = true; error = nil
-        defer { changingVerbPreview = false }
-        do { try await progress.setVerbTrainingPreview(!verbTrainingPreview) }
-        catch { self.error = error.localizedDescription }
+    @ObservationIgnored private var verbPreviewTask: Task<Void, Never>?
+    @discardableResult
+    func toggleVerbTrainingPreview() -> Task<Void, Never> {
+        if let verbPreviewTask { return verbPreviewTask }
+        let enabled = !verbTrainingPreview
+        changingVerbPreview = true
+        error = nil
+        let task = Task {
+            defer { changingVerbPreview = false; verbPreviewTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await progress.setVerbTrainingPreview(enabled)
+            } catch is CancellationError {
+                // No failure message for work cancelled before saving.
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+        verbPreviewTask = task
+        return task
     }
     #endif
     private let library: any LibraryFeature

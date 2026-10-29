@@ -16,13 +16,54 @@ import StoreKit
         let (p, s, l, _, _) = try await makeViewModelTestGraph()
         let model = SettingsViewModel(library: l, progress: s, purchases: p)
         #expect(!model.verbTrainingPreview)
-        await model.toggleVerbTrainingPreview()
+        await model.toggleVerbTrainingPreview().value
         #expect(model.verbTrainingPreview)
         #expect(s.snapshot.verbTrainingUnlocked)
         #expect(s.snapshot.practiceDays.isEmpty)
-        await model.toggleVerbTrainingPreview()
+        await model.toggleVerbTrainingPreview().value
         #expect(!model.verbTrainingPreview)
         #expect(!s.snapshot.verbTrainingUnlocked)
+    }
+    @Test func previewToggleCoalescesAndPublishesOnlyAfterSuccessfulSave() async throws {
+        let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
+        let repository = SettingsResetRepository(value: LearnerProgress())
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let model = SettingsViewModel(library: library, progress: progress, purchases: purchases)
+        let first = model.toggleVerbTrainingPreview()
+        let repeated = model.toggleVerbTrainingPreview()
+        #expect(model.changingVerbPreview)
+        await repository.waitForSave()
+        #expect(!model.verbTrainingPreview)
+        #expect(await repository.saveCalls == 1)
+        await repository.release(failing: true)
+        await first.value
+        await repeated.value
+        #expect(!model.changingVerbPreview)
+        #expect(!model.verbTrainingPreview)
+        #expect(model.error != nil)
+        await repository.release(failing: false)
+        await model.toggleVerbTrainingPreview().value
+        #expect(model.verbTrainingPreview)
+        #expect(model.error == nil)
+        #expect(await repository.saveCalls == 2)
+        await model.toggleVerbTrainingPreview().value
+        #expect(!model.verbTrainingPreview)
+    }
+
+    @Test func cancelledPreviewToggleDoesNotSaveOrChangePreview() async throws {
+        let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
+        let repository = SettingsResetRepository(value: LearnerProgress())
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let model = SettingsViewModel(library: library, progress: progress, purchases: purchases)
+        let task = model.toggleVerbTrainingPreview()
+        task.cancel()
+        await task.value
+        #expect(!model.verbTrainingPreview)
+        #expect(!model.changingVerbPreview)
+        #expect(model.error == nil)
+        #expect(await repository.saveCalls == 0)
     }
     #endif
     @Test func settingsRestoreExplainsExistingAndRecoveredAccess() async throws {

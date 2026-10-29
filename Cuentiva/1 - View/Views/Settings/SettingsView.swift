@@ -99,7 +99,7 @@ struct SettingsView: View {
             #if DEBUG
             Section("Developer testing") {
                 Button(viewModel.verbTrainingPreview ? "Disable Verb Training preview" : "Enable Verb Training now") {
-                    Task { await viewModel.toggleVerbTrainingPreview() }
+                    viewModel.toggleVerbTrainingPreview()
                 }.disabled(viewModel.changingVerbPreview)
                 if viewModel.verbTrainingPreview {
                     NavigationLink("Open Verb Training") { VerbTrainingView() }
