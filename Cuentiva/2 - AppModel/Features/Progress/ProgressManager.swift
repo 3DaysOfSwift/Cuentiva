@@ -46,7 +46,7 @@ import Observation
     func recordPractice(book: Book, matches: Int, elapsed: Double?) async throws
     func installThemePack(_ pack: ThemePack) async throws
     func saveChatReply(authorID: String, conversation: ChatConversation, receiptID: UUID?, renewing: Bool, cost: Int) async throws -> PaidChatSession
-    func checkpointChat(authorID: String, receiptID: UUID) async throws
+    func checkpointChat(authorID: String, receiptID: UUID, departedAt: Date) async throws
     func clearChat(authorID: String) async throws
     func payForChat(deliver: @MainActor () -> Bool) async throws
     func reset() async throws
@@ -549,11 +549,11 @@ import Observation
             return session
         }
     }
-    func checkpointChat(authorID: String, receiptID: UUID) async throws {
+    func checkpointChat(authorID: String, receiptID: UUID, departedAt: Date) async throws {
         try await commit { next in
             guard var session = next.chatSessions?[authorID], session.receiptID == receiptID,
                   session.sentMessages < ChatLimits.messagesPerCoin else { return }
-            session.lastActivity = now()
+            session.lastActivity = max(session.lastActivity, departedAt)
             session.resumeUntil = session.lastActivity.addingTimeInterval(ChatLimits.returnWindow)
             next.chatSessions?[authorID] = session
         }

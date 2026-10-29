@@ -452,6 +452,63 @@ private actor ResetGateProgress: ProgressRepository {
         #expect(!chat.sessionAuthorized)
     }
 
+    @Test func failedDepartureCheckpointIsRetriedBeforeChatReopens() async throws {
+        let clock = ChatSessionClock(), repository = MemoryProgress()
+        let progress = try await wallet(1, repository: repository, now: { clock.date })
+        let chat = ChatManager(generator: ChatTestGenerator(), progress: progress,
+            purchases: TestPurchases(hasAccess: true), now: { clock.date })
+        try await chat.prepare()
+        let id = UUID()
+        chat.beginSession(id: id, author: author)
+        try chat.authorizeSession()
+        try await chat.send("Hola", to: author, level: "A2")
+        clock.date += 300
+        await repository.setFailure(true)
+        chat.endSession(id: id)
+        await #expect(throws: AppFailure.self) { try await chat.prepare() }
+        await repository.setFailure(false)
+        clock.date += 100
+        try await chat.prepare()
+        clock.date += 499
+        chat.beginSession(id: UUID(), author: author)
+        #expect(chat.sessionAuthorized)
+        #expect(chat.coins == 0)
+        clock.date += 1
+        chat.beginSession(id: UUID(), author: author)
+        #expect(!chat.sessionAuthorized)
+    }
+
+    @Test func failedCheckpointDoesNotDiscardLaterDeparture() async throws {
+        let clock = ChatSessionClock(), repository = MemoryProgress()
+        let progress = try await wallet(1, repository: repository, now: { clock.date })
+        let chat = ChatManager(generator: ChatTestGenerator(), progress: progress,
+            purchases: TestPurchases(hasAccess: true), now: { clock.date })
+        try await chat.prepare()
+        let first = UUID()
+        chat.beginSession(id: first, author: author)
+        try chat.authorizeSession()
+        try await chat.send("Hola", to: author, level: "A2")
+        clock.date += 300
+        await repository.setFailure(true)
+        chat.endSession(id: first)
+        await #expect(throws: AppFailure.self) { try await chat.prepare() }
+        clock.date += 100
+        let second = UUID()
+        chat.beginSession(id: second, author: author)
+        #expect(chat.sessionAuthorized)
+        chat.endSession(id: second)
+        await #expect(throws: AppFailure.self) { try await chat.prepare() }
+        let lastDeparture = clock.date
+        await repository.setFailure(false)
+        clock.date += 100
+        try await chat.prepare()
+        let saved = try #require(progress.snapshot.chatSessions?[author.id])
+        #expect(saved.resumeUntil == lastDeparture.addingTimeInterval(ChatLimits.returnWindow))
+        #expect(progress.snapshot.availableChatCoins == 0)
+        let persisted = await repository.load()
+        #expect(persisted.chatSessions?[author.id]?.resumeUntil == saved.resumeUntil)
+    }
+
     @Test func leavingStartsTenMinuteReturnWindow() async throws {
         let clock = ChatSessionClock(), repository = MemoryProgress()
         let progress = try await wallet(1, repository: repository, now: { clock.date })

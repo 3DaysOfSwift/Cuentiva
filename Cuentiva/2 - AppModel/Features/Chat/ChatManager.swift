@@ -49,6 +49,7 @@ extension ChatFeature {
     private var savedReceiptID: UUID?
     private var sentInAllowance = 0
     @ObservationIgnored private var checkpointTask: Task<Void, Error>?
+    @ObservationIgnored private var pendingCheckpoints: [(authorID: String, receiptID: UUID, departedAt: Date)] = []
     private var resetInProgress = false
     private var sessionID: UUID?
     private var sessionStorageKey: String?
@@ -98,11 +99,8 @@ extension ChatFeature {
     func endSession(id: UUID) {
         guard sessionID == id else { return }
         if sessionPaid, let storageKey = sessionStorageKey, let receiptID = savedReceiptID {
-            let earlier = checkpointTask
-            checkpointTask = Task {
-                if let earlier { try await earlier.value }
-                try await progress.checkpointChat(authorID: storageKey, receiptID: receiptID)
-            }
+            pendingCheckpoints.append((storageKey, receiptID, now()))
+            savePendingCheckpoints()
         }
         sessionID = nil
         sessionStorageKey = nil
@@ -112,6 +110,19 @@ extension ChatFeature {
         sessionPaid = false
         sessionAuthorized = false
         sessionConversation = .init()
+    }
+    @discardableResult private func savePendingCheckpoints() -> Task<Void, Error> {
+        if let checkpointTask { return checkpointTask }
+        let task = Task {
+            defer { checkpointTask = nil }
+            while let checkpoint = pendingCheckpoints.first {
+                try await progress.checkpointChat(authorID: checkpoint.authorID,
+                    receiptID: checkpoint.receiptID, departedAt: checkpoint.departedAt)
+                pendingCheckpoints.removeFirst()
+            }
+        }
+        checkpointTask = task
+        return task
     }
     private func validateSessionAccess() throws {
         guard progress.snapshot.chatUnlocked else {
@@ -139,10 +150,7 @@ extension ChatFeature {
         preparing = true
         let task = Task { @MainActor in
             try await self.progress.load()
-            if let checkpoint = self.checkpointTask {
-                self.checkpointTask = nil
-                try await checkpoint.value
-            }
+            try await self.savePendingCheckpoints().value
             self.unavailable = await self.generator.availabilityMessage()
             self.ready = true
         }
