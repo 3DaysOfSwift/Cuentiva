@@ -49,6 +49,7 @@ extension ChatFeature {
     private var savedReceiptID: UUID?
     private var sentInAllowance = 0
     @ObservationIgnored private var checkpointTask: Task<Void, Error>?
+    private var resetInProgress = false
     private var sessionID: UUID?
     private var sessionStorageKey: String?
     private(set) var sessionCost = 1
@@ -159,6 +160,7 @@ extension ChatFeature {
         try await send(message, in: ConversationContext(author: author), level: level)
     }
     func send(_ message: String, in context: ConversationContext, level: String) async throws {
+        guard !resetInProgress else { throw AppFailure.busy }
         try validateSessionAccess()
         guard hasAccess else {
             throw AppFailure.unavailable("Complete a story to earn a doubloon for a new chat.")
@@ -260,9 +262,12 @@ extension ChatFeature {
         try await clear(context: ConversationContext(author: author))
     }
     func clear(context: ConversationContext) async throws {
-        guard ready, !busy else { throw AppFailure.busy }
-        guard sessionStorageKey == context.storageKey else { return }
+        guard ready, !busy, !resetInProgress else { throw AppFailure.busy }
+        guard sessionStorageKey == context.storageKey, let clearingSessionID = sessionID else { return }
+        resetInProgress = true
+        defer { resetInProgress = false }
         try await progress.clearChat(authorID: context.storageKey)
+        guard sessionID == clearingSessionID else { return }
         savedReceiptID = nil
         sentInAllowance = 0
         sessionPaid = false

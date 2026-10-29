@@ -29,6 +29,7 @@ import Observation
         else { suggestionTranslations.insert(turn.id) }
     }
     private var sessionID = UUID()
+    @ObservationIgnored private var resetTask: Task<Void, Never>?
     private var replyTasks: [UUID: Task<Void, Never>] = [:]
     enum AdmissionPhase { case ready, accepted, celebrating, balanceUpdated, dismissing, finished }
     private(set) var admissionPhase: AdmissionPhase = .ready
@@ -124,7 +125,11 @@ import Observation
             feature.beginSession(id: preparingSessionID, context: context)
             preparedSession = true
             if feature.sessionPaid { admissionPhase = .finished }
-        } catch { preparationError = error.localizedDescription }
+        } catch {
+            guard !Task.isCancelled, sessionID == preparingSessionID,
+                  !(error is CancellationError) else { return }
+            preparationError = error.localizedDescription
+        }
     }
     func toggleTranslation(for turn: ChatMessage) {
         if !translations.insert(turn.id).inserted { translations.remove(turn.id) }
@@ -174,14 +179,31 @@ import Observation
         return audio.spokenRange
     }
     var audioError: String? { audio.error }
-    func clear() async {
+    // Once dispatched, reset finishes saving even if this screen closes.
+    // Repeated confirmation shares completion; session guards protect a later screen.
+    @discardableResult func clear() -> Task<Void, Never> {
+        if let resetTask { return resetTask }
+        let clearingSessionID = sessionID
+        let task = Task {
+            defer { resetTask = nil }
+            await clearSession(id: clearingSessionID)
+        }
+        resetTask = task
+        return task
+    }
+    private func clearSession(id clearingSessionID: UUID) async {
+        guard sessionID == clearingSessionID else { return }
         spokenMessageID = nil
         audio.stop()
         error = nil
         do {
             try await feature.clear(context: context)
+            guard sessionID == clearingSessionID else { return }
             resetAdmission()
             translations = []; suggestionTranslations = []
-        } catch { self.error = error.localizedDescription }
+        } catch {
+            guard sessionID == clearingSessionID else { return }
+            self.error = error.localizedDescription
+        }
     }
 }

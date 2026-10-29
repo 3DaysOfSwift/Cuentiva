@@ -40,6 +40,24 @@ private actor ChatTestGenerator: ChatGenerator {
             correction: "", suggestion: "Vive en el bosque.", memory: "Discussing a dragon in a forest.")
     }
 }
+private actor ResetGateProgress: ProgressRepository {
+    private var value: LearnerProgress
+    private var paused = false
+    private var continuation: CheckedContinuation<Void, Never>?
+    init(_ value: LearnerProgress) { self.value = value }
+    func load() -> LearnerProgress { value }
+    func pause() { paused = true }
+    func isWaiting() -> Bool { continuation != nil }
+    func resume() {
+        paused = false
+        continuation?.resume()
+        continuation = nil
+    }
+    func save(_ value: LearnerProgress) async {
+        if paused { await withCheckedContinuation { continuation = $0 } }
+        self.value = value
+    }
+}
 @Suite @MainActor struct ChatTests {
     private let author = Author.demoProfiles[0]
     private func waitUntil(_ condition: () async -> Bool) async throws {
@@ -59,6 +77,39 @@ private actor ChatTestGenerator: ChatGenerator {
         try await progress.load()
         return progress
     }
+    @Test func resetCompletionDoesNotClearANewerSession() async throws {
+        var initial = LearnerProgress()
+        initial.doubloons = 3
+        initial.completed = Set((0..<ReadingMilestones.chatOfferBookCount).map { "earned-\($0)" })
+        let repository = ResetGateProgress(initial)
+        let progress = ProgressManager(repository: repository)
+        let chat = ChatManager(generator: ChatTestGenerator(), progress: progress, purchases: TestPurchases(hasAccess: true))
+        try await chat.prepare()
+        chat.beginSession(id: UUID(), author: author)
+        try chat.authorizeSession()
+        try await chat.send("Hola", to: author, level: "A2")
+        let nextAuthor = try #require(Author.demoProfiles.dropFirst().first)
+        await repository.pause()
+        let reset = Task { try await chat.clear(author: author) }
+        do {
+            try await waitUntil { await repository.isWaiting() }
+        } catch {
+            await repository.resume()
+            reset.cancel()
+            _ = await reset.result
+            throw error
+        }
+        await #expect(throws: AppFailure.self) { try await chat.clear(author: author) }
+        await #expect(throws: AppFailure.self) { try await chat.send("Another reply", to: author, level: "A2") }
+        chat.beginSession(id: UUID(), author: nextAuthor)
+        try chat.authorizeSession()
+        #expect(chat.sessionAuthorized)
+        await repository.resume()
+        try await reset.value
+        #expect(chat.sessionAuthorized)
+        #expect(progress.snapshot.chatSessions?[author.id] == nil)
+    }
+
     @Test func expiredAccessCannotAuthorizeOrSend() async throws {
         let purchases = TestPurchases(hasAccess: true)
         let generator = ChatTestGenerator()

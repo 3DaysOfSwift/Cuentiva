@@ -10,6 +10,81 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct ChatViewModelTests {
+    @Test(arguments: [false, true]) func oldResetCannotChangeNewPresentation(fails: Bool) async throws {
+        let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
+        feature.resetPause = { try await gate.pause() }
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        let reset = model.clear()
+        do { try await waitUntil { gate.waiting } }
+        catch { gate.release(); await reset.value; throw error }
+        model.endSession()
+        await model.prepare()
+        let translatedID = UUID()
+        model.translations.insert(translatedID)
+        feature.resetFailure = fails ? AppFailure.unavailable("Old reset failed") : nil
+        gate.release()
+        await reset.value
+        #expect(model.translations.contains(translatedID))
+        #expect(model.error == nil)
+        model.endSession()
+    }
+
+    @Test(arguments: [false, true]) func obsoletePreparationCannotPublishAnError(cancelled: Bool) async throws {
+        let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
+        feature.preparationPause = { try await gate.pause() }
+        feature.preparationFailure = AppFailure.unavailable("Old preparation failed")
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        let oldPreparation = Task { await model.prepare() }
+        do { try await waitUntil { gate.waiting } }
+        catch { gate.release(); await oldPreparation.value; throw error }
+        if cancelled { oldPreparation.cancel() }
+        else {
+            model.endSession()
+            feature.preparationPause = nil
+            feature.preparationFailure = nil
+            await model.prepare()
+            #expect(model.canPresentAdmission)
+        }
+        gate.release()
+        await oldPreparation.value
+        #expect(model.preparationError == nil)
+        model.endSession()
+    }
+
+    @Test func resetDoesNotStartInAReplacementSession() async {
+        let feature = ChatViewModelFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        let reset = model.clear()
+        model.endSession()
+        await reset.value
+        #expect(feature.resetCount == 0)
+    }
+
+    @Test func repeatedResetSharesCompletionAndAllowsRetry() async throws {
+        let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
+        feature.resetPause = { try await gate.pause() }
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        let first = model.clear()
+        do { try await waitUntil { gate.waiting } }
+        catch { gate.release(); await first.value; throw error }
+        let repeated = model.clear()
+        feature.resetFailure = AppFailure.unavailable("Save failed")
+        gate.release()
+        await first.value
+        await repeated.value
+        #expect(feature.resetCount == 1)
+        #expect(model.error != nil)
+        feature.resetFailure = nil
+        feature.resetPause = nil
+        await model.clear().value
+        #expect(feature.resetCount == 2)
+        #expect(model.error == nil)
+        model.endSession()
+    }
+
     @Test func restoredPaidChatBypassesAdmissionAndKeepsTranscript() async {
         let feature = ChatViewModelFeature()
         feature.coins = 0
@@ -84,7 +159,7 @@ import Testing
         model.cancel()
         #expect(model.spokenRange(for: second) == nil)
         model.listen(second)
-        await model.clear()
+        await model.clear().value
         #expect(model.spokenRange(for: second) == nil)
         #expect(audio.spokenRates == [true, true, true])
     }
@@ -169,7 +244,7 @@ import Testing
         model.toggleSuggestionTranslation(turn)
         #expect(model.suggestionTranslations.isEmpty)
         model.toggleSuggestionTranslation(turn)
-        await model.clear()
+        await model.clear().value
         #expect(model.suggestionTranslations.isEmpty)
     }
 
@@ -209,7 +284,7 @@ import Testing
         model.authorizeSession()
         #expect(model.canSend)
         #expect(feature.coins == 1)
-        await model.clear()
+        await model.clear().value
         #expect(!model.canSend)
         model.endSession()
         #expect(!model.canStart)
@@ -340,11 +415,14 @@ import Testing
     var session: UUID?
     var ended: [UUID] = []
     var messages: [String] = []
+    var preparationPause: (() async throws -> Void)?
     var preparationFailure: AppFailure?
     private var replies: [CheckedContinuation<Void, Error>] = []
     var reply: CheckedContinuation<Void, Error>? { replies.first }
     func prepare() async throws {
-        if let preparationFailure { throw preparationFailure }
+        let failure = preparationFailure
+        try await preparationPause?()
+        if let failure { throw failure }
         ready = true
     }
     func beginSession(id: UUID, author: Author) { session = id }
@@ -362,7 +440,17 @@ import Testing
         if let error { pending.resume(throwing: error) }
         else { pending.resume() }
     }
-    func clear(author: Author) async throws { sessionAuthorized = false }
+    var resetCount = 0
+    var resetPause: (() async throws -> Void)?
+    var resetFailure: AppFailure?
+    func clear(author: Author) async throws {
+        resetCount += 1
+        let clearingSession = session
+        try await resetPause?()
+        if let resetFailure { throw resetFailure }
+        guard session == clearingSession else { return }
+        sessionAuthorized = false
+    }
 }
 
 @MainActor private final class AdmissionPauseGate {

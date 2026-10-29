@@ -192,7 +192,7 @@ struct ChatView: View {
             }
         }
         .confirmationDialog(model.context.isRolePlay ? "Start this Role Play again? This clears the current attempt and its remaining allowance. A new attempt costs 2 doubloons." : "Start a new topic? This clears this saved conversation and its remaining allowance. The next topic costs 1 doubloon.", isPresented: $model.confirmingClear, titleVisibility: .visible) {
-            Button(model.context.isRolePlay ? "Start again" : "Start new topic", role: .destructive) { Task { await model.clear() } }
+            Button(model.context.isRolePlay ? "Start again" : "Start new topic", role: .destructive) { model.clear() }
         }
         .onChange(of: model.feature.sessionAuthorized) { _, authorized in
             if !authorized { composing = false; model.resetAdmission() }
