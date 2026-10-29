@@ -14,6 +14,36 @@ import Testing
 #endif
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct LaunchAccessTests {
+    @Test func cancelledRestoreDoesNotStartStoreSyncAndCanRetry() async throws {
+        let gate = PurchasePreparationGate()
+        var syncCalls = 0
+        let purchases = PurchaseManager(readEntitlements: {
+            try? await gate.prepare()
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, syncStore: {
+            syncCalls += 1
+            throw AppFailure.unavailable("Controlled store sync failure")
+        }, observesTransactions: false)
+        var request: Task<Void, Error>?
+        await withCheckedContinuation { started in
+            request = Task {
+                started.resume()
+                try await purchases.restore()
+            }
+        }
+        let task = try #require(request)
+        defer { gate.finish(); task.cancel() }
+        #expect(gate.calls == 1)
+        task.cancel()
+        gate.finish()
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(syncCalls == 0)
+        #expect(!purchases.hasAccess)
+        // A fresh restore can still reach the store after the cancelled caller exits.
+        await #expect(throws: AppFailure.self) { try await purchases.restore() }
+        #expect(syncCalls == 1)
+    }
+
     @Test func cancellationDuringEntitlementReadStopsPurchase() async throws {
         let gate = PurchasePreparationGate()
         let purchases = PurchaseManager(readEntitlements: {

@@ -74,6 +74,7 @@ extension PurchaseFeature {
     @ObservationIgnored private var refreshTask: Task<Void, Never>?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Purchases")
     private let prepareForPurchase: @MainActor () async throws -> Void
+    private let syncStore: @MainActor () async throws -> Void
     private let observesTransactions: Bool
     private let readEntitlements: @MainActor () async -> [VerificationResult<Transaction>]
     private let readLatest: @MainActor (String) async -> VerificationResult<Transaction>?
@@ -90,9 +91,11 @@ extension PurchaseFeature {
         loadProducts: @escaping @MainActor ([String]) async throws -> [Product] = {
             try await Product.products(for: $0)
         },
+        syncStore: @escaping @MainActor () async throws -> Void = { try await AppStore.sync() },
         observesTransactions: Bool = true,
         prepareForPurchase: @escaping @MainActor () async throws -> Void = {}
     ) {
+        self.syncStore = syncStore
         self.prepareForPurchase = prepareForPurchase
         self.observesTransactions = observesTransactions
         self.readEntitlements = readEntitlements
@@ -266,11 +269,12 @@ extension PurchaseFeature {
         operationInProgress = true
         defer { operationInProgress = false }
         await updateEntitlements()
+        try Task.checkCancellation()
         guard !hasAccess else {
             message = nil
             return
         }
-        try await AppStore.sync()
+        try await syncStore()
         await updateEntitlements()
         if !hasAccess {
             throw AppFailure.unavailable(
