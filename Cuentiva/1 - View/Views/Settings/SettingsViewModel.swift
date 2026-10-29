@@ -34,6 +34,7 @@ import Observation
     var reviewURL: URL? { ReadingMilestones.reviewURL }
     var error: String?
     var resetConfirmation = false
+    @ObservationIgnored private var resetTask: Task<Void, Never>?
     @ObservationIgnored private var restoreTask: Task<Void, Never>?
     private(set) var restoring = false
     private(set) var restoreMessage: String?
@@ -41,7 +42,25 @@ import Observation
     var isVIP: Bool { progress.snapshot.isVIP }
     var hasAccess: Bool { purchases.hasAccess }
     init(library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.library = library; self.progress = progress; self.purchases = purchases }
-    func reset() async { do { try await progress.reset() } catch { self.error = error.localizedDescription } }
+    // A confirmed reset belongs to this owner until persistence completes.
+    @discardableResult
+    func reset() -> Task<Void, Never> {
+        if let resetTask { return resetTask }
+        error = nil
+        let task = Task {
+            defer { resetTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await progress.reset()
+            } catch is CancellationError {
+                // A reset cancelled before persistence is not a storage failure.
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+        resetTask = task
+        return task
+    }
     // Repeated requests share completion. A dispatched restore finishes even
     // after this screen closes so the purchase feature can deliver verified access.
     @discardableResult

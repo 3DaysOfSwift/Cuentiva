@@ -54,6 +54,49 @@ import StoreKit
         #expect(vm.restoreError == nil)
         #expect(vm.restoreMessage != nil)
     }
+    @Test func repeatedResetSharesFailureAndRetryPreservesProgressUntilSaved() async throws {
+        let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
+        var saved = LearnerProgress()
+        saved.completed = ["read-book"]
+        let repository = SettingsResetRepository(value: saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let model = SettingsViewModel(library: library, progress: progress, purchases: purchases)
+        let first = model.reset()
+        let repeated = model.reset()
+        await repository.waitForSave()
+        #expect(progress.snapshot.completed == saved.completed)
+        #expect(await repository.saveCalls == 1)
+        await repository.release(failing: true)
+        await first.value
+        await repeated.value
+        #expect(model.error == "Controlled reset failure")
+        #expect(progress.snapshot.completed == saved.completed)
+        #expect(await repository.value.completed == saved.completed)
+        await repository.release(failing: false)
+        await model.reset().value
+        #expect(model.error == nil)
+        #expect(progress.snapshot.completed.isEmpty)
+        #expect(await repository.value.completed.isEmpty)
+        #expect(await repository.saveCalls == 2)
+    }
+
+    @Test func cancelledResetBeforeDispatchPreservesProgressWithoutWriting() async throws {
+        let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
+        var saved = LearnerProgress()
+        saved.completed = ["read-book"]
+        let repository = SettingsResetRepository(value: saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let model = SettingsViewModel(library: library, progress: progress, purchases: purchases)
+        let task = model.reset()
+        task.cancel()
+        await task.value
+        #expect(await repository.saveCalls == 0)
+        #expect(progress.snapshot.completed == saved.completed)
+        #expect(model.error == nil)
+    }
+
     @Test func repeatedRestoreWaitsForTheSameOperationAndFailureAllowsRetry() async throws {
         let (_, progress, library, _, _) = try await makeViewModelTestGraph()
         let purchases = SettingsRestorePurchases()
@@ -146,6 +189,40 @@ import StoreKit
         await withCheckedContinuation { arrival = $0 }
     }
     func release() {
+        released = true
+        pending?.resume()
+        pending = nil
+    }
+}
+
+
+private actor SettingsResetRepository: ProgressRepository {
+    var value: LearnerProgress
+    private(set) var saveCalls = 0
+    private var pending: CheckedContinuation<Void, Never>?
+    private var arrival: CheckedContinuation<Void, Never>?
+    private var released = false
+    private var failing = false
+    init(value: LearnerProgress) { self.value = value }
+    func load() -> LearnerProgress { value }
+    func save(_ next: LearnerProgress) async throws {
+        saveCalls += 1
+        if !released {
+            await withCheckedContinuation {
+                pending = $0
+                arrival?.resume()
+                arrival = nil
+            }
+        }
+        if failing { throw AppFailure.unavailable("Controlled reset failure") }
+        value = next
+    }
+    func waitForSave() async {
+        if pending != nil { return }
+        await withCheckedContinuation { arrival = $0 }
+    }
+    func release(failing: Bool) {
+        self.failing = failing
         released = true
         pending?.resume()
         pending = nil

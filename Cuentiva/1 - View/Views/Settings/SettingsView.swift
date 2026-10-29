@@ -164,6 +164,6 @@ struct SettingsView: View {
             .sheet(item: $viewModel.showingThemePack) { pack in
                 ThemePackGiftView(pack: pack) { viewModel.showingThemePack = nil }
             }
-            .confirmationDialog("Delete learning progress from this device?", isPresented: $viewModel.resetConfirmation, titleVisibility: .visible) { Button("Reset progress", role: .destructive) { Task { await viewModel.reset() } } }
+            .confirmationDialog("Delete learning progress from this device?", isPresented: $viewModel.resetConfirmation, titleVisibility: .visible) { Button("Reset progress", role: .destructive) { viewModel.reset() } }
     }
 }
