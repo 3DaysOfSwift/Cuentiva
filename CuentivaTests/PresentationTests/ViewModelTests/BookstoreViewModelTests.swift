@@ -9,7 +9,48 @@ import Foundation
 import Testing
 @testable import Cuentiva
 
-@Suite @MainActor struct BookstoreViewModelTests {
+@Suite(.timeLimit(.minutes(1))) @MainActor struct BookstoreViewModelTests {
+    @Test func olderSearchCannotReplaceNewerResults() async throws {
+        let library = DelayedLibrary()
+        let model = BookstoreViewModel(library: library, progress: ProgressManager(repository: MemoryProgress()))
+        model.query = "older"
+        let older = try await startRefresh(model)
+        let oldReplyCandidate = library.pending.popLast()
+        let oldReply = try #require(oldReplyCandidate)
+        model.query = "newer"
+        let newer = try await startRefresh(model)
+        let newReplyCandidate = library.pending.popLast()
+        let newReply = try #require(newReplyCandidate)
+        newReply.resume(returning: LibraryPresentation(books: [sample("newer")]))
+        await newer.value
+        oldReply.resume(returning: LibraryPresentation(books: [sample("older")]))
+        await older.value
+        #expect(model.books.map(\.id) == ["newer"])
+    }
+
+    @Test func cancelledSearchDoesNotPublishLateResult() async throws {
+        let library = DelayedLibrary()
+        let model = BookstoreViewModel(library: library, progress: ProgressManager(repository: MemoryProgress()))
+        let refresh = try await startRefresh(model)
+        let replyCandidate = library.pending.popLast()
+        let reply = try #require(replyCandidate)
+        refresh.cancel()
+        reply.resume(returning: LibraryPresentation(books: [sample("obsolete")]))
+        await refresh.value
+        #expect(model.books.isEmpty)
+    }
+
+    private func startRefresh(_ model: BookstoreViewModel) async throws -> Task<Void, Never> {
+        var task: Task<Void, Never>?
+        await withCheckedContinuation { started in
+            task = Task {
+                started.resume()
+                await model.refresh()
+            }
+        }
+        return try #require(task)
+    }
+
     @Test func fullCatalogueHidesCompletedByDefaultAndCanShowThemAgain() async throws {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress())
