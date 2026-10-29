@@ -10,6 +10,39 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct ChatViewModelTests {
+    @Test func queuedPreparationCannotStartInReplacementSession() async {
+        let feature = ChatViewModelFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        let request = model.requestPreparation()
+        model.endSession()
+        await request.value
+        #expect(feature.preparationCount == 0)
+        #expect(!model.canPresentAdmission)
+    }
+
+    @Test func repeatedPreparationSharesCompletionAndCanRetry() async throws {
+        let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
+        feature.preparationPause = { try await gate.pause() }
+        feature.preparationFailure = AppFailure.unavailable("Try again")
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        let first = model.requestPreparation()
+        do { try await waitUntil { gate.waiting } }
+        catch { gate.release(); await first.value; throw error }
+        let repeated = model.requestPreparation()
+        gate.release()
+        await first.value
+        await repeated.value
+        #expect(feature.preparationCount == 1)
+        #expect(model.preparationError != nil)
+        feature.preparationPause = nil
+        feature.preparationFailure = nil
+        await model.requestPreparation().value
+        #expect(feature.preparationCount == 2)
+        #expect(model.canPresentAdmission)
+        #expect(model.preparationError == nil)
+        model.endSession()
+    }
+
     @Test(arguments: [false, true]) func oldResetCannotChangeNewPresentation(fails: Bool) async throws {
         let feature = ChatViewModelFeature(), gate = AdmissionPauseGate()
         feature.resetPause = { try await gate.pause() }
@@ -415,11 +448,13 @@ import Testing
     var session: UUID?
     var ended: [UUID] = []
     var messages: [String] = []
+    var preparationCount = 0
     var preparationPause: (() async throws -> Void)?
     var preparationFailure: AppFailure?
     private var replies: [CheckedContinuation<Void, Error>] = []
     var reply: CheckedContinuation<Void, Error>? { replies.first }
     func prepare() async throws {
+        preparationCount += 1
         let failure = preparationFailure
         try await preparationPause?()
         if let failure { throw failure }

@@ -40,7 +40,7 @@ struct ChatView: View {
                             Label("On-device chat unavailable", systemImage: "iphone.slash")
                                 .font(.headline)
                             Text(unavailable)
-                            Button("Check again") { Task { await model.prepare() } }
+                            Button("Check again") { model.requestPreparation() }
                                 .disabled(model.feature.preparing)
                         }.padding().frame(maxWidth: .infinity, alignment: .leading)
                             .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
@@ -50,7 +50,7 @@ struct ChatView: View {
                             ProgressView("Preparing chat…")
                         } else {
                             Text("Chat couldn’t load. Please try again.")
-                            Button("Try again") { Task { await model.prepare() } }
+                            Button("Try again") { model.requestPreparation() }
                         }
                     } else {
                         ForEach(model.messages) { turn in
@@ -205,7 +205,7 @@ struct ChatView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .background { composing = false; model.endSession() }
             else if phase != .active { model.cancel() }
-            else { Task { await model.prepare() } }
+            else { model.requestPreparation() }
         }
     }
 

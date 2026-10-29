@@ -29,6 +29,8 @@ import Observation
         else { suggestionTranslations.insert(turn.id) }
     }
     private var sessionID = UUID()
+    @ObservationIgnored private var preparationRequest: Task<Void, Never>?
+    @ObservationIgnored private var preparationRequestID: UUID?
     @ObservationIgnored private var resetTask: Task<Void, Never>?
     private var replyTasks: [UUID: Task<Void, Never>] = [:]
     enum AdmissionPhase { case ready, accepted, celebrating, balanceUpdated, dismissing, finished }
@@ -116,6 +118,24 @@ import Observation
         canStart && feature.sessionAuthorized && !scenarioComplete && replyTasks.count < 5
             && ChatLimits.acceptsMessage(draft)
     }
+    @discardableResult func requestPreparation() -> Task<Void, Never> {
+        if let preparationRequest { return preparationRequest }
+        let requestID = UUID()
+        let preparingSessionID = sessionID
+        preparationRequestID = requestID
+        let task = Task {
+            defer {
+                if preparationRequestID == requestID {
+                    preparationRequest = nil
+                    preparationRequestID = nil
+                }
+            }
+            guard !Task.isCancelled, sessionID == preparingSessionID else { return }
+            await prepare()
+        }
+        preparationRequest = task
+        return task
+    }
     func prepare() async {
         let preparingSessionID = sessionID
         preparationError = nil
@@ -160,6 +180,9 @@ import Observation
         audio.stop()
     }
     func endSession() {
+        preparationRequest?.cancel()
+        preparationRequest = nil
+        preparationRequestID = nil
         resetAdmission()
         cancel()
         feature.endSession(id: sessionID)
