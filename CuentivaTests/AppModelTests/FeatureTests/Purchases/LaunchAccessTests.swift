@@ -13,7 +13,38 @@ import Testing
 @testable import Cuentiva
 #endif
 
-@Suite @MainActor struct LaunchAccessTests {
+@Suite(.timeLimit(.minutes(1))) @MainActor struct LaunchAccessTests {
+    @Test func pendingPurchaseRejectsRepeatedPurchaseAndRestore() async throws {
+        let gate = PurchasePreparationGate()
+        var entitlementReads = 0
+        let purchases = PurchaseManager(readEntitlements: {
+            entitlementReads += 1
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, observesTransactions: false,
+            prepareForPurchase: { try await gate.prepare() })
+        var first: Task<Void, Error>?
+        await withCheckedContinuation { started in
+            first = Task {
+                started.resume()
+                try await purchases.purchase()
+            }
+        }
+        let pending = try #require(first)
+        defer { gate.finish(); pending.cancel() }
+        try await purchases.purchase(plan: .monthly)
+        try await purchases.restore()
+        #expect(gate.calls == 1)
+        #expect(entitlementReads == 0)
+        gate.failure = .unavailable("Controlled preparation failure")
+        gate.finish()
+        await #expect(throws: AppFailure.self) { try await pending.value }
+        #expect(!purchases.hasAccess)
+        gate.failure = nil
+        await #expect(throws: AppFailure.self) { try await purchases.purchase() }
+        #expect(gate.calls == 2)
+        #expect(entitlementReads == 1)
+    }
+
     @Test func purchaseWaitsForStorageAndFailureCanRetry() async throws {
         let gate = PurchasePreparationGate()
         var entitlementReads = 0
