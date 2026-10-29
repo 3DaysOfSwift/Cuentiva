@@ -9,7 +9,9 @@ import Foundation
 import Observation
 @MainActor @Observable final class PaywallViewModel {
     private let purchases: any PurchaseFeature
-    var busy = false
+    private(set) var busy = false
+    @ObservationIgnored private var operationTask: Task<Void, Never>?
+    @ObservationIgnored private var reloadTask: Task<Void, Never>?
     var error: String?
     var title: String { "Your next chapter\nis waiting." }
     var selectedPlan: InAppPurchases = .annual
@@ -27,29 +29,58 @@ import Observation
     var annualSaves: Bool { purchases.annualPlanSaves }
     var storeMessage: String? { purchases.message }
     init(purchases: any PurchaseFeature = AppModel.shared.purchases) { self.purchases = purchases }
-    func purchase() async {
-        guard !busy else { return }
+    // Purchase and Restore share one admission gate. Once dispatched, the operation
+    // finishes even if this screen disappears, so verified access can be delivered.
+    @discardableResult
+    func purchase() -> Task<Void, Never> {
+        if let operationTask { return operationTask }
+        let plan = selectedPlan
         busy = true
         error = nil
-        defer { busy = false }
-        do {
-            try await purchases.purchase(plan: selectedPlan)
-        } catch {
-            self.error = error.localizedDescription
+        let task = Task {
+            defer { busy = false; operationTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await purchases.purchase(plan: plan)
+            } catch is CancellationError {
+                // Cancellation before dispatch is not a purchase failure.
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
+        operationTask = task
+        return task
     }
 
-    func restore() async {
-        guard !busy else { return }
+    @discardableResult
+    func restore() -> Task<Void, Never> {
+        if let operationTask { return operationTask }
         busy = true
         error = nil
-        defer { busy = false }
-        do {
-            try await purchases.restore()
-        } catch {
-            self.error = error.localizedDescription
+        let task = Task {
+            defer { busy = false; operationTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await purchases.restore()
+            } catch is CancellationError {
+                // A cancelled restore does not need an error message.
+            } catch {
+                self.error = error.localizedDescription
+            }
         }
+        operationTask = task
+        return task
     }
 
-    func reload() async { await purchases.refresh() }
+    @discardableResult
+    func reload() -> Task<Void, Never> {
+        if let reloadTask { return reloadTask }
+        let task = Task {
+            defer { reloadTask = nil }
+            guard !Task.isCancelled else { return }
+            await purchases.refresh()
+        }
+        reloadTask = task
+        return task
+    }
 }

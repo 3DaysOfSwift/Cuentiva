@@ -81,13 +81,13 @@ struct PaywallView: View {
                 if let trialNotice = viewModel.trialNotice {
                     Text(trialNotice).font(.footnote).foregroundStyle(theme.theme.muted)
                 }
-                Button(viewModel.button) { Task { await viewModel.purchase() } }.buttonStyle(PrimaryButton()).disabled(
+                Button(viewModel.button) { viewModel.purchase() }.buttonStyle(PrimaryButton()).disabled(
                     viewModel.busy || !viewModel.available)
                 if viewModel.busy { ProgressView().frame(maxWidth: .infinity) }
-                Button("Restore purchases") { Task { await viewModel.restore() } }.frame(maxWidth: .infinity).disabled(
+                Button("Restore purchases") { viewModel.restore() }.frame(maxWidth: .infinity).disabled(
                     viewModel.busy)
                 InlineError(message: viewModel.error ?? viewModel.storeMessage)
-                if !viewModel.available { Button("Reload purchase options") { Task { await viewModel.reload() } } }
+                if !viewModel.available { Button("Reload purchase options") { viewModel.reload() } }
                 #if DEBUG
                     Text(
                         "DEMO • The Xcode StoreKit scheme uses a test price. No real payment is taken in local StoreKit testing."
@@ -105,7 +105,7 @@ struct PaywallView: View {
                     }
                 }.font(.caption2)
             }.padding(28)
-        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).task { await viewModel.reload() }
+        }.background(theme.theme.paper).foregroundStyle(theme.theme.ink).task { await viewModel.reload().value }
     }
 
     private func subscriptionReason(_ title: String, detail: String, symbol: String) -> some View {
