@@ -383,6 +383,22 @@ import Testing
         #expect(model.canSend)
     }
 
+    @Test func closingBeforeSendStartsDoesNotDispatchTheMessage() async throws {
+        let feature = ChatViewModelFeature()
+        let model = ChatViewModel(author: Author.demoProfiles[0], feature: feature, audio: TestAudio())
+        await model.prepare()
+        model.authorizeSession()
+        model.draft = "Hola"
+        model.send()
+        model.endSession()
+        try await waitUntil { !model.sending || feature.reply != nil }
+        #expect(feature.messages.isEmpty)
+        feature.finishReply()
+        try await waitUntil { !model.sending }
+        #expect(model.draft.isEmpty)
+        #expect(model.error == nil)
+    }
+
     @Test func endingSessionCancelsReplyAndStopsAudio() async throws {
         let feature = ChatViewModelFeature()
         let audio = TestAudio()

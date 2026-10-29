@@ -164,6 +164,7 @@ import Observation
         error = nil
         replyTasks[requestID] = Task {
             defer { replyTasks[requestID] = nil }
+            guard !Task.isCancelled, sessionID == sendingSession else { return }
             do {
                 try await feature.send(text, in: context, level: sendingLevel)
                 if sessionID == sendingSession, !feature.sessionAuthorized { resetAdmission() }
