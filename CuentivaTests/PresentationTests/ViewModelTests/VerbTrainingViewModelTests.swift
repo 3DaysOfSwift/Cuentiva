@@ -104,7 +104,8 @@ import Testing
     }
     @Test func giftCelebratesOnlyAfterSuccessThenPreparesFirstRep() async throws {
         let repo = MemoryProgress()
-        var saved = LearnerProgress(); saved.practiceDays = Set((1...20).map { String(format: "2026-01-%02d", $0) })
+        var saved = LearnerProgress()
+        saved.completed = Set((0..<ReadingMilestones.verbTrainingBookCount).map { "completed-book-\($0)" })
         try await repo.save(saved)
         let progress = ProgressManager(repository: repo); try await progress.load()
         let purchases = TestPurchases(); purchases.hasAccess = true
@@ -112,10 +113,30 @@ import Testing
         await repo.setFailure(true)
         await model.openGift()
         #expect(model.error != nil && !model.giftCelebrated)
+        #expect(!progress.snapshot.verbTrainingGiftOpened)
         await repo.setFailure(false)
         await model.openGift()
         #expect(model.giftCelebrated)
+        #expect(progress.snapshot.verbTrainingGiftOpened)
         await model.enterGift()
         #expect(!model.giftCelebrated && model.state.phrase != nil)
     }
+    @Test func practiceDaysAloneCannotClaimVerbGift() async throws {
+        let repository = MemoryProgress()
+        var saved = LearnerProgress()
+        saved.practiceDays = Set((1...20).map { String(format: "2026-01-%02d", $0) })
+        saved.completed = Set((0..<(ReadingMilestones.verbTrainingBookCount - 1)).map { "book-\($0)" })
+        try await repository.save(saved)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases(hasAccess: true)
+        let model = VerbTrainingViewModel(feature: VerbTrainingManager(progress: progress, purchases: purchases))
+        #expect(!model.eligible)
+        await model.openGift()
+        #expect(model.error != nil)
+        #expect(!model.giftCelebrated)
+        #expect(!progress.snapshot.verbTrainingGiftOpened)
+        #expect(progress.snapshot.completed == saved.completed)
+    }
+
 }

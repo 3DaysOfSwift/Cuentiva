@@ -11,24 +11,39 @@ import Testing
 
 @Suite @MainActor struct CompletionViewModelTests {
     @Test func nextChapterPreservesWritingGiftAndNormalDismissal() {
-        let fifth = CompletionReceipt(book: sample(), isNew: true, total: 5)
-        let vm = CompletionViewModel(receipt: fifth)
-        #expect(!vm.continueJourney(fifth, practiceAllowed: false))
+        let writingReceipt = CompletionReceipt(book: sample(), isNew: true, total: ReadingMilestones.writingBookCount)
+        let vm = CompletionViewModel(receipt: writingReceipt)
+        #expect(!vm.continueJourney(writingReceipt, practiceAllowed: false))
         #expect(vm.showingWritingMilestone)
-        let ordinary = CompletionReceipt(book: sample(), isNew: true, total: 6)
+        let ordinary = CompletionReceipt(book: sample(), isNew: true, total: 7)
+        #expect(ordinary.themePackGift == nil)
         vm.prepare(ordinary)
         #expect(vm.continueJourney(ordinary, practiceAllowed: false))
         #expect(!vm.showingWritingMilestone)
         #expect(!vm.showingPractice)
     }
 
-    @Test func eleventhNewBookOffersChatGiftButRereadsDoNot() {
-        let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
+    @Test func earnedThemePackIsPresentedInsteadOfDismissing() throws {
+        for pack in ThemePack.allCases {
+            guard let count = pack.requiredBooks else { continue }
+            let receipt = CompletionReceipt(book: sample(), isNew: true, total: count)
+            let model = CompletionViewModel(receipt: receipt)
+            #expect(!model.continueJourney(receipt, practiceAllowed: false))
+            #expect(model.showingThemePack == pack)
+            let reread = CompletionReceipt(book: sample(), isNew: false, total: count)
+            model.prepare(reread)
+            #expect(model.showingThemePack == nil)
+            #expect(model.continueJourney(reread, practiceAllowed: false))
+        }
+    }
+
+    @Test func chatMilestoneOffersGiftButRereadsDoNot() {
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: ReadingMilestones.chatOfferBookCount)
         let model = CompletionViewModel(receipt: receipt, supportsChat: true)
         #expect(receipt.unlocksChat)
         #expect(!model.continueJourney(receipt, practiceAllowed: false))
         #expect(model.showingChatGift)
-        let reread = CompletionReceipt(book: sample(), isNew: false, total: 11)
+        let reread = CompletionReceipt(book: sample(), isNew: false, total: ReadingMilestones.chatOfferBookCount)
         model.prepare(reread)
         #expect(!reread.unlocksChat)
         #expect(!model.showingChatGift)
@@ -36,7 +51,7 @@ import Testing
     }
 
     @Test func unsupportedDeviceNeverOffersChatGift() {
-        let receipt = CompletionReceipt(book: sample(), isNew: true, total: 11)
+        let receipt = CompletionReceipt(book: sample(), isNew: true, total: ReadingMilestones.chatOfferBookCount)
         let model = CompletionViewModel(receipt: receipt, supportsChat: false)
         #expect(!model.offersChatGift(receipt))
         #expect(model.continueJourney(receipt, practiceAllowed: false))
@@ -73,19 +88,19 @@ import Testing
     }
 
     @Test func reviewRequestIsConsumedOnceAndIndependentOfWriting() {
-        let fifth = CompletionReceipt(book: sample(), isNew: true, total: 5)
-        let model = CompletionViewModel(receipt: fifth)
-        model.presentWritingMilestone(fifth)
+        let writingReceipt = CompletionReceipt(book: sample(), isNew: true, total: ReadingMilestones.writingBookCount)
+        let model = CompletionViewModel(receipt: writingReceipt)
+        model.presentWritingMilestone(writingReceipt)
         #expect(model.showingWritingMilestone)
-        #expect(!model.takeReviewRequest(fifth))
+        #expect(!model.takeReviewRequest(writingReceipt))
         model.showingWritingMilestone = false
-        model.presentWritingMilestone(fifth)
+        model.presentWritingMilestone(writingReceipt)
         #expect(!model.showingWritingMilestone)
-        let fifteenth = CompletionReceipt(book: sample(), isNew: true, total: 15)
-        model.prepare(fifteenth)
+        let reviewReceipt = CompletionReceipt(book: sample(), isNew: true, total: ReadingMilestones.reviewBookCount)
+        model.prepare(reviewReceipt)
         #expect(!model.showingWritingMilestone)
-        #expect(model.takeReviewRequest(fifteenth))
-        model.prepare(fifteenth)
-        #expect(!model.takeReviewRequest(fifteenth))
+        #expect(model.takeReviewRequest(reviewReceipt))
+        model.prepare(reviewReceipt)
+        #expect(!model.takeReviewRequest(reviewReceipt))
     }
 }
