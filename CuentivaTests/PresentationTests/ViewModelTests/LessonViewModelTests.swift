@@ -10,9 +10,41 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct LessonViewModelTests {
+    @Test func repeatedAndCompetingReadingActionsShareOneOperation() async throws {
+        let (_, _, _, learning, _) = try await makeViewModelTestGraph()
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(sample(sentences: 3))
+        let first = vm.next()
+        #expect(vm.busy)
+        let duplicate = vm.next()
+        let competing = vm.back()
+        await first.value
+        await duplicate.value
+        await competing.value
+        #expect(vm.index == 1)
+        #expect(!vm.busy)
+        await vm.next().value
+        #expect(vm.index == 2)
+    }
+
+    @Test func cancellationBeforeDispatchDoesNotAdvanceAndAllowsRetry() async throws {
+        let (_, progress, _, learning, _) = try await makeViewModelTestGraph()
+        let vm = LessonViewModel(learning: learning, audio: TestAudio())
+        vm.load(sample(sentences: 2))
+        let initial = progress.snapshot
+        let task = vm.next()
+        task.cancel()
+        await task.value
+        #expect(vm.index == 0)
+        #expect(progress.snapshot == initial)
+        #expect(!vm.busy)
+        await vm.next().value
+        #expect(vm.index == 1)
+    }
+
     @Test func lessonWritesAndCompletesThroughFeature() async throws {
         let (_,_,_,learning,_) = try await makeViewModelTestGraph(); let vm = LessonViewModel(learning: learning, audio: TestAudio())
-        vm.load(sample()); vm.mode = "Write"; vm.answer = "El cafe esta aqui"; await vm.check(); await vm.next()
+        vm.load(sample()); vm.mode = "Write"; vm.answer = "El cafe esta aqui"; await vm.check().value; await vm.next().value
         #expect(vm.feedback?.matched == 1); #expect(vm.receipt != nil); #expect(!vm.showingReader)
     }
 
@@ -25,7 +57,7 @@ import Testing
         vm.load(book)
         vm.readMoreFluently()
         #expect(!vm.showingReader)
-        await vm.next()
+        await vm.next().value
         #expect(vm.showingChapterCelebration)
         #expect(progress.snapshot.completed.isEmpty)
         vm.readMoreFluently()
@@ -44,12 +76,12 @@ import Testing
         book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
         vm.load(book)
         await repository.setFailure(true)
-        await vm.next()
+        await vm.next().value
         #expect(vm.error != nil)
         #expect(!vm.showingChapterCelebration)
         #expect(!vm.showingReader)
         await repository.setFailure(false)
-        await vm.next()
+        await vm.next().value
         #expect(vm.error == nil)
         #expect(vm.showingChapterCelebration)
     }
@@ -62,9 +94,9 @@ import Testing
         #expect(vm.answer == "El cafe")
         vm.mode = "Write"; vm.changeMode()
         #expect(vm.answer == "El cafe"); #expect(!vm.showSpanish)
-        await vm.next()
+        await vm.next().value
         #expect(vm.index == 1); #expect(vm.answer.isEmpty); #expect(vm.error == nil)
-        await vm.back()
+        await vm.back().value
         #expect(vm.answer == "El cafe")
     }
 
@@ -74,7 +106,7 @@ import Testing
         var book = sample()
         book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
         book.ending = [.init(id: "ending", spanish: "Fin.", english: "End.")]
-        vm.load(book); #expect(vm.nextTitle == "Complete chapter 1"); await vm.next()
+        vm.load(book); #expect(vm.nextTitle == "Complete chapter 1"); await vm.next().value
         #expect(vm.showingChapterCelebration); #expect(!vm.showingReader); #expect(vm.error == nil)
         vm.readMoreFluently()
         #expect(vm.showingReader); #expect(!vm.showingChapterCelebration)
@@ -84,7 +116,7 @@ import Testing
         await resumed.chapterTwoFinished(at: next)
         #expect(resumed.chapter == 3); #expect(resumed.sentence?.id == "ending")
         #expect(!resumed.showingReader)
-        await resumed.next()
+        await resumed.next().value
         #expect(resumed.receipt?.isNew == true)
         #expect(!resumed.showingWholeBook); #expect(!resumed.showingCompletion)
         resumed.showingWholeBook = true
@@ -101,9 +133,9 @@ import Testing
         vm.changeMode()
         #expect(vm.answer == "Hola"); #expect(!vm.isPartnerLine)
         #expect(vm.nextTitle == "Next line")
-        await vm.next()
+        await vm.next().value
         #expect(vm.isPartnerLine); #expect(vm.nextTitle == "Complete chapter 1")
-        await vm.next()
+        await vm.next().value
         #expect(vm.receipt?.total == 1); #expect(!vm.showingReader); #expect(vm.error == nil)
     }
 }

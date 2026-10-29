@@ -24,7 +24,8 @@ import Observation
     var slow = false
     var showSpanish = false
     var error: String?
-    var busy = false
+    private(set) var busy = false
+    @ObservationIgnored private var operationTask: Task<Void, Never>?
     private(set) var showingReader = false
     private(set) var receipt: CompletionReceipt?
     var showingWholeBook = false
@@ -94,10 +95,27 @@ import Observation
         recordingTask = nil
         audio.stop()
     }
-    func check() async {
-        guard let book, let sentence, !busy else { return }
+    /// One reading action owns the pending save. Repeated or competing taps
+    /// await that action; closing the screen stops audio but lets a save finish.
+    private func performOperation(_ action: @escaping @MainActor () async -> Void) -> Task<Void, Never> {
+        if let operationTask { return operationTask }
         busy = true
-        defer { busy = false }
+        let task = Task {
+            defer { busy = false; operationTask = nil }
+            guard !Task.isCancelled else { return }
+            await action()
+        }
+        operationTask = task
+        return task
+    }
+
+    @discardableResult
+    func check() -> Task<Void, Never> {
+        performOperation { await self.checkOperation() }
+    }
+
+    private func checkOperation() async {
+        guard let book, let sentence else { return }
         error = nil
         let response = mode == "Speak" ? audio.transcript : answer
         audio.stopRecording()
@@ -105,10 +123,13 @@ import Observation
             self.error = error.localizedDescription
         }
     }
-    func next() async {
-        guard let book, !busy else { return }
-        busy = true
-        defer { busy = false }
+    @discardableResult
+    func next() -> Task<Void, Never> {
+        performOperation { await self.nextOperation() }
+    }
+
+    private func nextOperation() async {
+        guard let book else { return }
         error = nil
         stop()
         do {
@@ -143,10 +164,13 @@ import Observation
         }
     }
 
-    func back() async {
-        guard let book, index > (chapter == 3 ? book.chapterThreeStart : 0), !busy else { return }
-        busy = true
-        defer { busy = false }
+    @discardableResult
+    func back() -> Task<Void, Never> {
+        performOperation { await self.backOperation() }
+    }
+
+    private func backOperation() async {
+        guard let book, index > (chapter == 3 ? book.chapterThreeStart : 0) else { return }
         stop()
         do {
             try await learning.move(book: book, position: index - 1)
