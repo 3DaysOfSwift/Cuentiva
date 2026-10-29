@@ -34,6 +34,7 @@ import Observation
     var reviewURL: URL? { ReadingMilestones.reviewURL }
     var error: String?
     var resetConfirmation = false
+    @ObservationIgnored private var restoreTask: Task<Void, Never>?
     private(set) var restoring = false
     private(set) var restoreMessage: String?
     private(set) var restoreError: String?
@@ -41,21 +42,34 @@ import Observation
     var hasAccess: Bool { purchases.hasAccess }
     init(library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.library = library; self.progress = progress; self.purchases = purchases }
     func reset() async { do { try await progress.reset() } catch { self.error = error.localizedDescription } }
-    func restore() async {
-        guard !restoring else { return }
+    // Repeated requests share completion. A dispatched restore finishes even
+    // after this screen closes so the purchase feature can deliver verified access.
+    @discardableResult
+    func restore() -> Task<Void, Never> {
+        if let restoreTask { return restoreTask }
         restoring = true
-        restoreMessage = nil; restoreError = nil
-        defer { restoring = false }
+        restoreMessage = nil
+        restoreError = nil
         let alreadyOwned = purchases.hasAccess
-        do {
-            try await purchases.restore()
-            if purchases.hasAccess {
-                restoreMessage = alreadyOwned
-                    ? "Your library access is active. You already have full access to Cuentiva."
-                    : "Purchase restored. Your access to Cuentiva is ready."
-            } else {
-                restoreError = "No active purchase was found. Check the Apple Account used for your purchase and try again."
+        let task = Task {
+            defer { restoring = false; restoreTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await purchases.restore()
+                if purchases.hasAccess {
+                    restoreMessage = alreadyOwned
+                        ? "Your library access is active. You already have full access to Cuentiva."
+                        : "Purchase restored. Your access to Cuentiva is ready."
+                } else {
+                    restoreError = "No active purchase was found. Check the Apple Account used for your purchase and try again."
+                }
+            } catch is CancellationError {
+                // Cancellation is neither a successful restore nor a store failure.
+            } catch {
+                restoreError = error.localizedDescription
             }
-        } catch { restoreError = error.localizedDescription }
+        }
+        restoreTask = task
+        return task
     }
 }

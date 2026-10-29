@@ -81,7 +81,7 @@ struct SettingsView: View {
                     Label("Lifetime access active", systemImage: "checkmark.seal.fill")
                         .foregroundStyle(themeManager.theme.accent)
                 }
-                Button { Task { await viewModel.restore() } } label: {
+                Button { viewModel.restore() } label: {
                     HStack {
                         Text(viewModel.restoring ? "Checking purchases…" : "Restore purchases")
                         Spacer()
