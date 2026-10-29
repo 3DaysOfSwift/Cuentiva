@@ -48,6 +48,54 @@ import Testing
         #expect(await repository.load() == progress.snapshot)
     }
 
+    @Test func failedCompletionPreservesProgressAndRetryAwardsOnce() async throws {
+        let book = sample("paid")
+        var initial = LearnerProgress()
+        initial.attempts[book.id] = Set(book.fullText.map(\.id))
+        let repository = CompletionRepository(value: initial)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let feature = LearningManager(purchases: purchases, progress: progress)
+
+        let completion = Task { try await feature.finish(book) }
+        await repository.waitForSave()
+        await repository.release(failing: true)
+        await #expect(throws: AppFailure.self) { try await completion.value }
+        #expect(progress.snapshot == initial)
+        #expect(await repository.load() == initial)
+
+        await repository.release()
+        #expect(try await feature.finish(book).isNew)
+        #expect(!(try await feature.finish(book)).isNew)
+        #expect(progress.snapshot.doubloons == 1)
+        #expect(await repository.load() == progress.snapshot)
+    }
+
+    @Test func cancellationDuringSuccessfulCompletionSaveStillPublishesCommittedReward() async throws {
+        let book = sample("paid")
+        var initial = LearnerProgress()
+        initial.attempts[book.id] = Set(book.fullText.map(\.id))
+        let repository = CompletionRepository(value: initial)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let feature = LearningManager(purchases: purchases, progress: progress)
+
+        let completion = Task { try await feature.finish(book) }
+        await repository.waitForSave()
+        completion.cancel()
+        #expect(progress.snapshot == initial)
+        await repository.release()
+        #expect(try await completion.value.isNew)
+        #expect(progress.snapshot.doubloons == 1)
+        #expect(await repository.load() == progress.snapshot)
+        #expect(!(try await feature.finish(book)).isNew)
+        #expect(progress.snapshot.doubloons == 1)
+    }
+
     @Test func threeChaptersResumeAndCannotCompleteBeforeTheEnding() async throws {
         let repository = MemoryProgress()
         let progress = ProgressManager(repository: repository); try await progress.load()
@@ -166,10 +214,11 @@ private actor CompletionRepository: ProgressRepository {
     private var pending: CheckedContinuation<Void, Never>?
     private var arrival: CheckedContinuation<Void, Never>?
     private var released = false
+    private var failing = false
 
     init(value: LearnerProgress) { self.value = value }
     func load() -> LearnerProgress { value }
-    func save(_ next: LearnerProgress) async {
+    func save(_ next: LearnerProgress) async throws {
         if !released {
             await withCheckedContinuation {
                 pending = $0
@@ -177,13 +226,15 @@ private actor CompletionRepository: ProgressRepository {
                 arrival = nil
             }
         }
+        if failing { throw AppFailure.unavailable("Controlled completion failure") }
         value = next
     }
     func waitForSave() async {
         if pending != nil { return }
         await withCheckedContinuation { arrival = $0 }
     }
-    func release() {
+    func release(failing: Bool = false) {
+        self.failing = failing
         released = true
         pending?.resume()
         pending = nil
