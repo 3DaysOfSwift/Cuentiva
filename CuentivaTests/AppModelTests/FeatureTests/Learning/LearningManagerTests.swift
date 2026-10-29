@@ -13,7 +13,41 @@ import Testing
 @testable import Cuentiva
 #endif
 
-@Suite @MainActor struct LearningManagerTests {
+@Suite(.timeLimit(.minutes(1))) @MainActor struct LearningManagerTests {
+    @Test func overlappingCompletionsAwardOnlyOneRewardAfterPersistence() async throws {
+        let book = sample("paid")
+        var initial = LearnerProgress()
+        initial.attempts[book.id] = Set(book.fullText.map(\.id))
+        let repository = CompletionRepository(value: initial)
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let feature = LearningManager(purchases: purchases, progress: progress)
+
+        let first = Task { try await feature.finish(book) }
+        await repository.waitForSave()
+        #expect(progress.snapshot == initial)
+        var secondCompletion: Task<CompletionReceipt, Error>?
+        await withCheckedContinuation { (started: CheckedContinuation<Void, Never>) in
+            let task = Task {
+                started.resume(returning: ())
+                return try await feature.finish(book)
+            }
+            // The caller resumes only after this MainActor task reaches its await.
+            secondCompletion = task
+        }
+        await repository.release()
+        let firstReceipt = try await first.value
+        let secondTask = try #require(secondCompletion)
+        let secondReceipt = try await secondTask.value
+        #expect(firstReceipt.isNew)
+        #expect(!secondReceipt.isNew)
+        #expect(progress.snapshot.doubloons == 1)
+        #expect(progress.snapshot.completed == [book.id])
+        #expect(await repository.load() == progress.snapshot)
+    }
+
     @Test func threeChaptersResumeAndCannotCompleteBeforeTheEnding() async throws {
         let repository = MemoryProgress()
         let progress = ProgressManager(repository: repository); try await progress.load()
@@ -124,5 +158,34 @@ import Testing
         }
         #expect(await repository.saveAttempts == 0)
         #expect(progress.snapshot.completed.isEmpty)
+    }
+}
+
+private actor CompletionRepository: ProgressRepository {
+    private var value: LearnerProgress
+    private var pending: CheckedContinuation<Void, Never>?
+    private var arrival: CheckedContinuation<Void, Never>?
+    private var released = false
+
+    init(value: LearnerProgress) { self.value = value }
+    func load() -> LearnerProgress { value }
+    func save(_ next: LearnerProgress) async {
+        if !released {
+            await withCheckedContinuation {
+                pending = $0
+                arrival?.resume()
+                arrival = nil
+            }
+        }
+        value = next
+    }
+    func waitForSave() async {
+        if pending != nil { return }
+        await withCheckedContinuation { arrival = $0 }
+    }
+    func release() {
+        released = true
+        pending?.resume()
+        pending = nil
     }
 }
