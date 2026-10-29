@@ -10,7 +10,7 @@ import SwiftUI
 struct BookReaderView: View {
     let book: Book
     let chapterTwo: Bool
-    let onChapterFinished: ((Int) async -> Void)?
+    let onChapterFinished: (@MainActor (Int) async -> Void)?
     let onFinish: (() -> Void)?
     @State private var viewModel: BookReaderViewModel
     @Environment(ThemeManager.self) private var theme
@@ -18,7 +18,7 @@ struct BookReaderView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    init(book: Book, chapterTwo: Bool = false, onChapterFinished: ((Int) async -> Void)? = nil,
+    init(book: Book, chapterTwo: Bool = false, onChapterFinished: (@MainActor (Int) async -> Void)? = nil,
          onFinish: (() -> Void)? = nil) {
         self.book = book; self.chapterTwo = chapterTwo
         self.onChapterFinished = onChapterFinished; self.onFinish = onFinish
@@ -91,9 +91,7 @@ struct BookReaderView: View {
                     InlineError(message: viewModel.error ?? viewModel.audio.error)
                     Button(chapterTwo ? "Continue to Chapter 3 →" : "Finish reading ✓") {
                         if chapterTwo {
-                            Task {
-                                if let position = await viewModel.finishChapter(book) { await onChapterFinished?(position) }
-                            }
+                            viewModel.finishChapter(book, onFinished: onChapterFinished)
                         } else if let onFinish { onFinish() }
                         else { dismiss() }
                     }.buttonStyle(PrimaryButton()).disabled(viewModel.busy)

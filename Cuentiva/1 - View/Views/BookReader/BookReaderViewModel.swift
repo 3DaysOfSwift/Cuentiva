@@ -26,6 +26,7 @@ import Observation
     var revealed: Set<String> = []
     func passages(_ book: Book) -> [Sentence] { chapterTwo ? (book.continuation ?? []) : book.fullText }
     private(set) var busy = false
+    @ObservationIgnored private var completionTask: Task<Int?, Never>?
     func chapterTitle(_ book: Book, at index: Int) -> String? {
         if chapterTwo { return index == 0 ? "Chapter 2" : nil }
         if index == 0 { return "Chapter 1" }
@@ -121,10 +122,29 @@ import Observation
         audio.stop(); activeIndex = nil; guideRange = nil
         if chapterTwo { audioEnabled = false }
     }
-    func finishChapter(_ book: Book) async -> Int? {
-        guard !busy else { return nil }
-        busy = true; defer { busy = false }; error = nil; stop()
-        do { return try await learning.finishChapterTwo(book) }
-        catch { self.error = error.localizedDescription; return nil }
+    @discardableResult
+    func finishChapter(_ book: Book, onFinished: (@MainActor (Int) async -> Void)? = nil) -> Task<Int?, Never> {
+        if let completionTask { return completionTask }
+        busy = true
+        error = nil
+        stop()
+        let task = Task<Int?, Never> {
+            defer { busy = false; completionTask = nil }
+            do {
+                try Task.checkCancellation()
+                let position = try await learning.finishChapterTwo(book)
+                // Keep ownership through the parent's transition, including any
+                // final reward save. Repeated taps must not repeat that callback.
+                await onFinished?(position)
+                return position
+            } catch is CancellationError {
+                return nil
+            } catch {
+                self.error = error.localizedDescription
+                return nil
+            }
+        }
+        completionTask = task
+        return task
     }
 }

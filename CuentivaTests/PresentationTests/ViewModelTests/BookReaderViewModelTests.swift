@@ -10,6 +10,52 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct BookReaderViewModelTests {
+    @Test func chapterCompletionStaysBusyUntilParentTransitionFinishes() async throws {
+        let progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let learning = LearningManager(purchases: TestPurchases(), progress: progress)
+        var book = sample()
+        book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
+        _ = try await learning.advance(book: book, from: 0)
+        let model = BookReaderViewModel(chapterTwo: true, learning: learning, audio: TestAudio())
+        let transition = ReaderWordGate()
+        defer { transition.release() }
+        let first = model.finishChapter(book) { _ in await transition.wait() }
+        try await waitUntil { transition.pending != nil }
+        #expect(model.busy)
+        let repeated = model.finishChapter(book) { _ in await transition.wait() }
+        model.stop()
+        #expect(model.busy)
+        transition.release()
+        #expect(await first.value == book.chapterThreeStart)
+        #expect(await repeated.value == book.chapterThreeStart)
+        #expect(transition.calls == 1)
+        #expect(!model.busy)
+        #expect(progress.snapshot.attempts[book.id]?.contains("middle") == true)
+    }
+
+    @Test func failedChapterCompletionDoesNotTransitionAndCanRetry() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let learning = LearningManager(purchases: TestPurchases(), progress: progress)
+        var book = sample()
+        book.continuation = [.init(id: "middle", spanish: "Sigue.", english: "Continues.")]
+        _ = try await learning.advance(book: book, from: 0)
+        let model = BookReaderViewModel(chapterTwo: true, learning: learning, audio: TestAudio())
+        var transitions = 0
+        await repository.setFailure(true)
+        #expect(await model.finishChapter(book) { _ in transitions += 1 }.value == nil)
+        #expect(transitions == 0)
+        #expect(model.error != nil)
+        #expect(!model.busy)
+        await repository.setFailure(false)
+        #expect(await model.finishChapter(book) { _ in transitions += 1 }.value == book.chapterThreeStart)
+        #expect(transitions == 1)
+        #expect(model.error == nil)
+        #expect(!model.busy)
+    }
+
     @Test func wholeBookIncludesEndingWithNoAutomaticAudioOrTranslations() async throws {
         let purchases = TestPurchases(); purchases.hasAccess = true
         let progress = ProgressManager(repository: MemoryProgress()); try await progress.load()
@@ -110,7 +156,7 @@ import Testing
         for _ in 0..<100 where vm.audioEnabled { await Task.yield() }
         #expect(!vm.audioEnabled)
         #expect(progress.snapshot.completed.isEmpty)
-        #expect(await vm.finishChapter(book) == 3)
+        #expect(await vm.finishChapter(book).value == 3)
         #expect(progress.snapshot.completed.isEmpty)
         #expect(progress.snapshot.attempts[book.id] == ["a", "b", "c"])
     }
