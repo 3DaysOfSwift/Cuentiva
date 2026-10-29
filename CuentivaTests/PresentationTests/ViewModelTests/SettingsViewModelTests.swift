@@ -54,6 +54,56 @@ import StoreKit
         #expect(vm.restoreError == nil)
         #expect(vm.restoreMessage != nil)
     }
+    @Test func libraryRefreshCoalescesAndRetriesWithoutReplacingCurrentBooks() async throws {
+        let purchases = TestPurchases(hasAccess: true)
+        let progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let repository = SettingsSyncRepository()
+        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
+        try await library.load()
+        let model = SettingsViewModel(library: library, progress: progress, purchases: purchases)
+        let first = model.syncLibrary()
+        let repeated = model.syncLibrary()
+        await repository.waitForSync()
+        #expect(model.syncing)
+        #expect(await repository.calls == 1)
+        await repository.release()
+        await first.value
+        await repeated.value
+        #expect(!model.syncing)
+        #expect(model.syncMessage?.contains("Couldn’t update") == true)
+        #expect(library.books.map(\.id) == ["cafe"])
+        await repository.setFailure(false)
+        await model.syncLibrary().value
+        #expect(await repository.calls == 2)
+        #expect(model.syncMessage?.contains("Library checked") == true)
+        #expect(library.books.map(\.id) == ["cafe"])
+    }
+
+    @Test func cancelledLibraryRefreshCanRetryWithoutFalseFailure() async throws {
+        let purchases = TestPurchases(hasAccess: true)
+        let progress = ProgressManager(repository: MemoryProgress())
+        try await progress.load()
+        let repository = SettingsSyncRepository()
+        let library = LibraryManager(repository: repository, purchases: purchases, progress: progress)
+        let model = SettingsViewModel(library: library, progress: progress, purchases: purchases)
+        let beforeDispatch = model.syncLibrary()
+        beforeDispatch.cancel()
+        await beforeDispatch.value
+        #expect(await repository.calls == 0)
+        let dispatched = model.syncLibrary()
+        await repository.waitForSync()
+        dispatched.cancel()
+        await repository.release()
+        await dispatched.value
+        #expect(!model.syncing)
+        #expect(model.syncMessage == nil)
+        await repository.setFailure(false)
+        await model.syncLibrary().value
+        #expect(await repository.calls == 2)
+        #expect(model.syncMessage?.contains("Library checked") == true)
+    }
+
     @Test func repeatedResetSharesFailureAndRetryPreservesProgressUntilSaved() async throws {
         let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
         var saved = LearnerProgress()
@@ -227,4 +277,37 @@ private actor SettingsResetRepository: ProgressRepository {
         pending?.resume()
         pending = nil
     }
+}
+
+
+private actor SettingsSyncRepository: SyncingBookRepository {
+    private(set) var calls = 0
+    private var pending: CheckedContinuation<Void, Never>?
+    private var arrival: CheckedContinuation<Void, Never>?
+    private var released = false
+    private var failing = true
+    func books() -> [Book] { [sample()] }
+    func sync() async throws -> [Book] {
+        calls += 1
+        if !released {
+            await withCheckedContinuation {
+                pending = $0
+                arrival?.resume()
+                arrival = nil
+            }
+        }
+        try Task.checkCancellation()
+        if failing { throw AppFailure.unavailable("Controlled sync failure") }
+        return [sample("new-book")]
+    }
+    func waitForSync() async {
+        if pending != nil { return }
+        await withCheckedContinuation { arrival = $0 }
+    }
+    func release() {
+        released = true
+        pending?.resume()
+        pending = nil
+    }
+    func setFailure(_ value: Bool) { failing = value }
 }

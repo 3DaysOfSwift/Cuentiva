@@ -153,11 +153,15 @@ extension LibraryFeature {
     }
     func sync() async {
         guard purchases.hasAccess, !purchases.checking, !syncing, let repository = repository as? any SyncingBookRepository else { return }
+        guard !Task.isCancelled else { return }
         syncing = true
+        syncMessage = nil
         defer { syncing = false }
         do {
             _ = try await repository.sync()
             syncMessage = "Library checked. Any new books are prepared for your next launch."
+        } catch is CancellationError {
+            // An abandoned refresh is not a connectivity failure.
         } catch {
             syncMessage =
                 "Couldn’t update the library. Your current books are still available. Try again when you’re connected."

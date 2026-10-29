@@ -22,7 +22,18 @@ import Observation
     private let library: any LibraryFeature
     var syncing: Bool { library.syncing }
     var syncMessage: String? { library.syncMessage }
-    func syncLibrary() async { await library.sync() }
+    @ObservationIgnored private var syncTask: Task<Void, Never>?
+    @discardableResult
+    func syncLibrary() -> Task<Void, Never> {
+        if let syncTask { return syncTask }
+        let task = Task {
+            defer { syncTask = nil }
+            guard !Task.isCancelled else { return }
+            await library.sync()
+        }
+        syncTask = task
+        return task
+    }
     var chatUnlocked: Bool { progress.snapshot.canOfferChat(onSupportedDevice: AppleChatGenerator.supportsDevice) }
     private let progress: any ProgressFeature
     private let purchases: any PurchaseFeature

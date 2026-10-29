@@ -116,7 +116,7 @@ struct SettingsView: View {
                     .font(.footnote).foregroundStyle(themeManager.theme.muted)
             }.listRowBackground(themeManager.theme.surface)
             Section("Community library") {
-                Button { Task { await viewModel.syncLibrary() } } label: {
+                Button { viewModel.syncLibrary() } label: {
                     HStack { Text(viewModel.syncing ? "Updating library…" : "Update library"); Spacer(); if viewModel.syncing { ProgressView() } }
                 }.disabled(viewModel.syncing).foregroundStyle(themeManager.theme.accent)
                 if let message = viewModel.syncMessage { Text(message).font(.footnote).foregroundStyle(themeManager.theme.muted) }
