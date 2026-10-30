@@ -75,6 +75,85 @@ import Testing
         #expect(model.session?.missingIndex == 1)
     }
 
+    @Test(.timeLimit(.minutes(1)), arguments: [false, true], [false, true])
+    func sceneAndStopWaitForSavingAndCanRetry(stop: Bool, fail: Bool) async throws {
+        let repository = HeldDailyPracticeSave()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let books = (0..<3).map { sample("scene\($0)", sentences: 4) }
+        try await progress.saveDailyReading(books.map(\.id), date: .now)
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let feature = DailyPracticeManager(progress: progress, purchases: purchases)
+        let model = DailyPracticeViewModel(books: books, feature: feature)
+        await model.prepare().value
+        model.select(.sentenceTrail)
+        if stop {
+            let firstWord = try #require(model.session?.currentTrail.words.first)
+            await model.choose(firstWord).value
+            #expect(model.session?.trailScore == 1)
+        }
+        let before = progress.snapshot
+        await repository.holdNextSave(failing: fail)
+        let action = stop ? model.stop() : model.scenario(.coffee)
+        await repository.waitForSave()
+        #expect(model.busy)
+        #expect(progress.snapshot == before)
+        let repeated = stop ? model.stop() : model.scenario(.coffee)
+        #expect(action == repeated)
+        #expect(await repository.heldWrites == 1)
+        await repository.release()
+        await action.value
+        #expect(!model.busy)
+        if fail {
+            #expect(progress.snapshot == before)
+            #expect(model.error != nil)
+            await (stop ? model.stop() : model.scenario(.coffee)).value
+        }
+        #expect(model.error == nil)
+        #expect(await repository.value == progress.snapshot)
+        if stop {
+            #expect(model.session?.completed.contains(.sentenceTrail) == true)
+            #expect(model.session?.creditedGames.contains(.sentenceTrail) == true)
+            #expect(progress.snapshot.doubloons == 1)
+            model.completePractice()
+            #expect(model.showingReward)
+            await model.stop().value
+            #expect(progress.snapshot.doubloons == 1)
+        } else {
+            #expect(model.session?.scenario == .coffee)
+            #expect(model.session?.trailScore == 0)
+            #expect(model.session?.creditedGames.isEmpty == true)
+        }
+    }
+
+    @Test(.timeLimit(.minutes(1))) func preparationSharesPendingSaveAndRetriesFailure() async throws {
+        let repository = HeldDailyPracticeSave()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let books = (0..<3).map { sample("prepare\($0)", sentences: 4) }
+        try await progress.saveDailyReading(books.map(\.id), date: .now)
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let feature = DailyPracticeManager(progress: progress, purchases: purchases)
+        let model = DailyPracticeViewModel(books: books, feature: feature)
+        await repository.holdNextSave(failing: true)
+        let first = model.prepare()
+        await repository.waitForSave()
+        let repeated = model.prepare()
+        #expect(first == repeated)
+        #expect(model.session == nil)
+        await repository.release()
+        await first.value
+        #expect(model.error != nil)
+        #expect(model.session == nil)
+        #expect(!model.busy)
+        await model.prepare().value
+        #expect(model.error == nil)
+        #expect(model.session != nil)
+        #expect(await repository.value == progress.snapshot)
+    }
+
     @Test func eachFinishedSentenceCelebratesAndFinalCounterReachesFive() async throws {
         let repo = MemoryProgress()
         let progress = ProgressManager(repository: repo); try await progress.load()
