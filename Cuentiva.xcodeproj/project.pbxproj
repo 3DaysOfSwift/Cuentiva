@@ -513,7 +513,6 @@
 			children = (
 				19F59476B06245399B13FAF1 /* LanguageTipProgress.swift */,
 				CF62815E12BE457981117D69 /* LanguageTipView.swift */,
-				452AEB5B439049D08A219BDD /* AppIconSettingsViewModel.swift */,
 				C2056141D136428298C3AC2F /* AppIconSettingsSection.swift */,
 				81CDBBBEF31346A498C4E703 /* Cuentiva/1 - View/Views/Verbs/VerbWorkoutCelebration.swift */,
 				66E04FE9A0CB4C83946D60F4 /* Cuentiva/2 - AppModel/Features/Verbs/VerbWorkoutSummary.swift */,
@@ -1178,6 +1177,7 @@
 				B5A9EF7A4B583713A0D2027E /* SettingsView.swift */,
 				5E3F4A6D33DE44A8A123E023 /* WhyCuentivaView.swift */,
 				FA87BFFCFF7705C265A17640 /* SettingsViewModel.swift */,
+				452AEB5B439049D08A219BDD /* AppIconSettingsViewModel.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";

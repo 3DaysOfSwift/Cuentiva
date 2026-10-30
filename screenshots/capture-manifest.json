@@ -1,0 +1,41 @@
+{
+  "captured": "2026-10-24",
+  "device": "iPhone Air",
+  "os": "iOS 26.2 Simulator",
+  "source": "Genuine captures from the running app; no fabricated UI",
+  "repository_head": "b67e9acb0e3f135c19d26d3f2d6b6b294864ab8a",
+  "installed_build": "Not independently verified against repository HEAD",
+  "status": "Draft capture set; presentation HTML is not an exported upload image",
+  "files": [
+    {
+      "file": "source/iphone/01-bookstore.png",
+      "width": 1260,
+      "height": 2736
+    },
+    {
+      "file": "source/iphone/02-reading.png",
+      "width": 1260,
+      "height": 2736
+    },
+    {
+      "file": "source/iphone/03-ereader-english.png",
+      "width": 1260,
+      "height": 2736
+    },
+    {
+      "file": "source/iphone/04-ereader-spanish.png",
+      "width": 1260,
+      "height": 2736
+    },
+    {
+      "file": "source/iphone/05-sentence-practice.png",
+      "width": 1260,
+      "height": 2736
+    },
+    {
+      "file": "source/iphone/06-storytellers.png",
+      "width": 1260,
+      "height": 2736
+    }
+  ]
+}
