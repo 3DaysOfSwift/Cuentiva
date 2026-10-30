@@ -17,12 +17,13 @@ import Observation
     var canStartReading: Bool { progressReady && book != nil && !completed }
     var lesson: Book?
     var error: String?
+    @ObservationIgnored private var preparationTask: Task<Void, Never>?
     @ObservationIgnored private var restoreTask: Task<Void, Never>?
     var book: Book? { library.introduction }
     var completed: Bool { progressReady && progress.snapshot.completed.contains("cafe") }
     init(library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.library = library; self.progress = progress; self.purchases = purchases }
     func prepareProgress() async {
-        guard !preparing else { return }
+        guard !preparing, !Task.isCancelled else { return }
         preparing = true
         preparationError = nil
         defer { preparing = false }
@@ -31,8 +32,22 @@ import Observation
             try Task.checkCancellation()
         } catch is CancellationError {
             // The shared progress load may still finish for another caller.
-        } catch { preparationError = error.localizedDescription }
+        } catch {
+            if !Task.isCancelled { preparationError = error.localizedDescription }
+        }
     }
+    @discardableResult
+    func retryPreparation() -> Task<Void, Never> {
+        if let preparationTask { return preparationTask }
+        let task = Task {
+            defer { preparationTask = nil }
+            await prepareProgress()
+        }
+        preparationTask = task
+        return task
+    }
+    func cancelPreparation() { preparationTask?.cancel() }
+
     func startReading() {
         guard canStartReading else { return }
         lesson = book

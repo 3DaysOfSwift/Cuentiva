@@ -55,6 +55,45 @@ import StoreKit
         #expect(purchases.restoreCalls == 2)
     }
 
+    @Test(.timeLimit(.minutes(1)), arguments: [false, true])
+    func cancelledPreparationDoesNotPresentLateFailure(fail: Bool) async throws {
+        let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
+        let repository = HeldOnboardingLoad(fail: fail)
+        let progress = ProgressManager(repository: repository)
+        let model = OnboardingViewModel(library: library, progress: progress, purchases: purchases)
+        let preparation = Task { await model.prepareProgress() }
+        await repository.waitForLoad()
+        preparation.cancel()
+        await repository.release()
+        await preparation.value
+        #expect(model.preparationError == nil)
+        #expect(!model.preparing)
+        await model.prepareProgress()
+        #expect(model.progressReady)
+        #expect(model.canStartReading)
+    }
+
+    @Test(.timeLimit(.minutes(1))) func retryPreparationIsOwnedAndCancelledOnDeparture() async throws {
+        let (purchases, _, library, _, _) = try await makeViewModelTestGraph()
+        let repository = HeldOnboardingLoad(fail: true)
+        let progress = ProgressManager(repository: repository)
+        let model = OnboardingViewModel(library: library, progress: progress, purchases: purchases)
+        let first = model.retryPreparation()
+        await repository.waitForLoad()
+        let repeated = model.retryPreparation()
+        #expect(first == repeated)
+        model.cancelPreparation()
+        #expect(first.isCancelled)
+        await repository.release()
+        await first.value
+        #expect(model.preparationError == nil)
+        let retry = model.retryPreparation()
+        #expect(retry != first)
+        await retry.value
+        #expect(model.progressReady)
+        #expect(!model.preparing)
+    }
+
     @Test func onboardingKeepsItsBook() async throws {
         let (p,s,l,_,_) = try await makeViewModelTestGraph(); let vm = OnboardingViewModel(library: l, progress: s, purchases: p)
         #expect(vm.book?.id == "cafe"); #expect(!vm.completed)
@@ -139,5 +178,34 @@ private actor OnboardingProgressRepository: ProgressRepository {
             }
         }
         if fail { throw AppFailure.unavailable("Controlled restore failure") }
+    }
+}
+
+private actor HeldOnboardingLoad: ProgressRepository {
+    private let fail: Bool
+    private var released = false
+    private var pending: CheckedContinuation<Void, Never>?
+    private var arrival: CheckedContinuation<Void, Never>?
+    init(fail: Bool) { self.fail = fail }
+    func load() async throws -> LearnerProgress {
+        if !released {
+            await withCheckedContinuation {
+                pending = $0
+                arrival?.resume()
+                arrival = nil
+            }
+            if fail { throw AppFailure.unavailable("Controlled delayed load failure") }
+        }
+        return LearnerProgress()
+    }
+    func save(_ value: LearnerProgress) {}
+    func waitForLoad() async {
+        if pending != nil { return }
+        await withCheckedContinuation { arrival = $0 }
+    }
+    func release() {
+        released = true
+        pending?.resume()
+        pending = nil
     }
 }

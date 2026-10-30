@@ -46,7 +46,7 @@ struct OnboardingView: View {
                             VStack(spacing: 8) {
                                 if let error = viewModel.preparationError {
                                     InlineError(message: error)
-                                    Button("Try preparing again") { Task { await viewModel.prepareProgress() } }
+                                    Button("Try preparing again") { viewModel.retryPreparation() }
                                         .disabled(viewModel.preparing)
                                 }
                                 Button(action: viewModel.startReading) {
@@ -66,6 +66,7 @@ struct OnboardingView: View {
                 }
             }.background(theme.theme.paper).foregroundStyle(theme.theme.ink)
                 .task { await viewModel.prepareProgress() }
+                .onDisappear { viewModel.cancelPreparation() }
                 .fullScreenCover(item: $viewModel.lesson) { book in NavigationStack { LessonView(book: book) } }
         }
     }
