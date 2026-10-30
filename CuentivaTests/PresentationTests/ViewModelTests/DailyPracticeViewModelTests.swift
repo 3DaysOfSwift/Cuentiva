@@ -21,15 +21,16 @@ import Testing
         purchases.hasAccess = true
         let feature = DailyPracticeManager(progress: progress, purchases: purchases)
         let model = DailyPracticeViewModel(books: books, feature: feature)
-        await model.prepare()
+        await model.prepare().value
         model.select(.missingWord)
         let answer = try #require(model.session?.missingAnswer)
         await repository.holdNextSave(failing: fail)
-        let first = Task { await model.choose(answer) }
+        let first = model.choose(answer)
         await repository.waitForSave()
         #expect(model.busy)
         #expect(model.session?.missingIndex == 0)
-        await model.choose(answer)
+        let repeated = model.choose(answer)
+        #expect(repeated == first)
         #expect(await repository.heldWrites == 1)
         if cancel { first.cancel() }
         await repository.release()
@@ -40,12 +41,38 @@ import Testing
         if fail {
             #expect(model.error != nil)
             #expect(model.celebrationID == nil)
-            await model.choose(answer)
+            await model.choose(answer).value
             #expect(model.error == nil)
             #expect(model.session?.missingIndex == 1)
         }
         #expect(model.celebrationID != nil)
         #expect(progress.snapshot.doubloons == nil || progress.snapshot.doubloons == 0)
+    }
+
+    @Test func cancelledAnswerBeforeDispatchDoesNotChangeRoundAndAllowsRetry() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let books = (0..<3).map { sample("cancel\($0)", sentences: 4) }
+        try await progress.saveDailyReading(books.map(\.id), date: .now)
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let feature = DailyPracticeManager(progress: progress, purchases: purchases)
+        let model = DailyPracticeViewModel(books: books, feature: feature)
+        await model.prepare().value
+        model.select(.missingWord)
+        let answer = try #require(model.session?.missingAnswer)
+        let previousSaves = await repository.saveAttempts
+        let cancelled = model.choose(answer)
+        #expect(model.busy)
+        cancelled.cancel()
+        await cancelled.value
+        #expect(model.session?.missingIndex == 0)
+        #expect(await repository.saveAttempts == previousSaves)
+        #expect(model.error == nil)
+        #expect(!model.busy)
+        await model.choose(answer).value
+        #expect(model.session?.missingIndex == 1)
     }
 
     @Test func eachFinishedSentenceCelebratesAndFinalCounterReachesFive() async throws {
@@ -56,12 +83,12 @@ import Testing
         let purchases = TestPurchases(); purchases.hasAccess = true
         let feature = DailyPracticeManager(progress: progress, purchases: purchases)
         let model = DailyPracticeViewModel(books: books, feature: feature)
-        await model.prepare(); model.select(.sentenceBuilder)
+        await model.prepare().value; model.select(.sentenceBuilder)
         let rounds = try #require(model.session?.rounds)
         for round in 0..<rounds {
             let phrase = try #require(model.session?.builderPhrase)
             for index in phrase.words.indices {
-                await model.choose(String(index))
+                await model.choose(String(index)).value
                 if index < phrase.words.count - 1 { #expect(model.celebrationID == nil) }
             }
             #expect(model.celebrationID != nil && model.completedRounds == round)
@@ -96,27 +123,27 @@ import Testing
         purchases.hasAccess = false
         let feature = DailyPracticeManager(progress: progress, purchases: purchases)
         let model = DailyPracticeViewModel(books: books, feature: feature)
-        await model.prepare()
+        await model.prepare().value
         #expect(model.error != nil)
         #expect(model.session == nil)
         purchases.hasAccess = true
-        await model.prepare()
+        await model.prepare().value
         model.select(.missingWord)
         let answer = try #require(model.session?.missingAnswer)
         await repo.setFailure(true)
-        await model.choose(answer)
+        await model.choose(answer).value
         #expect(model.error != nil)
         #expect(model.session?.missingIndex == 0)
         #expect(!model.busy)
         #expect(model.celebrationID == nil && model.completedRounds == 0)
         await repo.setFailure(false)
-        await model.choose(answer)
+        await model.choose(answer).value
         #expect(model.error == nil)
         #expect(model.session?.missingIndex == 1)
         #expect(model.feedback == nil)
         #expect(model.celebrationID != nil && model.completedRounds == 0)
         #expect(model.displayedSession?.missingIndex == 0)
-        await model.choose(answer)
+        await model.choose(answer).value
         #expect(model.session?.missingIndex == 1)
         await model.celebrateRound()
         #expect(model.celebrationID == nil && model.completedRounds == 1)

@@ -19,6 +19,7 @@ import Observation
         showingReward = true
     }
     private(set) var busy = false
+    @ObservationIgnored private var operationTask: Task<Void, Never>?
     private(set) var error: String?
     private(set) var feedback: String?
     private(set) var celebrationID: UUID?
@@ -51,42 +52,61 @@ import Observation
         } catch { /* Leaving the screen ends the animation; saved progress remains. */ }
     }
     init(books: [Book], feature: any DailyPracticeFeature) { self.books = books; self.feature = feature }
-    func prepare() async {
-        guard !busy else { return }
-        busy = true; error = nil
-        defer { busy = false }
-        do { try await feature.prepare(books: books) } catch { self.error = error.localizedDescription }
+    @discardableResult
+    func prepare() -> Task<Void, Never> {
+        perform { try await self.feature.prepare(books: self.books) }
     }
     func select(_ game: DailyPracticeGame) {
         guard !busy, celebrationID == nil, session != nil else { return }
         selected = game; feedback = nil; showingReward = false
     }
-    func choose(_ choice: String) async {
-        guard !busy, celebrationID == nil, let game = selected, let before = session else { return }
-        let day = before.day
-        let previousCount = roundCount(before)
-        busy = true; error = nil
-        defer { busy = false }
-        do {
-            let correct = try await feature.choose(choice, game: game, day: day)
-            if correct && roundCount(session) > previousCount {
-                heldSession = before
-                heldCount = previousCount
-                celebrationID = UUID()
+    @discardableResult
+    func choose(_ choice: String) -> Task<Void, Never> {
+        perform {
+            guard self.celebrationID == nil, let game = self.selected,
+                  let before = self.session else { return }
+            let previousCount = self.roundCount(before)
+            let correct = try await self.feature.choose(choice, game: game, day: before.day)
+            if correct && self.roundCount(self.session) > previousCount {
+                self.heldSession = before
+                self.heldCount = previousCount
+                self.celebrationID = UUID()
             }
-            feedback = correct ? nil : game == .sentenceTrail ? "That word broke the trail." : "Try another tile to rebuild the book’s sentence."
-        } catch { self.error = error.localizedDescription }
+            self.feedback = correct ? nil : game == .sentenceTrail ? "That word broke the trail." : "Try another tile to rebuild the book’s sentence."
+        }
     }
-    func scenario(_ scenario: PracticeScenario) async {
-        guard !busy, let day = session?.day else { return }
-        busy = true; error = nil
-        defer { busy = false }
-        do { try await feature.selectScenario(scenario, day: day) } catch { self.error = error.localizedDescription }
+    @discardableResult
+    func scenario(_ scenario: PracticeScenario) -> Task<Void, Never> {
+        perform {
+            guard let day = self.session?.day else { return }
+            try await self.feature.selectScenario(scenario, day: day)
+        }
     }
-    func stop() async {
-        guard !busy, let day = session?.day else { return }
-        busy = true; error = nil
-        defer { busy = false }
-        do { try await feature.stopTrail(day: day) } catch { self.error = error.localizedDescription }
+    @discardableResult
+    func stop() -> Task<Void, Never> {
+        perform {
+            guard let day = self.session?.day else { return }
+            try await self.feature.stopTrail(day: day)
+        }
+    }
+
+    /// One admitted action at a time. Saved practice survives screen departure.
+    private func perform(_ action: @escaping @MainActor () async throws -> Void) -> Task<Void, Never> {
+        if let operationTask { return operationTask }
+        busy = true
+        error = nil
+        let task = Task {
+            defer { busy = false; operationTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await action()
+            } catch is CancellationError {
+                // Cancellation before the save begins is not a failed answer.
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+        operationTask = task
+        return task
     }
 }

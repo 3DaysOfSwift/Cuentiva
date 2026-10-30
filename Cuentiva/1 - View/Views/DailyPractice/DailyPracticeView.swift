@@ -32,7 +32,7 @@ struct DailyPracticeView: View {
                         DailyPracticeOverview(session: session, select: model.select)
                     }
                 } else if model.busy { ProgressView("Preparing practice…") }
-                else { Button("Prepare today’s practice") { Task { await model.prepare() } } }
+                else { Button("Prepare today’s practice") { model.prepare() } }
                 if let feedback = model.feedback { Text(feedback).foregroundStyle(theme.theme.accent) }
                 InlineError(message: model.error)
             }.padding(24)
@@ -71,7 +71,7 @@ struct DailyPracticeView: View {
             }
             ToolbarItem(placement: .topBarTrailing) { Button("Done") { dismiss() } }
         }
-        .task { await model.prepare() }
+        .task { await model.prepare().value }
         .sensoryFeedback(.success, trigger: model.session?.rewarded ?? false)
     }
     @ViewBuilder private func exercise(_ session: DailyPracticeSession, game: DailyPracticeGame) -> some View {
@@ -93,7 +93,7 @@ struct DailyPracticeView: View {
                 .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 95))], spacing: 12) {
                 ForEach(session.builderOrder, id: \.self) { index in
-                    Button(session.builderPhrase.words[index]) { Task { await model.choose(String(index)) } }
+                    Button(session.builderPhrase.words[index]) { model.choose(String(index)) }
                         .buttonStyle(.bordered).disabled(model.busy || session.builderTokens.contains(index))
                 }
             }
@@ -101,7 +101,7 @@ struct DailyPracticeView: View {
             if session.trailScore == 0 {
                 Menu("Scene: \(session.scenario.title)") {
                     ForEach(PracticeScenario.allCases) { scenario in
-                        Button(scenario.title) { Task { await model.scenario(scenario) } }
+                        Button(scenario.title) { model.scenario(scenario) }
                     }
                 }.disabled(model.busy)
             }
@@ -114,14 +114,14 @@ struct DailyPracticeView: View {
                 .background(theme.theme.surface, in: RoundedRectangle(cornerRadius: 18))
             tiles(session.trailOptions)
             Text(session.currentTrail.source).font(.caption).foregroundStyle(theme.theme.muted)
-            Button("Stop and keep my score") { Task { await model.stop() } }
+            Button("Stop and keep my score") { model.stop() }
                 .buttonStyle(.bordered).disabled(model.busy || session.trailScore == 0)
         }
     }
     private func tiles(_ words: [String]) -> some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 95))], spacing: 12) {
             ForEach(words, id: \.self) { word in
-                Button(word) { Task { await model.choose(word) } }
+                Button(word) { model.choose(word) }
                     .font(.title3).buttonStyle(.bordered).disabled(model.busy)
             }
         }
