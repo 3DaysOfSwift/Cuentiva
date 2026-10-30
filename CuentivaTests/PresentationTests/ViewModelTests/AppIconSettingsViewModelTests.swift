@@ -3,6 +3,34 @@ import Testing
 @testable import Cuentiva
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct AppIconSettingsViewModelTests {
+    @Test(arguments: [false, true], [false, true])
+    func storytellerSelectionRequiresProfileAndSystemSupport(hasProfile: Bool, supported: Bool) async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
+        try await feature.load()
+        if hasProfile { _ = try await feature.drawCreature() }
+        var icon: String?
+        var calls = 0
+        let model = AppIconSettingsViewModel(feature: feature, supportsIcons: { supported },
+                                            currentIcon: { icon }, changeIcon: { icon = $0; calls += 1 })
+        await model.prepare()
+        #expect(model.canOfferIcon == (hasProfile && supported))
+        await model.useStorytellerIcon()?.value
+        if hasProfile && supported {
+            let creature = try #require(feature.profile?.creature)
+            #expect(icon == creature.appIconName)
+            #expect(model.selectedIcon == creature.appIconName)
+            #expect(model.usesStorytellerIcon)
+            #expect(calls == 1)
+            await model.useStorytellerIcon()?.value
+            #expect(calls == 1)
+        } else {
+            #expect(calls == 0)
+            #expect(icon == nil)
+            #expect(model.iconMessage == nil)
+        }
+        #expect(!model.changingIcon)
+    }
+
     @Test func cancellationBeforeIconDispatchAllowsRetry() async throws {
         let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
         var icon: String? = "Storyteller"
