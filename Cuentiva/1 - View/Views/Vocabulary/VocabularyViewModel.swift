@@ -11,7 +11,9 @@ import Observation
 @MainActor @Observable final class VocabularyViewModel {
     private let progress: any ProgressFeature
     var query = ""
-    private(set) var saving = false
+    private var saveTask: Task<Void, Never>?
+    @ObservationIgnored private var saveRequest = UUID()
+    var saving: Bool { saveTask != nil }
     private(set) var error: String?
     var selectedLevel: LearningLevel? { progress.snapshot.selectedLearningLevel }
     var total: Int { progress.snapshot.vocabulary.count }
@@ -23,16 +25,38 @@ import Observation
     }
     init(progress: any ProgressFeature = AppModel.shared.progress) { self.progress = progress }
     func state(_ word: String) -> VocabularyState { progress.snapshot.vocabulary[word] ?? .unknown }
-    func set(_ word: String, state: VocabularyState) async {
-        guard !saving else { return }
-        saving = true; error = nil; defer { saving = false }
-        do { try await progress.setVocabulary(word, state: state) }
-        catch { self.error = error.localizedDescription }
+    @discardableResult
+    func set(_ word: String, state: VocabularyState) -> Task<Void, Never> {
+        enqueue { try await self.progress.setVocabulary(word, state: state) }
     }
-    func select(_ level: LearningLevel?) async {
-        guard !saving else { return }
-        saving = true; error = nil; defer { saving = false }
-        do { try await progress.setLearningLevel(level) }
-        catch { self.error = error.localizedDescription }
+
+    @discardableResult
+    func select(_ level: LearningLevel?) -> Task<Void, Never> {
+        enqueue { try await self.progress.setLearningLevel(level) }
+    }
+
+    /// Accepted edits finish in order, even if the screen disappears.
+    /// Progress remains responsible for committing and publishing saved state.
+    private func enqueue(_ edit: @escaping @MainActor () async throws -> Void) -> Task<Void, Never> {
+        let previous = saveTask
+        let request = UUID()
+        saveRequest = request
+        if previous == nil { error = nil }
+        let task = Task {
+            defer {
+                if saveRequest == request { saveTask = nil }
+            }
+            await previous?.value
+            do {
+                try Task.checkCancellation()
+                try await edit()
+            } catch is CancellationError {
+                // An explicitly cancelled edit has not been reported as saved.
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+        saveTask = task
+        return task
     }
 }

@@ -15,7 +15,7 @@ struct VocabularyView: View {
             Section("Your learning level") {
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 10) {
                     ForEach(LearningLevel.allCases, id: \.self) { level in
-                        Button { Task { await model.select(level) } } label: {
+                        Button { model.select(level) } label: {
                             HStack(spacing: 4) {
                                 Text(level.rawValue).font(.headline)
                                 if model.selectedLevel == level { Image(systemName: "checkmark").font(.caption.bold()) }
@@ -34,7 +34,7 @@ struct VocabularyView: View {
                 Text("Choose the level you feel comfortable studying. This is your own estimate, not a test result. Changing it won’t mark words as known or change your completed books.")
                     .font(.footnote).foregroundStyle(theme.theme.muted)
                 if model.selectedLevel != nil {
-                    Button("Clear my level") { Task { await model.select(nil) } }.disabled(model.saving)
+                    Button("Clear my level") { model.select(nil) }.disabled(model.saving)
                 }
             }.listRowBackground(theme.theme.surface)
             if let error = model.error {
@@ -48,7 +48,7 @@ struct VocabularyView: View {
                     ContentUnavailableView.search(text: model.query)
                 }
                 ForEach(model.words, id: \.self) { word in
-                    Picker(word, selection: Binding(get: { model.state(word) }, set: { state in Task { await model.set(word, state: state) } })) {
+                    Picker(word, selection: Binding(get: { model.state(word) }, set: { state in model.set(word, state: state) })) {
                         ForEach(VocabularyState.allCases, id: \.self) { Text($0.rawValue.capitalized).tag($0) }
                     }
                     .tint(theme.theme.accent).id(theme.selectedTheme).disabled(model.saving)
