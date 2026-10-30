@@ -54,7 +54,7 @@ struct RootView: View {
                 VStack(spacing: 16) {
                     if let error = viewModel.error {
                         InlineError(message: error)
-                        Button("Retry") { Task { await viewModel.start() } }
+                        Button("Retry") { viewModel.start() }
                             .buttonStyle(PrimaryButton())
                     } else {
                         Color.clear.accessibilityHidden(true)
@@ -71,7 +71,7 @@ struct RootView: View {
             .fullScreenCover(isPresented: $viewModel.showingStoryteller) {
                 StorytellerRevealView(feature: AppModel.shared.fantasy) { viewModel.showingStoryteller = false }
             }
-            .task { await viewModel.start() }
+            .task { await viewModel.start().value }
             .task(id: viewModel.hasAccess && !viewModel.checkingAccess) {
                 await viewModel.accessChanged()
             }

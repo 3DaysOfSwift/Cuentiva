@@ -35,7 +35,7 @@ import Observation
     private let library: any LibraryFeature
     @ObservationIgnored private var loadingTask: Task<Void, Never>?
     private var hasEnteredBackground = false
-    private var starting = false
+    @ObservationIgnored private var launchTask: Task<Void, Never>?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Launch")
     private let fantasy: any FantasyFeature
     private var checkedIntroduction = false
@@ -59,11 +59,20 @@ import Observation
     }
     /// Launch has one owner. Local data and StoreKit can finish independently;
     /// catalogue updates are prepared only after the initial work has completed.
-    func start() async {
-        guard !starting else { return }
-        starting = true
+    @discardableResult
+    func start() -> Task<Void, Never> {
+        if let launchTask { return launchTask }
         error = nil
-        defer { starting = false }
+        let task = Task {
+            defer { launchTask = nil }
+            guard !Task.isCancelled else { return }
+            await prepareLaunch()
+        }
+        launchTask = task
+        return task
+    }
+
+    private func prepareLaunch() async {
         async let storage: Void = prepareProgress()
         async let onboarding: Void = loadIntroduction()
         await refreshPurchases()

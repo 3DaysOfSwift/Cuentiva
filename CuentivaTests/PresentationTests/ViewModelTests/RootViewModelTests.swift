@@ -9,17 +9,55 @@ import Foundation
 import Testing
 @testable import Cuentiva
 
-@Suite @MainActor struct RootViewModelTests {
+@Suite(.timeLimit(.minutes(1))) @MainActor struct RootViewModelTests {
+    @Test func repeatedLaunchSharesPendingCompletion() async throws {
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let library = GatedLaunchLibrary()
+        let root = makeRoot(purchases, library, ProgressManager(repository: MemoryProgress()))
+        let first = root.start()
+        defer { library.finish() }
+        try await waitUntil { library.continuation != nil }
+        let repeated = root.start()
+        #expect(first == repeated)
+        #expect(library.loads == 1)
+        #expect(purchases.refreshCalls == 1)
+        #expect(!root.ready)
+        library.finish()
+        await first.value
+        await repeated.value
+        #expect(root.ready)
+        #expect(library.syncs == 1)
+    }
+
+    @Test func cancelledLaunchBeforeDispatchCanRetry() async {
+        let purchases = TestPurchases()
+        let library = GatedLaunchLibrary(gated: false)
+        let progress = ProgressManager(repository: MemoryProgress())
+        let root = makeRoot(purchases, library, progress)
+        let cancelled = root.start()
+        cancelled.cancel()
+        await cancelled.value
+        #expect(purchases.refreshCalls == 0)
+        #expect(!progress.loaded)
+        #expect(!root.onboardingReady)
+        #expect(root.error == nil)
+        await root.start().value
+        #expect(purchases.refreshCalls == 1)
+        #expect(progress.loaded)
+        #expect(root.onboardingReady)
+    }
+
     @Test func unpaidLaunchRetryClearsIntroductionFailure() async {
         let purchases = TestPurchases()
         let library = GatedLaunchLibrary(gated: false)
         library.introductionFailure = .invalidBook
         let root = makeRoot(purchases, library, ProgressManager(repository: MemoryProgress()))
-        await root.start()
+        await root.start().value
         #expect(root.error != nil)
         #expect(!root.canShowContent)
         library.introductionFailure = nil
-        await root.start()
+        await root.start().value
         #expect(root.error == nil)
         #expect(root.onboardingReady)
         #expect(root.canShowContent)
@@ -77,12 +115,14 @@ import Testing
         let progress = ProgressManager(repository: MemoryProgress())
         let library = GatedLaunchLibrary(gated: false)
         let root = makeRoot(purchases, library, progress)
-        let launch = Task { await root.start() }
+        let launch = Task { await root.start().value }
         defer { entitlementWait?.resume(); entitlementWait = nil; launch.cancel() }
         try await waitUntil { entitlementWait != nil && progress.loaded && root.onboardingReady }
         #expect(purchases.checking)
         #expect(!root.ready)
         #expect(library.loads == 0)
+        // SwiftUI may cancel its waiting task; Root still owns shared launch work.
+        launch.cancel()
         entitlementWait?.resume(); entitlementWait = nil
         await launch.value
         #expect(root.canShowContent)
@@ -94,7 +134,7 @@ import Testing
         let progress = ProgressManager(repository: MemoryProgress())
         let library = GatedLaunchLibrary(gated: false)
         let root = makeRoot(purchases, library, progress)
-        await root.start()
+        await root.start().value
         #expect(root.dailyWelcome == nil)
         #expect(root.onboardingReady)
         #expect(root.canShowContent)
@@ -116,7 +156,7 @@ import Testing
         let progress = ProgressManager(repository: MemoryProgress())
         let library = GatedLaunchLibrary()
         let root = makeRoot(purchases, library, progress)
-        await root.start()
+        await root.start().value
         purchases.hasAccess = true
         #expect(!root.canShowContent)
         let activation = Task { await root.accessChanged() }
