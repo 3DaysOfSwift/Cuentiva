@@ -90,9 +90,11 @@ import Observation
         async let storage: Void = prepareProgress()
         async let onboarding: Void = loadIntroduction()
         await refreshPurchases()
+        guard !Task.isCancelled else { return }
         if hasAccess && !checkingAccess { await load() }
         await onboarding
         await storage
+        guard !Task.isCancelled else { return }
         await syncLibrary()
     }
 
@@ -100,7 +102,10 @@ import Observation
         // The shared repository opens SwiftData on its worker actor. Start now,
         // independently of StoreKit; other readers await the same operation.
         do { try await progress.load() }
-        catch { if !progress.loaded { self.error = error.localizedDescription } }
+        catch {
+            guard !Task.isCancelled, !progress.loaded else { return }
+            self.error = error.localizedDescription
+        }
     }
 
     private func loadIntroduction() async {
@@ -109,9 +114,13 @@ import Observation
             // Welcome content has no dependency on the user's database.
             // Progress prepares independently, so the welcome need not wait for it.
             try await library.loadIntroduction()
+            guard !Task.isCancelled else { return }
             onboardingReady = true
             logger.info("Onboarding ready in \(Date().timeIntervalSince(started), privacy: .public) seconds")
-        } catch { self.error = error.localizedDescription }
+        } catch {
+            guard !Task.isCancelled else { return }
+            self.error = error.localizedDescription
+        }
     }
 
     private func prepareWelcome() {

@@ -10,6 +10,49 @@ import Testing
 @testable import Cuentiva
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct RootViewModelTests {
+    @Test func cancelledLaunchDuringIntroductionDoesNotPresentFailureAndCanRetry() async throws {
+        let purchases = TestPurchases()
+        let library = GatedLaunchLibrary(gated: false)
+        library.gateIntroduction = true
+        let root = makeRoot(purchases, library, ProgressManager(repository: MemoryProgress()))
+        let launch = root.start()
+        defer { library.finishIntroduction() }
+        try await waitUntil { library.pendingIntroduction != nil }
+        launch.cancel()
+        library.finishIntroduction()
+        await launch.value
+        #expect(root.error == nil)
+        #expect(!root.onboardingReady)
+        await root.start().value
+        #expect(root.error == nil)
+        #expect(root.onboardingReady)
+    }
+
+    @Test func cancelledForegroundDuringEntitlementReadCanRetry() async throws {
+        var reads = 0
+        var pending: CheckedContinuation<Void, Never>?
+        let purchases = PurchaseManager(readEntitlements: {
+            reads += 1
+            if reads == 1 { await withCheckedContinuation { pending = $0 } }
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, observesTransactions: false)
+        let root = makeRoot(purchases, GatedLaunchLibrary(gated: false), ProgressManager(repository: MemoryProgress()))
+        root.enteredBackground()
+        let foreground = try #require(root.becameActive())
+        defer { pending?.resume(); pending = nil }
+        try await waitUntil { pending != nil }
+        foreground.cancel()
+        pending?.resume(); pending = nil
+        await foreground.value
+        #expect(root.error == nil)
+        #expect(!root.ready)
+        let retry = try #require(root.becameActive())
+        await retry.value
+        #expect(reads == 2)
+        #expect(!root.checkingAccess)
+        #expect(root.becameActive() == nil)
+    }
+
     @Test func foregroundRefreshSharesWorkAndPreservesNewActivation() async throws {
         var reads = 0
         var pending: CheckedContinuation<Void, Never>?
@@ -383,7 +426,18 @@ import Testing
     private var gated: Bool
     init(gated: Bool = true) { self.gated = gated }
     var introductionFailure: AppFailure?
+    var gateIntroduction = false
+    var pendingIntroduction: CheckedContinuation<Void, Never>?
+    func finishIntroduction() {
+        gateIntroduction = false
+        pendingIntroduction?.resume()
+        pendingIntroduction = nil
+    }
     func loadIntroduction() async throws {
+        if gateIntroduction {
+            await withCheckedContinuation { pendingIntroduction = $0 }
+            try Task.checkCancellation()
+        }
         if let introductionFailure { throw introductionFailure }
     }
     func load() async throws {
