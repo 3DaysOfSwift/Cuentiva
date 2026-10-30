@@ -34,6 +34,7 @@ import Observation
     private let purchases: any PurchaseFeature
     private let library: any LibraryFeature
     @ObservationIgnored private var loadingTask: Task<Void, Never>?
+    @ObservationIgnored private var beginDayTask: Task<Void, Never>?
     private var hasEnteredBackground = false
     @ObservationIgnored private var launchTask: Task<Void, Never>?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Launch")
@@ -106,9 +107,20 @@ import Observation
         dailyWelcome = welcome
     }
 
-    func beginDay() async {
-        guard ready, hasAccess, !checkingAccess, let welcome = dailyWelcome else { return }
-        guard progress.dailyWelcome == nil else { return }
+    @discardableResult
+    func beginDay() -> Task<Void, Never>? {
+        if let beginDayTask { return beginDayTask }
+        guard ready, hasAccess, !checkingAccess, let welcome = dailyWelcome else { return nil }
+        guard progress.dailyWelcome == nil else { return nil }
+        let task = Task {
+            defer { beginDayTask = nil }
+            await prepareDay(welcome)
+        }
+        beginDayTask = task
+        return task
+    }
+
+    private func prepareDay(_ welcome: DailyWelcome) async {
         // A suspended app may be welcoming a new calendar day. Prepare that
         // day's selection before fading back to the retained Today screen.
         while hasAccess && !checkingAccess && !Task.isCancelled {

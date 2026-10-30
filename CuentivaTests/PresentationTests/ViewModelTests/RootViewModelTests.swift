@@ -10,6 +10,37 @@ import Testing
 @testable import Cuentiva
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct RootViewModelTests {
+    @Test(arguments: [false, true])
+    func beginDaySharesPreparationAndCancelledResultDoesNotDismiss(cancel: Bool) async throws {
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let progress = ProgressManager(repository: MemoryProgress())
+        let library = GatedLaunchLibrary(gated: false)
+        let root = makeRoot(purchases, library, progress)
+        await root.load()
+        let welcome = try #require(root.dailyWelcome)
+        // The welcome feature saves acknowledgement before forwarding this intent.
+        try await progress.acknowledgeWelcome(day: welcome.day)
+        library.gatePresentation = true
+        let before = library.presentations
+        let first = try #require(root.beginDay())
+        defer { library.finishPresentation() }
+        let repeated = try #require(root.beginDay())
+        #expect(first == repeated)
+        try await waitUntil { library.pendingPresentation != nil }
+        #expect(library.presentations == before + 1)
+        #expect(root.dailyWelcome == welcome)
+        if cancel { first.cancel() }
+        library.finishPresentation()
+        await first.value
+        if cancel {
+            #expect(root.dailyWelcome == welcome)
+            await root.beginDay()?.value
+        }
+        #expect(root.dailyWelcome == nil)
+        #expect(root.todayPresentation.dailyReads.map(\.id) == library.books.map(\.id))
+    }
+
     @Test func repeatedLaunchSharesPendingCompletion() async throws {
         let purchases = TestPurchases()
         purchases.hasAccess = true
@@ -258,6 +289,7 @@ import Testing
     var gatePresentation = false
     var pendingPresentation: CheckedContinuation<LibraryPresentation, Never>?
     var dailyPreparations = 0
+    var presentations = 0
     var loads = 0
     var syncs = 0
     var failure: AppFailure?
@@ -276,6 +308,7 @@ import Testing
     func sync() async { syncs += 1 }
     func matchingBooks(_ query: LibraryQuery) async -> [Book] { books }
     func presentation(_ query: LibraryQuery) async -> LibraryPresentation {
+        presentations += 1
         if gatePresentation {
             return await withCheckedContinuation { pendingPresentation = $0 }
         }

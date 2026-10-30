@@ -18,7 +18,7 @@ struct RootView: View {
         Group {
             if let welcome = viewModel.dailyWelcome, viewModel.hasAccess, !viewModel.checkingAccess, viewModel.error == nil {
                 DailyWelcomeView(welcome: welcome, ready: viewModel.ready) {
-                    Task { await viewModel.beginDay() }
+                    viewModel.beginDay()
                 }.id(welcome.day).transition(.opacity)
             } else if let tip = viewModel.languageTip, viewModel.ready, !viewModel.checkingAccess {
                 LanguageTipView(term: tip, busy: viewModel.savingTip, error: viewModel.tipError) {
