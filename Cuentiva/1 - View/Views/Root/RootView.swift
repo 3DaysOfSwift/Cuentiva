@@ -84,7 +84,7 @@ struct RootView: View {
             .onChange(of: scenePhase) { _, phase in
                 switch phase {
                 case .background: viewModel.enteredBackground()
-                case .active: Task { await viewModel.becameActive() }
+                case .active: viewModel.becameActive()
                 default: break
                 }
             }

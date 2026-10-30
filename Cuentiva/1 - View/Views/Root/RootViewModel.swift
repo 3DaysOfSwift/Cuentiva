@@ -46,6 +46,8 @@ import Observation
     private let library: any LibraryFeature
     @ObservationIgnored private var loadingTask: Task<Void, Never>?
     @ObservationIgnored private var beginDayTask: Task<Void, Never>?
+    @ObservationIgnored private var foregroundTask: Task<Void, Never>?
+    private var foregroundRefreshRequested = false
     private var hasEnteredBackground = false
     @ObservationIgnored private var launchTask: Task<Void, Never>?
     private let logger = Logger(subsystem: "com.3DaysOfSwiftConcurrency.Cuentiva", category: "Launch")
@@ -154,12 +156,33 @@ import Observation
 
     func enteredBackground() { hasEnteredBackground = true }
 
-    func becameActive() async {
+    @discardableResult
+    func becameActive() -> Task<Void, Never>? {
         // The first active event belongs to start(), not a second launch check.
-        guard hasEnteredBackground else { return }
-        hasEnteredBackground = false
-        await refreshPurchases()
-        await accessChanged()
+        if hasEnteredBackground {
+            hasEnteredBackground = false
+            foregroundRefreshRequested = true
+        }
+        if let foregroundTask { return foregroundTask }
+        guard foregroundRefreshRequested else { return nil }
+        let task = Task {
+            defer { foregroundTask = nil }
+            while foregroundRefreshRequested {
+                guard !Task.isCancelled else {
+                    hasEnteredBackground = true
+                    return
+                }
+                foregroundRefreshRequested = false
+                await refreshPurchases()
+                guard !Task.isCancelled else {
+                    hasEnteredBackground = true
+                    return
+                }
+                await accessChanged()
+            }
+        }
+        foregroundTask = task
+        return task
     }
 
     var checkingAccess: Bool { purchases.checking }

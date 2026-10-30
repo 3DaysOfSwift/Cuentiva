@@ -10,6 +10,42 @@ import Testing
 @testable import Cuentiva
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct RootViewModelTests {
+    @Test func foregroundRefreshSharesWorkAndPreservesNewActivation() async throws {
+        var reads = 0
+        var pending: CheckedContinuation<Void, Never>?
+        let purchases = PurchaseManager(readEntitlements: {
+            reads += 1
+            if reads == 1 { await withCheckedContinuation { pending = $0 } }
+            return []
+        }, readLatest: { _ in nil }, loadProducts: { _ in [] }, observesTransactions: false)
+        let root = makeRoot(purchases, GatedLaunchLibrary(gated: false), ProgressManager(repository: MemoryProgress()))
+        #expect(root.becameActive() == nil)
+        root.enteredBackground()
+        let first = try #require(root.becameActive())
+        defer { pending?.resume(); pending = nil }
+        try await waitUntil { pending != nil }
+        #expect(root.becameActive() == first)
+        root.enteredBackground()
+        #expect(root.becameActive() == first)
+        #expect(reads == 1)
+        pending?.resume(); pending = nil
+        await first.value
+        #expect(reads == 2)
+        #expect(root.becameActive() == nil)
+    }
+
+    @Test func cancelledForegroundBeforeDispatchCanRetry() async throws {
+        let purchases = TestPurchases()
+        let root = makeRoot(purchases, GatedLaunchLibrary(gated: false), ProgressManager(repository: MemoryProgress()))
+        root.enteredBackground()
+        let task = try #require(root.becameActive())
+        task.cancel()
+        await task.value
+        #expect(purchases.refreshCalls == 0)
+        await root.becameActive()?.value
+        #expect(purchases.refreshCalls == 1)
+    }
+
     @Test(arguments: [false, true])
     func languageTipWaitsForSaveAndSharesRepeatedRequests(fails: Bool) async throws {
         let repository = HeldRootProgress()
@@ -225,10 +261,10 @@ import Testing
         #expect(library.loads == 0)
         #expect(library.syncs == 0)
         #expect(purchases.refreshCalls == 1)
-        await root.becameActive()
+        await root.becameActive()?.value
         #expect(purchases.refreshCalls == 1)
         root.enteredBackground()
-        await root.becameActive()
+        await root.becameActive()?.value
         #expect(purchases.refreshCalls == 2)
         #expect(library.loads == 0)
     }
