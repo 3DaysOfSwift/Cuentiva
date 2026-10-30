@@ -14,6 +14,42 @@ import Testing
 #endif
 
 @Suite @MainActor struct FantasyTests {
+    @Test(.timeLimit(.minutes(1)), arguments: [false, true], [false, true])
+    func overlappingLoadsShareOutcomeAndFailureAllowsRetry(fail: Bool, cancelFirst: Bool) async throws {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        let joined = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish(); joined.continuation.finish() }
+        let repository = HeldFantasyLoad(fail: fail, entered: entered.continuation, release: release.stream)
+        let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        let first = Task { try await feature.load() }
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        let second = Task {
+            joined.continuation.yield(())
+            try await feature.load()
+        }
+        var arrivals = joined.stream.makeAsyncIterator()
+        _ = await arrivals.next()
+        #expect(!feature.introductionSeen)
+        if cancelFirst { first.cancel() }
+        release.continuation.finish()
+        for request in [first, second] {
+            do {
+                try await request.value
+                #expect(!fail)
+            } catch AppFailure.unavailable(let message) {
+                #expect(fail)
+                #expect(message == "Read rejected")
+            } catch { Issue.record("Unexpected load result: \(error)") }
+        }
+        #expect(await repository.loadCount == 1)
+        #expect(feature.introductionSeen == !fail)
+        try await feature.load()
+        #expect(feature.introductionSeen)
+        #expect(await repository.loadCount == (fail ? 2 : 1))
+    }
+
     @Test(.timeLimit(.minutes(1)), arguments: [false, true])
     func generationExcludesEditsAndCancellationAllowsRetry(cancel: Bool) async throws {
         let entered = AsyncStream<Void>.makeStream()
@@ -123,4 +159,27 @@ private actor HeldStoryGenerator: FantasyGenerator {
         // Deliberately return a late result even when the caller has cancelled.
         return try await FantasyTestGenerator().story(memory: memory, profile: profile)
     }
+}
+
+private actor HeldFantasyLoad: FantasyRepository {
+    private(set) var loadCount = 0
+    let fail: Bool
+    let entered: AsyncStream<Void>.Continuation
+    let release: AsyncStream<Void>
+    init(fail: Bool, entered: AsyncStream<Void>.Continuation, release: AsyncStream<Void>) {
+        self.fail = fail; self.entered = entered; self.release = release
+    }
+    func load() async throws -> FantasyArchive {
+        loadCount += 1
+        if loadCount == 1 {
+            entered.yield(())
+            for await _ in release { break }
+            try Task.checkCancellation()
+            if fail { throw AppFailure.unavailable("Read rejected") }
+        }
+        var archive = FantasyArchive()
+        archive.introductionSeen = true
+        return archive
+    }
+    func save(_ value: FantasyArchive) {}
 }

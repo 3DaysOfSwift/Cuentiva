@@ -34,6 +34,7 @@ import Observation
     var libraryContent: PersonalLibraryContent {
         .init(publications: archive.publications ?? [], author: personalAuthor)
     }
+    @ObservationIgnored private var loadTask: Task<Void, Error>?
     private var loaded = false
     private var busy = false
     private let repository: any FantasyRepository
@@ -97,9 +98,20 @@ import Observation
     }
     func load() async throws {
         guard !loaded else { return }
+        if let loadTask {
+            try await loadTask.value
+            return
+        }
         guard !busy else { throw AppFailure.busy }
-        busy = true; defer { busy = false }
-        archive = try await repository.load(); loaded = true
+        busy = true
+        // Shared model preparation outlives any individual screen caller.
+        let task = Task {
+            defer { loadTask = nil; busy = false }
+            archive = try await repository.load()
+            loaded = true
+        }
+        loadTask = task
+        try await task.value
     }
     func drawCreature() async throws -> FantasyCreature {
         guard loaded, !busy else { throw AppFailure.busy }
