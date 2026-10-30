@@ -14,6 +14,25 @@ import Testing
 #endif
 
 @Suite @MainActor struct FantasyTests {
+    @Test(.timeLimit(.minutes(1)), arguments: [false, true])
+    func newerAvailabilityResultSurvivesOlderCompletion(latestAvailable: Bool) async {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let generator = ReorderedAvailability(latestAvailable: latestAvailable, entered: entered.continuation, release: release.stream)
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: generator)
+        let first = Task { await feature.refreshAvailability() }
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        await feature.refreshAvailability()
+        let expected = latestAvailable ? nil : "Current unavailable reason"
+        #expect(feature.availabilityMessage == expected)
+        release.continuation.finish()
+        await first.value
+        #expect(feature.availabilityMessage == expected)
+        #expect(await generator.requests == 2)
+    }
+
     @Test(.timeLimit(.minutes(1)), arguments: [false, true], [false, true])
     func overlappingLoadsShareOutcomeAndFailureAllowsRetry(fail: Bool, cancelFirst: Bool) async throws {
         let entered = AsyncStream<Void>.makeStream()
@@ -182,4 +201,29 @@ private actor HeldFantasyLoad: FantasyRepository {
         return archive
     }
     func save(_ value: FantasyArchive) {}
+}
+
+private actor ReorderedAvailability: FantasyGenerator {
+    let latestAvailable: Bool
+    let entered: AsyncStream<Void>.Continuation
+    let release: AsyncStream<Void>
+    private(set) var requests = 0
+    init(latestAvailable: Bool, entered: AsyncStream<Void>.Continuation, release: AsyncStream<Void>) {
+        self.latestAvailable = latestAvailable; self.entered = entered; self.release = release
+    }
+    func availabilityMessage() async -> String? {
+        requests += 1
+        if requests == 1 {
+            entered.yield(())
+            for await _ in release { break }
+            return latestAvailable ? "Old unavailable reason" : nil
+        }
+        return latestAvailable ? nil : "Current unavailable reason"
+    }
+    func identity(name: String, biography: String, creature: FantasyCreature) async throws -> FantasyIdentity {
+        try await FantasyTestGenerator().identity(name: name, biography: biography, creature: creature)
+    }
+    func story(memory: String, profile: FantasyProfile) async throws -> FantasyStory {
+        try await FantasyTestGenerator().story(memory: memory, profile: profile)
+    }
 }

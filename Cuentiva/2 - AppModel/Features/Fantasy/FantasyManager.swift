@@ -45,7 +45,16 @@ import Observation
     var profile: FantasyProfile? { archive.profile }
     var introductionSeen: Bool { archive.introductionSeen ?? false }
     private(set) var availabilityMessage: String?
-    func refreshAvailability() async { availabilityMessage = await generator.availabilityMessage() }
+    @ObservationIgnored private var availabilityRequest = UUID()
+    func refreshAvailability() async {
+        // A foreground request must check current device settings even if an
+        // earlier preparation check is pending. Only the newest result applies.
+        let request = UUID()
+        availabilityRequest = request
+        let message = await generator.availabilityMessage()
+        guard availabilityRequest == request else { return }
+        availabilityMessage = message
+    }
     func finishIntroduction() async throws {
         guard loaded, !busy else { throw AppFailure.busy }
         busy = true; defer { busy = false }
