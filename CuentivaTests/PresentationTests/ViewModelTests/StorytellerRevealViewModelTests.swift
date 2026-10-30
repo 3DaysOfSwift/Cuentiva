@@ -10,6 +10,69 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct StorytellerRevealViewModelTests {
+    @Test(.timeLimit(.minutes(1)))
+    func latePreparationPreservesDraftFromCompletedPreparation() async throws {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let generator = HeldPreparationAvailability(entered: entered.continuation, release: release.stream)
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: generator)
+        try await feature.load()
+        _ = try await feature.drawCreature()
+        try await feature.saveIdentity(name: "Lirio", biography: "Saved biography")
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        let first = Task { await model.prepare() }
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        await model.prepare()
+        #expect(model.ready)
+        model.name = "New draft"
+        model.biography = "Unsaved biography"
+        release.continuation.finish()
+        await first.value
+        #expect(model.name == "New draft")
+        #expect(model.biography == "Unsaved biography")
+        #expect(model.error == nil)
+    }
+
+    @Test func repeatedPreparationPreservesEditedDraft() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
+        try await feature.load()
+        _ = try await feature.drawCreature()
+        try await feature.saveIdentity(name: "Lirio", biography: "Saved biography")
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        await model.prepare()
+        model.name = "New draft"
+        model.biography = "Unsaved biography"
+        await model.prepare()
+        #expect(model.name == "New draft")
+        #expect(model.biography == "Unsaved biography")
+        #expect(model.stage == .details)
+        #expect(feature.profile?.identity?.name == "Lirio")
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func cancelledPreparationDoesNotPublishAndCanResume() async {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let repository = HeldPreparationLoad(entered: entered.continuation, release: release.stream)
+        let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        let request = Task { await model.prepare() }
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        request.cancel()
+        release.continuation.finish()
+        await request.value
+        #expect(!model.ready)
+        #expect(model.error == nil)
+        #expect(feature.introductionSeen)
+        await model.prepare()
+        #expect(model.ready)
+        #expect(model.error == nil)
+    }
+
     @Test func successfulPreparationRetryClearsLoadingError() async {
         let repository = RetryStorytellerLoad()
         let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
@@ -214,4 +277,43 @@ private actor RetryStorytellerLoad: FantasyRepository {
         return FantasyArchive()
     }
     func save(_ value: FantasyArchive) {}
+}
+
+private actor HeldPreparationLoad: FantasyRepository {
+    let entered: AsyncStream<Void>.Continuation
+    let release: AsyncStream<Void>
+    init(entered: AsyncStream<Void>.Continuation, release: AsyncStream<Void>) {
+        self.entered = entered; self.release = release
+    }
+    func load() async throws -> FantasyArchive {
+        entered.yield(())
+        for await _ in release { break }
+        var archive = FantasyArchive()
+        archive.introductionSeen = true
+        return archive
+    }
+    func save(_ value: FantasyArchive) {}
+}
+
+private actor HeldPreparationAvailability: FantasyGenerator {
+    let entered: AsyncStream<Void>.Continuation
+    let release: AsyncStream<Void>
+    private var requested = false
+    init(entered: AsyncStream<Void>.Continuation, release: AsyncStream<Void>) {
+        self.entered = entered; self.release = release
+    }
+    func availabilityMessage() async -> String? {
+        if !requested {
+            requested = true
+            entered.yield(())
+            for await _ in release { break }
+        }
+        return nil
+    }
+    func identity(name: String, biography: String, creature: FantasyCreature) async throws -> FantasyIdentity {
+        try await FantasyTestGenerator().identity(name: name, biography: biography, creature: creature)
+    }
+    func story(memory: String, profile: FantasyProfile) async throws -> FantasyStory {
+        try await FantasyTestGenerator().story(memory: memory, profile: profile)
+    }
 }

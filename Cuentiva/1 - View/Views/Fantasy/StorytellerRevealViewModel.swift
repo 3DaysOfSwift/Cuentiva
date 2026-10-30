@@ -120,17 +120,25 @@ import UIKit
     }
 
     func prepare() async {
+        guard !ready, !Task.isCancelled else { return }
         error = nil
         selectedIcon = currentIcon()
         do {
             try await feature.load()
+            try Task.checkCancellation()
             await feature.refreshAvailability()
+            try Task.checkCancellation()
+            guard !ready else { return }
             ready = true
             name = feature.profile?.details?.name ?? ""
             biography = feature.profile?.details?.biography ?? ""
             if identity != nil { editDetails() }
             else if let creature { number = feature.profile?.revealNumber ?? creature.rawValue; stage = feature.profile?.details == nil ? .creature : .details }
-        } catch { self.error = error.localizedDescription }
+        } catch is CancellationError {
+            // Shared model loading may complete after this screen departs.
+        } catch {
+            if !Task.isCancelled, !ready { self.error = error.localizedDescription }
+        }
     }
     func animateNumbers() async {
         do {
