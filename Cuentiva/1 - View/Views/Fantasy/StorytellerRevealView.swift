@@ -10,7 +10,6 @@ import SwiftUI
 struct StorytellerRevealView: View {
     @State private var model: StorytellerRevealViewModel
     @FocusState private var editingDetails: Bool
-    @State private var operation: Task<Void, Never>?
     @Environment(\.scenePhase) private var scenePhase
     @Environment(ThemeManager.self) private var theme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -34,7 +33,7 @@ struct StorytellerRevealView: View {
                         .accessibilityLabel("Your creature is waiting to be revealed")
                     Text("A little chance. A whole new character.").foregroundStyle(theme.theme.muted)
                     Button(model.busy ? "Finding your creature…" : "Choose my creature") {
-                        operation = Task { await model.choose() }
+                        model.chooseCreature()
                     }.buttonStyle(PrimaryButton()).disabled(model.busy || !model.ready)
                 } else {
                     if let creature = model.creature {
@@ -62,7 +61,7 @@ struct StorytellerRevealView: View {
                 }
                 if model.stage != .details && model.stage != .creature {
                     Button("Continue to the library for now") {
-                        operation = Task { if await model.finish() { onContinue() } }
+                        model.finishAndContinue()
                     }.font(.footnote).disabled(model.busy)
                 }
             }.multilineTextAlignment(.center).padding(26)
@@ -73,7 +72,7 @@ struct StorytellerRevealView: View {
                     if model.stage == .creature {
                         if model.canOfferIcon {
                             Button(model.changingIcon ? "Changing icon…" : "Use my storyteller as the app icon") {
-                                operation = Task { await model.chooseIconAndEdit() }
+                                model.selectIconAndEdit()
                             }.buttonStyle(PrimaryButton()).disabled(model.changingIcon || model.busy)
                             Button("Keep Pipa and continue") { model.editDetails() }
                                 .font(.footnote).disabled(model.changingIcon || model.busy)
@@ -83,10 +82,7 @@ struct StorytellerRevealView: View {
                     } else {
                         Button(model.busy ? "Saving…" : "Save my storyteller") {
                             editingDetails = false
-                            operation = Task {
-                                await model.saveDetails()
-                                if model.savedMessage != nil { onContinue() }
-                            }
+                            model.saveAndContinue()
                         }.buttonStyle(PrimaryButton()).disabled(!model.canSaveDetails)
                     }
                 }.padding(.horizontal, 26).padding(.vertical, 12)
@@ -112,6 +108,9 @@ struct StorytellerRevealView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await model.refreshAvailability() } }
         }
-        .onDisappear { operation?.cancel() }
+        .onChange(of: model.continueRequested) { _, requested in
+            if requested { onContinue() }
+        }
+        .onDisappear { model.cancelInteraction() }
     }
 }

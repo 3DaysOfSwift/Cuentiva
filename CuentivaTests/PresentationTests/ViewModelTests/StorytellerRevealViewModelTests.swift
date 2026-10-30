@@ -10,6 +10,39 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct StorytellerRevealViewModelTests {
+    @Test(.timeLimit(.minutes(1)), arguments: [false, true])
+    func saveOwnsCompletionAndDepartureSuppressesNavigation(depart: Bool) async throws {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let repository = HeldStorytellerSave(entered: entered.continuation, release: release.stream)
+        let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        try await feature.load()
+        _ = try await feature.drawCreature()
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        await model.prepare()
+        model.name = "Lirio"; model.biography = "A traveller beside the sea."
+        await repository.holdNextSave()
+        let first = model.saveAndContinue()
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        let duplicate = model.saveAndContinue()
+        #expect(model.busy)
+        #expect(!model.continueRequested)
+        if depart { model.cancelInteraction() }
+        release.continuation.finish()
+        await first.value
+        await duplicate.value
+        #expect(!model.busy)
+        #expect(feature.profile?.identity?.name == "Lirio")
+        #expect(await repository.heldSaveCount == 1)
+        #expect(model.continueRequested == !depart)
+        model.name = "Otro"
+        await model.saveAndContinue().value
+        #expect(model.continueRequested)
+        #expect(feature.profile?.identity?.name == "Otro")
+    }
+
     @Test func savedBioReturnsToEditableForm() async throws {
         let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
         try await feature.load(); _ = try await feature.drawCreature()
@@ -96,4 +129,27 @@ import Testing
         #expect(changes == 0)
     }
 
+}
+
+private actor HeldStorytellerSave: FantasyRepository {
+    private var archive = FantasyArchive()
+    private var shouldHold = false
+    private(set) var heldSaveCount = 0
+    let entered: AsyncStream<Void>.Continuation
+    let release: AsyncStream<Void>
+    init(entered: AsyncStream<Void>.Continuation, release: AsyncStream<Void>) {
+        self.entered = entered; self.release = release
+    }
+    func holdNextSave() { shouldHold = true }
+    func load() -> FantasyArchive { archive }
+    func save(_ value: FantasyArchive) async {
+        if shouldHold {
+            shouldHold = false
+            heldSaveCount += 1
+            entered.yield(())
+            for await _ in release { break }
+        }
+        // Simulate a storage commit that completes despite caller cancellation.
+        archive = value
+    }
 }

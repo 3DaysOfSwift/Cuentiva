@@ -11,6 +11,40 @@ import UIKit
 
 @MainActor @Observable final class StorytellerRevealViewModel {
     enum Stage { case spinning, slowing, number, creature, details }
+    @ObservationIgnored private var interactionTask: Task<Void, Never>?
+    private(set) var continueRequested = false
+
+    @discardableResult func chooseCreature() -> Task<Void, Never> {
+        performInteraction { await self.choose() }
+    }
+    @discardableResult func selectIconAndEdit() -> Task<Void, Never> {
+        performInteraction { await self.chooseIconAndEdit() }
+    }
+    @discardableResult func saveAndContinue() -> Task<Void, Never> {
+        performInteraction {
+            await self.saveDetails()
+            if !Task.isCancelled, self.savedMessage != nil { self.continueRequested = true }
+        }
+    }
+    @discardableResult func finishAndContinue() -> Task<Void, Never> {
+        performInteraction {
+            let finished = await self.finish()
+            if !Task.isCancelled, finished { self.continueRequested = true }
+        }
+    }
+    func cancelInteraction() { interactionTask?.cancel() }
+
+    private func performInteraction(_ operation: @escaping @MainActor () async -> Void) -> Task<Void, Never> {
+        if let interactionTask { return interactionTask }
+        continueRequested = false
+        let task = Task {
+            defer { interactionTask = nil }
+            await operation()
+        }
+        interactionTask = task
+        return task
+    }
+
     private let feature: any FantasyFeature
     private let supportsIcons: @MainActor () -> Bool
     private let currentIcon: @MainActor () -> String?
