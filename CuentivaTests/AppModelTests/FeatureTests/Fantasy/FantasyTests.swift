@@ -14,6 +14,46 @@ import Testing
 #endif
 
 @Suite @MainActor struct FantasyTests {
+    @Test(.timeLimit(.minutes(1)), arguments: [false, true])
+    func generationExcludesEditsAndCancellationAllowsRetry(cancel: Bool) async throws {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let generator = HeldStoryGenerator(entered: entered.continuation, release: release.stream)
+        let repository = FantasyTestRepository()
+        let feature = FantasyManager(repository: repository, generator: generator, draw: { .turtle })
+        try await feature.load()
+        _ = try await feature.drawCreature()
+        try await feature.saveIdentity(name: "Lirio", biography: "A traveller beside the sea.")
+        let request = Task { try await feature.createStory(memory: "A day beside the sea.") }
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        do {
+            try await feature.saveIdentity(name: "Otro", biography: "A different traveller.")
+            Issue.record("An edit was accepted while story generation was pending")
+        } catch AppFailure.busy {
+            // The Feature owns admission across the generator suspension.
+        } catch {
+            Issue.record("Expected busy rejection, received: \(error)")
+        }
+        #expect(feature.profile?.identity?.name == "Lirio")
+        #expect(feature.stories.isEmpty)
+        if cancel { request.cancel() }
+        release.continuation.finish()
+        if cancel {
+            await #expect(throws: CancellationError.self) { _ = try await request.value }
+            #expect(feature.stories.isEmpty)
+            #expect(await repository.load().stories.isEmpty)
+            _ = try await feature.createStory(memory: "A second day beside the sea.")
+        } else {
+            _ = try await request.value
+        }
+        #expect(feature.stories.count == 1)
+        #expect(await repository.load().stories.map(\.id) == feature.stories.map(\.id))
+        try await feature.saveIdentity(name: "Otro", biography: "A different traveller.")
+        #expect(feature.profile?.identity?.name == "Otro")
+    }
+
     @Test func skippedIntroductionPersistsWithoutFakeIdentity() async throws {
         let repository = FantasyTestRepository()
         let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
@@ -60,5 +100,27 @@ import Testing
         await #expect(throws: (any Error).self) { try await feature.createIdentity(name: "Matt", biography: "A traveller") }
         #expect(feature.profile?.identity == nil)
         #expect(feature.profile?.creature != nil)
+    }
+}
+
+private actor HeldStoryGenerator: FantasyGenerator {
+    let entered: AsyncStream<Void>.Continuation
+    let release: AsyncStream<Void>
+    private var requests = 0
+    init(entered: AsyncStream<Void>.Continuation, release: AsyncStream<Void>) {
+        self.entered = entered
+        self.release = release
+    }
+    func identity(name: String, biography: String, creature: FantasyCreature) async throws -> FantasyIdentity {
+        try await FantasyTestGenerator().identity(name: name, biography: biography, creature: creature)
+    }
+    func story(memory: String, profile: FantasyProfile) async throws -> FantasyStory {
+        requests += 1
+        if requests == 1 {
+            entered.yield(())
+            for await _ in release { break }
+        }
+        // Deliberately return a late result even when the caller has cancelled.
+        return try await FantasyTestGenerator().story(memory: memory, profile: profile)
     }
 }
