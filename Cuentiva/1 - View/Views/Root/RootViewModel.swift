@@ -17,14 +17,25 @@ import Observation
     }
     private(set) var savingTip = false
     private(set) var tipError: String?
-    func continueLanguageTip() async {
-        guard hasAccess, !checkingAccess, !savingTip, let tip = languageTip else { return }
-        savingTip = true; tipError = nil
-        defer { savingTip = false }
-        do {
-            try await progress.acknowledgeLanguageTip(tip.id)
-            showingStoryteller = hasAccess && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
-        } catch { tipError = error.localizedDescription }
+    @ObservationIgnored private var tipTask: Task<Void, Never>?
+    @discardableResult
+    func continueLanguageTip() -> Task<Void, Never>? {
+        if let tipTask { return tipTask }
+        guard hasAccess, !checkingAccess, let tip = languageTip else { return nil }
+        savingTip = true
+        tipError = nil
+        let task = Task {
+            defer { savingTip = false; tipTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await progress.acknowledgeLanguageTip(tip.id)
+                showingStoryteller = hasAccess && !checkingAccess && checkedIntroduction && writingUnlocked && !fantasy.introductionSeen
+            } catch is CancellationError {
+                // A cancelled request before saving leaves the tip available.
+            } catch { tipError = error.localizedDescription }
+        }
+        tipTask = task
+        return task
     }
     private(set) var todayPresentation = LibraryPresentation()
     private let progress: any ProgressFeature

@@ -22,7 +22,7 @@ struct RootView: View {
                 }.id(welcome.day).transition(.opacity)
             } else if let tip = viewModel.languageTip, viewModel.ready, !viewModel.checkingAccess {
                 LanguageTipView(term: tip, busy: viewModel.savingTip, error: viewModel.tipError) {
-                    Task { await viewModel.continueLanguageTip() }
+                    viewModel.continueLanguageTip()
                 }.transition(.opacity)
             } else if viewModel.canShowContent {
                 if viewModel.hasAccess {

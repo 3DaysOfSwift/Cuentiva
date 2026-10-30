@@ -11,6 +11,57 @@ import Testing
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct RootViewModelTests {
     @Test(arguments: [false, true])
+    func languageTipWaitsForSaveAndSharesRepeatedRequests(fails: Bool) async throws {
+        let repository = HeldRootProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        let day = try #require(progress.dailyWelcome?.day)
+        try await progress.acknowledgeWelcome(day: day)
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let root = makeRoot(purchases, GatedLaunchLibrary(gated: false), progress)
+        let tip = try #require(root.languageTip?.id)
+        await repository.holdNextSave(fails: fails)
+        let first = try #require(root.continueLanguageTip())
+        let repeated = try #require(root.continueLanguageTip())
+        #expect(first == repeated)
+        await repository.waitForSave()
+        #expect(root.languageTip?.id == tip)
+        #expect(root.savingTip)
+        first.cancel() // An admitted write is allowed to finish.
+        await repository.release()
+        await first.value
+        #expect(!root.savingTip)
+        if fails {
+            #expect(root.languageTip?.id == tip)
+            #expect(root.tipError != nil)
+            await root.continueLanguageTip()?.value
+        }
+        #expect(root.languageTip == nil)
+        #expect(root.tipError == nil)
+        #expect(await repository.value.languageTips?.pending == nil)
+    }
+
+    @Test func languageTipCancelledBeforeDispatchDoesNotSave() async throws {
+        let repository = MemoryProgress()
+        let progress = ProgressManager(repository: repository)
+        try await progress.load()
+        try await progress.acknowledgeWelcome(day: try #require(progress.dailyWelcome?.day))
+        let purchases = TestPurchases()
+        purchases.hasAccess = true
+        let root = makeRoot(purchases, GatedLaunchLibrary(gated: false), progress)
+        let saves = await repository.saveAttempts
+        let task = try #require(root.continueLanguageTip())
+        task.cancel()
+        await task.value
+        #expect(await repository.saveAttempts == saves)
+        #expect(root.languageTip != nil)
+        #expect(root.tipError == nil)
+        await root.continueLanguageTip()?.value
+        #expect(root.languageTip == nil)
+    }
+
+    @Test(arguments: [false, true])
     func beginDaySharesPreparationAndCancelledResultDoesNotDismiss(cancel: Bool) async throws {
         let purchases = TestPurchases()
         purchases.hasAccess = true
@@ -106,10 +157,10 @@ import Testing
         purchases.hasAccess = true
         #expect(root.languageTip?.id == "noun")
         await repo.setFailure(true)
-        await root.continueLanguageTip()
+        await root.continueLanguageTip()?.value
         #expect(root.tipError != nil && root.languageTip?.id == "noun")
         await repo.setFailure(false)
-        await root.continueLanguageTip()
+        await root.continueLanguageTip()?.value
         #expect(root.tipError == nil && root.languageTip == nil)
     }
 
@@ -325,4 +376,32 @@ import Testing
     }
     func prepareDailyReads() async throws { dailyPreparations += 1 }
     func loadMoreDailyReads() async throws {}
+}
+
+
+private actor HeldRootProgress: ProgressRepository {
+    private(set) var value = LearnerProgress()
+    private var hold = false
+    private var fails = false
+    private var pending: CheckedContinuation<Void, Never>?
+    private var arrival: CheckedContinuation<Void, Never>?
+    func load() -> LearnerProgress { value }
+    func holdNextSave(fails: Bool) { hold = true; self.fails = fails }
+    func save(_ next: LearnerProgress) async throws {
+        if hold {
+            hold = false
+            await withCheckedContinuation { continuation in
+                pending = continuation
+                arrival?.resume()
+                arrival = nil
+            }
+            if fails { throw AppFailure.unavailable("Controlled save failure") }
+        }
+        value = next
+    }
+    func waitForSave() async {
+        if pending != nil { return }
+        await withCheckedContinuation { arrival = $0 }
+    }
+    func release() { pending?.resume(); pending = nil }
 }
