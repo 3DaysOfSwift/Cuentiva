@@ -10,6 +10,22 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct RootViewModelTests {
+    @Test func unpaidLaunchRetryClearsIntroductionFailure() async {
+        let purchases = TestPurchases()
+        let library = GatedLaunchLibrary(gated: false)
+        library.introductionFailure = .invalidBook
+        let root = makeRoot(purchases, library, ProgressManager(repository: MemoryProgress()))
+        await root.start()
+        #expect(root.error != nil)
+        #expect(!root.canShowContent)
+        library.introductionFailure = nil
+        await root.start()
+        #expect(root.error == nil)
+        #expect(root.onboardingReady)
+        #expect(root.canShowContent)
+        #expect(library.loads == 0)
+    }
+
     @Test func languageTipIsPaidOnlyAndContinueRetriesFailedSave() async throws {
         let repo = MemoryProgress()
         let progress = ProgressManager(repository: repo); try await progress.load()
@@ -207,7 +223,10 @@ import Testing
     var failure: AppFailure?
     private var gated: Bool
     init(gated: Bool = true) { self.gated = gated }
-    func loadIntroduction() async throws {}
+    var introductionFailure: AppFailure?
+    func loadIntroduction() async throws {
+        if let introductionFailure { throw introductionFailure }
+    }
     func load() async throws {
         loads += 1
         if let failure { throw failure }

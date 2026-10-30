@@ -62,6 +62,7 @@ import Observation
     func start() async {
         guard !starting else { return }
         starting = true
+        error = nil
         defer { starting = false }
         async let storage: Void = prepareProgress()
         async let onboarding: Void = loadIntroduction()
