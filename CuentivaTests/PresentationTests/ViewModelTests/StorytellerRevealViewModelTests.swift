@@ -11,6 +11,53 @@ import Testing
 
 @Suite @MainActor struct StorytellerRevealViewModelTests {
     @Test(.timeLimit(.minutes(1)))
+    func retryTaskIsSharedAndDepartureCancelsScreenPreparation() async {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let feature = FantasyManager(repository: HeldPreparationLoad(entered: entered.continuation, release: release.stream), generator: FantasyTestGenerator())
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        let first = model.retryPreparation()
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        let duplicate = model.retryPreparation()
+        #expect(first == duplicate)
+        model.cancelTasks()
+        #expect(first.isCancelled)
+        release.continuation.finish()
+        await first.value
+        await duplicate.value
+        #expect(!model.ready)
+        #expect(model.error == nil)
+        await model.retryPreparation().value
+        #expect(model.ready)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
+    func foregroundRefreshSharesTaskAndReleasesAfterDeparture() async {
+        let entered = AsyncStream<Void>.makeStream()
+        let release = AsyncStream<Void>.makeStream()
+        defer { entered.continuation.finish(); release.continuation.finish() }
+        let generator = HeldPreparationAvailability(entered: entered.continuation, release: release.stream)
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: generator)
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        let first = model.refreshAvailability()
+        var events = entered.stream.makeAsyncIterator()
+        _ = await events.next()
+        let duplicate = model.refreshAvailability()
+        #expect(first == duplicate)
+        model.cancelTasks()
+        #expect(first.isCancelled)
+        release.continuation.finish()
+        await first.value
+        await duplicate.value
+        let next = model.refreshAvailability()
+        #expect(next != first)
+        await next.value
+        #expect(!next.isCancelled)
+    }
+
+    @Test(.timeLimit(.minutes(1)))
     func latePreparationPreservesDraftFromCompletedPreparation() async throws {
         let entered = AsyncStream<Void>.makeStream()
         let release = AsyncStream<Void>.makeStream()
@@ -142,7 +189,7 @@ import Testing
         let duplicate = model.saveAndContinue()
         #expect(model.busy)
         #expect(!model.continueRequested)
-        if depart { model.cancelInteraction() }
+        if depart { model.cancelTasks() }
         release.continuation.finish()
         await first.value
         await duplicate.value

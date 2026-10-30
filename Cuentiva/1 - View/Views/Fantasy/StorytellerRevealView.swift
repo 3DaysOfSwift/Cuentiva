@@ -57,7 +57,7 @@ struct StorytellerRevealView: View {
                 if let message = model.iconMessage { Text(message).font(.footnote) }
                 InlineError(message: model.error)
                 if !model.ready, model.error != nil {
-                    Button("Retry loading my storyteller") { Task { await model.prepare() } }
+                    Button("Retry loading my storyteller") { model.retryPreparation() }
                 }
                 if model.stage != .details && model.stage != .creature {
                     Button("Continue to the library for now") {
@@ -106,11 +106,11 @@ struct StorytellerRevealView: View {
             if model.stage == .spinning, !reduceMotion { await model.animateNumbers() }
         }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await model.refreshAvailability() } }
+            if phase == .active { model.refreshAvailability() }
         }
         .onChange(of: model.continueRequested) { _, requested in
             if requested { onContinue() }
         }
-        .onDisappear { model.cancelInteraction() }
+        .onDisappear { model.cancelTasks() }
     }
 }

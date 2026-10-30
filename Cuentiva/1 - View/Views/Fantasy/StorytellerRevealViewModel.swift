@@ -12,6 +12,7 @@ import UIKit
 @MainActor @Observable final class StorytellerRevealViewModel {
     enum Stage { case spinning, slowing, number, creature, details }
     @ObservationIgnored private var interactionTask: Task<Void, Never>?
+    @ObservationIgnored private var availabilityTask: Task<Void, Never>?
     private(set) var continueRequested = false
 
     @discardableResult func chooseCreature() -> Task<Void, Never> {
@@ -32,7 +33,14 @@ import UIKit
             if !Task.isCancelled, finished { self.continueRequested = true }
         }
     }
-    func cancelInteraction() { interactionTask?.cancel() }
+    @discardableResult func retryPreparation() -> Task<Void, Never> {
+        performInteraction { await self.prepare() }
+    }
+
+    func cancelTasks() {
+        interactionTask?.cancel()
+        availabilityTask?.cancel()
+    }
 
     private func performInteraction(_ operation: @escaping @MainActor () async -> Void) -> Task<Void, Never> {
         if let interactionTask { return interactionTask }
@@ -101,7 +109,16 @@ import UIKit
     }
     var confettiStart: Date?
     var availabilityMessage: String? { feature.availabilityMessage }
-    func refreshAvailability() async { await feature.refreshAvailability() }
+    @discardableResult func refreshAvailability() -> Task<Void, Never> {
+        if let availabilityTask { return availabilityTask }
+        let task = Task {
+            defer { availabilityTask = nil }
+            guard !Task.isCancelled else { return }
+            await feature.refreshAvailability()
+        }
+        availabilityTask = task
+        return task
+    }
     func finish() async -> Bool {
         do { try await feature.finishIntroduction(); return true }
         catch { self.error = error.localizedDescription; return false }
