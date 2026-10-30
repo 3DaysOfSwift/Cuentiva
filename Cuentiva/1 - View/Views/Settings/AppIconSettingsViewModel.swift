@@ -8,7 +8,8 @@ import UIKit
     private let supportsIcons: @MainActor () -> Bool
     private let currentIcon: @MainActor () -> String?
     private let changeIcon: @MainActor (String?) async throws -> Void
-    var changingIcon = false
+    @ObservationIgnored private var iconTask: Task<Void, Never>?
+    private(set) var changingIcon = false
     var selectedIcon: String?
     private var loadMessage: String?
     private var changeMessage: String?
@@ -17,24 +18,37 @@ import UIKit
     var canOfferIcon: Bool { creature != nil && supportsIcons() }
     var usesStorytellerIcon: Bool { creature != nil && selectedIcon == creature?.appIconName }
 
-    func useStorytellerIcon() async {
-        guard let creature, canOfferIcon else { return }
-        await setIcon(creature.appIconName)
+    @discardableResult
+    func useStorytellerIcon() -> Task<Void, Never>? {
+        guard let creature, canOfferIcon else { return nil }
+        return setIcon(creature.appIconName)
     }
 
-    func restorePipaIcon() async { await setIcon(nil) }
+    @discardableResult
+    func restorePipaIcon() -> Task<Void, Never>? { setIcon(nil) }
 
-    private func setIcon(_ name: String?) async {
-        guard supportsIcons(), !changingIcon, currentIcon() != name else { return }
-        changingIcon = true; changeMessage = nil
-        defer { changingIcon = false }
-        do {
-            try await changeIcon(name)
-            selectedIcon = currentIcon()
-            changeMessage = name == nil ? "Pipa is back on your Home Screen." : "Your storyteller now welcomes you from your Home Screen."
-        } catch {
-            changeMessage = "Your app icon couldn’t be changed. Please try again."
+    private func setIcon(_ name: String?) -> Task<Void, Never>? {
+        // The controls admit one system change at a time. Once dispatched,
+        // observe its outcome even if the presenting screen disappears.
+        if let iconTask { return iconTask }
+        guard supportsIcons(), currentIcon() != name else { return nil }
+        changingIcon = true
+        changeMessage = nil
+        let task = Task {
+            defer { changingIcon = false; iconTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await changeIcon(name)
+                selectedIcon = currentIcon()
+                changeMessage = name == nil ? "Pipa is back on your Home Screen." : "Your storyteller now welcomes you from your Home Screen."
+            } catch is CancellationError {
+                // Cancellation before dispatch is not an icon-change failure.
+            } catch {
+                changeMessage = "Your app icon couldn’t be changed. Please try again."
+            }
         }
+        iconTask = task
+        return task
     }
     var creature: FantasyCreature? { feature.profile?.creature }
     var identity: FantasyIdentity? { feature.profile?.identity }

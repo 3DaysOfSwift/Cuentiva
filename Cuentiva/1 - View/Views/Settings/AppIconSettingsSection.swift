@@ -6,7 +6,7 @@ struct AppIconSettingsSection: View {
     @Environment(\.scenePhase) private var scenePhase
     var body: some View {
         Section {
-            Button { Task { await model.restorePipaIcon() } } label: {
+            Button { model.restorePipaIcon() } label: {
                 HStack(spacing: 16) {
                     Image("OriginalAppIconPreview").resizable().scaledToFit()
                         .frame(width: 60, height: 60).clipShape(RoundedRectangle(cornerRadius: 14))
@@ -18,7 +18,7 @@ struct AppIconSettingsSection: View {
                     if model.selectedIcon == nil { Image(systemName: "checkmark.circle.fill").foregroundStyle(theme.theme.accent) }
                 }.padding(.vertical, 6)
             }.buttonStyle(.plain).disabled(model.changingIcon)
-            Button { Task { await model.useStorytellerIcon() } } label: {
+            Button { model.useStorytellerIcon() } label: {
                 HStack(spacing: 16) {
                     if let creature = model.creature {
                         Image(creature.portrait).resizable().scaledToFill()
@@ -39,9 +39,8 @@ struct AppIconSettingsSection: View {
         } header: { Text("App icon") }
         footer: { Text("Choose how Cuentiva appears on your Home Screen. You can change it back whenever you like.") }
         .listRowBackground(theme.theme.surface)
-        .task { await model.prepare() }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await model.prepare() } }
+        .task(id: scenePhase) {
+            if scenePhase == .active { await model.prepare() }
         }
     }
 }

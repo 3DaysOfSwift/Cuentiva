@@ -3,6 +3,51 @@ import Testing
 @testable import Cuentiva
 
 @Suite(.timeLimit(.minutes(1))) @MainActor struct AppIconSettingsViewModelTests {
+    @Test func cancellationBeforeIconDispatchAllowsRetry() async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
+        var icon: String? = "Storyteller"
+        var calls = 0
+        let model = AppIconSettingsViewModel(feature: feature, supportsIcons: { true },
+                                            currentIcon: { icon }, changeIcon: { icon = $0; calls += 1 })
+        let task = try #require(model.restorePipaIcon())
+        task.cancel()
+        await task.value
+        #expect(calls == 0)
+        #expect(!model.changingIcon)
+        #expect(model.iconMessage == nil)
+        await model.restorePipaIcon()?.value
+        #expect(calls == 1)
+        #expect(model.selectedIcon == nil)
+    }
+
+    @Test(arguments: [false, true])
+    func iconChangesSharePendingWorkAndRetryFailure(fails: Bool) async throws {
+        let feature = FantasyManager(repository: FantasyTestRepository(), generator: FantasyTestGenerator())
+        let system = HeldIconChange(fails: fails)
+        let model = AppIconSettingsViewModel(feature: feature, supportsIcons: { true },
+                                            currentIcon: { system.icon }, changeIcon: { try await system.change($0) })
+        let first = try #require(model.restorePipaIcon())
+        let repeated = try #require(model.restorePipaIcon())
+        #expect(first == repeated)
+        await system.waitForChange()
+        #expect(system.calls == 1)
+        #expect(model.changingIcon)
+        first.cancel()
+        system.release()
+        await first.value
+        #expect(!model.changingIcon)
+        if fails {
+            #expect(system.icon == "Storyteller")
+            #expect(model.iconMessage == "Your app icon couldn’t be changed. Please try again.")
+            system.fails = false
+            await model.restorePipaIcon()?.value
+            #expect(system.calls == 2)
+        }
+        #expect(system.icon == nil)
+        #expect(model.selectedIcon == nil)
+        #expect(model.iconMessage == "Pipa is back on your Home Screen.")
+    }
+
     @Test(arguments: [false, true])
     func cancelledPreparationIgnoresLateOutcomeAndAllowsRetry(fails: Bool) async {
         let repository = HeldIconProfileRepository(fails: fails)
@@ -39,7 +84,7 @@ import Testing
         var icon: String? = "Storyteller"
         let model = AppIconSettingsViewModel(feature: feature, supportsIcons: { true },
                                             currentIcon: { icon }, changeIcon: { icon = $0 })
-        await model.restorePipaIcon()
+        await model.restorePipaIcon()?.value
         let confirmation = model.iconMessage
         #expect(confirmation != nil)
         await model.prepare()
@@ -52,7 +97,7 @@ import Testing
         var icon: String? = "Storyteller"
         let model = AppIconSettingsViewModel(feature: feature, supportsIcons: { true }, currentIcon: { icon }, changeIcon: { icon = $0 })
         await model.prepare()
-        await model.restorePipaIcon()
+        await model.restorePipaIcon()?.value
         #expect(model.selectedIcon == nil)
         #expect(model.iconMessage != nil)
         #expect(!model.changingIcon)
@@ -97,4 +142,34 @@ private actor HeldIconProfileRepository: FantasyRepository {
         pending = nil
     }
     func save(_ archive: FantasyArchive) async throws {}
+}
+
+
+@MainActor private final class HeldIconChange {
+    var icon: String? = "Storyteller"
+    var fails: Bool
+    private(set) var calls = 0
+    private var pending: CheckedContinuation<Void, Never>?
+    private var arrival: CheckedContinuation<Void, Never>?
+    init(fails: Bool) { self.fails = fails }
+    func change(_ name: String?) async throws {
+        calls += 1
+        if calls == 1 {
+            await withCheckedContinuation { continuation in
+                pending = continuation
+                arrival?.resume()
+                arrival = nil
+            }
+        }
+        if fails { throw AppFailure.unavailable("Controlled system failure") }
+        icon = name
+    }
+    func waitForChange() async {
+        if pending != nil { return }
+        await withCheckedContinuation { arrival = $0 }
+    }
+    func release() {
+        pending?.resume()
+        pending = nil
+    }
 }
