@@ -120,6 +120,7 @@ import UIKit
     }
 
     func prepare() async {
+        error = nil
         selectedIcon = currentIcon()
         do {
             try await feature.load()

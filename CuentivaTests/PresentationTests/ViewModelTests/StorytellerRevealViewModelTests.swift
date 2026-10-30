@@ -10,6 +10,20 @@ import Testing
 @testable import Cuentiva
 
 @Suite @MainActor struct StorytellerRevealViewModelTests {
+    @Test func successfulPreparationRetryClearsLoadingError() async {
+        let repository = RetryStorytellerLoad()
+        let feature = FantasyManager(repository: repository, generator: FantasyTestGenerator())
+        let model = StorytellerRevealViewModel(feature: feature, supportsIcons: { false }, currentIcon: { nil })
+        await model.prepare()
+        #expect(!model.ready)
+        #expect(model.error != nil)
+        await model.prepare()
+        #expect(model.ready)
+        #expect(model.error == nil)
+        #expect(model.stage == .spinning)
+        #expect(await repository.loadCount == 2)
+    }
+
     @Test(.timeLimit(.minutes(1)))
     func rejectedSavePreservesDraftAndRetryContinues() async throws {
         let entered = AsyncStream<Void>.makeStream()
@@ -190,4 +204,14 @@ private actor HeldStorytellerSave: FantasyRepository {
         // Simulate a storage commit that completes despite caller cancellation.
         archive = value
     }
+}
+
+private actor RetryStorytellerLoad: FantasyRepository {
+    private(set) var loadCount = 0
+    func load() throws -> FantasyArchive {
+        loadCount += 1
+        if loadCount == 1 { throw AppFailure.unavailable("Read unavailable") }
+        return FantasyArchive()
+    }
+    func save(_ value: FantasyArchive) {}
 }
