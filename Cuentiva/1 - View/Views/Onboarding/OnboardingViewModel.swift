@@ -17,6 +17,7 @@ import Observation
     var canStartReading: Bool { progressReady && book != nil && !completed }
     var lesson: Book?
     var error: String?
+    @ObservationIgnored private var restoreTask: Task<Void, Never>?
     var book: Book? { library.introduction }
     var completed: Bool { progressReady && progress.snapshot.completed.contains("cafe") }
     init(library: any LibraryFeature = AppModel.shared.library, progress: any ProgressFeature = AppModel.shared.progress, purchases: any PurchaseFeature = AppModel.shared.purchases) { self.library = library; self.progress = progress; self.purchases = purchases }
@@ -36,5 +37,23 @@ import Observation
         guard canStartReading else { return }
         lesson = book
     }
-    func restore() async { do { try await purchases.restore() } catch { self.error = error.localizedDescription } }
+    /// A restore already admitted by this screen can finish after departure.
+    @discardableResult
+    func restore() -> Task<Void, Never> {
+        if let restoreTask { return restoreTask }
+        error = nil
+        let task = Task {
+            defer { restoreTask = nil }
+            do {
+                try Task.checkCancellation()
+                try await purchases.restore()
+            } catch is CancellationError {
+                // Cancellation before dispatch is not a restore failure.
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+        restoreTask = task
+        return task
+    }
 }

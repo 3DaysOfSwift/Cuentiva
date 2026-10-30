@@ -37,7 +37,7 @@ struct OnboardingView: View {
                                 BookDetailsView(book: book)
                             }
                             Text("One complete book, free. Counts towards today’s 3 recommended books.").font(.footnote).frame(maxWidth: .infinity).multilineTextAlignment(.center)
-                            Button("Already a member? Restore purchases") { Task { await viewModel.restore() } }.font(.footnote).frame(maxWidth: .infinity)
+                            Button("Already a member? Restore purchases") { viewModel.restore() }.font(.footnote).frame(maxWidth: .infinity)
                             InlineError(message: viewModel.error)
                         }.padding(26)
                     }
