@@ -10,7 +10,10 @@ import UIKit
     private let changeIcon: @MainActor (String?) async throws -> Void
     var changingIcon = false
     var selectedIcon: String?
-    var iconMessage: String?
+    private var loadMessage: String?
+    private var changeMessage: String?
+    var iconMessage: String? { changeMessage ?? loadMessage }
+    private var preparing = false
     var canOfferIcon: Bool { creature != nil && supportsIcons() }
     var usesStorytellerIcon: Bool { creature != nil && selectedIcon == creature?.appIconName }
 
@@ -23,14 +26,14 @@ import UIKit
 
     private func setIcon(_ name: String?) async {
         guard supportsIcons(), !changingIcon, currentIcon() != name else { return }
-        changingIcon = true; iconMessage = nil
+        changingIcon = true; changeMessage = nil
         defer { changingIcon = false }
         do {
             try await changeIcon(name)
             selectedIcon = currentIcon()
-            iconMessage = name == nil ? "Pipa is back on your Home Screen." : "Your storyteller now welcomes you from your Home Screen."
+            changeMessage = name == nil ? "Pipa is back on your Home Screen." : "Your storyteller now welcomes you from your Home Screen."
         } catch {
-            iconMessage = "Your app icon couldn’t be changed. Please try again."
+            changeMessage = "Your app icon couldn’t be changed. Please try again."
         }
     }
     var creature: FantasyCreature? { feature.profile?.creature }
@@ -46,8 +49,15 @@ import UIKit
     }
 
     func prepare() async {
+        guard !preparing, !Task.isCancelled else { return }
+        preparing = true
+        loadMessage = nil
         selectedIcon = currentIcon()
+        defer { preparing = false }
         do { try await feature.load() }
-        catch { iconMessage = "Your storyteller couldn’t be loaded. Please try again." }
+        catch {
+            guard !Task.isCancelled else { return }
+            loadMessage = "Your storyteller couldn’t be loaded. Please try again."
+        }
     }
 }
